@@ -21,6 +21,7 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
           supabase_path = Path('js/supabase-config.js')
           text = supabase_path.read_text()
@@ -79,36 +80,44 @@ jobs:
             raise SystemExit('adminSignIn marker not found; refusing unsafe patch')
           admin = admin.replace(marker, helper, 1)
 
-          old_signin = """      }=await supabaseClient.auth.signInWithPassword({
-                email:String(email||'').trim(),
-                password:String(password||'')
-              });"""
-          new_signin = """      }=await withAdminAuthTimeout(
-                supabaseClient.auth.signInWithPassword({
-                  email:String(email||'').trim(),
-                  password:String(password||'')
-                }),
-                12000
-              );"""
-          if old_signin not in admin:
-            raise SystemExit('signInWithPassword block not found; refusing unsafe patch')
-          admin = admin.replace(old_signin, new_signin, 1)
+          signin_pattern = re.compile(
+            r"\}=await\s+supabaseClient\.auth\.signInWithPassword\(\{\s*"
+            r"email:String\(email\|\|''\)\.trim\(\),\s*"
+            r"password:String\(password\|\|''\)\s*"
+            r"\}\);"
+          )
+          signin_replacement = """}=await withAdminAuthTimeout(
+        supabaseClient.auth.signInWithPassword({
+          email:String(email||'').trim(),
+          password:String(password||'')
+        }),
+        12000
+      );"""
+          admin, signin_count = signin_pattern.subn(signin_replacement, admin, count=1)
+          if signin_count != 1:
+            raise SystemExit(f'signInWithPassword patch count={signin_count}; refusing unsafe patch')
 
-          old_error = """      if(/invalid login credentials/i.test(message)){
-                message='البريد الإلكتروني أو كلمة المرور غير صحيحة.';"""
-          new_error = """      if(/AUTH_TIMEOUT/i.test(message)){
-                message='تأخر الاتصال بخدمة تسجيل الدخول. تحقق من الإنترنت ثم حاول مرة أخرى.';
-              }else if(/invalid login credentials/i.test(message)){
-                message='البريد الإلكتروني أو كلمة المرور غير صحيحة.';"""
-          if old_error not in admin:
-            raise SystemExit('login error mapping not found; refusing unsafe patch')
-          admin = admin.replace(old_error, new_error, 1)
+          error_pattern = re.compile(
+            r"if\(/invalid login credentials/i\.test\(message\)\)\{\s*"
+            r"message='البريد الإلكتروني أو كلمة المرور غير صحيحة\.';"
+          )
+          error_replacement = """if(/AUTH_TIMEOUT/i.test(message)){
+        message='تأخر الاتصال بخدمة تسجيل الدخول. تحقق من الإنترنت ثم حاول مرة أخرى.';
+      }else if(/invalid login credentials/i.test(message)){
+        message='البريد الإلكتروني أو كلمة المرور غير صحيحة.';"""
+          admin, error_count = error_pattern.subn(error_replacement, admin, count=1)
+          if error_count != 1:
+            raise SystemExit(f'login error mapping patch count={error_count}; refusing unsafe patch')
 
-          admin = admin.replace('js/supabase-config.js?v=2.2', 'js/supabase-config.js?v=2.5')
+          if 'js/supabase-config.js?v=2.2' not in admin:
+            raise SystemExit('Supabase script cache marker not found; refusing unsafe patch')
+          admin = admin.replace('js/supabase-config.js?v=2.2', 'js/supabase-config.js?v=2.5', 1)
           admin_path.write_text(admin)
 
           sw_path = Path('sw.js')
           sw = sw_path.read_text()
+          if 'restbr-pasha-baby-v1' not in sw:
+            raise SystemExit('Service worker cache marker not found; refusing unsafe patch')
           sw = sw.replace('restbr-pasha-baby-v1', 'restbr-pasha-baby-v2', 1)
           sw = sw.replace('./js/supabase-config.js?v=2.4', './js/supabase-config.js?v=2.5', 1)
           sw_path.write_text(sw)
@@ -121,6 +130,7 @@ jobs:
           grep -q "supabase-config.js?v=2.5" admin.html
           grep -q "restbr-pasha-baby-v2" sw.js
           git diff --check
+          git diff --stat
 
       - name: Commit fix
         run: |
