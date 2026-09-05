@@ -131,3 +131,14 @@ window.RESTBR_CONFIG = Object.freeze({
   script.defer = true;
   document.head.appendChild(script);
 })();
+
+// Shared security/reliability layer. It is intentionally loaded from the
+// per-client runtime config so both storefront and admin receive the guard.
+(() => {
+  if (document.getElementById('restbrHardeningScript')) return;
+  const script = document.createElement('script');
+  script.id = 'restbrHardeningScript';
+  script.src = 'js/restbr-hardening.js?v=1.0';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
