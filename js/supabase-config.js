@@ -320,9 +320,9 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only simple percentage discount manager.
+// Admin-only restaurant-mode percentage discount manager.
 (() => {
-  if (!RESTBR_IS_ADMIN_PATH) return;
+  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
   if (document.getElementById('restbrAdminDiscountsScript')) return;
 
   const script = document.createElement('script');
