@@ -24,7 +24,7 @@ function walk(dir, predicate = () => true) {
 }
 
 function checkLocalRef(ref, source) {
-  if (!ref || isExternal(ref)) return;
+  if (!ref || isExternal(ref) || ref.includes('${') || ref.includes('{{')) return;
   const clean = stripQuery(ref).replace(/^\.\//, '');
   if (!clean || clean.startsWith('../')) return;
   if (!exists(clean)) fail(`${source}: missing local asset ${ref}`);
@@ -68,7 +68,7 @@ for (const file of walk('css', file => file.endsWith('.css'))) {
   const base = path.posix.dirname(file);
   for (const match of css.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/gi)) {
     const ref = match[1].trim();
-    if (!ref || isExternal(ref)) continue;
+    if (!ref || isExternal(ref) || ref.includes('${') || ref.includes('{{')) continue;
     const clean = stripQuery(ref);
     const resolved = path.posix.normalize(path.posix.join(base, clean));
     if (!resolved.startsWith('..') && !exists(resolved)) fail(`${file}: missing CSS asset ${ref}`);
