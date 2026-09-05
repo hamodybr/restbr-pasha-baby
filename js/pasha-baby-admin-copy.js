@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_BABY_ADMIN_COPY_V1__) return;
-  window.__PASHA_BABY_ADMIN_COPY_V1__ = true;
+  if (window.__PASHA_BABY_ADMIN_COPY_V2__) return;
+  window.__PASHA_BABY_ADMIN_COPY_V2__ = true;
 
   const EXACT = new Map([
     ['إعدادات المطعم', 'إعدادات المحل'],
@@ -119,9 +119,8 @@
     });
   }
 
-  function scan(root = document.body) {
+  function scan(root) {
     if (!root) return;
-
     if (root instanceof Element) translateAttributes(root);
 
     const walker = document.createTreeWalker(
@@ -136,46 +135,46 @@
     }
   }
 
-  let queued = false;
-  function scheduleScan() {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(() => {
-      queued = false;
-      scan(document.body);
-    });
+  function activeScope() {
+    return document.querySelector('.admin-view.active') || document.body;
   }
 
-  const observer = new MutationObserver(records => {
-    for (const record of records) {
-      if (record.type === 'characterData') {
-        translateTextNode(record.target);
-        continue;
-      }
-
-      if (record.type === 'attributes') {
-        translateAttributes(record.target);
-        continue;
-      }
-
-      record.addedNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) translateTextNode(node);
-        else if (node instanceof Element) scan(node);
+  let frame = 0;
+  function scheduleScopeScan(delay = 0) {
+    const run = () => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        scan(activeScope());
+        scan(document.querySelector('.admin-header'));
+        scan(document.querySelector('.bottom-nav'));
       });
-    }
-    scheduleScan();
-  });
+    };
+    if (delay > 0) setTimeout(run, delay);
+    else run();
+  }
 
   function start() {
+    // One initial pass only. No permanent MutationObserver and no recurring
+    // whole-document scans: those caused severe jank on iPhone/Safari.
     scan(document.body);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-      attributes: true,
-      attributeFilter: ['placeholder', 'title', 'aria-label']
+
+    document.addEventListener('restbr:admin-language-change', () => {
+      scheduleScopeScan();
+      scheduleScopeScan(80);
     });
-    [150, 500, 1200, 2500, 5000].forEach(delay => setTimeout(scheduleScan, delay));
+
+    document.addEventListener('click', event => {
+      if (event.target.closest('[data-admin-nav],[data-go-view]')) {
+        scheduleScopeScan();
+        scheduleScopeScan(90);
+        return;
+      }
+
+      if (event.target.closest('button,summary')) {
+        scheduleScopeScan(60);
+      }
+    }, { passive: true });
   }
 
   if (document.readyState === 'loading') {
