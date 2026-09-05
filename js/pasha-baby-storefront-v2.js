@@ -7,8 +7,6 @@
       eyebrow: 'كل احتياجات طفلك بمكان واحد',
       title: 'اختار القسم اللي تحتاجه',
       sub: 'أقسام واضحة، أسعار مباشرة، وطلب سهل.',
-      categories: 'الأقسام',
-      hint: 'اضغط على القسم',
       search: 'ابحث عن منتج',
       searchHint: 'اكتب الاسم أو النوع'
     },
@@ -16,8 +14,6 @@
       eyebrow: 'هەمی پێداویستیێن زاروکی تە ل شوینەکی',
       title: 'پۆلا کو پێدڤی تەیە هەلبژێرە',
       sub: 'پۆلێن ئاشکرا، نرخێن دیار و داواکاریەکا ساناهی.',
-      categories: 'پۆل',
-      hint: 'لسەر پۆلێ کلیک بکە',
       search: 'ل بەرهەمەکی بگەڕێ',
       searchHint: 'ناڤ یان جۆر بنڤیسە'
     },
@@ -25,8 +21,6 @@
       eyebrow: 'Everything your baby needs in one place',
       title: 'Choose what you need',
       sub: 'Clear categories, simple prices, easy ordering.',
-      categories: 'Categories',
-      hint: 'Tap a category',
       search: 'Search products',
       searchHint: 'Type a name or product type'
     }
@@ -40,22 +34,6 @@
       'ar'
     ).toLowerCase();
     return ['ar','ku','en'].includes(value) ? value : 'ar';
-  }
-
-  function iconFor(value) {
-    const text = String(value || '').toLowerCase();
-    if (/حفاض|پەمپ|diaper|wipe|مناديل|دەستمال/.test(text)) return '🧷';
-    if (/رضاع|حليب|bottle|feed|pacifier|لهاية|شیردان|پستانک/.test(text)) return '🍼';
-    if (/عناي|كريم|شامبو|care|cream|shampoo|چاڤدێر/.test(text)) return '🧴';
-    if (/استحم|حمام|منشف|bath|towel|خۆشوشتن/.test(text)) return '🛁';
-    if (/ملابس|لباس|قطن|clothes|clothing|جل|بەرگ/.test(text)) return '👕';
-    if (/نوم|بطاني|سرير|sleep|blanket|bed|نڤستن/.test(text)) return '🌙';
-    if (/لعب|العاب|ألعاب|toy|game|یاری/.test(text)) return '🧸';
-    if (/عربات|عربة|كرسي|stroller|seat|carriage|عەرەبان/.test(text)) return '🚼';
-    if (/حقيبة|شنط|bag|سفر/.test(text)) return '🎒';
-    if (/سلامة|حماية|safety|protect/.test(text)) return '🛡️';
-    if (/غذاء|طعام|food|meal/.test(text)) return '🥣';
-    return '✨';
   }
 
   function ensureHero() {
@@ -96,6 +74,9 @@
       });
     }
 
+    // Remove the retired duplicate category grid from older cached builds.
+    document.getElementById('pbCategoryPanelV2')?.remove();
+
     const copy = COPY[lang()];
     hero.querySelector('.pb-store-eyebrow').textContent = copy.eyebrow;
     hero.querySelector('h2').textContent = copy.title;
@@ -103,70 +84,6 @@
     hero.querySelector('.pb-search-label').textContent = copy.search;
     hero.querySelector('.pb-search-hint').textContent = copy.searchHint;
     return hero;
-  }
-
-  function ensureCategoryPanel() {
-    const hero = ensureHero();
-    if (!hero) return null;
-
-    let panel = document.getElementById('pbCategoryPanelV2');
-    if (!panel) {
-      panel = document.createElement('section');
-      panel.id = 'pbCategoryPanelV2';
-      panel.className = 'pb-category-panel';
-      panel.innerHTML = `
-        <div class="pb-category-head">
-          <h2></h2>
-          <span></span>
-        </div>
-        <div class="pb-category-grid"></div>
-      `;
-      hero.insertAdjacentElement('afterend', panel);
-    }
-
-    const copy = COPY[lang()];
-    panel.querySelector('.pb-category-head h2').textContent = copy.categories;
-    panel.querySelector('.pb-category-head span').textContent = copy.hint;
-    return panel;
-  }
-
-  function syncCategoryGrid() {
-    const panel = ensureCategoryPanel();
-    if (!panel) return;
-    const grid = panel.querySelector('.pb-category-grid');
-    if (!grid) return;
-
-    const sourceButtons = [...document.querySelectorAll('#smCats .sm-cat')];
-    if (!sourceButtons.length) return;
-
-    const signature = sourceButtons.map(button => String(button.textContent || '').trim()).join('|');
-    if (grid.dataset.signature === signature) return;
-    grid.dataset.signature = signature;
-    grid.replaceChildren();
-
-    sourceButtons.forEach((source, index) => {
-      const label = String(source.textContent || '').trim();
-      if (!label) return;
-
-      const tile = document.createElement('button');
-      tile.type = 'button';
-      tile.className = 'pb-category-tile';
-      tile.dataset.categoryIndex = String(index);
-      tile.innerHTML = `
-        <span class="pb-category-icon" aria-hidden="true">${iconFor(label)}</span>
-        <span class="pb-category-label"></span>
-      `;
-      tile.querySelector('.pb-category-label').textContent = label;
-      tile.setAttribute('aria-label', label);
-      tile.addEventListener('click', () => {
-        source.click();
-        setTimeout(() => {
-          const active = document.querySelector('#smMenu .sm-section:not([hidden])');
-          (active || document.getElementById('smMenu'))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 60);
-      });
-      grid.appendChild(tile);
-    });
   }
 
   function removeRestaurantGate() {
@@ -178,17 +95,7 @@
   function sync() {
     removeRestaurantGate();
     ensureHero();
-    syncCategoryGrid();
-  }
-
-  let queued = false;
-  function schedule() {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(() => {
-      queued = false;
-      sync();
-    });
+    document.getElementById('pbCategoryPanelV2')?.remove();
   }
 
   function start() {
@@ -205,12 +112,6 @@
       sync();
       setTimeout(sync, 120);
     });
-
-    const cats = document.getElementById('smCats');
-    if (cats) {
-      const observer = new MutationObserver(schedule);
-      observer.observe(cats, { childList:true, subtree:true, characterData:true });
-    }
 
     [120,350,800,1600].forEach(delay => setTimeout(sync, delay));
   }
