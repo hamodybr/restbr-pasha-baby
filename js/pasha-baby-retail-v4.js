@@ -11,6 +11,92 @@
     const style = document.createElement('style');
     style.id = 'pbRetailV5RuntimeStyles';
     style.textContent = `
+      /* Shorash-style identity stack: logo, store name, subtitle. */
+      .sm-header{
+        padding-top:18px!important;
+      }
+      #pbBrand.pb-brand{
+        width:100%!important;
+        max-width:none!important;
+        margin:0 auto 12px!important;
+        padding:4px 14px 8px!important;
+        display:flex!important;
+        flex-direction:column!important;
+        align-items:center!important;
+        justify-content:center!important;
+        gap:0!important;
+        text-align:center!important;
+        border:0!important;
+        border-radius:0!important;
+        background:transparent!important;
+        background-image:none!important;
+        box-shadow:none!important;
+      }
+      #pbBrand .pb-brand-mark{
+        grid-row:auto!important;
+        grid-column:auto!important;
+        width:118px!important;
+        height:118px!important;
+        margin:0 auto 8px!important;
+        padding:0!important;
+        border:0!important;
+        border-radius:0!important;
+        background:transparent!important;
+        background-image:none!important;
+        box-shadow:none!important;
+        overflow:visible!important;
+      }
+      #pbBrand .pb-brand-mark.has-store-logo,
+      #pbBrand .pb-brand-mark.has-store-logo:hover{
+        background:transparent!important;
+        border:0!important;
+        box-shadow:none!important;
+      }
+      #pbBrand .pb-brand-mark.has-store-logo::before,
+      #pbBrand .pb-brand-mark.has-store-logo::after,
+      #pbBrand .pb-brand-mark.has-store-logo small{
+        display:none!important;
+        content:none!important;
+      }
+      #pbBrand .pb-brand-logo{
+        width:100%!important;
+        height:100%!important;
+        max-width:118px!important;
+        max-height:118px!important;
+        padding:0!important;
+        margin:0 auto!important;
+        object-fit:contain!important;
+        object-position:center!important;
+        border:0!important;
+        border-radius:0!important;
+        background:transparent!important;
+        box-shadow:none!important;
+      }
+      #pbBrand .pb-brand-name{
+        grid-column:auto!important;
+        width:100%!important;
+        margin:0!important;
+        padding:0!important;
+        color:#243137!important;
+        font-size:28px!important;
+        line-height:1.15!important;
+        font-weight:950!important;
+        letter-spacing:-.45px!important;
+        text-align:center!important;
+      }
+      #pbBrand .pb-brand-tagline{
+        grid-column:auto!important;
+        width:100%!important;
+        max-width:330px!important;
+        margin:6px auto 0!important;
+        padding:0!important;
+        color:#6d7b80!important;
+        font-size:12.5px!important;
+        line-height:1.55!important;
+        font-weight:720!important;
+        text-align:center!important;
+      }
+
       #smMenu .sm-img.pb-placeholder .sm-product-image,
       #smMenu .sm-product-image[data-pb-placeholder="1"]{
         opacity:1!important;
@@ -143,9 +229,6 @@
     removeDuplicateCategoryPanel();
     markPlaceholders();
     decorateProductCards();
-    // Important: never auto-center the active category during a render/mutation.
-    // On iOS Safari repeated scrollIntoView calls can chain momentum and push
-    // the horizontal rail all the way to the last category.
   }
 
   let queued = false;
@@ -175,8 +258,6 @@
     event.stopImmediatePropagation();
   }, true);
 
-  // Only a deliberate tap may recenter the category rail.
-  // Do it instantly so it cannot fight the user's finger/momentum.
   document.addEventListener('click', event => {
     const category = event.target.closest?.('#smCats .sm-cat');
     if (!category) return;
