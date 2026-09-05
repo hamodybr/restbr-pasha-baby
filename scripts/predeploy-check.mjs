@@ -30,6 +30,14 @@ function checkLocalRef(ref, source) {
   if (!exists(clean)) fail(`${source}: missing local asset ${ref}`);
 }
 
+function requireText(file, marker, label = marker) {
+  if (!read(file).includes(marker)) fail(`${file}: missing ${label}`);
+}
+
+function forbidText(file, marker, label = marker) {
+  if (read(file).includes(marker)) fail(`${file}: forbidden legacy/unsafe marker ${label}`);
+}
+
 // 1) JavaScript syntax: no deploy if any browser/service-worker file cannot parse.
 const jsFiles = [
   ...walk('js', file => file.endsWith('.js')),
@@ -131,6 +139,29 @@ for (const marker of [
   'RESTBR_EXCEL_TRANSACTIONAL_IMPORT'
 ]) {
   if (!hardening.includes(marker)) fail(`js/restbr-hardening.js: missing ${marker}`);
+}
+
+// 9) Core-flow invariants fixed by the audit must not regress.
+requireText('js/app.js', 'const categoryKey =', 'UUID-backed category key');
+requireText('js/app.js', 'data-cat="${escapeUi(category.id)}"', 'UUID category navigation');
+requireText('js/app.js', 'String(product.category.id)===String(active)', 'UUID category render filter');
+requireText('js/cart.js', 'const orderNonce=', 'random order ID nonce');
+requireText('admin.html', "rpc('can_access_admin')", 'native admin role gate');
+requireText('admin.html', 'result.products_updated ?? result.products ?? 0', 'bulk price result compatibility');
+requireText('admin.html', "const PRICE_SAFETY_BACKUP_KEY='RESTBR_LAST_PRICE_BACKUP_V1';", 'client-neutral price backup key');
+requireText('admin.html', "const ADMIN_SETTINGS_THEME_KEY='RESTBR_ADMIN_SETTINGS_THEME_V1';", 'client-neutral admin theme key');
+forbidText('admin.html', "const PRICE_SAFETY_BACKUP_KEY='SHORASH_LAST_PRICE_BACKUP_V1';", 'Shorash price backup key');
+forbidText('admin.html', "const ADMIN_SETTINGS_THEME_KEY='SHORASH_ADMIN_SETTINGS_THEME_V1';", 'Shorash admin theme key');
+requireText('js/supabase-config.js', 'if (RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;', 'retail-only discount loader guard');
+forbidText('js/supabase-config.js', 'testSupabaseConnection();', 'development connection-test request');
+
+// 10) The live database hardening migration must be committed with the app.
+const auditMigration = 'supabase/migrations/20260905223000_pasha_audit_hardening.sql';
+if (!exists(auditMigration)) fail(`${auditMigration}: missing`);
+else {
+  requireText(auditMigration, 'restaurant_settings_singleton_idx', 'settings singleton guard');
+  requireText(auditMigration, 'menu_analytics_minute_rate', 'analytics rate limiter');
+  requireText(auditMigration, 'apply_menu_excel_updates', 'transactional Excel RPC');
 }
 
 for (const message of notes) console.log(`✓ ${message}`);
