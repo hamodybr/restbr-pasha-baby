@@ -1,0 +1,211 @@
+/* PASHA BABY — RETAIL V4
+   One category navigation system only: large pastel horizontal rail.
+   Also replaces the last legacy search/image-viewer accents. */
+
+:root{
+  --pb4-ink:#26363b;
+  --pb4-muted:#718086;
+  --pb4-line:#dde8e4;
+  --pb4-primary:#4f8f83;
+  --pb4-primary-dark:#2f7568;
+  --pb4-mint:#dcefe9;
+  --pb4-sky:#e4f1f6;
+  --pb4-peach:#f8e5da;
+  --pb4-butter:#f8efcf;
+  --pb4-lilac:#eee9f7;
+}
+
+/* The duplicate large category grid is retired in retail v4. */
+#pbCategoryPanelV2{display:none!important}
+
+/* Search popover: no black/gold restaurant UI. */
+#smSearchWrap,
+.sm-header-tools .sm-search-wrap{
+  width:min(86vw,430px)!important;
+  max-width:min(86vw,430px)!important;
+  padding:8px!important;
+  border:1px solid var(--pb4-line)!important;
+  border-radius:18px!important;
+  background:#fff!important;
+  background-image:none!important;
+  color:var(--pb4-ink)!important;
+  box-shadow:0 12px 34px rgba(48,67,63,.13)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+#smSearchWrap .sm-search-row,
+.sm-search-row{
+  min-height:48px!important;
+  padding:0 10px!important;
+  border:1px solid #e3ece9!important;
+  border-radius:14px!important;
+  background:#f8fbfa!important;
+  background-image:none!important;
+  color:var(--pb4-ink)!important;
+  box-shadow:none!important;
+}
+
+#smSearchInput,
+.sm-search-input{
+  min-width:0!important;
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  color:var(--pb4-ink)!important;
+  -webkit-text-fill-color:var(--pb4-ink)!important;
+  caret-color:var(--pb4-primary-dark)!important;
+  font-size:16px!important;
+  box-shadow:none!important;
+}
+#smSearchInput::placeholder,.sm-search-input::placeholder{
+  color:#8b999d!important;
+  opacity:1!important;
+}
+
+.sm-search-icon{
+  color:var(--pb4-primary-dark)!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+
+#smSearchClear,.sm-search-clear{
+  width:36px!important;
+  height:36px!important;
+  min-width:36px!important;
+  border:1px solid var(--pb4-line)!important;
+  border-radius:11px!important;
+  background:#fff!important;
+  color:var(--pb4-muted)!important;
+  box-shadow:none!important;
+}
+
+#smSearchCount,.sm-search-count{
+  padding:7px 4px 1px!important;
+  color:var(--pb4-muted)!important;
+  background:transparent!important;
+  font-size:10px!important;
+}
+
+/* Main category navigation = the rail itself. */
+.sm-cats-wrap,
+.sm-cats-wrap.fixed{
+  top:0!important;
+  padding:8px 0 9px!important;
+  border:0!important;
+  background:rgba(247,248,246,.97)!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(12px)!important;
+  -webkit-backdrop-filter:blur(12px)!important;
+}
+
+#smCats.sm-cats{
+  gap:9px!important;
+  padding:2px 14px 5px!important;
+  overflow-x:auto!important;
+  scroll-snap-type:x proximity!important;
+  scrollbar-width:none!important;
+}
+#smCats.sm-cats::-webkit-scrollbar{display:none!important}
+
+#smCats.sm-cats .sm-cat,
+#smCats.sm-cats .sm-cat:hover,
+#smCats.sm-cats .sm-cat:focus{
+  flex:0 0 auto!important;
+  min-width:148px!important;
+  width:auto!important;
+  height:66px!important;
+  min-height:66px!important;
+  padding:0 12px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:9px!important;
+  scroll-snap-align:start!important;
+  border:1px solid transparent!important;
+  border-radius:18px!important;
+  background:var(--pb4-sky)!important;
+  background-image:none!important;
+  color:var(--pb4-ink)!important;
+  -webkit-text-fill-color:var(--pb4-ink)!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
+  filter:none!important;
+  font-size:12px!important;
+  line-height:1.22!important;
+  font-weight:900!important;
+  white-space:normal!important;
+  text-align:start!important;
+  transform:none!important;
+}
+
+#smCats.sm-cats .sm-cat:nth-child(5n+2){background:var(--pb4-peach)!important}
+#smCats.sm-cats .sm-cat:nth-child(5n+3){background:var(--pb4-butter)!important}
+#smCats.sm-cats .sm-cat:nth-child(5n+4){background:var(--pb4-lilac)!important}
+#smCats.sm-cats .sm-cat:nth-child(5n+5){background:var(--pb4-mint)!important}
+
+#smCats.sm-cats .sm-cat::before{
+  content:attr(data-pb-icon)!important;
+  flex:0 0 40px!important;
+  width:40px!important;
+  height:40px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:13px!important;
+  background:rgba(255,255,255,.82)!important;
+  color:inherit!important;
+  font-size:21px!important;
+  line-height:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+
+#smCats.sm-cats .sm-cat.active,
+#smCats.sm-cats .sm-cat.active:hover,
+#smCats.sm-cats .sm-cat.active:focus{
+  border-color:#a8d2c7!important;
+  background:var(--pb4-mint)!important;
+  color:var(--pb4-primary-dark)!important;
+  -webkit-text-fill-color:var(--pb4-primary-dark)!important;
+  box-shadow:0 0 0 2px rgba(79,143,131,.08) inset!important;
+}
+
+/* When a product has no real photo, the pictogram is the visual; no viewer affordance. */
+#smMenu .sm-img.pb-placeholder .sm-product-image,
+#smMenu .sm-img.sm-image-fallback-empty .sm-product-image,
+#smMenu .sm-product-image[data-pb-placeholder="1"]{
+  pointer-events:none!important;
+  cursor:default!important;
+}
+
+/* If a stale image viewer opens anyway, keep it neutral rather than restaurant-black/gold. */
+.sm-image-viewer{
+  background:rgba(38,54,59,.86)!important;
+}
+.sm-image-viewer button{
+  border:1px solid var(--pb4-line)!important;
+  background:#fff!important;
+  color:var(--pb4-ink)!important;
+  box-shadow:none!important;
+}
+.sm-image-viewer #smImageCaption{
+  color:#fff!important;
+  text-shadow:none!important;
+}
+
+@media(max-width:390px){
+  #smCats.sm-cats .sm-cat{
+    min-width:136px!important;
+    height:62px!important;
+    min-height:62px!important;
+    padding:0 10px!important;
+    font-size:11px!important;
+  }
+  #smCats.sm-cats .sm-cat::before{
+    flex-basis:36px!important;
+    width:36px!important;
+    height:36px!important;
+    font-size:19px!important;
+  }
+}
