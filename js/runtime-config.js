@@ -3,6 +3,8 @@
 // Never put a Supabase service_role key in browser code.
 window.RESTBR_CONFIG = Object.freeze({
   restaurantName: 'Pasha Baby',
+  businessType: 'retail',
+  enableDiningModes: false,
   orderIdPrefix: 'PB',
   supabaseUrl: 'https://wlollfpmjzenhkjwxrqo.supabase.co',
   supabasePublishableKey: 'sb_publishable_VOuh1-xvEayYsNBdDCzRnA_3bcFWUB2',
