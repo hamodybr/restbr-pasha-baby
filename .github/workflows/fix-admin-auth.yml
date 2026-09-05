@@ -1,0 +1,131 @@
+name: One-time Pasha Baby admin auth stability patch
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-admin-auth.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch Supabase auth isolation and admin timeout
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          supabase_path = Path('js/supabase-config.js')
+          text = supabase_path.read_text()
+          old = """// Create Supabase client
+          const supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+          );"""
+          new = """// Create Supabase client.
+          // Keep public browsing completely separate from the admin Auth session.
+          const RESTBR_PROJECT_REF = (() => {
+            try {
+              return new URL(SUPABASE_URL).hostname.split('.')[0] || 'restbr';
+            } catch (_) {
+              return 'restbr';
+            }
+          })();
+
+          const RESTBR_AUTH_OPTIONS = RESTBR_IS_ADMIN_PATH
+            ? {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true,
+                storageKey: `restbr-${RESTBR_PROJECT_REF}-admin-auth-v1`
+              }
+            : {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false,
+                storageKey: `restbr-${RESTBR_PROJECT_REF}-public-auth-v1`
+              };
+
+          const supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY,
+            { auth: RESTBR_AUTH_OPTIONS }
+          );"""
+          if old not in text:
+            raise SystemExit('Expected Supabase client block not found; refusing unsafe patch')
+          supabase_path.write_text(text.replace(old, new, 1))
+
+          admin_path = Path('admin.html')
+          admin = admin_path.read_text()
+
+          marker = "  async function adminSignIn(email,password){"
+          helper = """  function withAdminAuthTimeout(promise, timeoutMs = 12000){
+            let timeoutId;
+            const timeout = new Promise((_, reject) => {
+              timeoutId = setTimeout(() => reject(new Error('AUTH_TIMEOUT')), timeoutMs);
+            });
+            return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+          }
+
+          async function adminSignIn(email,password){"""
+          if marker not in admin:
+            raise SystemExit('adminSignIn marker not found; refusing unsafe patch')
+          admin = admin.replace(marker, helper, 1)
+
+          old_signin = """      }=await supabaseClient.auth.signInWithPassword({
+                email:String(email||'').trim(),
+                password:String(password||'')
+              });"""
+          new_signin = """      }=await withAdminAuthTimeout(
+                supabaseClient.auth.signInWithPassword({
+                  email:String(email||'').trim(),
+                  password:String(password||'')
+                }),
+                12000
+              );"""
+          if old_signin not in admin:
+            raise SystemExit('signInWithPassword block not found; refusing unsafe patch')
+          admin = admin.replace(old_signin, new_signin, 1)
+
+          old_error = """      if(/invalid login credentials/i.test(message)){
+                message='البريد الإلكتروني أو كلمة المرور غير صحيحة.';"""
+          new_error = """      if(/AUTH_TIMEOUT/i.test(message)){
+                message='تأخر الاتصال بخدمة تسجيل الدخول. تحقق من الإنترنت ثم حاول مرة أخرى.';
+              }else if(/invalid login credentials/i.test(message)){
+                message='البريد الإلكتروني أو كلمة المرور غير صحيحة.';"""
+          if old_error not in admin:
+            raise SystemExit('login error mapping not found; refusing unsafe patch')
+          admin = admin.replace(old_error, new_error, 1)
+
+          admin = admin.replace('js/supabase-config.js?v=2.2', 'js/supabase-config.js?v=2.5')
+          admin_path.write_text(admin)
+
+          sw_path = Path('sw.js')
+          sw = sw_path.read_text()
+          sw = sw.replace('restbr-pasha-baby-v1', 'restbr-pasha-baby-v2', 1)
+          sw = sw.replace('./js/supabase-config.js?v=2.4', './js/supabase-config.js?v=2.5', 1)
+          sw_path.write_text(sw)
+          PY
+
+      - name: Verify patch
+        run: |
+          grep -q "admin-auth-v1" js/supabase-config.js
+          grep -q "withAdminAuthTimeout" admin.html
+          grep -q "supabase-config.js?v=2.5" admin.html
+          grep -q "restbr-pasha-baby-v2" sw.js
+          git diff --check
+
+      - name: Commit fix
+        run: |
+          git config user.name "HaMoDyBr"
+          git config user.email "78080184+hamodybr@users.noreply.github.com"
+          git add js/supabase-config.js admin.html sw.js
+          git commit -m "fix: stabilize Pasha Baby admin authentication"
+          git push origin HEAD:main
