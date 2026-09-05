@@ -25,6 +25,7 @@
         position:relative !important;
         z-index:4 !important;
         flex:0 0 auto !important;
+        opacity:1 !important;
       }
 
       .sm-news-ticker.sm-news-motion .sm-news-window{
@@ -32,8 +33,8 @@
         overflow:hidden !important;
         flex:1 1 auto !important;
         min-width:0 !important;
-        -webkit-mask-image:linear-gradient(to right,transparent 0,#000 8%,#000 92%,transparent 100%) !important;
-        mask-image:linear-gradient(to right,transparent 0,#000 8%,#000 92%,transparent 100%) !important;
+        -webkit-mask-image:linear-gradient(to right,transparent 0,#000 3%,#000 97%,transparent 100%) !important;
+        mask-image:linear-gradient(to right,transparent 0,#000 3%,#000 97%,transparent 100%) !important;
       }
 
       .sm-news-ticker.sm-news-motion .sm-news-track{
@@ -49,6 +50,12 @@
         white-space:nowrap !important;
         animation:smUnifiedTickerMotion var(--sm-news-motion-duration,14s) linear infinite !important;
         will-change:transform,opacity !important;
+      }
+
+      .sm-news-ticker.sm-news-motion .sm-news-copy{
+        opacity:1 !important;
+        filter:none !important;
+        text-shadow:none !important;
       }
 
       .sm-news-ticker.sm-news-motion .sm-news-copy[aria-hidden="true"]{
@@ -100,10 +107,10 @@
           transform:translateX(var(--sm-news-motion-start,0px));
           opacity:0;
         }
-        8%{
+        4%{
           opacity:1;
         }
-        92%{
+        96%{
           opacity:1;
         }
         100%{
@@ -159,13 +166,13 @@
     const trackWidth = Math.max(1, Math.ceil(track.scrollWidth));
     const edge = 12;
 
-    const start = isEnglish
-      ? -(trackWidth + edge)
-      : windowWidth + edge;
-
-    const end = isEnglish
-      ? windowWidth + edge
-      : -(trackWidth + edge);
+    /*
+      Pasha Baby ticker deliberately travels LEFT -> RIGHT in every language.
+      Arabic/Kurdish keep RTL text direction, so the sentence beginning lives on
+      the track's right edge and is the first part that enters from the left.
+    */
+    const start = -(trackWidth + edge);
+    const end = windowWidth + edge;
 
     ticker.style.setProperty('--sm-news-motion-start', `${start}px`);
     ticker.style.setProperty('--sm-news-motion-end', `${end}px`);
@@ -173,7 +180,7 @@
     const base = baseDurationSeconds(ticker);
     const duration = isEnglish
       ? Math.max(14, base * 1.8)
-      : Math.max(10, base);
+      : Math.max(12, base * 1.15);
 
     ticker.style.setProperty('--sm-news-motion-duration', `${duration.toFixed(1)}s`);
 
