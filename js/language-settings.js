@@ -252,6 +252,7 @@
     // whole dashboard and caused severe navigation jank on mobile Safari.
     appendAdminI18nScript('restbrAdminI18nScript', 'js/admin-i18n.js?v=1.0');
     appendAdminI18nScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.1');
+    appendAdminI18nScript('pashaBabyImageOptimizerScript', 'js/admin-image-optimizer.js?v=1.0');
   }
 
   async function initAdmin() {
