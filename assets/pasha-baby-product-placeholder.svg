@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Pasha Baby placeholder">
+  <rect width="160" height="160" rx="28" fill="#eef7f4"/>
+  <circle cx="80" cy="70" r="38" fill="#ffffff" stroke="#d6e8e2" stroke-width="3"/>
+  <path d="M59 74c0-14 9-25 21-25s21 11 21 25v20H59V74Z" fill="#dcefe9" stroke="#4f8f83" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M67 55c3-8 8-12 13-12s10 4 13 12" fill="none" stroke="#4f8f83" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="72" cy="72" r="3" fill="#4f8f83"/>
+  <circle cx="88" cy="72" r="3" fill="#4f8f83"/>
+  <path d="M73 82c4 4 10 4 14 0" fill="none" stroke="#4f8f83" stroke-width="3" stroke-linecap="round"/>
+  <text x="80" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#326f65">PB</text>
+</svg>
