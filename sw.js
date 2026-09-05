@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v16";
+const CACHE_NAME = "restbr-pasha-baby-v17";
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -27,6 +27,7 @@ const CORE = [
   "./js/cart.js?v=4.5",
   "./js/cart-stale-item-guard.js?v=1.1",
   "./js/runtime-config.js?v=2.1",
+  "./js/restbr-hardening.js?v=1.0",
   "./js/url-safety.js?v=1.3",
   "./js/supabase-config.js?v=2.4",
   "./js/language-settings.js?v=1.2",
@@ -131,7 +132,8 @@ self.addEventListener("fetch", event => {
   const isAdminPage = /\/admin(?:\.html)?\/?$/i.test(url.pathname);
   const isAdminAsset =
     /\/js\/admin-[^/]+\.js$/i.test(url.pathname) ||
-    /\/js\/(?:runtime|supabase)-config\.js$/i.test(url.pathname);
+    /\/js\/(?:runtime|supabase)-config\.js$/i.test(url.pathname) ||
+    /\/js\/restbr-hardening\.js$/i.test(url.pathname);
 
   if (isAdminPage || isAdminAsset) {
     event.respondWith(networkFirst(request, { noStore: true }));
