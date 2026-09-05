@@ -2,6 +2,7 @@
   if (window.__PASHA_BABY_RETAIL_V4__) return;
   window.__PASHA_BABY_RETAIL_V4__ = true;
 
+  const DEFAULT_PLACEHOLDER = 'assets/pasha-baby-product-placeholder.svg';
   const PLACEHOLDER_RE = /(?:restaurant-placeholder|pasha-baby-product-placeholder)\.svg(?:\?|$)/i;
 
   function removeDuplicateCategoryPanel() {
@@ -22,6 +23,11 @@
 
       img.dataset.pbPlaceholder = placeholder ? '1' : '0';
       if (holder) holder.classList.toggle('pb-placeholder', placeholder);
+
+      if (placeholder && !/pasha-baby-product-placeholder\.svg(?:\?|$)/i.test(src)) {
+        img.src = DEFAULT_PLACEHOLDER;
+        img.dataset.fullImage = DEFAULT_PLACEHOLDER;
+      }
     });
   }
 
