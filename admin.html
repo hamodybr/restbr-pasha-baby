@@ -5103,7 +5103,9 @@
           event==='TOKEN_REFRESHED' ||
           event==='INITIAL_SESSION'
         ){
-          unlockAdminForSession(session);
+          // Supabase recommends not starting async API work directly inside
+          // onAuthStateChange. Defer the role RPC to the next task.
+          setTimeout(()=>unlockAdminForSession(session),0);
         }
       });
 
