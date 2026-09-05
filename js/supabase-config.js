@@ -83,15 +83,45 @@ if (RESTBR_CONFIGURED) {
   }
 })();
 
-// Load the shared menu-language policy for both the public menu and admin.
+// Load the shared menu-language policy.
+// On admin pages, keep the login screen lightweight: dashboard localization
+// starts only after authentication unlocks the body. This avoids expensive
+// DOM observers/scans while the user is typing email/password on mobile Safari.
 (() => {
-  if (document.getElementById('restbrLanguageSettingsScript')) return;
+  const loadLanguageSettings = () => {
+    if (document.getElementById('restbrLanguageSettingsScript')) return;
+    const script = document.createElement('script');
+    script.id = 'restbrLanguageSettingsScript';
+    script.src = 'js/language-settings.js?v=1.2';
+    script.async = false;
+    document.head.appendChild(script);
+  };
 
-  const script = document.createElement('script');
-  script.id = 'restbrLanguageSettingsScript';
-  script.src = 'js/language-settings.js?v=1.1';
-  script.async = false;
-  document.head.appendChild(script);
+  if (!RESTBR_IS_ADMIN_PATH) {
+    loadLanguageSettings();
+    return;
+  }
+
+  const startAfterUnlock = () => {
+    if (!document.body || document.body.classList.contains('auth-locked')) return false;
+    loadLanguageSettings();
+    return true;
+  };
+
+  const watchForUnlock = () => {
+    if (startAfterUnlock()) return;
+    const observer = new MutationObserver(() => {
+      if (!startAfterUnlock()) return;
+      observer.disconnect();
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', watchForUnlock, { once: true });
+  } else {
+    watchForUnlock();
+  }
 })();
 
 // Public-menu only: keep the open options sheet synced after live price refreshes.
