@@ -1,0 +1,78 @@
+name: Pasha retail admin cleanup
+
+on:
+  push:
+    paths:
+      - '.github/workflows/pasha-retail-admin-cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Disable restaurant-only admin modules in retail mode
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('js/supabase-config.js')
+          s = p.read_text()
+
+          needle = "const RESTBR_IS_ADMIN_PATH =\n  /(?:^|\\/)admin(?:\\.html)?\\/?$/i.test(location.pathname);\n"
+          insert = needle + "\nconst RESTBR_RETAIL_MODE =\n  String(RESTBR_CONFIG.businessType || '').trim().toLowerCase() === 'retail' ||\n  RESTBR_CONFIG.enableDiningModes === false;\n"
+          if needle not in s:
+            raise SystemExit('admin path marker not found')
+          if 'const RESTBR_RETAIL_MODE =' not in s:
+            s = s.replace(needle, insert, 1)
+
+          comments = {
+            '// Admin-only dine-in / takeaway price controls for product options.': '// Admin-only dine-in / takeaway price controls for restaurant deployments.',
+            '// Admin-only: choose which price type a bulk change targets.': '// Admin-only restaurant dual-price target selector.',
+            '// Admin-only: include dine-in and takeaway prices in Excel export.': '// Admin-only restaurant dual-price Excel export.',
+            '// Admin-only: allow takeaway_price updates during Excel import.': '// Admin-only restaurant dual-price Excel import.',
+            '// Admin-only editor for the first dine-in / takeaway choice window.': '// Admin-only restaurant dine-in / takeaway choice-window editor.'
+          }
+          for old, new in comments.items():
+            s = s.replace(old, new)
+
+          targets = [
+            "restbrAdminTakeawayPricesScript",
+            "restbrAdminBulkPriceTargetUiScript",
+            "restbrAdminExcelExportTakeawayScript",
+            "restbrAdminExcelImportTakeawayScript",
+            "restbrAdminDiningGateSettingsScript",
+          ]
+
+          for target in targets:
+            marker = f"if (document.getElementById('{target}')) return;"
+            pos = s.find(marker)
+            if pos < 0:
+              raise SystemExit(f'module marker missing: {target}')
+            before = s.rfind("if (!RESTBR_IS_ADMIN_PATH) return;", 0, pos)
+            if before < 0:
+              raise SystemExit(f'admin guard missing before: {target}')
+            old = "if (!RESTBR_IS_ADMIN_PATH) return;"
+            new = "if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;"
+            s = s[:before] + s[before:].replace(old, new, 1)
+
+          p.write_text(s)
+          PY
+
+      - name: Verify patch
+        run: |
+          grep -q "const RESTBR_RETAIL_MODE" js/supabase-config.js
+          test "$(grep -c "RESTBR_RETAIL_MODE) return" js/supabase-config.js)" -ge 5
+          grep -q "restbrAdminDiningGateSettingsScript" js/supabase-config.js
+          git diff --check
+
+      - name: Commit
+        run: |
+          git config user.name "HaMoDyBr"
+          git config user.email "78080184+hamodybr@users.noreply.github.com"
+          git add js/supabase-config.js
+          git commit -m "fix: disable restaurant-only admin modules for Pasha retail mode"
+          git push origin HEAD:main
