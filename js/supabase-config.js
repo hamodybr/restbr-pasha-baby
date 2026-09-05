@@ -17,6 +17,10 @@ const RESTBR_CONFIGURED =
 const RESTBR_IS_ADMIN_PATH =
   /(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname);
 
+const RESTBR_RETAIL_MODE =
+  String(RESTBR_CONFIG.businessType || '').trim().toLowerCase() === 'retail' ||
+  RESTBR_CONFIG.enableDiningModes === false;
+
 if (!RESTBR_CONFIGURED) {
   console.error(
     'RESTBR setup is incomplete. Add this restaurant Supabase URL and publishable key to js/runtime-config.js.'
@@ -196,9 +200,9 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only dine-in / takeaway price controls for product options.
+// Admin-only dine-in / takeaway price controls for restaurant deployments.
 (() => {
-  if (!RESTBR_IS_ADMIN_PATH) return;
+  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
   if (document.getElementById('restbrAdminTakeawayPricesScript')) return;
 
   const script = document.createElement('script');
@@ -232,9 +236,9 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only: choose which price type a bulk change targets.
+// Admin-only restaurant dual-price target selector.
 (() => {
-  if (!RESTBR_IS_ADMIN_PATH) return;
+  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
   if (document.getElementById('restbrAdminBulkPriceTargetUiScript')) return;
 
   const script = document.createElement('script');
@@ -268,9 +272,9 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only: include dine-in and takeaway prices in Excel export.
+// Admin-only restaurant dual-price Excel export.
 (() => {
-  if (!RESTBR_IS_ADMIN_PATH) return;
+  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
   if (document.getElementById('restbrAdminExcelExportTakeawayScript')) return;
 
   const script = document.createElement('script');
@@ -280,9 +284,9 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only: allow takeaway_price updates during Excel import.
+// Admin-only restaurant dual-price Excel import.
 (() => {
-  if (!RESTBR_IS_ADMIN_PATH) return;
+  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
   if (document.getElementById('restbrAdminExcelImportTakeawayScript')) return;
 
   const script = document.createElement('script');
@@ -304,9 +308,9 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only editor for the first dine-in / takeaway choice window.
+// Admin-only restaurant dine-in / takeaway choice-window editor.
 (() => {
-  if (!RESTBR_IS_ADMIN_PATH) return;
+  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
   if (document.getElementById('restbrAdminDiningGateSettingsScript')) return;
 
   const script = document.createElement('script');
