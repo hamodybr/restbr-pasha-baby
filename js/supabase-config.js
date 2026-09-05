@@ -35,10 +35,34 @@ if (!RESTBR_CONFIGURED) {
   }, { once: true });
 }
 
-// Create Supabase client
+// Create Supabase client.
+// Public browsing must never share the same Auth storage/lock with the admin dashboard.
+const RESTBR_PROJECT_REF = (() => {
+  try {
+    return new URL(SUPABASE_URL).hostname.split('.')[0] || 'restbr';
+  } catch (_) {
+    return 'restbr';
+  }
+})();
+
+const RESTBR_AUTH_OPTIONS = RESTBR_IS_ADMIN_PATH
+  ? {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: `restbr-${RESTBR_PROJECT_REF}-admin-auth-v1`
+    }
+  : {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      storageKey: `restbr-${RESTBR_PROJECT_REF}-public-auth-v1`
+    };
+
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
+  SUPABASE_PUBLISHABLE_KEY,
+  { auth: RESTBR_AUTH_OPTIONS }
 );
 
 if (RESTBR_CONFIGURED) {
