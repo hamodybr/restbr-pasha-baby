@@ -4,6 +4,7 @@
 
   const DEFAULT_PLACEHOLDER = 'assets/pasha-baby-product-placeholder.svg';
   const PLACEHOLDER_RE = /(?:restaurant-placeholder|pasha-baby-product-placeholder)\.svg(?:\?|$)/i;
+  const CARD_CHARACTERS = ['🧸','🐰','🐥','🐼','🐨','🦊','🐻‍❄️','🐯'];
 
   function installRetailFixStyles() {
     if (document.getElementById('pbRetailV4RuntimeStyles')) return;
@@ -62,6 +63,45 @@
     document.getElementById('pbCategoryPanelV2')?.remove();
   }
 
+  function stableHash(value) {
+    const text = String(value || '');
+    let hash = 2166136261;
+    for (let i = 0; i < text.length; i += 1) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return Math.abs(hash >>> 0);
+  }
+
+  function decorateProductCards(root = document) {
+    root.querySelectorAll?.('#smMenu .sm-card').forEach(card => {
+      if (card.querySelector(':scope > .pb-card-character')) return;
+
+      const name = String(card.querySelector('.sm-name')?.textContent || '').trim();
+      const category = String(
+        card.querySelector('.sm-search-category')?.textContent ||
+        card.closest('.sm-section')?.querySelector('.sm-section-title')?.textContent ||
+        ''
+      ).trim();
+      const image = String(card.querySelector('.sm-product-image')?.getAttribute('src') || '');
+      const explicit = String(
+        card.dataset.productId ||
+        card.dataset.id ||
+        card.getAttribute('data-product') ||
+        ''
+      );
+      const key = `${explicit}|${category}|${name}|${image}`;
+      const index = stableHash(key) % CARD_CHARACTERS.length;
+
+      const sticker = document.createElement('span');
+      sticker.className = `pb-card-character pb-card-character-${index + 1}`;
+      sticker.textContent = CARD_CHARACTERS[index];
+      sticker.setAttribute('aria-hidden', 'true');
+      sticker.dataset.pbCharacter = String(index + 1);
+      card.appendChild(sticker);
+    });
+  }
+
   function markPlaceholders(root = document) {
     root.querySelectorAll?.('#smMenu .sm-product-image').forEach(img => {
       const src = String(img.getAttribute('src') || '');
@@ -102,6 +142,7 @@
     installRetailFixStyles();
     removeDuplicateCategoryPanel();
     markPlaceholders();
+    decorateProductCards();
     centerActiveCategory();
   }
 
@@ -142,6 +183,7 @@
       centerActiveCategory();
       scrollToMenu();
       markPlaceholders();
+      decorateProductCards();
     }, 40);
   });
 
