@@ -23,6 +23,22 @@
     try { localStorage.removeItem(OFFLINE_CACHE_KEY); } catch (_) {}
   }
 
+  // Preserve useful local admin state while removing the last client-specific
+  // SHORASH key names inherited from the original template.
+  try {
+    [
+      ['SHORASH_LAST_PRICE_BACKUP_V1', 'RESTBR_LAST_PRICE_BACKUP_V1'],
+      ['SHORASH_ADMIN_SETTINGS_THEME_V1', 'RESTBR_ADMIN_SETTINGS_THEME_V1']
+    ].forEach(([legacyKey, currentKey]) => {
+      const current = localStorage.getItem(currentKey);
+      const legacy = localStorage.getItem(legacyKey);
+      if (current === null && legacy !== null) {
+        localStorage.setItem(currentKey, legacy);
+      }
+      if (legacy !== null) localStorage.removeItem(legacyKey);
+    });
+  } catch (_) {}
+
   const isAdminPath = /(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname);
   if (!isAdminPath) return;
 
