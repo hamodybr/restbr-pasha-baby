@@ -4026,7 +4026,7 @@
   // BULK PRICE ADJUSTMENT
   // ==========================================
 
-  const PRICE_SAFETY_BACKUP_KEY='SHORASH_LAST_PRICE_BACKUP_V1';
+  const PRICE_SAFETY_BACKUP_KEY='RESTBR_LAST_PRICE_BACKUP_V1';
 
   function renderBulkPriceCategoryOptions(){
     const select=document.getElementById('bulkPriceCategorySelect');
@@ -4249,8 +4249,8 @@
 
       setBulkPriceMsg(
         `تم التعديل ✓ `+
-        `(${result.products_updated ?? 0} سعر أساسي، `+
-        `${result.options_updated ?? 0} سعر خيار)`,
+        `(${result.products_updated ?? result.products ?? 0} سعر أساسي، `+
+        `${result.options_updated ?? result.options ?? 0} سعر خيار)`,
         true
       );
 
@@ -4947,7 +4947,7 @@
   // ==========================================
   // SETTINGS-ONLY APPEARANCE
   // ==========================================
-  const ADMIN_SETTINGS_THEME_KEY='SHORASH_ADMIN_SETTINGS_THEME_V1';
+  const ADMIN_SETTINGS_THEME_KEY='RESTBR_ADMIN_SETTINGS_THEME_V1';
 
   function applyAdminSettingsTheme(mode){
     const view=document.getElementById('viewTools');
@@ -5030,6 +5030,27 @@
   }
 
   async function unlockAdminForSession(session){
+    const access=await supabaseClient.rpc('can_access_admin');
+
+    if(access.error){
+      adminSession=null;
+      adminDashboardLoaded=false;
+      setAdminLocked(true);
+      updateAdminAccountUI(null);
+      setLoginMessage('تعذر التحقق من صلاحية حساب الإدارة: '+(access.error.message||access.error));
+      return false;
+    }
+
+    if(access.data!==true){
+      adminSession=null;
+      adminDashboardLoaded=false;
+      setAdminLocked(true);
+      updateAdminAccountUI(null);
+      setLoginMessage('هذا الحساب لا يملك صلاحية دخول لوحة الإدارة.');
+      try{await supabaseClient.auth.signOut({scope:'local'});}catch(_){}
+      return false;
+    }
+
     adminSession=session;
     setAdminLocked(false);
     updateAdminAccountUI(session);
@@ -5040,6 +5061,8 @@
       switchAdminView('home');
       await loadAdminDashboard();
     }
+
+    return true;
   }
 
   function lockAdmin(){
@@ -5244,7 +5267,7 @@
 
 
       console.log(
-        '✅ SHORASH ADMIN DATA LOADED',
+        '✅ RESTBR ADMIN DATA LOADED',
         {
           categories: adminCategories.length,
           products: adminProducts.length,
@@ -5771,7 +5794,7 @@
       setTimeout(closeAdminEditor,850);
 
     }catch(e){
-      console.error('SHORASH SAVE ERROR:',e);
+      console.error('RESTBR SAVE ERROR:',e);
       showEditorMsg('فشل الحفظ: '+(e.message||e));
     }finally{
       btn.disabled=false;
@@ -6005,7 +6028,7 @@
 
       const insert={};
 
-      // ID is UUID in the current SHORASH products table.
+      // ID is UUID in the current RESTBR products table.
       insert.id=newId;
 
       if(hasField(sample,'category_id')) insert.category_id=categoryId;

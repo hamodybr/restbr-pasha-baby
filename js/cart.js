@@ -387,11 +387,18 @@
 
     const {sum}=totals();
 
+    const orderNonce=
+      globalThis.crypto?.randomUUID
+        ? crypto.randomUUID().replaceAll("-","").slice(0,8).toUpperCase()
+        : Math.random().toString(36).slice(2,10).toUpperCase().padEnd(8,"0");
+
     const id=
       orderIdPrefix()+"-"+
       new Date().toISOString().slice(2,10).replaceAll("-","")+
       "-"+
-      String(Date.now()).slice(-5);
+      String(Date.now()).slice(-5)+
+      "-"+
+      orderNonce;
 
     const mono=v=>"```"+v+"```";
     const bold=v=>"*"+v+"*";

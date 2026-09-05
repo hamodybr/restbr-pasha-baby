@@ -943,7 +943,7 @@ function applyDeepLinkBeforeRender(){
     const product=DB.products.find(p=>String(p.id)===String(productId));
 
     if(product?.category){
-      active=product.category.ar;
+      active=String(product.category.id||"");
       return;
     }
   }
@@ -952,7 +952,7 @@ function applyDeepLinkBeforeRender(){
     const category=categories().find(c=>String(c.id)===String(categoryId));
 
     if(category){
-      active=category.ar;
+      active=String(category.id||"");
     }
   }
 }
@@ -1902,14 +1902,14 @@ function categories() {
 
   DB.products.forEach(product => {
 
-    if (
-      !product.category ||
-      !product.category.ar
-    ) return;
+    const categoryKey =
+      String(product.category?.id || "");
 
-    if (!map.has(product.category.ar)) {
+    if (!categoryKey) return;
+
+    if (!map.has(categoryKey)) {
       map.set(
-        product.category.ar,
+        categoryKey,
         product.category
       );
     }
@@ -1959,8 +1959,8 @@ function renderCats() {
   rail.innerHTML = categories()
     .map(category => `
       <button
-        class="sm-cat ${category.ar === active ? "active" : ""}"
-        data-cat="${escapeUi(category.ar)}"
+        class="sm-cat ${String(category.id) === String(active) ? "active" : ""}"
+        data-cat="${escapeUi(category.id)}"
         data-cat-id="${escapeUi(category.id)}">
         ${escapeUi(txt(category))}
       </button>
@@ -2226,7 +2226,7 @@ function render() {
   const products=DB.products.filter(
     product=>
       product.category &&
-      product.category.ar===active
+      String(product.category.id)===String(active)
   );
 
 
@@ -4491,7 +4491,7 @@ async function startRestbr() {
 
 
     active =
-      cats[0]?.ar || "";
+      String(cats[0]?.id || "");
 
 
     console.log(

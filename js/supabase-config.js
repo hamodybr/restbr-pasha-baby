@@ -130,7 +130,7 @@ if (RESTBR_CONFIGURED) {
 
 // Public-menu only: keep the open options sheet synced after live price refreshes.
 (() => {
-  if (RESTBR_IS_ADMIN_PATH) return;
+  if (RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
   if (document.getElementById('restbrDiscountChoicePriceSyncScript')) return;
 
   const script = document.createElement('script');
@@ -370,4 +370,4 @@ async function testSupabaseConnection() {
   }
 }
 
-testSupabaseConnection();
+// Connection health is exercised by the real menu/admin queries; avoid an extra production request.
