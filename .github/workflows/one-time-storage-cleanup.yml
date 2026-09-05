@@ -1,0 +1,37 @@
+name: One-time Pasha Storage Cleanup
+
+on:
+  push:
+    branches: [audit-hardening-2026-09-06]
+    paths:
+      - .github/workflows/one-time-storage-cleanup.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout audit branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: audit-hardening-2026-09-06
+
+      - name: Remove verified orphaned Storage objects via Storage API
+        run: |
+          set -euo pipefail
+          response="$(curl --fail-with-body --silent --show-error --retry 3 'https://wlollfpmjzenhkjwxrqo.supabase.co/functions/v1/pasha-storage-cleanup-once')"
+          echo "$response"
+          echo "$response" | grep -q '"ok":true'
+
+      - name: Remove one-time workflow
+        run: rm .github/workflows/one-time-storage-cleanup.yml
+
+      - name: Commit cleanup of maintenance workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: finish one-time Pasha storage cleanup"
+          git push origin HEAD:audit-hardening-2026-09-06
