@@ -85,9 +85,15 @@ function replaceRegex(text, pattern, to, label, expected=1){
 
   text=replaceExact(
     text,
-    '`${result.products_updated ?? 0} سعر أساسي، `+\n        `${result.options_updated ?? 0} سعر خيار)`',
-    '`${result.products_updated ?? result.products ?? 0} سعر أساسي، `+\n        `${result.options_updated ?? result.options ?? 0} سعر خيار)`',
-    'bulk price result compatibility'
+    'result.products_updated ?? 0',
+    'result.products_updated ?? result.products ?? 0',
+    'bulk price product result compatibility'
+  );
+  text=replaceExact(
+    text,
+    'result.options_updated ?? 0',
+    'result.options_updated ?? result.options ?? 0',
+    'bulk price option result compatibility'
   );
 
   const unlockPattern=/  async function unlockAdminForSession\(session\)\{[\s\S]*?\n  \}\n\n  function lockAdmin\(\)\{/;
