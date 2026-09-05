@@ -1,0 +1,63 @@
+/* PASHA BABY — soft brand atmosphere
+   CSS-only background. No image assets. */
+
+:root{
+  --pb-bg-sky:228,241,246;
+  --pb-bg-peach:248,229,218;
+  --pb-bg-butter:248,239,207;
+  --pb-bg-lilac:238,233,247;
+  --pb-bg-mint:220,239,233;
+}
+
+html{
+  background:#fffaf7 !important;
+}
+
+body{
+  min-height:100svh;
+  background:
+    radial-gradient(ellipse 72% 34% at 4% 3%, rgba(var(--pb-bg-sky),.72) 0%, rgba(var(--pb-bg-sky),.28) 42%, transparent 72%),
+    radial-gradient(ellipse 64% 31% at 96% 12%, rgba(var(--pb-bg-peach),.68) 0%, rgba(var(--pb-bg-peach),.24) 43%, transparent 73%),
+    radial-gradient(ellipse 70% 35% at 12% 47%, rgba(var(--pb-bg-lilac),.48) 0%, rgba(var(--pb-bg-lilac),.18) 44%, transparent 74%),
+    radial-gradient(ellipse 64% 34% at 92% 63%, rgba(var(--pb-bg-mint),.55) 0%, rgba(var(--pb-bg-mint),.19) 44%, transparent 74%),
+    radial-gradient(ellipse 64% 30% at 18% 92%, rgba(var(--pb-bg-butter),.48) 0%, rgba(var(--pb-bg-butter),.16) 43%, transparent 73%),
+    linear-gradient(180deg,#fffdfb 0%,#fff9f6 34%,#fbfcfb 69%,#fffaf7 100%) !important;
+  background-repeat:no-repeat !important;
+  color:var(--pb4-ink,#26363b) !important;
+}
+
+/* Remove the older dotted texture so the result stays clean and premium. */
+body::before{
+  content:none !important;
+  display:none !important;
+  background:none !important;
+}
+
+.sm-app,
+.sm-header,
+.sm-menu,
+.sm-section{
+  background:transparent !important;
+}
+
+/* Let a hint of the page gradient breathe through the sticky category rail. */
+.sm-cats-wrap,
+.sm-cats-wrap.fixed{
+  background:rgba(255,250,247,.84) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.08) !important;
+  backdrop-filter:blur(18px) saturate(1.08) !important;
+}
+
+/* Keep the bottom area visually continuous instead of ending in a flat block. */
+.sm-footer{
+  background:transparent !important;
+}
+
+@media (prefers-reduced-transparency: reduce){
+  .sm-cats-wrap,
+  .sm-cats-wrap.fixed{
+    background:rgba(255,250,247,.96) !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+}
