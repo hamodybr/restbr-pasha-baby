@@ -40,20 +40,34 @@ body::before{
   background:transparent !important;
 }
 
-/* Keep search + refresh controls on the physical right side in all languages. */
+/* Keep header controls on the PHYSICAL right side in every document direction.
+   Do not use inset-inline-* here: in RTL it maps back onto right/left and can
+   cancel the physical right value. */
 .sm-header{
   position:relative !important;
 }
 
+#smHeaderTools.sm-header-tools,
 .sm-header-tools,
 .sm-header .sm-tools,
 .sm-header .sm-toolbar{
+  position:absolute !important;
   left:auto !important;
   right:max(10px,env(safe-area-inset-right)) !important;
-  inset-inline-start:auto !important;
-  inset-inline-end:auto !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
   justify-content:flex-start !important;
   direction:ltr !important;
+}
+
+@media (max-width:650px){
+  #smHeaderTools.sm-header-tools,
+  .sm-header-tools,
+  .sm-header .sm-tools,
+  .sm-header .sm-toolbar{
+    left:auto !important;
+    right:max(8px,env(safe-area-inset-right)) !important;
+  }
 }
 
 /* Let a hint of the page gradient breathe through the sticky category rail. */
