@@ -1,13 +1,19 @@
 (() => {
-  if (window.__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V2__) return;
-  window.__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V2__ = true;
+  if (window.__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V3__) return;
+  window.__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V3__ = true;
 
   const MAX_EDGE = 1600;
+  const LARGE_IMAGE_EDGE = 1280;
   const WEBP_QUALITY = 0.82;
+  const LARGE_IMAGE_QUALITY = 0.76;
+  const JPEG_FALLBACK_QUALITY = 0.80;
   const KEEP_SMALL_WEBP_UNDER = 420 * 1024;
   const MAX_SOURCE_BYTES = 30 * 1024 * 1024;
+  const LARGE_SOURCE_BYTES = 12 * 1024 * 1024;
   const MAX_UNOPTIMIZED_BYTES = 10 * 1024 * 1024;
   const MAX_OPTIMIZED_BYTES = 5 * 1024 * 1024;
+  const DECODE_TIMEOUT_MS = 18000;
+  const ENCODE_TIMEOUT_MS = 12000;
   const PATH_REWRITE = new Map();
 
   function setProgressFor(id, text) {
@@ -18,6 +24,20 @@
   function setAnyUploadProgress(text) {
     setProgressFor('p_upload_progress', text);
     setProgressFor('np_upload_progress', text);
+  }
+
+  function nextPaint() {
+    return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+  }
+
+  function withTimeout(promise, ms, message) {
+    let timer = 0;
+    return Promise.race([
+      Promise.resolve(promise).finally(() => clearTimeout(timer)),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(message)), ms);
+      })
+    ]);
   }
 
   function isImage(file) {
@@ -62,38 +82,157 @@
     return `${value.toFixed(value >= 10 ? 1 : 2)}MB`;
   }
 
-  async function decodeImage(file) {
-    const url = URL.createObjectURL(file);
+  async function decodeWithImageBitmap(file, progressId) {
+    if (typeof createImageBitmap !== 'function') return null;
+    setProgressFor(progressId, `جاري قراءة الصورة ${formatMb(file.size)}...`);
+    await nextPaint();
+
     try {
-      const img = new Image();
-      img.decoding = 'async';
-      img.src = url;
+      return await withTimeout(
+        createImageBitmap(file, { imageOrientation: 'from-image' }),
+        DECODE_TIMEOUT_MS,
+        'استغرقت قراءة الصورة وقتاً طويلاً.'
+      );
+    } catch (firstError) {
+      try {
+        return await withTimeout(
+          createImageBitmap(file),
+          DECODE_TIMEOUT_MS,
+          'استغرقت قراءة الصورة وقتاً طويلاً.'
+        );
+      } catch (_) {
+        throw firstError;
+      }
+    }
+  }
+
+  async function decodeWithImageElement(file, progressId) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = url;
+
+    try {
+      setProgressFor(progressId, `جاري قراءة الصورة ${formatMb(file.size)}...`);
+      await nextPaint();
+
       if (typeof img.decode === 'function') {
-        await img.decode();
+        await withTimeout(
+          img.decode(),
+          DECODE_TIMEOUT_MS,
+          'استغرقت قراءة الصورة وقتاً طويلاً.'
+        );
       } else {
-        await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = reject;
-        });
+        await withTimeout(
+          new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = () => reject(new Error('تعذر قراءة الصورة على هذا الجهاز.'));
+          }),
+          DECODE_TIMEOUT_MS,
+          'استغرقت قراءة الصورة وقتاً طويلاً.'
+        );
       }
       return img;
-    } finally {
-      setTimeout(() => URL.revokeObjectURL(url), 0);
+    } catch (error) {
+      URL.revokeObjectURL(url);
+      throw error;
+    }
+  }
+
+  async function decodeRaster(file, progressId) {
+    try {
+      const bitmap = await decodeWithImageBitmap(file, progressId);
+      if (bitmap) return { source: bitmap, revoke: () => bitmap.close?.() };
+    } catch (bitmapError) {
+      console.debug('ImageBitmap decode failed, trying Image:', bitmapError?.message || bitmapError);
+    }
+
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = url;
+
+    try {
+      setProgressFor(progressId, 'جاري فتح الصورة بطريقة متوافقة...');
+      await nextPaint();
+      if (typeof img.decode === 'function') {
+        await withTimeout(img.decode(), DECODE_TIMEOUT_MS, 'تعذر فتح الصورة الكبيرة خلال الوقت المسموح.');
+      } else {
+        await withTimeout(
+          new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = () => reject(new Error('تعذر قراءة الصورة.'));
+          }),
+          DECODE_TIMEOUT_MS,
+          'تعذر فتح الصورة الكبيرة خلال الوقت المسموح.'
+        );
+      }
+      return { source: img, revoke: () => URL.revokeObjectURL(url) };
+    } catch (error) {
+      URL.revokeObjectURL(url);
+      throw error;
     }
   }
 
   function canvasToBlob(canvas, type, quality) {
-    return new Promise(resolve => canvas.toBlob(resolve, type, quality));
+    return new Promise((resolve, reject) => {
+      try {
+        canvas.toBlob(blob => resolve(blob || null), type, quality);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
-  async function optimizeImage(file) {
-    if (shouldSkip(file)) return file;
+  async function encodeCanvas(canvas, file, progressId, quality) {
+    setProgressFor(progressId, 'جاري تحويل الصورة إلى WebP...');
+    await nextPaint();
 
     try {
-      const img = await decodeImage(file);
-      const sourceWidth = Number(img.naturalWidth || img.width || 0);
-      const sourceHeight = Number(img.naturalHeight || img.height || 0);
-      if (!sourceWidth || !sourceHeight) return file;
+      const webp = await withTimeout(
+        canvasToBlob(canvas, 'image/webp', quality),
+        ENCODE_TIMEOUT_MS,
+        'تأخر تحويل WebP.'
+      );
+      if (webp && webp.type === 'image/webp') {
+        return new File(
+          [webp],
+          `${baseName(file.name)}.webp`,
+          { type: 'image/webp', lastModified: Date.now() }
+        );
+      }
+    } catch (error) {
+      console.debug('WebP encode fallback:', error?.message || error);
+    }
+
+    setProgressFor(progressId, 'WebP ما استجاب بسرعة، جاري التحويل إلى JPG خفيف...');
+    await nextPaint();
+
+    const jpeg = await withTimeout(
+      canvasToBlob(canvas, 'image/jpeg', JPEG_FALLBACK_QUALITY),
+      ENCODE_TIMEOUT_MS,
+      'تعذر ضغط الصورة على هذا الجهاز.'
+    );
+
+    if (!jpeg) throw new Error('تعذر إنشاء نسخة مضغوطة من الصورة.');
+
+    return new File(
+      [jpeg],
+      `${baseName(file.name)}.jpg`,
+      { type: 'image/jpeg', lastModified: Date.now() }
+    );
+  }
+
+  async function optimizeImage(file, progressId) {
+    if (shouldSkip(file)) return file;
+
+    let decoded = null;
+    try {
+      decoded = await decodeRaster(file, progressId);
+      const source = decoded.source;
+      const sourceWidth = Number(source.width || source.naturalWidth || 0);
+      const sourceHeight = Number(source.height || source.naturalHeight || 0);
+      if (!sourceWidth || !sourceHeight) throw new Error('تعذر معرفة أبعاد الصورة.');
 
       const maxSourceEdge = Math.max(sourceWidth, sourceHeight);
       if (
@@ -104,36 +243,41 @@
         return file;
       }
 
-      const scale = Math.min(1, MAX_EDGE / maxSourceEdge);
+      const targetEdge = file.size >= LARGE_SOURCE_BYTES ? LARGE_IMAGE_EDGE : MAX_EDGE;
+      const quality = file.size >= LARGE_SOURCE_BYTES ? LARGE_IMAGE_QUALITY : WEBP_QUALITY;
+      const scale = Math.min(1, targetEdge / maxSourceEdge);
       const width = Math.max(1, Math.round(sourceWidth * scale));
       const height = Math.max(1, Math.round(sourceHeight * scale));
+
+      setProgressFor(progressId, `جاري تصغير الصورة إلى ${width}×${height}...`);
+      await nextPaint();
 
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
 
-      const ctx = canvas.getContext('2d', { alpha: true });
-      if (!ctx) return file;
+      const ctx = canvas.getContext('2d', { alpha: false });
+      if (!ctx) throw new Error('تعذر تشغيل معالج الصور في المتصفح.');
 
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, 0, 0, width, height);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(source, 0, 0, width, height);
 
-      const blob = await canvasToBlob(canvas, 'image/webp', WEBP_QUALITY);
-      if (!blob || blob.type !== 'image/webp') return file;
+      const optimized = await encodeCanvas(canvas, file, progressId, quality);
 
-      if (scale === 1 && blob.size >= file.size) return file;
+      canvas.width = 1;
+      canvas.height = 1;
 
-      const optimized = new File(
-        [blob],
-        `${baseName(file.name)}.webp`,
-        { type: 'image/webp', lastModified: Date.now() }
-      );
+      if (scale === 1 && optimized.size >= file.size && file.size <= MAX_UNOPTIMIZED_BYTES) {
+        return file;
+      }
+
       try { optimized.__pbOptimized = true; } catch (_) {}
       return optimized;
-    } catch (error) {
-      console.debug('Pasha Baby image optimizer fallback:', error?.message || error);
-      return file;
+    } finally {
+      try { decoded?.revoke?.(); } catch (_) {}
     }
   }
 
@@ -157,11 +301,18 @@
       return file;
     }
 
-    setProgressFor(progressId, `جاري تحسين وضغط الصورة ${formatMb(file.size)}...`);
-    const optimized = await optimizeImage(file);
+    setProgressFor(progressId, `جاري تجهيز الصورة ${formatMb(file.size)}...`);
+    await nextPaint();
+
+    let optimized;
+    try {
+      optimized = await optimizeImage(file, progressId);
+    } catch (error) {
+      throw new Error(`فشل ضغط الصورة: ${error?.message || error}`);
+    }
 
     if (optimized === file && file.size > MAX_UNOPTIMIZED_BYTES) {
-      throw new Error('تعذر ضغط الصورة الكبيرة على هذا الجهاز. جرّب صورة أخرى أو حوّلها إلى JPG/WebP ثم أعد الرفع.');
+      throw new Error('تعذر ضغط الصورة الكبيرة على هذا الجهاز. جرّب JPG أو WebP، أو صورة أصغر من 10MB.');
     }
 
     if (optimized.size > MAX_OPTIMIZED_BYTES) {
@@ -191,9 +342,10 @@
     setProgressFor(
       progressId,
       prepared !== file
-        ? `تم التحسين إلى ${formatMb(after)}${saved ? ` — توفير ${saved}%` : ''}. جاري الرفع...`
+        ? `تم الضغط إلى ${formatMb(after)}${saved ? ` — توفير ${saved}%` : ''}. جاري الرفع...`
         : 'جاري رفع الصورة...'
     );
+    await nextPaint();
 
     try { prepared.__pbOptimized = true; } catch (_) {}
 
@@ -262,7 +414,6 @@
     return `${clean}.webp`;
   }
 
-  // Fallback protection for any future product uploader that writes directly to Storage.
   function patchStorage() {
     const storage = getSupabaseClient()?.storage;
     if (!storage || typeof storage.from !== 'function') return false;
@@ -286,9 +437,11 @@
               }
 
               setAnyUploadProgress('جاري تحسين وضغط الصورة...');
-              const optimized = await optimizeImage(body);
-              const converted = optimized !== body && optimized.type === 'image/webp';
-              const uploadPath = converted ? webpPath(originalPath) : originalPath;
+              const optimized = await optimizeImage(body, 'p_upload_progress');
+              const converted = optimized !== body;
+              const uploadPath = converted && optimized.type === 'image/webp'
+                ? webpPath(originalPath)
+                : originalPath.replace(/\.[a-z0-9]+$/i, optimized.type === 'image/jpeg' ? '.jpg' : '$&');
 
               const nextOptions = {
                 ...options,
@@ -345,9 +498,7 @@
   }, true);
 
   document.addEventListener('click', event => {
-    if (event.target.closest?.('#saveRestaurantSettingsBtn')) {
-      sanitizeSocialUrlInputs();
-    }
+    if (event.target.closest?.('#saveRestaurantSettingsBtn')) sanitizeSocialUrlInputs();
   }, true);
 
   function install() {
@@ -367,9 +518,7 @@
           window.uploadAdminProductImage?.__pbOptimizedWrapper &&
           window.uploadNewProductImage?.__pbOptimizedWrapper
         )
-      ) {
-        clearInterval(timer);
-      }
+      ) clearInterval(timer);
     }, 100);
   }
 
