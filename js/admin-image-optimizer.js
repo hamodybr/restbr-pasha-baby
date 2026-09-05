@@ -1,23 +1,36 @@
 (() => {
-  if (window.__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V1__) return;
-  window.__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V1__ = true;
+  if (window.__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V2__) return;
+  window.__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V2__ = true;
 
   const MAX_EDGE = 1600;
   const WEBP_QUALITY = 0.82;
   const KEEP_SMALL_WEBP_UNDER = 420 * 1024;
+  const MAX_SOURCE_BYTES = 30 * 1024 * 1024;
+  const MAX_UNOPTIMIZED_BYTES = 10 * 1024 * 1024;
+  const MAX_OPTIMIZED_BYTES = 5 * 1024 * 1024;
   const PATH_REWRITE = new Map();
 
-  function setProgress(text) {
-    const el = document.getElementById('p_upload_progress');
+  function setProgressFor(id, text) {
+    const el = document.getElementById(id);
     if (el) el.textContent = text || '';
   }
 
+  function setAnyUploadProgress(text) {
+    setProgressFor('p_upload_progress', text);
+    setProgressFor('np_upload_progress', text);
+  }
+
+  function isImage(file) {
+    return !!file && file instanceof Blob && String(file.type || '').toLowerCase().startsWith('image/');
+  }
+
+  function isNonRasterOptimizable(file) {
+    const type = String(file?.type || '').toLowerCase();
+    return type === 'image/gif' || type === 'image/svg+xml';
+  }
+
   function shouldSkip(file) {
-    if (!file || !(file instanceof Blob)) return true;
-    const type = String(file.type || '').toLowerCase();
-    if (!type.startsWith('image/')) return true;
-    if (type === 'image/gif' || type === 'image/svg+xml') return true;
-    return false;
+    return !isImage(file) || isNonRasterOptimizable(file);
   }
 
   function baseName(name) {
@@ -25,6 +38,28 @@
       .replace(/\.[^.]+$/, '')
       .replace(/[^a-zA-Z0-9_-]+/g, '-')
       .replace(/^-+|-+$/g, '') || 'product';
+  }
+
+  function extensionFor(file) {
+    const type = String(file?.type || '').toLowerCase();
+    const mapped = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+      'image/svg+xml': 'svg',
+      'image/avif': 'avif',
+      'image/heic': 'heic',
+      'image/heif': 'heif'
+    }[type];
+    if (mapped) return mapped;
+    const fromName = String(file?.name || '').match(/\.([a-z0-9]{2,6})$/i)?.[1];
+    return fromName ? fromName.toLowerCase() : 'jpg';
+  }
+
+  function formatMb(bytes) {
+    const value = Number(bytes || 0) / (1024 * 1024);
+    return `${value.toFixed(value >= 10 ? 1 : 2)}MB`;
   }
 
   async function decodeImage(file) {
@@ -89,15 +124,134 @@
 
       if (scale === 1 && blob.size >= file.size) return file;
 
-      return new File(
+      const optimized = new File(
         [blob],
         `${baseName(file.name)}.webp`,
         { type: 'image/webp', lastModified: Date.now() }
       );
+      try { optimized.__pbOptimized = true; } catch (_) {}
+      return optimized;
     } catch (error) {
       console.debug('Pasha Baby image optimizer fallback:', error?.message || error);
       return file;
     }
+  }
+
+  function getSupabaseClient() {
+    try {
+      if (typeof supabaseClient !== 'undefined' && supabaseClient) return supabaseClient;
+    } catch (_) {}
+    return window.supabaseClient || null;
+  }
+
+  async function prepareImage(file, progressId) {
+    if (!isImage(file)) throw new Error('الملف المختار ليس صورة.');
+    if (file.size > MAX_SOURCE_BYTES) {
+      throw new Error(`حجم الصورة الأصلية ${formatMb(file.size)}. الحد الأقصى قبل الضغط هو 30MB.`);
+    }
+
+    if (isNonRasterOptimizable(file)) {
+      if (file.size > MAX_UNOPTIMIZED_BYTES) {
+        throw new Error('ملفات GIF وSVG لا يتم ضغطها تلقائياً، والحد الأقصى لها 10MB.');
+      }
+      return file;
+    }
+
+    setProgressFor(progressId, `جاري تحسين وضغط الصورة ${formatMb(file.size)}...`);
+    const optimized = await optimizeImage(file);
+
+    if (optimized === file && file.size > MAX_UNOPTIMIZED_BYTES) {
+      throw new Error('تعذر ضغط الصورة الكبيرة على هذا الجهاز. جرّب صورة أخرى أو حوّلها إلى JPG/WebP ثم أعد الرفع.');
+    }
+
+    if (optimized.size > MAX_OPTIMIZED_BYTES) {
+      throw new Error(`الصورة بعد المعالجة ما زالت كبيرة (${formatMb(optimized.size)}). جرّب صورة أخرى.`);
+    }
+
+    return optimized;
+  }
+
+  async function uploadProductImage({ inputId, urlInputId, progressId, productId }) {
+    const input = document.getElementById(inputId);
+    const file = input?.files?.[0];
+    if (!file) return String(document.getElementById(urlInputId)?.value || '').trim();
+
+    const prepared = await prepareImage(file, progressId);
+    const before = Math.max(1, Number(file.size || 0));
+    const after = Number(prepared.size || 0);
+    const saved = Math.max(0, Math.round((1 - after / before) * 100));
+
+    const client = getSupabaseClient();
+    if (!client?.storage) throw new Error('Supabase Storage غير متاح.');
+
+    const ext = extensionFor(prepared);
+    const safeProductId = String(productId).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const path = `products/${safeProductId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+    setProgressFor(
+      progressId,
+      prepared !== file
+        ? `تم التحسين إلى ${formatMb(after)}${saved ? ` — توفير ${saved}%` : ''}. جاري الرفع...`
+        : 'جاري رفع الصورة...'
+    );
+
+    try { prepared.__pbOptimized = true; } catch (_) {}
+
+    const upload = await client.storage
+      .from('menu-images')
+      .upload(path, prepared, {
+        cacheControl: '31536000',
+        upsert: false,
+        contentType: prepared.type || file.type
+      });
+
+    if (upload.error) throw upload.error;
+
+    const result = client.storage.from('menu-images').getPublicUrl(path);
+    const publicUrl = result?.data?.publicUrl;
+    if (!publicUrl) throw new Error('تم رفع الصورة لكن تعذر إنشاء رابطها العام.');
+
+    const urlInput = document.getElementById(urlInputId);
+    if (urlInput) urlInput.value = publicUrl;
+
+    setProgressFor(
+      progressId,
+      prepared !== file
+        ? `تم رفع الصورة ✓ ${formatMb(before)} → ${formatMb(after)}${saved ? ` (${saved}% أقل)` : ''}`
+        : 'تم رفع الصورة ✓'
+    );
+
+    return publicUrl;
+  }
+
+  function patchLegacyUploadFunctions() {
+    let patched = false;
+
+    if (typeof window.uploadAdminProductImage === 'function' && !window.uploadAdminProductImage.__pbOptimizedWrapper) {
+      const editUploader = async productId => uploadProductImage({
+        inputId: 'p_image_file',
+        urlInputId: 'p_image_url',
+        progressId: 'p_upload_progress',
+        productId
+      });
+      editUploader.__pbOptimizedWrapper = true;
+      window.uploadAdminProductImage = editUploader;
+      patched = true;
+    }
+
+    if (typeof window.uploadNewProductImage === 'function' && !window.uploadNewProductImage.__pbOptimizedWrapper) {
+      const newUploader = async productId => uploadProductImage({
+        inputId: 'np_image_file',
+        urlInputId: 'np_image_url',
+        progressId: 'np_upload_progress',
+        productId
+      });
+      newUploader.__pbOptimizedWrapper = true;
+      window.uploadNewProductImage = newUploader;
+      patched = true;
+    }
+
+    return patched;
   }
 
   function webpPath(path) {
@@ -108,13 +262,7 @@
     return `${clean}.webp`;
   }
 
-  function getSupabaseClient() {
-    try {
-      if (typeof supabaseClient !== 'undefined' && supabaseClient) return supabaseClient;
-    } catch (_) {}
-    return window.supabaseClient || null;
-  }
-
+  // Fallback protection for any future product uploader that writes directly to Storage.
   function patchStorage() {
     const storage = getSupabaseClient()?.storage;
     if (!storage || typeof storage.from !== 'function') return false;
@@ -133,11 +281,11 @@
               const originalPath = String(path || '');
               const isProductImage = /^products\//i.test(originalPath);
 
-              if (!isProductImage || shouldSkip(body)) {
+              if (!isProductImage || shouldSkip(body) || body?.__pbOptimized) {
                 return target.upload(originalPath, body, options);
               }
 
-              setProgress('جاري تحسين وضغط الصورة...');
+              setAnyUploadProgress('جاري تحسين وضغط الصورة...');
               const optimized = await optimizeImage(body);
               const converted = optimized !== body && optimized.type === 'image/webp';
               const uploadPath = converted ? webpPath(originalPath) : originalPath;
@@ -151,10 +299,6 @@
               const result = await target.upload(uploadPath, optimized, nextOptions);
               if (!result?.error && converted && uploadPath !== originalPath) {
                 PATH_REWRITE.set(originalPath, uploadPath);
-                const before = Math.max(1, Number(body.size || 0));
-                const after = Number(optimized.size || 0);
-                const saved = Math.max(0, Math.round((1 - after / before) * 100));
-                setProgress(`تم ضغط الصورة ${saved ? `— توفير ${saved}%` : ''}`.trim());
               }
               return result;
             };
@@ -206,12 +350,26 @@
     }
   }, true);
 
+  function install() {
+    patchStorage();
+    patchLegacyUploadFunctions();
+  }
+
   function start() {
-    if (patchStorage()) return;
+    install();
     let tries = 0;
     const timer = setInterval(() => {
       tries += 1;
-      if (patchStorage() || tries >= 80) clearInterval(timer);
+      install();
+      if (
+        tries >= 100 ||
+        (
+          window.uploadAdminProductImage?.__pbOptimizedWrapper &&
+          window.uploadNewProductImage?.__pbOptimizedWrapper
+        )
+      ) {
+        clearInterval(timer);
+      }
     }, 100);
   }
 
