@@ -25,10 +25,8 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-
           cfg = Path('js/supabase-config.js')
           text = cfg.read_text()
-
           comments = [
               'Public-menu only: keep the open options sheet synced after live price refreshes.',
               'Admin-only dine-in / takeaway price controls for restaurant deployments.',
@@ -40,18 +38,15 @@ jobs:
               'Admin-only restaurant dine-in / takeaway choice-window editor.',
               'Admin-only restaurant-mode percentage discount manager.',
           ]
-
           for comment in comments:
               pattern = re.compile(r'// ' + re.escape(comment) + r'\n\(\(\) => \{.*?\n\}\)\(\);\n\n', re.S)
               text, count = pattern.subn('', text)
               if count != 1:
                   raise SystemExit(f'expected one loader block for {comment!r}, found {count}')
-
           marker = '// ==========================================\n// RESTBR MENU — Supabase Connection Test\n// ==========================================\n'
           if text.count(marker) != 1:
               raise SystemExit('unexpected connection-test marker count')
-          text = text.split(marker, 1)[0].rstrip() + '\n'
-          cfg.write_text(text)
+          cfg.write_text(text.split(marker, 1)[0].rstrip() + '\n')
 
           sw = Path('sw.js')
           sw_text = sw.read_text()
@@ -67,30 +62,29 @@ jobs:
           if check_text.count(old) != 1:
               raise SystemExit('unexpected predeploy retail guard count')
           check_text = check_text.replace(old, new)
-
           anchor = "forbidText('js/supabase-config.js', 'testSupabaseConnection();', 'development connection-test request');"
-          dead_check = """
-const restaurantOnlyDeadFiles = [
-  'js/discount-choice-price-sync.js',
-  'js/admin-takeaway-prices.js',
-  'js/admin-bulk-price-target-ui.js',
-  'js/admin-full-backup-discounts.js',
-  'js/admin-full-restore-discounts.js',
-  'js/admin-excel-export-takeaway.js',
-  'js/admin-excel-import-takeaway.js',
-  'js/admin-dining-gate-settings.js',
-  'js/admin-discounts.js',
-  'js/dining-mode.js',
-  'js/dining-gate-language.js'
-];
-for (const file of restaurantOnlyDeadFiles) {
-  if (exists(file)) fail(`${file}: restaurant-only dead code must not ship in Pasha retail`);
-}
-""".strip()
+          dead_lines = [
+              "const restaurantOnlyDeadFiles = [",
+              "  'js/discount-choice-price-sync.js',",
+              "  'js/admin-takeaway-prices.js',",
+              "  'js/admin-bulk-price-target-ui.js',",
+              "  'js/admin-full-backup-discounts.js',",
+              "  'js/admin-full-restore-discounts.js',",
+              "  'js/admin-excel-export-takeaway.js',",
+              "  'js/admin-excel-import-takeaway.js',",
+              "  'js/admin-dining-gate-settings.js',",
+              "  'js/admin-discounts.js',",
+              "  'js/dining-mode.js',",
+              "  'js/dining-gate-language.js'",
+              "];",
+              "for (const file of restaurantOnlyDeadFiles) {",
+              "  if (exists(file)) fail(`${file}: restaurant-only dead code must not ship in Pasha retail`);",
+              "}",
+          ]
+          dead_check = '\n'.join(dead_lines)
           if check_text.count(anchor) != 1:
               raise SystemExit('unexpected predeploy anchor count')
-          check_text = check_text.replace(anchor, anchor + '\n\n' + dead_check)
-          check.write_text(check_text)
+          check.write_text(check_text.replace(anchor, anchor + '\n\n' + dead_check))
           PY
 
           rm -f \
