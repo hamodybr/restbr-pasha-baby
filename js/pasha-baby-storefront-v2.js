@@ -63,7 +63,7 @@
         width:100%!important;min-width:0!important;height:38px!important;margin:0!important;
         padding:0 2px!important;border:0!important;outline:0!important;border-radius:0!important;
         background:transparent!important;color:#243137!important;-webkit-text-fill-color:#243137!important;
-        box-shadow:none!important;font:inherit!important;font-size:13px!important;line-height:38px!important;
+        box-shadow:none!important;font:inherit!important;font-size:16px!important;line-height:38px!important;
         font-weight:800!important;text-align:start!important;direction:inherit!important;
         appearance:none!important;-webkit-appearance:none!important
       }
@@ -90,7 +90,7 @@
       @media(max-width:390px){
         .pb-search-host{margin-top:12px}
         .pb-store-hero #smSearchWrap{min-height:47px!important;border-radius:15px!important}
-        .pb-store-hero #smSearchInput{font-size:12.5px!important}
+        .pb-store-hero #smSearchInput{font-size:16px!important}
       }
     `;
     document.head.appendChild(style);
