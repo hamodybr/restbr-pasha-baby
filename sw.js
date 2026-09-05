@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v4";
+const CACHE_NAME = "restbr-pasha-baby-v5";
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -15,6 +15,7 @@ const CORE = [
   "./css/pasha-baby-storefront-v2.css?v=2.0",
   "./css/pasha-baby-retail-fixes.css?v=1.0",
   "./css/pasha-baby-retail-polish-v3.css?v=3.0",
+  "./css/pasha-baby-retail-v4.css?v=4.0",
   "./js/offline-status.js?v=1.1",
   "./js/unavailable-card-state.js?v=1.1",
   "./js/app.js?v=18.1",
@@ -35,8 +36,9 @@ const CORE = [
   "./js/card-life-effects.js?v=1.0",
   "./js/live-card-badges.js?v=1.0",
   "./js/pasha-baby-ui.js?v=1.1",
-  "./js/pasha-baby-storefront-v2.js?v=2.0",
+  "./js/pasha-baby-storefront-v2.js?v=2.1",
   "./js/pasha-baby-retail-interactions-v3.js?v=3.0",
+  "./js/pasha-baby-retail-v4.js?v=4.0",
   "./data/menu.json?v=32",
   "./assets/restaurant-placeholder.svg",
   "./assets/pasha-baby-product-placeholder.svg",
