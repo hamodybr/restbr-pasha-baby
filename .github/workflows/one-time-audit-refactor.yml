@@ -44,3 +44,5 @@ jobs:
           git diff --cached --check
           git commit -m "refactor: harden Pasha core flows after audit"
           git push origin HEAD:audit-hardening-2026-09-06
+
+# retry: 2
