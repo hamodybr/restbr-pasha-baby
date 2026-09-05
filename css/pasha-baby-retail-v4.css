@@ -1,6 +1,6 @@
-/* PASHA BABY — RETAIL V4
+/* PASHA BABY — RETAIL V5
    One category navigation system only: large pastel horizontal rail.
-   Also replaces the last legacy search/image-viewer accents. */
+   Stable iOS touch scrolling + retail search/image/card polish. */
 
 :root{
   --pb4-ink:#26363b;
@@ -15,10 +15,8 @@
   --pb4-lilac:#eee9f7;
 }
 
-/* The duplicate large category grid is retired in retail v4. */
 #pbCategoryPanelV2{display:none!important}
 
-/* Search popover: no black/gold restaurant UI. */
 #smSearchWrap,
 .sm-header-tools .sm-search-wrap{
   width:min(86vw,430px)!important;
@@ -87,7 +85,6 @@
   font-size:10px!important;
 }
 
-/* Main category navigation = the rail itself. */
 .sm-cats-wrap,
 .sm-cats-wrap.fixed{
   top:0!important;
@@ -100,11 +97,17 @@
   -webkit-backdrop-filter:blur(12px)!important;
 }
 
+/* iPhone/Safari: no snap + no CSS smooth scrolling.
+   The user's finger fully owns horizontal movement. */
 #smCats.sm-cats{
   gap:9px!important;
   padding:2px 14px 5px!important;
   overflow-x:auto!important;
-  scroll-snap-type:x proximity!important;
+  overflow-y:hidden!important;
+  scroll-snap-type:none!important;
+  scroll-behavior:auto!important;
+  overscroll-behavior-x:contain!important;
+  touch-action:pan-x!important;
   scrollbar-width:none!important;
 }
 #smCats.sm-cats::-webkit-scrollbar{display:none!important}
@@ -122,7 +125,7 @@
   align-items:center!important;
   justify-content:flex-start!important;
   gap:9px!important;
-  scroll-snap-align:start!important;
+  scroll-snap-align:none!important;
   border:1px solid transparent!important;
   border-radius:18px!important;
   background:var(--pb4-sky)!important;
@@ -171,7 +174,6 @@
   box-shadow:0 0 0 2px rgba(79,143,131,.08) inset!important;
 }
 
-/* When a product has no real photo, the pictogram is the visual; no viewer affordance. */
 #smMenu .sm-img.pb-placeholder .sm-product-image,
 #smMenu .sm-img.sm-image-fallback-empty .sm-product-image,
 #smMenu .sm-product-image[data-pb-placeholder="1"]{
@@ -179,8 +181,6 @@
   cursor:default!important;
 }
 
-/* Small cartoon character peeking from the physical bottom-left of each card.
-   Keep this away from badges and top controls. */
 #smMenu .sm-card{
   position:relative!important;
 }
@@ -190,10 +190,10 @@
   z-index:32;
   top:auto!important;
   right:auto!important;
+  left:-7px!important;
+  bottom:-7px!important;
   inset-inline-start:auto!important;
   inset-inline-end:auto!important;
-  left:-7px!important;
-  bottom:-8px!important;
   width:42px;
   height:42px;
   display:grid;
@@ -236,12 +236,11 @@
     width:36px;
     height:36px;
     left:-6px!important;
-    bottom:-7px!important;
+    bottom:-6px!important;
     font-size:23px;
   }
 }
 
-/* If a stale image viewer opens anyway, keep it neutral rather than restaurant-black/gold. */
 .sm-image-viewer{
   background:rgba(38,54,59,.86)!important;
 }
