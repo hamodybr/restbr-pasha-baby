@@ -147,6 +147,7 @@ requireText('js/app.js', 'data-cat="${escapeUi(category.id)}"', 'UUID category n
 requireText('js/app.js', 'String(product.category.id)===String(active)', 'UUID category render filter');
 requireText('js/cart.js', 'const orderNonce=', 'random order ID nonce');
 requireText('admin.html', "rpc('can_access_admin')", 'native admin role gate');
+requireText('admin.html', 'setTimeout(()=>unlockAdminForSession(session),0);', 'deferred admin role check outside auth callback');
 requireText('admin.html', 'result.products_updated ?? result.products ?? 0', 'bulk price result compatibility');
 requireText('admin.html', "const PRICE_SAFETY_BACKUP_KEY='RESTBR_LAST_PRICE_BACKUP_V1';", 'client-neutral price backup key');
 requireText('admin.html', "const ADMIN_SETTINGS_THEME_KEY='RESTBR_ADMIN_SETTINGS_THEME_V1';", 'client-neutral admin theme key');
