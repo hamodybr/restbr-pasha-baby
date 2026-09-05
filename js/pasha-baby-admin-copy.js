@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_BABY_ADMIN_COPY_V2__) return;
-  window.__PASHA_BABY_ADMIN_COPY_V2__ = true;
+  if (window.__PASHA_BABY_ADMIN_COPY_V3__) return;
+  window.__PASHA_BABY_ADMIN_COPY_V3__ = true;
 
   const EXACT = new Map([
     ['إعدادات المطعم', 'إعدادات المحل'],
@@ -135,6 +135,20 @@
     }
   }
 
+  // Pasha Baby is a retail store. These controls belong to the restaurant
+  // template and are intentionally disabled here instead of deleting DB columns.
+  function applyRetailFeaturePolicy() {
+    document.getElementById('diningGateSettingsPanel')?.remove();
+    document.getElementById('bulkPriceTargetField')?.remove();
+    document.getElementById('discountsSettingsPanel')?.remove();
+    document.querySelectorAll('.sm-takeaway-field').forEach(element => element.remove());
+
+    const backgroundVideoControl =
+      document.getElementById('rs_background_video_enabled') ||
+      document.getElementById('rs_background_video');
+    backgroundVideoControl?.closest('.settings-element')?.remove();
+  }
+
   function activeScope() {
     return document.querySelector('.admin-view.active') || document.body;
   }
@@ -145,6 +159,7 @@
       if (frame) cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         frame = 0;
+        applyRetailFeaturePolicy();
         scan(activeScope());
         scan(document.querySelector('.admin-header'));
         scan(document.querySelector('.bottom-nav'));
@@ -157,6 +172,7 @@
   function start() {
     // One initial pass only. No permanent MutationObserver and no recurring
     // whole-document scans: those caused severe jank on iPhone/Safari.
+    applyRetailFeaturePolicy();
     scan(document.body);
 
     document.addEventListener('restbr:admin-language-change', () => {
