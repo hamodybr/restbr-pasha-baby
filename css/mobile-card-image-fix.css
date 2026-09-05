@@ -1,0 +1,62 @@
+/* RESTBR — mobile product image clipping fix */
+@media (max-width:768px){
+  .sm-card{
+    overflow:hidden !important;
+    contain:paint;
+    -webkit-mask-image:-webkit-radial-gradient(white,black);
+  }
+
+  /* Arabic/Kurdish: photo is on the RIGHT. */
+  html[dir="rtl"] .sm-card .sm-img,
+  .sm-card .sm-img{
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+    border-radius:0 16px 16px 0 !important;
+    clip-path:inset(0 round 0 16px 16px 0);
+    transform:translateZ(0);
+  }
+
+  /* English: photo is mirrored to the LEFT, so its OUTER corners are the left ones. */
+  html[dir="ltr"] body #smMenu .sm-card .sm-img{
+    border-radius:16px 0 0 16px !important;
+    clip-path:inset(0 round 16px 0 0 16px) !important;
+  }
+
+  .sm-card .sm-img img,
+  .sm-card:hover .sm-img img,
+  .sm-card:active .sm-img img{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    object-fit:cover !important;
+    transform:none !important;
+  }
+}
+
+@media (max-width:390px){
+  html[dir="rtl"] .sm-card .sm-img,
+  .sm-card .sm-img{
+    border-radius:0 15px 15px 0 !important;
+    clip-path:inset(0 round 0 15px 15px 0);
+  }
+
+  html[dir="ltr"] body #smMenu .sm-card .sm-img{
+    border-radius:15px 0 0 15px !important;
+    clip-path:inset(0 round 15px 0 0 15px) !important;
+  }
+}
+
+/* RESTBR — logo float independent from transform overrides. */
+.sm-logo-wrap{
+  animation:smLogoLiveFloat 4.2s ease-in-out infinite !important;
+  will-change:translate;
+}
+@keyframes smLogoLiveFloat{
+  0%,100%{translate:0 0}
+  50%{translate:0 -8px}
+}
