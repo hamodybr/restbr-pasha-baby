@@ -1,0 +1,131 @@
+/* PASHA BABY — retail storefront corrections
+   Keep this stylesheet last. It intentionally overrides legacy restaurant accents. */
+
+/* Header tools must sit on the side opposite the PB mark. */
+html[dir="rtl"] .sm-header-tools{
+  left:14px !important;
+  right:auto !important;
+}
+
+html[dir="ltr"] .sm-header-tools{
+  right:14px !important;
+  left:auto !important;
+}
+
+html[dir="rtl"] .sm-header-tools .sm-search-wrap,
+html[dir="rtl"] #smLangs.sm-lang-menu{
+  left:0 !important;
+  right:auto !important;
+}
+
+html[dir="ltr"] .sm-header-tools .sm-search-wrap,
+html[dir="ltr"] #smLangs.sm-lang-menu{
+  right:0 !important;
+  left:auto !important;
+}
+
+.sm-header-tools .sm-header-icon-btn,
+#smSearchToggle,
+#smRefreshBtn{
+  border:1px solid #d9e8e3 !important;
+  background:#ffffff !important;
+  color:#326f65 !important;
+  box-shadow:0 5px 15px rgba(48,67,63,.07) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+.sm-header-tools .sm-header-icon-btn svg,
+#smSearchToggle svg,
+#smRefreshBtn svg{
+  stroke:#326f65 !important;
+}
+
+.sm-header-tools .sm-header-icon-btn:focus-visible,
+#smSearchToggle:focus-visible,
+#smRefreshBtn:focus-visible{
+  outline:3px solid rgba(79,143,131,.18) !important;
+  outline-offset:2px !important;
+}
+
+/* Remove every remaining luxury/restaurant accent from the sticky category strip. */
+.sm-cats-wrap,
+#smCatsSentinel + .sm-cats-wrap{
+  background:rgba(247,248,246,.96) !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+#smCats.sm-cats{
+  gap:7px !important;
+  padding-inline:14px !important;
+}
+
+#smCats.sm-cats .sm-cat,
+#smCats.sm-cats .sm-cat:hover,
+#smCats.sm-cats .sm-cat:focus,
+#smCats.sm-cats .sm-cat:visited{
+  min-height:40px !important;
+  height:40px !important;
+  padding:0 11px !important;
+  border:1px solid #dbe9e5 !important;
+  border-radius:13px !important;
+  background:#eef7f4 !important;
+  background-image:none !important;
+  color:#496961 !important;
+  -webkit-text-fill-color:#496961 !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  filter:none !important;
+  transform:none !important;
+}
+
+#smCats.sm-cats .sm-cat:nth-child(4n+2){
+  background:#eef6fa !important;
+  border-color:#dceaf0 !important;
+  color:#496b78 !important;
+  -webkit-text-fill-color:#496b78 !important;
+}
+
+#smCats.sm-cats .sm-cat:nth-child(4n+3){
+  background:#fbf4e2 !important;
+  border-color:#eee3c4 !important;
+  color:#716849 !important;
+  -webkit-text-fill-color:#716849 !important;
+}
+
+#smCats.sm-cats .sm-cat:nth-child(4n+4){
+  background:#f3eef9 !important;
+  border-color:#e6ddf2 !important;
+  color:#675b78 !important;
+  -webkit-text-fill-color:#675b78 !important;
+}
+
+#smCats.sm-cats .sm-cat.active,
+#smCats.sm-cats .sm-cat.active:hover,
+#smCats.sm-cats .sm-cat.active:focus{
+  background:#cfe9e1 !important;
+  background-image:none !important;
+  border-color:#b5dacf !important;
+  color:#245c51 !important;
+  -webkit-text-fill-color:#245c51 !important;
+  box-shadow:0 4px 12px rgba(50,111,101,.08) !important;
+  text-shadow:none !important;
+}
+
+#smCats.sm-cats .sm-cat::before,
+#smCats.sm-cats .sm-cat.active::before{
+  color:inherit !important;
+  filter:none !important;
+  text-shadow:none !important;
+}
+
+.sm-progress,
+.sm-cats-wrap .sm-progress{
+  display:none !important;
+}
+
+@media(max-width:430px){
+  html[dir="rtl"] .sm-header-tools{left:10px !important}
+  html[dir="ltr"] .sm-header-tools{right:10px !important}
+}
