@@ -43,7 +43,6 @@
       }
       return img;
     } finally {
-      // Revoke later after the image is drawn; callers hold the decoded pixels.
       setTimeout(() => URL.revokeObjectURL(url), 0);
     }
   }
@@ -88,16 +87,13 @@
       const blob = await canvasToBlob(canvas, 'image/webp', WEBP_QUALITY);
       if (!blob || blob.type !== 'image/webp') return file;
 
-      // If no resizing happened and WebP is not smaller, keep the original.
       if (scale === 1 && blob.size >= file.size) return file;
 
-      const optimized = new File(
+      return new File(
         [blob],
         `${baseName(file.name)}.webp`,
         { type: 'image/webp', lastModified: Date.now() }
       );
-
-      return optimized;
     } catch (error) {
       console.debug('Pasha Baby image optimizer fallback:', error?.message || error);
       return file;
@@ -112,8 +108,15 @@
     return `${clean}.webp`;
   }
 
+  function getSupabaseClient() {
+    try {
+      if (typeof supabaseClient !== 'undefined' && supabaseClient) return supabaseClient;
+    } catch (_) {}
+    return window.supabaseClient || null;
+  }
+
   function patchStorage() {
-    const storage = window.supabaseClient?.storage;
+    const storage = getSupabaseClient()?.storage;
     if (!storage || typeof storage.from !== 'function') return false;
     if (storage.__pbImageOptimizerPatched) return true;
 
