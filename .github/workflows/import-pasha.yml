@@ -1,0 +1,55 @@
+name: One-time Pasha Baby import
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-pasha.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout destination
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tested Pasha Baby branch
+        run: |
+          git clone --depth 1 --branch pasha-baby-design https://github.com/hamodybr/restbr-menu-app.git /tmp/pasha-baby-source
+
+      - name: Copy project into dedicated repository
+        run: |
+          rsync -a --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            /tmp/pasha-baby-source/ ./
+
+          cat > README.md <<'EOF'
+          # Pasha Baby
+
+          Dedicated storefront for **پاشا بيبي — پاشا بەیبی — Pasha Baby**.
+
+          - Independent repository
+          - Independent Supabase project
+          - Public storefront in Arabic, Badini Kurdish and English
+          - Admin dashboard in Arabic and English
+          - Pasha Baby light retail theme
+
+          Customer contact/location/social details currently contain temporary placeholders and must be replaced before enabling live orders.
+          EOF
+
+      - name: Commit imported project
+        run: |
+          git config user.name "HaMoDyBr"
+          git config user.email "78080184+hamodybr@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to import"
+            exit 0
+          fi
+          git commit -m "feat: initialize dedicated Pasha Baby storefront"
+          git push origin HEAD:main
