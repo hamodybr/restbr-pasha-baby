@@ -40,12 +40,61 @@ body::before{
   background:transparent !important;
 }
 
+/* Keep search + refresh controls on the physical right side in all languages. */
+.sm-header{
+  position:relative !important;
+}
+
+.sm-header-tools,
+.sm-header .sm-tools,
+.sm-header .sm-toolbar{
+  left:auto !important;
+  right:max(10px,env(safe-area-inset-right)) !important;
+  inset-inline-start:auto !important;
+  inset-inline-end:auto !important;
+  justify-content:flex-start !important;
+  direction:ltr !important;
+}
+
 /* Let a hint of the page gradient breathe through the sticky category rail. */
 .sm-cats-wrap,
 .sm-cats-wrap.fixed{
   background:rgba(255,250,247,.84) !important;
   -webkit-backdrop-filter:blur(18px) saturate(1.08) !important;
   backdrop-filter:blur(18px) saturate(1.08) !important;
+}
+
+/* Announcement: clearer urgent label + stronger readable copy. */
+#smAnnouncement.sm-news-ticker,
+.sm-news-ticker{
+  border:1px solid rgba(199,152,148,.34) !important;
+  background:rgba(255,255,255,.94) !important;
+  color:#33474d !important;
+  box-shadow:0 8px 22px rgba(72,58,47,.075) !important;
+  opacity:1 !important;
+}
+
+#smAnnouncement .sm-news-label,
+.sm-news-ticker .sm-news-label{
+  min-width:52px !important;
+  padding-inline:10px !important;
+  background:linear-gradient(135deg,#ee9c96,#df7f83) !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  font-weight:950 !important;
+  opacity:1 !important;
+  text-shadow:none !important;
+  box-shadow:none !important;
+}
+
+#smAnnouncement .sm-news-copy,
+.sm-news-ticker .sm-news-copy{
+  color:#31464c !important;
+  -webkit-text-fill-color:#31464c !important;
+  font-weight:850 !important;
+  opacity:1 !important;
+  filter:none !important;
+  text-shadow:none !important;
 }
 
 /* Keep the bottom area visually continuous instead of ending in a flat block. */
