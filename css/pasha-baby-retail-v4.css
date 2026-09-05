@@ -179,8 +179,8 @@
   cursor:default!important;
 }
 
-/* Small cartoon character peeking from each card edge.
-   Deterministic assignment is handled in pasha-baby-retail-v4.js. */
+/* Small cartoon character peeking from the physical bottom-left of each card.
+   Keep this away from badges and top controls. */
 #smMenu .sm-card{
   position:relative!important;
 }
@@ -188,8 +188,12 @@
 #smMenu .pb-card-character{
   position:absolute;
   z-index:32;
-  top:-9px;
-  inset-inline-end:9px;
+  top:auto!important;
+  right:auto!important;
+  inset-inline-start:auto!important;
+  inset-inline-end:auto!important;
+  left:-7px!important;
+  bottom:-8px!important;
   width:42px;
   height:42px;
   display:grid;
@@ -227,13 +231,12 @@
   background:var(--pb4-mint);
 }
 
-/* Keep the decorative character away from controls on very compact cards. */
 @media(max-width:420px){
   #smMenu .pb-card-character{
     width:36px;
     height:36px;
-    top:-8px;
-    inset-inline-end:7px;
+    left:-6px!important;
+    bottom:-7px!important;
     font-size:23px;
   }
 }
