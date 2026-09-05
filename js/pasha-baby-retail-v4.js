@@ -5,6 +5,59 @@
   const DEFAULT_PLACEHOLDER = 'assets/pasha-baby-product-placeholder.svg';
   const PLACEHOLDER_RE = /(?:restaurant-placeholder|pasha-baby-product-placeholder)\.svg(?:\?|$)/i;
 
+  function installRetailFixStyles() {
+    if (document.getElementById('pbRetailV4RuntimeStyles')) return;
+    const style = document.createElement('style');
+    style.id = 'pbRetailV4RuntimeStyles';
+    style.textContent = `
+      /* Use the branded Pasha Baby image itself for products without photos. */
+      #smMenu .sm-img.pb-placeholder .sm-product-image,
+      #smMenu .sm-product-image[data-pb-placeholder="1"]{
+        opacity:1!important;
+        visibility:visible!important;
+        display:block!important;
+        width:100%!important;
+        height:100%!important;
+        object-fit:contain!important;
+        object-position:center!important;
+        padding:0!important;
+        background:#f8fbfa!important;
+      }
+      #smMenu .sm-img.pb-placeholder::after{
+        content:none!important;
+        display:none!important;
+      }
+
+      /* Cart notifications belong in the visual center, not at the bottom. */
+      .sm-cart-toast{
+        top:50%!important;
+        bottom:auto!important;
+        left:50%!important;
+        right:auto!important;
+        width:max-content!important;
+        max-width:min(86vw,360px)!important;
+        min-height:48px!important;
+        padding:12px 18px!important;
+        border:1px solid #cbe4dc!important;
+        border-radius:16px!important;
+        background:#eff8f5!important;
+        color:#2f7568!important;
+        box-shadow:0 14px 38px rgba(48,67,63,.16)!important;
+        font-size:13px!important;
+        font-weight:900!important;
+        text-align:center!important;
+        white-space:normal!important;
+        transform:translate(-50%,-50%) scale(.96)!important;
+        transition:opacity .18s ease,transform .18s ease!important;
+      }
+      .sm-cart-toast.show{
+        opacity:1!important;
+        transform:translate(-50%,-50%) scale(1)!important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function removeDuplicateCategoryPanel() {
     document.getElementById('pbCategoryPanelV2')?.remove();
   }
@@ -46,6 +99,7 @@
   }
 
   function refresh() {
+    installRetailFixStyles();
     removeDuplicateCategoryPanel();
     markPlaceholders();
     centerActiveCategory();
