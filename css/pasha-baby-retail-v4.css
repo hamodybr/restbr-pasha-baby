@@ -179,6 +179,65 @@
   cursor:default!important;
 }
 
+/* Small cartoon character peeking from each card edge.
+   Deterministic assignment is handled in pasha-baby-retail-v4.js. */
+#smMenu .sm-card{
+  position:relative!important;
+}
+
+#smMenu .pb-card-character{
+  position:absolute;
+  z-index:32;
+  top:-9px;
+  inset-inline-end:9px;
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-select:none;
+  border:2px solid rgba(255,255,255,.92);
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 7px 16px rgba(48,67,63,.12);
+  font-size:27px;
+  line-height:1;
+  transform:rotate(5deg);
+  transform-origin:center;
+  filter:saturate(.88);
+}
+
+#smMenu .pb-card-character-2,
+#smMenu .pb-card-character-6{
+  background:var(--pb4-peach);
+  transform:rotate(-6deg);
+}
+#smMenu .pb-card-character-3,
+#smMenu .pb-card-character-7{
+  background:var(--pb4-butter);
+  transform:rotate(4deg);
+}
+#smMenu .pb-card-character-4,
+#smMenu .pb-card-character-8{
+  background:var(--pb4-lilac);
+  transform:rotate(-4deg);
+}
+#smMenu .pb-card-character-5{
+  background:var(--pb4-mint);
+}
+
+/* Keep the decorative character away from controls on very compact cards. */
+@media(max-width:420px){
+  #smMenu .pb-card-character{
+    width:36px;
+    height:36px;
+    top:-8px;
+    inset-inline-end:7px;
+    font-size:23px;
+  }
+}
+
 /* If a stale image viewer opens anyway, keep it neutral rather than restaurant-black/gold. */
 .sm-image-viewer{
   background:rgba(38,54,59,.86)!important;
