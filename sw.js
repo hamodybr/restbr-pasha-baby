@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v9";
+const CACHE_NAME = "restbr-pasha-baby-v10";
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -16,6 +16,7 @@ const CORE = [
   "./css/pasha-baby-retail-fixes.css?v=1.0",
   "./css/pasha-baby-retail-polish-v3.css?v=3.0",
   "./css/pasha-baby-retail-v4.css?v=5.0",
+  "./css/pasha-baby-brand-background.css?v=1.0",
   "./js/offline-status.js?v=1.1",
   "./js/unavailable-card-state.js?v=1.1",
   "./js/app.js?v=18.1",
