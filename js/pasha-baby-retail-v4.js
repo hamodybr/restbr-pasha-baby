@@ -97,6 +97,157 @@
         text-align:center!important;
       }
 
+      /* Match the upper quick actions to the compact footer action buttons. */
+      #smActions.sm-actions,
+      .sm-header #smActions.sm-actions,
+      .sm-header .sm-quick-actions{
+        width:min(100%,430px)!important;
+        margin:8px auto 10px!important;
+        padding:0 14px!important;
+        display:grid!important;
+        grid-template-columns:repeat(3,minmax(0,1fr))!important;
+        gap:8px!important;
+        box-sizing:border-box!important;
+      }
+      #smActions.sm-actions>a,
+      .sm-header .sm-quick-actions>a{
+        min-width:0!important;
+        min-height:48px!important;
+        margin:0!important;
+        padding:7px 9px!important;
+        display:flex!important;
+        flex-direction:row!important;
+        align-items:center!important;
+        justify-content:center!important;
+        gap:6px!important;
+        border:1px solid rgba(139,177,167,.22)!important;
+        border-radius:16px!important;
+        background:linear-gradient(180deg,#fff,#f8fbfa)!important;
+        color:#34464b!important;
+        box-shadow:0 6px 15px rgba(48,67,63,.055)!important;
+        text-decoration:none!important;
+        text-align:center!important;
+        white-space:nowrap!important;
+        overflow:hidden!important;
+        -webkit-tap-highlight-color:transparent!important;
+      }
+      #smActions.sm-actions>a:nth-child(3n+2),
+      .sm-header .sm-quick-actions>a:nth-child(3n+2){
+        background:linear-gradient(180deg,#fff,#f8f7fc)!important;
+      }
+      #smActions.sm-actions>a:nth-child(3n+3),
+      .sm-header .sm-quick-actions>a:nth-child(3n+3){
+        background:linear-gradient(180deg,#fff,#fff8f3)!important;
+      }
+      #smActions.sm-actions>a>span,
+      .sm-header .sm-quick-actions>a>span{
+        width:20px!important;
+        height:20px!important;
+        min-width:20px!important;
+        flex:0 0 20px!important;
+        margin:0!important;
+        padding:0!important;
+        display:grid!important;
+        place-items:center!important;
+        border-radius:7px!important;
+        background:#dcefe9!important;
+        color:#2f7568!important;
+        font-size:13px!important;
+        line-height:1!important;
+      }
+      #smActions.sm-actions>a:nth-child(3n+2)>span,
+      .sm-header .sm-quick-actions>a:nth-child(3n+2)>span{
+        background:#eee9f7!important;
+        color:#625a75!important;
+      }
+      #smActions.sm-actions>a:nth-child(3n+3)>span,
+      .sm-header .sm-quick-actions>a:nth-child(3n+3)>span{
+        background:#f8e5da!important;
+        color:#875c51!important;
+      }
+      #smActions.sm-actions>a>b,
+      #smActions.sm-actions>a>strong,
+      .sm-header .sm-quick-actions>a>b,
+      .sm-header .sm-quick-actions>a>strong{
+        min-width:0!important;
+        margin:0!important;
+        padding:0!important;
+        color:inherit!important;
+        font-size:9.8px!important;
+        line-height:1.1!important;
+        font-weight:900!important;
+        white-space:nowrap!important;
+        overflow:hidden!important;
+        text-overflow:ellipsis!important;
+      }
+      #smActions.sm-actions>a:active,
+      .sm-header .sm-quick-actions>a:active{
+        transform:scale(.975)!important;
+      }
+
+      /* Social buttons: always four equal columns, never adaptive by label width. */
+      #smApp .sm-footer .sm-footer-socials{
+        display:grid!important;
+        grid-template-columns:repeat(4,minmax(0,1fr))!important;
+        gap:6px!important;
+        align-items:stretch!important;
+        justify-content:stretch!important;
+      }
+      #smApp .sm-footer .sm-footer-socials>a{
+        width:100%!important;
+        min-width:0!important;
+        max-width:none!important;
+        min-height:29px!important;
+        margin:0!important;
+        padding:0 4px!important;
+        box-sizing:border-box!important;
+        display:flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+        gap:4px!important;
+        font-size:8px!important;
+        white-space:nowrap!important;
+        overflow:hidden!important;
+      }
+
+      @media(max-width:390px){
+        #smActions.sm-actions,
+        .sm-header #smActions.sm-actions,
+        .sm-header .sm-quick-actions{
+          gap:6px!important;
+          padding-inline:11px!important;
+        }
+        #smActions.sm-actions>a,
+        .sm-header .sm-quick-actions>a{
+          min-height:45px!important;
+          padding-inline:6px!important;
+          gap:4px!important;
+        }
+        #smActions.sm-actions>a>span,
+        .sm-header .sm-quick-actions>a>span{
+          width:18px!important;
+          height:18px!important;
+          min-width:18px!important;
+          flex-basis:18px!important;
+          font-size:12px!important;
+        }
+        #smActions.sm-actions>a>b,
+        #smActions.sm-actions>a>strong,
+        .sm-header .sm-quick-actions>a>b,
+        .sm-header .sm-quick-actions>a>strong{
+          font-size:8.8px!important;
+        }
+        #smApp .sm-footer .sm-footer-socials{
+          gap:5px!important;
+        }
+        #smApp .sm-footer .sm-footer-socials>a{
+          min-height:28px!important;
+          padding-inline:3px!important;
+          gap:3px!important;
+          font-size:7.5px!important;
+        }
+      }
+
       #smMenu .sm-img.pb-placeholder .sm-product-image,
       #smMenu .sm-product-image[data-pb-placeholder="1"]{
         opacity:1!important;
