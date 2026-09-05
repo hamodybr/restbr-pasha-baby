@@ -6,23 +6,17 @@
     ar: {
       eyebrow: 'كل احتياجات طفلك بمكان واحد',
       title: 'اختار القسم اللي تحتاجه',
-      sub: 'أقسام واضحة، أسعار مباشرة، وطلب سهل.',
-      search: 'ابحث عن منتج',
-      searchHint: 'اكتب الاسم أو النوع'
+      sub: 'أقسام واضحة، أسعار مباشرة، وطلب سهل.'
     },
     ku: {
       eyebrow: 'هەمی پێداویستیێن زاروکی تە ل شوینەکی',
       title: 'پۆلا کو پێدڤی تەیە هەلبژێرە',
-      sub: 'پۆلێن ئاشکرا، نرخێن دیار و داواکاریەکا ساناهی.',
-      search: 'ل بەرهەمەکی بگەڕێ',
-      searchHint: 'ناڤ یان جۆر بنڤیسە'
+      sub: 'پۆلێن ئاشکرا، نرخێن دیار و داواکاریەکا ساناهی.'
     },
     en: {
       eyebrow: 'Everything your baby needs in one place',
       title: 'Choose what you need',
-      sub: 'Clear categories, simple prices, easy ordering.',
-      search: 'Search products',
-      searchHint: 'Type a name or product type'
+      sub: 'Clear categories, simple prices, easy ordering.'
     }
   };
 
@@ -49,41 +43,57 @@
         <span class="pb-store-eyebrow"></span>
         <h2></h2>
         <p></p>
-        <button id="pbSearchLaunchV2" class="pb-search-launch" type="button">
-          <span class="pb-search-icon">🔎</span>
-          <span class="pb-search-label"></span>
-          <small class="pb-search-hint"></small>
-        </button>
+        <div id="pbSearchHostV3" class="pb-search-host" role="search" aria-label="Search products"></div>
       `;
       header.insertAdjacentElement('afterend', hero);
-
-      hero.querySelector('#pbSearchLaunchV2')?.addEventListener('click', () => {
-        const input = document.getElementById('smSearchInput');
-        const toggle = document.getElementById('smSearchToggle');
-        if (input && input.offsetParent !== null) {
-          input.focus();
-          input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
-        toggle?.click();
-        setTimeout(() => {
-          const next = document.getElementById('smSearchInput');
-          next?.focus();
-          next?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 80);
-      });
     }
 
-    // Remove the retired duplicate category grid from older cached builds.
     document.getElementById('pbCategoryPanelV2')?.remove();
 
     const copy = COPY[lang()];
     hero.querySelector('.pb-store-eyebrow').textContent = copy.eyebrow;
     hero.querySelector('h2').textContent = copy.title;
     hero.querySelector('p').textContent = copy.sub;
-    hero.querySelector('.pb-search-label').textContent = copy.search;
-    hero.querySelector('.pb-search-hint').textContent = copy.searchHint;
     return hero;
+  }
+
+  function attachRealSearch() {
+    const hero = ensureHero();
+    const host = hero?.querySelector('#pbSearchHostV3');
+    if (!host) return false;
+
+    const toggle = document.getElementById('smSearchToggle');
+    if (toggle) {
+      toggle.hidden = true;
+      toggle.setAttribute('aria-hidden', 'true');
+      toggle.setAttribute('tabindex', '-1');
+    }
+
+    const wrap = document.getElementById('smSearchWrap');
+    if (!wrap) return false;
+
+    if (wrap.parentElement !== host) host.appendChild(wrap);
+    wrap.classList.add('pb-inline-search', 'open');
+    wrap.removeAttribute('hidden');
+    wrap.setAttribute('role', 'search');
+
+    const input = document.getElementById('smSearchInput');
+    if (input) {
+      input.type = 'search';
+      input.setAttribute('enterkeyhint', 'search');
+      input.setAttribute('autocomplete', 'off');
+      input.setAttribute('autocapitalize', 'none');
+    }
+
+    if (!host.dataset.pbSearchBound) {
+      host.dataset.pbSearchBound = '1';
+      host.addEventListener('click', event => {
+        if (event.target.closest('button,input')) return;
+        document.getElementById('smSearchInput')?.focus({ preventScroll: true });
+      });
+    }
+
+    return true;
   }
 
   function removeRestaurantGate() {
@@ -95,6 +105,7 @@
   function sync() {
     removeRestaurantGate();
     ensureHero();
+    attachRealSearch();
     document.getElementById('pbCategoryPanelV2')?.remove();
   }
 
@@ -113,7 +124,14 @@
       setTimeout(sync, 120);
     });
 
-    [120,350,800,1600].forEach(delay => setTimeout(sync, delay));
+    const observer = new MutationObserver(() => {
+      if (!document.getElementById('pbSearchHostV3') || document.getElementById('smSearchWrap')?.parentElement !== document.getElementById('pbSearchHostV3')) {
+        sync();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    [60,120,250,500,900,1600].forEach(delay => setTimeout(sync, delay));
   }
 
   if (document.readyState === 'loading') {
