@@ -48,9 +48,106 @@
 
   <title>Pasha Baby — پاشا بيبي</title>
 
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  <link rel="manifest" href="manifest.webmanifest">
+  <link id="smFavicon" rel="icon" href="assets/favicon.png">
+  <link id="smAppleTouchIcon" rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link id="smWebManifest" rel="manifest" href="manifest.webmanifest">
+
+  <script>
+    (function(){
+      const fallbackName=String(window.RESTBR_CONFIG?.restaurantName||"Pasha Baby").trim()||"Pasha Baby";
+      let lastIcon="";
+      let manifestObjectUrl="";
+
+      const safeLogo=value=>{
+        try{
+          return typeof window.RESTBR_SAFE_MEDIA_URL==="function"
+            ? window.RESTBR_SAFE_MEDIA_URL(value)
+            : "";
+        }catch(_){
+          return "";
+        }
+      };
+
+      const applyAppIcon=value=>{
+        const icon=safeLogo(value);
+        if(!icon||icon===lastIcon)return false;
+        lastIcon=icon;
+
+        const favicon=document.getElementById("smFavicon");
+        const appleIcon=document.getElementById("smAppleTouchIcon");
+        const manifestLink=document.getElementById("smWebManifest");
+
+        if(favicon)favicon.href=icon;
+        if(appleIcon)appleIcon.href=icon;
+
+        try{
+          if(manifestLink&&typeof Blob!=="undefined"&&URL?.createObjectURL){
+            const appRoot=new URL("./",window.location.href).href;
+            const manifest={
+              name:fallbackName,
+              short_name:fallbackName,
+              description:"Pasha Baby children's supplies storefront and ordering experience",
+              start_url:appRoot,
+              scope:appRoot,
+              display:"standalone",
+              background_color:"#fffaf5",
+              theme_color:"#fffaf5",
+              orientation:"portrait",
+              icons:[
+                {src:icon,sizes:"any",purpose:"any"},
+                {src:icon,sizes:"any",purpose:"maskable"}
+              ]
+            };
+            const nextUrl=URL.createObjectURL(
+              new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"})
+            );
+            manifestLink.href=nextUrl;
+            if(manifestObjectUrl)URL.revokeObjectURL(manifestObjectUrl);
+            manifestObjectUrl=nextUrl;
+          }
+        }catch(_){}
+
+        return true;
+      };
+
+      window.RESTBR_APPLY_APP_ICON=applyAppIcon;
+
+      try{
+        const cached=typeof window.RESTBR_READ_BRAND_CACHE==="function"
+          ? window.RESTBR_READ_BRAND_CACHE()
+          : null;
+        applyAppIcon(cached?.logo);
+      }catch(_){}
+
+      const scanBrandLogo=()=>{
+        const logos=document.querySelectorAll(
+          ".sm-logo,.sm-intro-logo,.pb-brand-logo,#pbBrand img"
+        );
+        for(const logo of logos){
+          const source=logo?.currentSrc||logo?.getAttribute?.("src")||logo?.src||"";
+          if(source&&applyAppIcon(source))return true;
+        }
+        return false;
+      };
+
+      const observer=new MutationObserver(scanBrandLogo);
+      observer.observe(document.documentElement,{
+        subtree:true,
+        childList:true,
+        attributes:true,
+        attributeFilter:["src"]
+      });
+
+      if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",scanBrandLogo,{once:true});
+      }else{
+        scanBrandLogo();
+      }
+
+      window.addEventListener("pageshow",scanBrandLogo,{passive:true});
+    })();
+  </script>
+
   <link rel="stylesheet" href="css/style.css?v=4.1">
   <link rel="stylesheet" href="css/cart.css?v=3.6">
 
