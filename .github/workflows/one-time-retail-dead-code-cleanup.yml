@@ -1,0 +1,126 @@
+name: One-time Pasha Retail Dead Code Cleanup
+
+on:
+  push:
+    branches: [audit-hardening-2026-09-06]
+    paths:
+      - .github/workflows/one-time-retail-dead-code-cleanup.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout audit branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: audit-hardening-2026-09-06
+          fetch-depth: 1
+
+      - name: Remove restaurant-only loaders and files
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          cfg = Path('js/supabase-config.js')
+          text = cfg.read_text()
+
+          comments = [
+              'Public-menu only: keep the open options sheet synced after live price refreshes.',
+              'Admin-only dine-in / takeaway price controls for restaurant deployments.',
+              'Admin-only restaurant dual-price target selector.',
+              'Admin-only: enhanced full backup includes discounts too.',
+              'Admin-only: restore discounts from enhanced backups too.',
+              'Admin-only restaurant dual-price Excel export.',
+              'Admin-only restaurant dual-price Excel import.',
+              'Admin-only restaurant dine-in / takeaway choice-window editor.',
+              'Admin-only restaurant-mode percentage discount manager.',
+          ]
+
+          for comment in comments:
+              pattern = re.compile(r'// ' + re.escape(comment) + r'\n\(\(\) => \{.*?\n\}\)\(\);\n\n', re.S)
+              text, count = pattern.subn('', text)
+              if count != 1:
+                  raise SystemExit(f'expected one loader block for {comment!r}, found {count}')
+
+          marker = '// ==========================================\n// RESTBR MENU — Supabase Connection Test\n// ==========================================\n'
+          if text.count(marker) != 1:
+              raise SystemExit('unexpected connection-test marker count')
+          text = text.split(marker, 1)[0].rstrip() + '\n'
+          cfg.write_text(text)
+
+          sw = Path('sw.js')
+          sw_text = sw.read_text()
+          line = '  "./js/discount-choice-price-sync.js?v=1.0",\n'
+          if sw_text.count(line) != 1:
+              raise SystemExit('unexpected service-worker discount cache entry count')
+          sw.write_text(sw_text.replace(line, ''))
+
+          check = Path('scripts/predeploy-check.mjs')
+          check_text = check.read_text()
+          old = "requireText('js/supabase-config.js', 'if (RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;', 'retail-only discount loader guard');"
+          new = "forbidText('js/supabase-config.js', 'discount-choice-price-sync.js', 'restaurant discount loader in retail build');"
+          if check_text.count(old) != 1:
+              raise SystemExit('unexpected predeploy retail guard count')
+          check_text = check_text.replace(old, new)
+
+          anchor = "forbidText('js/supabase-config.js', 'testSupabaseConnection();', 'development connection-test request');"
+          dead_check = """
+const restaurantOnlyDeadFiles = [
+  'js/discount-choice-price-sync.js',
+  'js/admin-takeaway-prices.js',
+  'js/admin-bulk-price-target-ui.js',
+  'js/admin-full-backup-discounts.js',
+  'js/admin-full-restore-discounts.js',
+  'js/admin-excel-export-takeaway.js',
+  'js/admin-excel-import-takeaway.js',
+  'js/admin-dining-gate-settings.js',
+  'js/admin-discounts.js',
+  'js/dining-mode.js',
+  'js/dining-gate-language.js'
+];
+for (const file of restaurantOnlyDeadFiles) {
+  if (exists(file)) fail(`${file}: restaurant-only dead code must not ship in Pasha retail`);
+}
+""".strip()
+          if check_text.count(anchor) != 1:
+              raise SystemExit('unexpected predeploy anchor count')
+          check_text = check_text.replace(anchor, anchor + '\n\n' + dead_check)
+          check.write_text(check_text)
+          PY
+
+          rm -f \
+            js/discount-choice-price-sync.js \
+            js/admin-takeaway-prices.js \
+            js/admin-bulk-price-target-ui.js \
+            js/admin-full-backup-discounts.js \
+            js/admin-full-restore-discounts.js \
+            js/admin-excel-export-takeaway.js \
+            js/admin-excel-import-takeaway.js \
+            js/admin-dining-gate-settings.js \
+            js/admin-discounts.js \
+            js/dining-mode.js \
+            js/dining-gate-language.js
+
+      - name: Verify retail build
+        run: |
+          node scripts/predeploy-check.mjs
+          ! grep -q 'discount-choice-price-sync.js' js/supabase-config.js
+          ! grep -q 'admin-takeaway-prices.js' js/supabase-config.js
+          ! grep -q 'admin-discounts.js' js/supabase-config.js
+
+      - name: Remove one-time workflow
+        run: rm .github/workflows/one-time-retail-dead-code-cleanup.yml
+
+      - name: Commit retail cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "refactor: remove restaurant-only dead code from Pasha"
+          git push origin HEAD:audit-hardening-2026-09-06
