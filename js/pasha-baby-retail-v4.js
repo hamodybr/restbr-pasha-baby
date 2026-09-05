@@ -1,17 +1,16 @@
 (() => {
-  if (window.__PASHA_BABY_RETAIL_V4__) return;
-  window.__PASHA_BABY_RETAIL_V4__ = true;
+  if (window.__PASHA_BABY_RETAIL_V5__) return;
+  window.__PASHA_BABY_RETAIL_V5__ = true;
 
   const DEFAULT_PLACEHOLDER = 'assets/pasha-baby-product-placeholder.svg';
   const PLACEHOLDER_RE = /(?:restaurant-placeholder|pasha-baby-product-placeholder)\.svg(?:\?|$)/i;
   const CARD_CHARACTERS = ['🧸','🐰','🐥','🐼','🐨','🦊','🐻‍❄️','🐯'];
 
   function installRetailFixStyles() {
-    if (document.getElementById('pbRetailV4RuntimeStyles')) return;
+    if (document.getElementById('pbRetailV5RuntimeStyles')) return;
     const style = document.createElement('style');
-    style.id = 'pbRetailV4RuntimeStyles';
+    style.id = 'pbRetailV5RuntimeStyles';
     style.textContent = `
-      /* Use the branded Pasha Baby image itself for products without photos. */
       #smMenu .sm-img.pb-placeholder .sm-product-image,
       #smMenu .sm-product-image[data-pb-placeholder="1"]{
         opacity:1!important;
@@ -29,7 +28,6 @@
         display:none!important;
       }
 
-      /* Cart notifications belong in the visual center, not at the bottom. */
       .sm-cart-toast{
         top:50%!important;
         bottom:auto!important;
@@ -133,9 +131,11 @@
     window.scrollTo({ top, behavior: 'smooth' });
   }
 
-  function centerActiveCategory() {
-    const active = document.querySelector('#smCats .sm-cat.active');
-    active?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  function centerCategory(category) {
+    if (!category) return;
+    try {
+      category.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+    } catch (_) {}
   }
 
   function refresh() {
@@ -143,7 +143,9 @@
     removeDuplicateCategoryPanel();
     markPlaceholders();
     decorateProductCards();
-    centerActiveCategory();
+    // Important: never auto-center the active category during a render/mutation.
+    // On iOS Safari repeated scrollIntoView calls can chain momentum and push
+    // the horizontal rail all the way to the last category.
   }
 
   let queued = false;
@@ -156,7 +158,6 @@
     });
   }
 
-  // A placeholder is not a real product photo. Do not open the old image viewer.
   document.addEventListener('click', event => {
     const image = event.target.closest?.('.sm-product-image');
     if (!image) return;
@@ -174,17 +175,18 @@
     event.stopImmediatePropagation();
   }, true);
 
-  // The pastel category rail is now the only category navigation.
+  // Only a deliberate tap may recenter the category rail.
+  // Do it instantly so it cannot fight the user's finger/momentum.
   document.addEventListener('click', event => {
     const category = event.target.closest?.('#smCats .sm-cat');
     if (!category) return;
 
     setTimeout(() => {
-      centerActiveCategory();
+      centerCategory(category);
       scrollToMenu();
       markPlaceholders();
       decorateProductCards();
-    }, 40);
+    }, 35);
   });
 
   function start() {
@@ -192,22 +194,28 @@
 
     const cats = document.getElementById('smCats');
     const menu = document.getElementById('smMenu');
-    [cats, menu].filter(Boolean).forEach(node => {
-      const observer = new MutationObserver(scheduleRefresh);
-      observer.observe(node, {
+
+    if (cats) {
+      const catsObserver = new MutationObserver(scheduleRefresh);
+      catsObserver.observe(cats, { childList: true, subtree: true });
+    }
+
+    if (menu) {
+      const menuObserver = new MutationObserver(scheduleRefresh);
+      menuObserver.observe(menu, {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['class', 'src', 'data-pb-icon']
+        attributeFilter: ['src']
       });
-    });
+    }
 
     window.addEventListener('restbr:ready', () => {
       refresh();
       setTimeout(refresh, 100);
     });
 
-    [80, 250, 650, 1300].forEach(delay => setTimeout(refresh, delay));
+    [80, 250, 650].forEach(delay => setTimeout(refresh, delay));
   }
 
   if (document.readyState === 'loading') {
