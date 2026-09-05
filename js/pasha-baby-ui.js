@@ -1,6 +1,6 @@
 (() => {
-  if (window.__PASHA_BABY_UI_V1__) return;
-  window.__PASHA_BABY_UI_V1__ = true;
+  if (window.__PASHA_BABY_UI_V12__) return;
+  window.__PASHA_BABY_UI_V12__ = true;
 
   const COPY = {
     ar: {
@@ -54,9 +54,120 @@
     return ['ar', 'ku', 'en'].includes(value) ? value : 'ar';
   }
 
+  function safeLogoUrl(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    if (typeof window.RESTBR_SAFE_MEDIA_URL === 'function') {
+      return window.RESTBR_SAFE_MEDIA_URL(raw) || '';
+    }
+    return raw;
+  }
+
+  function configuredLogo() {
+    const sourceCandidates = [
+      document.querySelector('.sm-logo')?.getAttribute('src'),
+      document.querySelector('.sm-intro-logo')?.getAttribute('src')
+    ];
+
+    try {
+      if (typeof window.RESTBR_READ_BRAND_CACHE === 'function') {
+        sourceCandidates.push(window.RESTBR_READ_BRAND_CACHE()?.logo || '');
+      }
+    } catch (_) {}
+
+    for (const candidate of sourceCandidates) {
+      const safe = safeLogoUrl(candidate);
+      if (safe) return safe;
+    }
+    return '';
+  }
+
+  function installLogoStyles() {
+    if (document.getElementById('pbDynamicLogoStyles')) return;
+    const style = document.createElement('style');
+    style.id = 'pbDynamicLogoStyles';
+    style.textContent = `
+      .pb-brand-mark.has-store-logo,
+      .pb-intro-mark.has-store-logo{
+        padding:0!important;
+        overflow:hidden!important;
+        background:#fff!important;
+        background-image:none!important;
+        color:transparent!important;
+      }
+      .pb-brand-mark.has-store-logo::before,
+      .pb-brand-mark.has-store-logo::after,
+      .pb-brand-mark.has-store-logo small{
+        display:none!important;
+        content:none!important;
+      }
+      .pb-brand-logo,
+      .pb-intro-logo-dynamic{
+        display:block!important;
+        width:100%!important;
+        height:100%!important;
+        max-width:100%!important;
+        max-height:100%!important;
+        object-fit:contain!important;
+        object-position:center!important;
+        border-radius:inherit!important;
+        background:transparent!important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function syncBrandLogo() {
+    installLogoStyles();
+    const logo = configuredLogo();
+
+    const mark = document.querySelector('#pbBrand .pb-brand-mark');
+    if (mark) {
+      let img = mark.querySelector('.pb-brand-logo');
+      if (!img) {
+        img = document.createElement('img');
+        img.className = 'pb-brand-logo';
+        img.alt = '';
+        img.decoding = 'async';
+        mark.prepend(img);
+      }
+
+      if (logo) {
+        if (img.getAttribute('src') !== logo) img.src = logo;
+        img.style.display = 'block';
+        mark.classList.add('has-store-logo');
+      } else {
+        img.removeAttribute('src');
+        img.style.display = 'none';
+        mark.classList.remove('has-store-logo');
+      }
+    }
+
+    const introMark = document.getElementById('pbIntroMark');
+    if (introMark) {
+      let img = introMark.querySelector('.pb-intro-logo-dynamic');
+      if (!img) {
+        img = document.createElement('img');
+        img.className = 'pb-intro-logo-dynamic';
+        img.alt = '';
+        img.decoding = 'async';
+        introMark.prepend(img);
+      }
+
+      if (logo) {
+        if (img.getAttribute('src') !== logo) img.src = logo;
+        img.style.display = 'block';
+        introMark.classList.add('has-store-logo');
+      } else {
+        img.removeAttribute('src');
+        img.style.display = 'none';
+        introMark.classList.remove('has-store-logo');
+      }
+    }
+  }
+
   function iconFor(value) {
     const text = String(value || '').toLowerCase();
-
     if (/حفاض|پەمپ|diaper|wipe|مناديل|دەستمال/.test(text)) return '🧷';
     if (/رضاع|حليب|شيشة|bottle|feed|pacifier|لهاية|شیردان|پستانک/.test(text)) return '🍼';
     if (/عناي|كريم|شامبو|care|cream|shampoo|چاڤدێر/.test(text)) return '🧴';
@@ -95,6 +206,7 @@
     setText(brand.querySelector('.pb-brand-name'), COPY[lang].name);
     setText(brand.querySelector('.pb-brand-tagline'), COPY[lang].tagline);
     setAttribute(brand, 'aria-label', COPY[lang].name);
+    syncBrandLogo();
   }
 
   function ensureIntroMark() {
@@ -106,11 +218,12 @@
       mark = document.createElement('div');
       mark.id = 'pbIntroMark';
       mark.className = 'pb-intro-mark';
-      mark.textContent = 'PB';
+      mark.append(document.createTextNode('PB'));
       const brand = intro.querySelector('.sm-intro-brand');
       if (brand) intro.insertBefore(mark, brand);
       else intro.prepend(mark);
     }
+    syncBrandLogo();
   }
 
   function decorateCategories() {
@@ -165,6 +278,7 @@
 
     ensureBrand();
     ensureIntroMark();
+    syncBrandLogo();
 
     setText(document.querySelector('.sm-header h1'), copy.title);
     setText(document.querySelector('.sm-intro-brand'), copy.name);
@@ -220,7 +334,12 @@
       }
     });
 
-    window.addEventListener('restbr:ready', updateStoreCopy);
+    window.addEventListener('restbr:ready', () => {
+      updateStoreCopy();
+      setTimeout(syncBrandLogo, 30);
+      setTimeout(syncBrandLogo, 180);
+    });
+
     [120, 350, 800, 1600, 3000].forEach(delay => setTimeout(updateStoreCopy, delay));
   }
 
