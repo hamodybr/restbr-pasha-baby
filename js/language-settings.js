@@ -246,11 +246,12 @@
   }
 
   function loadAdminDashboardI18n() {
-    appendAdminI18nScript('restbrAdminI18nAttributeGuardScript', 'js/admin-i18n-attribute-guard.js?v=1.0');
+    // Pasha Baby performance profile:
+    // one primary dashboard translator + one lightweight store-copy layer.
+    // The old supplement/final/attribute observers repeatedly rescanned the
+    // whole dashboard and caused severe navigation jank on mobile Safari.
     appendAdminI18nScript('restbrAdminI18nScript', 'js/admin-i18n.js?v=1.0');
-    appendAdminI18nScript('restbrAdminI18nSupplementScript', 'js/admin-i18n-supplement.js?v=1.0');
-    appendAdminI18nScript('restbrAdminI18nFinalCleanupScript', 'js/admin-i18n-final-cleanup.js?v=2.0');
-    appendAdminI18nScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.0');
+    appendAdminI18nScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.1');
   }
 
   async function initAdmin() {
