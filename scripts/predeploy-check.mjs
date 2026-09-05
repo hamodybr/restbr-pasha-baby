@@ -153,8 +153,25 @@ requireText('admin.html', "const PRICE_SAFETY_BACKUP_KEY='RESTBR_LAST_PRICE_BACK
 requireText('admin.html', "const ADMIN_SETTINGS_THEME_KEY='RESTBR_ADMIN_SETTINGS_THEME_V1';", 'client-neutral admin theme key');
 forbidText('admin.html', "const PRICE_SAFETY_BACKUP_KEY='SHORASH_LAST_PRICE_BACKUP_V1';", 'Shorash price backup key');
 forbidText('admin.html', "const ADMIN_SETTINGS_THEME_KEY='SHORASH_ADMIN_SETTINGS_THEME_V1';", 'Shorash admin theme key');
-requireText('js/supabase-config.js', 'if (RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;', 'retail-only discount loader guard');
+forbidText('js/supabase-config.js', 'discount-choice-price-sync.js', 'restaurant discount loader in retail build');
 forbidText('js/supabase-config.js', 'testSupabaseConnection();', 'development connection-test request');
+
+const restaurantOnlyDeadFiles = [
+  'js/discount-choice-price-sync.js',
+  'js/admin-takeaway-prices.js',
+  'js/admin-bulk-price-target-ui.js',
+  'js/admin-full-backup-discounts.js',
+  'js/admin-full-restore-discounts.js',
+  'js/admin-excel-export-takeaway.js',
+  'js/admin-excel-import-takeaway.js',
+  'js/admin-dining-gate-settings.js',
+  'js/admin-discounts.js',
+  'js/dining-mode.js',
+  'js/dining-gate-language.js'
+];
+for (const file of restaurantOnlyDeadFiles) {
+  if (exists(file)) fail(`${file}: restaurant-only dead code must not ship in Pasha retail`);
+}
 
 // 10) The live database hardening migration must be committed with the app.
 const auditMigration = 'supabase/migrations/20260905223000_pasha_audit_hardening.sql';

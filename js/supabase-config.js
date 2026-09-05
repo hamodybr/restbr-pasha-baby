@@ -128,18 +128,6 @@ if (RESTBR_CONFIGURED) {
   }
 })();
 
-// Public-menu only: keep the open options sheet synced after live price refreshes.
-(() => {
-  if (RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
-  if (document.getElementById('restbrDiscountChoicePriceSyncScript')) return;
-
-  const script = document.createElement('script');
-  script.id = 'restbrDiscountChoicePriceSyncScript';
-  script.src = 'js/discount-choice-price-sync.js?v=1.0';
-  script.async = false;
-  document.head.appendChild(script);
-})();
-
 // Public-menu only: automatic restaurant opening hours.
 (() => {
   if (RESTBR_IS_ADMIN_PATH) return;
@@ -200,18 +188,6 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only dine-in / takeaway price controls for restaurant deployments.
-(() => {
-  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
-  if (document.getElementById('restbrAdminTakeawayPricesScript')) return;
-
-  const script = document.createElement('script');
-  script.id = 'restbrAdminTakeawayPricesScript';
-  script.src = 'js/admin-takeaway-prices.js?v=1.1';
-  script.async = false;
-  document.head.appendChild(script);
-})();
-
 // Admin-only tap ordering for product options inside the product editor.
 (() => {
   if (!RESTBR_IS_ADMIN_PATH) return;
@@ -236,66 +212,6 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only restaurant dual-price target selector.
-(() => {
-  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
-  if (document.getElementById('restbrAdminBulkPriceTargetUiScript')) return;
-
-  const script = document.createElement('script');
-  script.id = 'restbrAdminBulkPriceTargetUiScript';
-  script.src = 'js/admin-bulk-price-target-ui.js?v=2.0';
-  script.async = false;
-  document.head.appendChild(script);
-})();
-
-// Admin-only: enhanced full backup includes discounts too.
-(() => {
-  if (!RESTBR_IS_ADMIN_PATH) return;
-  if (document.getElementById('restbrAdminFullBackupDiscountsScript')) return;
-
-  const script = document.createElement('script');
-  script.id = 'restbrAdminFullBackupDiscountsScript';
-  script.src = 'js/admin-full-backup-discounts.js?v=1.1';
-  script.async = false;
-  document.head.appendChild(script);
-})();
-
-// Admin-only: restore discounts from enhanced backups too.
-(() => {
-  if (!RESTBR_IS_ADMIN_PATH) return;
-  if (document.getElementById('restbrAdminFullRestoreDiscountsScript')) return;
-
-  const script = document.createElement('script');
-  script.id = 'restbrAdminFullRestoreDiscountsScript';
-  script.src = 'js/admin-full-restore-discounts.js?v=1.1';
-  script.async = false;
-  document.head.appendChild(script);
-})();
-
-// Admin-only restaurant dual-price Excel export.
-(() => {
-  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
-  if (document.getElementById('restbrAdminExcelExportTakeawayScript')) return;
-
-  const script = document.createElement('script');
-  script.id = 'restbrAdminExcelExportTakeawayScript';
-  script.src = 'js/admin-excel-export-takeaway.js?v=1.0';
-  script.async = false;
-  document.head.appendChild(script);
-})();
-
-// Admin-only restaurant dual-price Excel import.
-(() => {
-  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
-  if (document.getElementById('restbrAdminExcelImportTakeawayScript')) return;
-
-  const script = document.createElement('script');
-  script.id = 'restbrAdminExcelImportTakeawayScript';
-  script.src = 'js/admin-excel-import-takeaway.js?v=1.0';
-  script.async = false;
-  document.head.appendChild(script);
-})();
-
 // Admin-only restaurant opening-hours editor.
 (() => {
   if (!RESTBR_IS_ADMIN_PATH) return;
@@ -304,30 +220,6 @@ if (RESTBR_CONFIGURED) {
   const script = document.createElement('script');
   script.id = 'restbrAdminRestaurantHoursScript';
   script.src = 'js/admin-restaurant-hours.js?v=1.2';
-  script.async = false;
-  document.head.appendChild(script);
-})();
-
-// Admin-only restaurant dine-in / takeaway choice-window editor.
-(() => {
-  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
-  if (document.getElementById('restbrAdminDiningGateSettingsScript')) return;
-
-  const script = document.createElement('script');
-  script.id = 'restbrAdminDiningGateSettingsScript';
-  script.src = 'js/admin-dining-gate-settings.js?v=1.0';
-  script.async = false;
-  document.head.appendChild(script);
-})();
-
-// Admin-only restaurant-mode percentage discount manager.
-(() => {
-  if (!RESTBR_IS_ADMIN_PATH || RESTBR_RETAIL_MODE) return;
-  if (document.getElementById('restbrAdminDiscountsScript')) return;
-
-  const script = document.createElement('script');
-  script.id = 'restbrAdminDiscountsScript';
-  script.src = 'js/admin-discounts.js?v=1.0';
   script.async = false;
   document.head.appendChild(script);
 })();
@@ -343,31 +235,3 @@ if (RESTBR_CONFIGURED) {
   script.async = false;
   document.head.appendChild(script);
 })();
-
-// ==========================================
-// RESTBR MENU — Supabase Connection Test
-// ==========================================
-
-async function testSupabaseConnection() {
-  try {
-    console.log('🔄 Testing Supabase connection...');
-
-    const { data, error } = await supabaseClient
-      .from('restaurant_settings')
-      .select('*')
-      .limit(1);
-
-    if (error) {
-      console.error('❌ Supabase test failed:', error);
-      return;
-    }
-
-    console.log('✅ SUPABASE CONNECTION SUCCESS');
-    console.log('📦 Restaurant settings:', data);
-
-  } catch (error) {
-    console.error('❌ Supabase connection error:', error);
-  }
-}
-
-// Connection health is exercised by the real menu/admin queries; avoid an extra production request.

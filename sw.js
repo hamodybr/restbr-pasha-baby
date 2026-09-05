@@ -32,7 +32,6 @@ const CORE = [
   "./js/supabase-config.js?v=2.4",
   "./js/language-settings.js?v=1.2",
   "./js/live-prices.js?v=1.0",
-  "./js/discount-choice-price-sync.js?v=1.0",
   "./js/restaurant-hours.js?v=1.3",
   "./js/whatsapp-order-bullets.js?v=1.0",
   "./js/english-news-ticker.js?v=1.0",
