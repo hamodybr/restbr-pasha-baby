@@ -1,0 +1,23 @@
+name: One-time Pasha Live Delivery Smoke
+
+on:
+  push:
+    branches: [final-delivery-audit-2026-09-06]
+    paths:
+      - scripts/live-smoke-test.mjs
+      - .github/workflows/one-time-live-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  live-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Live delivery smoke test
+        env:
+          SMOKE_BASE_URL: https://pashababy.restbr.com
+        run: node scripts/live-smoke-test.mjs
