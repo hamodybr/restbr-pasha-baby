@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_ADMIN_PRODUCT_COLORS_V2__) return;
-  window.__PASHA_ADMIN_PRODUCT_COLORS_V2__ = true;
+  if (window.__PASHA_ADMIN_PRODUCT_COLORS_V3__) return;
+  window.__PASHA_ADMIN_PRODUCT_COLORS_V3__ = true;
 
   const state = {
     productId: '',
@@ -29,11 +29,7 @@
     ['بني فاتح', '#a98274'], ['بني غامق', '#5d4037'], ['بني', '#795548'], ['جوزي', '#6d4c41'],
     ['بيج', '#d7c3a3'], ['كريمي', '#fff3d6'], ['رملي', '#d8c3a5'],
     ['رمادي فاتح', '#cfd8dc'], ['رمادي غامق', '#616161'], ['رمادي', '#9e9e9e'], ['رصاصي', '#78909c'],
-    ['فضي', '#b0bec5'], ['اسود', '#111111'], ['ابيض', '#ffffff'],
-    ['black', '#111111'], ['white', '#ffffff'], ['red', '#e53935'], ['blue', '#1e88e5'],
-    ['green', '#43a047'], ['yellow', '#fdd835'], ['orange', '#fb8c00'], ['pink', '#f48fb1'],
-    ['purple', '#8e44ad'], ['brown', '#795548'], ['gray', '#9e9e9e'], ['grey', '#9e9e9e'],
-    ['beige', '#d7c3a3'], ['navy', '#1b2a49'], ['gold', '#d4af37'], ['silver', '#b0bec5']
+    ['فضي', '#b0bec5'], ['اسود', '#111111'], ['ابيض', '#ffffff']
   ];
 
   function normalizeColorName(value) {
@@ -66,10 +62,10 @@
   }
 
   function installStyles() {
-    if (q('#pbAdminColorsEditorStyles')) return;
+    if (q('#pbAdminColorsEditorStylesV3')) return;
 
     const style = document.createElement('style');
-    style.id = 'pbAdminColorsEditorStyles';
+    style.id = 'pbAdminColorsEditorStylesV3';
     style.textContent = `
       #pbProductColorsEditor{grid-column:1/-1;margin-top:14px;padding:14px;border:1px solid rgba(216,169,88,.22);border-radius:16px;background:rgba(216,169,88,.045)}
       .pb-editor-colors-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
@@ -97,6 +93,22 @@
       .pb-editor-color-actions .danger{color:#fecaca;border-color:rgba(248,113,113,.3);background:#251010}
       .pb-editor-color-empty{padding:14px;text-align:center;border:1px dashed rgba(255,255,255,.09);border-radius:11px;color:#8f867a;font-size:11px}
       .pb-editor-color-loading{padding:13px;text-align:center;color:#9b9288;font-size:11px}
+
+      body.admin-global-light #pbProductColorsEditor{background:#fffaf3!important;border-color:rgba(112,79,34,.16)!important;color:#30281f!important}
+      body.admin-global-light .pb-editor-colors-head strong{color:#b9791f!important}
+      body.admin-global-light .pb-editor-colors-head small,
+      body.admin-global-light #pbEditorColorStatus{color:#817568!important}
+      body.admin-global-light #pbEditorAddColor,
+      body.admin-global-light .pb-editor-color-auto{background:#fff7e9!important;color:#83571b!important;border-color:rgba(154,104,31,.24)!important}
+      body.admin-global-light .pb-editor-color-row{background:#fffdf9!important;border-color:rgba(112,79,34,.16)!important;box-shadow:0 4px 14px rgba(83,58,26,.035)!important}
+      body.admin-global-light .pb-editor-color-field label{color:#776b5f!important}
+      body.admin-global-light .pb-editor-color-field input,
+      body.admin-global-light .pb-editor-color-field select{background:#fff!important;color:#30281f!important;-webkit-text-fill-color:#30281f!important;border-color:rgba(112,79,34,.22)!important;color-scheme:light!important}
+      body.admin-global-light .pb-editor-color-actions button:not(.save):not(.danger){background:#fff7e9!important;color:#6f4b1b!important;border-color:rgba(112,79,34,.2)!important}
+      body.admin-global-light .pb-editor-color-actions .danger{background:#fff1f0!important;color:#a63731!important;border-color:rgba(166,55,49,.22)!important}
+      body.admin-global-light .pb-editor-color-empty,
+      body.admin-global-light .pb-editor-color-loading{color:#817568!important;border-color:rgba(112,79,34,.16)!important}
+
       @media(max-width:640px){
         .pb-editor-colors-head{align-items:stretch;flex-direction:column}
         #pbEditorAddColor{width:100%}
@@ -111,7 +123,7 @@
     const el = q('#pbEditorColorStatus');
     if (!el) return;
     el.textContent = message;
-    el.style.color = ok ? '#9ccfb7' : '#fecaca';
+    el.style.color = ok ? (document.body.classList.contains('admin-global-light') ? '#568d70' : '#9ccfb7') : '#b5463f';
   }
 
   function isPersistedId(value) {
@@ -139,17 +151,9 @@
         <div class="pb-editor-color-main">
           <span class="pb-editor-color-swatch" style="--pb-editor-color:${esc(colorHex)}"></span>
           <div class="pb-editor-color-grid">
-            <div class="pb-editor-color-field">
-              <label>اسم اللون بالعربي *</label>
+            <div class="pb-editor-color-field full">
+              <label>اسم اللون *</label>
               <input class="pb-edit-color-name-ar" maxlength="80" value="${esc(row.name_ar || '')}" placeholder="مثال: أسود">
-            </div>
-            <div class="pb-editor-color-field">
-              <label>اسم اللون English</label>
-              <input class="pb-edit-color-name-en" maxlength="80" value="${esc(row.name_en || '')}" placeholder="Black">
-            </div>
-            <div class="pb-editor-color-field">
-              <label>اسم اللون كوردي</label>
-              <input class="pb-edit-color-name-ku" maxlength="80" value="${esc(row.name_ku || '')}">
             </div>
             <div class="pb-editor-color-field">
               <label>لون الدائرة</label>
@@ -165,7 +169,7 @@
                 <option value="false" ${row.is_available === false ? 'selected' : ''}>غير متوفر</option>
               </select>
             </div>
-            <div class="pb-editor-color-field">
+            <div class="pb-editor-color-field full">
               <label>صورة خاصة لهذا اللون (اختياري)</label>
               <input class="pb-edit-color-image" type="url" value="${esc(row.image_url || '')}" placeholder="https://...">
             </div>
@@ -283,7 +287,7 @@
     picker.value = detected;
     row.dataset.manualColor = '0';
     updateRowSwatch(row);
-    if (notify) setStatus(`تم اختيار اللون تلقائياً: ${detected}`);
+    if (notify) setStatus('رجّعت مطابقة اللون التلقائية ✓');
     return true;
   }
 
@@ -292,15 +296,13 @@
 
     const id = String(row.dataset.pbColorRow || '');
     const nameAr = row.querySelector('.pb-edit-color-name-ar')?.value.trim() || '';
-    const nameEn = row.querySelector('.pb-edit-color-name-en')?.value.trim() || nameAr;
-    const nameKu = row.querySelector('.pb-edit-color-name-ku')?.value.trim() || nameAr;
     const colorHex = row.querySelector('.pb-editor-color-picker')?.value || '#d8d0d3';
     const isAvailable = row.querySelector('.pb-edit-color-available')?.value !== 'false';
     const imageUrl = row.querySelector('.pb-edit-color-image')?.value.trim() || null;
     const sortOrder = Math.max(0, Number(row.dataset.sortOrder || nextSortOrder()));
 
     if (!nameAr) {
-      setStatus('اكتب اسم اللون بالعربي أولاً.', false);
+      setStatus('اكتب اسم اللون أولاً.', false);
       row.querySelector('.pb-edit-color-name-ar')?.focus();
       return;
     }
@@ -308,8 +310,9 @@
     const payload = {
       product_id: state.productId,
       name_ar: nameAr,
-      name_ku: nameKu,
-      name_en: nameEn,
+      // Keep legacy DB columns populated for schema compatibility; the Pasha UI is Arabic-only.
+      name_ku: nameAr,
+      name_en: nameAr,
       color_hex: colorHex,
       image_url: imageUrl,
       sort_order: sortOrder,
@@ -326,12 +329,9 @@
 
     setStatus('جاري حفظ اللون...');
 
-    let result;
-    if (isPersistedId(id)) {
-      result = await supabaseClient.from('product_colors').update(payload).eq('id', id);
-    } else {
-      result = await supabaseClient.from('product_colors').insert(payload);
-    }
+    const result = isPersistedId(id)
+      ? await supabaseClient.from('product_colors').update(payload).eq('id', id)
+      : await supabaseClient.from('product_colors').insert(payload);
 
     if (result.error) {
       console.error('PRODUCT COLOR SAVE ERROR', result.error);
@@ -381,7 +381,7 @@
 
     const draft = {
       id: `new-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      name_ar: '', name_ku: '', name_en: '',
+      name_ar: '',
       color_hex: '#d8d0d3',
       is_available: true,
       image_url: '',
@@ -390,8 +390,7 @@
 
     box.insertAdjacentHTML('beforeend', rowHtml(draft));
     const rows = box.querySelectorAll('.pb-editor-color-row');
-    const row = rows[rows.length - 1];
-    row?.querySelector('.pb-edit-color-name-ar')?.focus();
+    rows[rows.length - 1]?.querySelector('.pb-edit-color-name-ar')?.focus();
     setStatus('اكتب اسم اللون؛ لون الدائرة يتغير تلقائياً.');
   }
 
@@ -454,7 +453,7 @@
     if (typeof window.editAdminProduct !== 'function') return false;
 
     const original = window.editAdminProduct;
-    if (original.__pbColorsV2Wrapped) {
+    if (original.__pbColorsV3Wrapped) {
       state.hookInstalled = true;
       return true;
     }
@@ -465,7 +464,7 @@
       return result;
     }
 
-    wrappedEditAdminProduct.__pbColorsV2Wrapped = true;
+    wrappedEditAdminProduct.__pbColorsV3Wrapped = true;
     wrappedEditAdminProduct.__pbOriginal = original;
     window.editAdminProduct = wrappedEditAdminProduct;
     state.hookInstalled = true;
