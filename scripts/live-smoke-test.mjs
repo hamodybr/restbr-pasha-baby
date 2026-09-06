@@ -1,8 +1,15 @@
+import fs from 'node:fs';
+
 const BASE_URL = String(process.env.SMOKE_BASE_URL || 'https://pashababy.restbr.com').replace(/\/$/, '');
-const SUPABASE_URL = 'https://wlollfpmjzenhkjwxrqo.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_VOuh1-xvEayYsNBdDCzRnA_3bcFWUB2';
+const runtimeConfig = fs.readFileSync(new URL('../js/runtime-config.js', import.meta.url), 'utf8');
+const SUPABASE_URL = runtimeConfig.match(/supabaseUrl:\s*'([^']+)'/)?.[1] || '';
+const SUPABASE_KEY = runtimeConfig.match(/supabasePublishableKey:\s*'([^']+)'/)?.[1] || '';
 const failures = [];
 const passed = [];
+
+if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL) || SUPABASE_KEY.length < 20) {
+  throw new Error('Pasha runtime Supabase public configuration is missing');
+}
 
 function ok(label) {
   passed.push(label);
