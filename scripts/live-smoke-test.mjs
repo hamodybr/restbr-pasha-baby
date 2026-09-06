@@ -1,0 +1,144 @@
+const BASE_URL = String(process.env.SMOKE_BASE_URL || 'https://pashababy.restbr.com').replace(/\/$/, '');
+const SUPABASE_URL = 'https://wlollfpmjzenhkjwxrqo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_VOuh1-xvEayYsNBdDCzRnA_3bcFWUB2';
+const failures = [];
+const passed = [];
+
+function ok(label) {
+  passed.push(label);
+  console.log(`✓ ${label}`);
+}
+
+function fail(label, detail = '') {
+  const message = detail ? `${label}: ${detail}` : label;
+  failures.push(message);
+  console.error(`✗ ${message}`);
+}
+
+async function get(path, { json = false, headers = {} } = {}) {
+  const url = new URL(path, `${BASE_URL}/`);
+  url.searchParams.set('__smoke', Date.now().toString());
+  const response = await fetch(url, {
+    redirect: 'follow',
+    cache: 'no-store',
+    headers: {
+      'cache-control': 'no-cache',
+      'user-agent': 'RestBr-Pasha-Delivery-Smoke/1.0',
+      ...headers
+    }
+  });
+  const body = json ? await response.json() : await response.text();
+  return { response, body, url: response.url };
+}
+
+async function expectText(path, markers, label) {
+  try {
+    const { response, body } = await get(path);
+    if (!response.ok) return fail(label, `HTTP ${response.status}`);
+    for (const marker of markers) {
+      if (!body.includes(marker)) return fail(label, `missing marker ${marker}`);
+    }
+    ok(`${label} (${response.status})`);
+    return body;
+  } catch (error) {
+    fail(label, error?.message || String(error));
+    return '';
+  }
+}
+
+function localRefs(html) {
+  const refs = new Set();
+  for (const match of html.matchAll(/\b(?:src|href)=["']([^"']+)["']/gi)) {
+    const value = match[1].trim();
+    if (!value || /^(?:[a-z]+:|\/\/|#|data:|blob:)/i.test(value)) continue;
+    refs.add(value);
+  }
+  return [...refs];
+}
+
+async function checkAsset(ref, source) {
+  try {
+    const url = new URL(ref, `${BASE_URL}/${source}`);
+    url.searchParams.set('__smoke', Date.now().toString());
+    const response = await fetch(url, { redirect: 'follow', cache: 'no-store' });
+    if (!response.ok) fail(`asset ${ref}`, `HTTP ${response.status}`);
+    else ok(`asset ${ref}`);
+  } catch (error) {
+    fail(`asset ${ref}`, error?.message || String(error));
+  }
+}
+
+const indexHtml = await expectText('/', [
+  'Pasha Baby',
+  'js/runtime-config.js?v=2.1',
+  'js/pasha-baby-storefront-v2.js?v=2.2',
+  'css/pasha-baby-footer-v2.css?v=2.0'
+], 'storefront');
+
+const adminHtml = await expectText('/admin.html', [
+  'Admin Dashboard',
+  'js/runtime-config.js',
+  'js/language-settings.js'
+], 'admin page');
+
+await expectText('/js/pasha-baby-admin-copy.js', [
+  "[/المنيو/g, 'المتجر']",
+  "[/منيو/g, 'متجر']",
+  "[/\\bMenu\\b/g, 'Store']",
+  "['🍽️', '📦']"
+], 'retail dashboard copy layer');
+
+await expectText('/sw.js', [
+  'restbr-pasha-baby-v17',
+  'js/restbr-hardening.js?v=1.0',
+  'js/pasha-baby-storefront-v2.js?v=2.2'
+], 'service worker');
+
+try {
+  const { response, body } = await get('/manifest.webmanifest', { json: true });
+  if (!response.ok) fail('manifest', `HTTP ${response.status}`);
+  else if (!/Pasha Baby/i.test(String(body?.name || ''))) fail('manifest', 'wrong app identity');
+  else {
+    ok('manifest');
+    for (const icon of body.icons || []) await checkAsset(icon.src, '');
+  }
+} catch (error) {
+  fail('manifest', error?.message || String(error));
+}
+
+const refs = new Set([
+  ...localRefs(indexHtml),
+  ...localRefs(adminHtml)
+]);
+for (const ref of refs) await checkAsset(ref, '');
+
+for (const table of ['categories', 'products', 'product_options', 'restaurant_settings']) {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*&limit=1`, {
+      cache: 'no-store',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        Accept: 'application/json'
+      }
+    });
+    const text = await response.text();
+    if (!response.ok) fail(`Supabase public read: ${table}`, `HTTP ${response.status} ${text.slice(0, 120)}`);
+    else {
+      const rows = JSON.parse(text);
+      if (!Array.isArray(rows)) fail(`Supabase public read: ${table}`, 'response is not an array');
+      else ok(`Supabase public read: ${table}`);
+    }
+  } catch (error) {
+    fail(`Supabase public read: ${table}`, error?.message || String(error));
+  }
+}
+
+console.log(`\nLive smoke summary: ${passed.length} passed, ${failures.length} failed`);
+if (failures.length) {
+  console.error('\nFailures:');
+  failures.forEach(item => console.error(` - ${item}`));
+  process.exit(1);
+}
+
+console.log('✓ Pasha Baby live delivery smoke test passed');
