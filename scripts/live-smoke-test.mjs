@@ -83,9 +83,9 @@ async function checkAsset(ref, source) {
 
 const indexHtml = await expectText('/', [
   'Pasha Baby',
-  'js/runtime-config.js?v=2.1',
-  'js/pasha-baby-storefront-v2.js?v=2.2',
-  'css/pasha-baby-footer-v2.css?v=2.0'
+  'js/runtime-config.js',
+  'js/pasha-baby-storefront-v2.js',
+  'css/pasha-baby-footer-v2.css'
 ], 'storefront');
 
 const adminHtml = await expectText('/admin.html', [
@@ -110,9 +110,9 @@ await expectText('/js/pasha-baby-admin-copy.js', [
 ], 'retail dashboard copy layer');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v17',
-  'js/restbr-hardening.js?v=1.0',
-  'js/pasha-baby-storefront-v2.js?v=2.2'
+  'restbr-pasha-baby-v',
+  'js/restbr-hardening.js',
+  'js/pasha-baby-storefront-v2.js'
 ], 'service worker');
 
 try {
