@@ -1,7 +1,13 @@
 (() => {
+  if (window.__RESTBR_LIVE_PRICES_V2__) return;
+  window.__RESTBR_LIVE_PRICES_V2__ = true;
+
+  const PAGE_SIZE = 1000;
+  const MAX_ROWS = 50000;
   let channel = null;
   let started = false;
   let activeChoiceProductId = null;
+  let syncInFlight = null;
 
   const client = () =>
     typeof supabaseClient !== "undefined"
@@ -38,6 +44,19 @@
     ) || null;
   }
 
+  function retailPrice(product, originalPrice) {
+    const original = Number(originalPrice);
+    if (!Number.isFinite(original) || original < 0) return null;
+
+    const percent = Math.max(
+      0,
+      Math.min(100, Number(product?.discountPercent || 0))
+    );
+
+    if (!percent) return original;
+    return Math.max(0, Math.round(original * (100 - percent) / 100));
+  }
+
   function refreshProductDom(productId) {
     const product = productById(productId);
     const card = productCard(productId);
@@ -46,8 +65,17 @@
       const rows = [...card.querySelectorAll(".sm-option")];
 
       (product.options || []).forEach((option, index) => {
-        const price = rows[index]?.querySelector(".sm-price");
+        const row = rows[index];
+        const price = row?.querySelector(".sm-price");
         if (price) price.textContent = money(option.price);
+
+        const old = row?.querySelector(".pb-old-price");
+        const original = Number(option.originalPrice ?? option.__retailOriginalPrice);
+        const current = Number(option.price);
+
+        if (old && Number.isFinite(original) && original > current) {
+          old.textContent = money(original);
+        }
       });
     }
 
@@ -76,12 +104,20 @@
 
     const product = productById(row.product_id);
     const option = optionById(product, row.id);
-    if (!option) return false;
+    if (!product || !option) return false;
 
-    const nextPrice = Number(row.price);
+    const originalPrice = Number(row.price);
+    if (!Number.isFinite(originalPrice) || originalPrice < 0) return false;
+
+    const nextPrice = retailPrice(product, originalPrice);
     if (!Number.isFinite(nextPrice)) return false;
 
-    const changed = Number(option.price) !== nextPrice;
+    const previousPrice = Number(option.price);
+    const previousOriginal = Number(option.originalPrice ?? option.__retailOriginalPrice);
+    const changed = previousPrice !== nextPrice || previousOriginal !== originalPrice;
+
+    option.__retailOriginalPrice = originalPrice;
+    option.originalPrice = originalPrice;
     option.price = nextPrice;
 
     if (changed) refreshProductDom(product.id);
@@ -90,39 +126,87 @@
       notifyPriceUpdate({
         productId: product.id,
         optionId: option.id,
-        price: nextPrice
+        price: nextPrice,
+        originalPrice,
+        discountPercent: Number(product.discountPercent || 0)
       });
     }
 
     return changed;
   }
 
-  async function syncAllPrices() {
+  async function fetchAllPriceRows() {
     const sb = client();
-    if (!sb || !db()?.products) return;
+    if (!sb) return [];
 
-    const { data, error } = await sb
-      .from("product_options")
-      .select("id,product_id,price");
+    const rows = [];
+    let from = 0;
 
-    if (error || !Array.isArray(data)) return;
+    while (true) {
+      const { data, error } = await sb
+        .from("product_options")
+        .select("id,product_id,price")
+        .order("id", { ascending: true })
+        .range(from, from + PAGE_SIZE - 1);
 
-    const touchedProducts = new Set();
-    let changed = false;
+      if (error) throw error;
 
-    data.forEach(row => {
-      const didChange = applyRow(row, false);
-      if (didChange) {
-        changed = true;
-        touchedProducts.add(String(row.product_id));
+      const page = Array.isArray(data) ? data : [];
+      rows.push(...page);
+
+      if (page.length < PAGE_SIZE) break;
+      from += PAGE_SIZE;
+
+      if (from >= MAX_ROWS) {
+        throw new Error(`product_options exceeded ${MAX_ROWS} row live-price safety limit`);
       }
+    }
+
+    return rows;
+  }
+
+  async function syncAllPrices() {
+    if (syncInFlight) return syncInFlight;
+
+    syncInFlight = (async () => {
+      const sb = client();
+      if (!sb || !db()?.products) return false;
+
+      let data;
+      try {
+        data = await fetchAllPriceRows();
+      } catch (error) {
+        console.warn("Live price sync failed:", error?.message || error);
+        return false;
+      }
+
+      const touchedProducts = new Set();
+      let changed = false;
+
+      data.forEach(row => {
+        const didChange = applyRow(row, false);
+        if (didChange) {
+          changed = true;
+          touchedProducts.add(String(row.product_id));
+        }
+      });
+
+      touchedProducts.forEach(refreshProductDom);
+
+      if (changed) {
+        notifyPriceUpdate({
+          bulk: true,
+          rows: data.length,
+          retailDiscountAware: true
+        });
+      }
+
+      return changed;
+    })().finally(() => {
+      syncInFlight = null;
     });
 
-    touchedProducts.forEach(refreshProductDom);
-
-    if (changed) {
-      notifyPriceUpdate({ bulk: true });
-    }
+    return syncInFlight;
   }
 
   function start() {
@@ -130,10 +214,10 @@
     if (started || !sb || !db()?.products) return;
     started = true;
 
-    syncAllPrices();
+    void syncAllPrices();
 
     channel = sb
-      .channel("restbr-live-prices-v1")
+      .channel("restbr-live-prices-v2")
       .on(
         "postgres_changes",
         {
@@ -143,7 +227,7 @@
         },
         payload => {
           if (payload.eventType === "DELETE") {
-            syncAllPrices();
+            void syncAllPrices();
             return;
           }
 
@@ -152,12 +236,12 @@
       )
       .subscribe(status => {
         if (status === "SUBSCRIBED") {
-          syncAllPrices();
+          void syncAllPrices();
         }
       });
 
     // Safety sync in case a mobile browser briefly drops the realtime socket.
-    window.setInterval(syncAllPrices, 30000);
+    window.setInterval(() => void syncAllPrices(), 30000);
   }
 
   document.addEventListener("click", event => {
@@ -171,10 +255,15 @@
     }
   }, true);
 
-  window.addEventListener("online", syncAllPrices);
+  window.addEventListener("online", () => void syncAllPrices());
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") syncAllPrices();
+    if (document.visibilityState === "visible") void syncAllPrices();
   });
+
+  // The commerce layer can replace the initial truncated catalog with its full
+  // paginated version. Re-sync prices afterwards so every option stays current.
+  window.addEventListener("restbr:catalog-expanded", () => void syncAllPrices());
+  window.addEventListener("restbr:commerce-ready", () => void syncAllPrices());
 
   window.addEventListener("restbr:ready", start, { once: true });
 
