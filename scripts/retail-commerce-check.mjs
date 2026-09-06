@@ -90,6 +90,15 @@ forbidText('js/admin-retail-discounts.js', 'داخل المطعم', 'restaurant 
 forbidText('js/admin-retail-discounts.js', 'سفري', 'takeaway wording');
 requireText('js/admin-retail-discounts.js', 'المتجر كامل', 'store-wide discount wording');
 
+// Regression guard: the generic retail copy layer must never delete the Pasha
+// discount panel. Doing so while discount resilience re-inserts it creates a
+// MutationObserver add/remove loop that freezes the Products dashboard.
+forbidText(
+  'js/pasha-baby-admin-copy.js',
+  "document.getElementById('discountsSettingsPanel')?.remove();",
+  'discount panel deletion / Products freeze loop'
+);
+
 requireText('js/admin-product-colors.js', '__PASHA_ADMIN_PRODUCT_COLORS_V3__', 'product colors v3 guard');
 requireText('js/admin-product-colors.js', 'pbProductColorsEditor', 'colors embedded inside product editor');
 requireText('js/admin-product-colors.js', 'hookProductEditor', 'product editor integration hook');
