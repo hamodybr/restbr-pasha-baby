@@ -49,8 +49,8 @@ requireText('js/pasha-baby-commerce.js', 'starts_at', 'discount start scheduling
 requireText('js/pasha-baby-commerce.js', 'ends_at', 'discount end scheduling');
 requireText('js/pasha-baby-commerce.js', 'product_colors', 'customer product colors loader');
 requireText('js/pasha-baby-commerce.js', 'data-retail-bypass', 'existing cart integration guard');
-requireText('js/pasha-baby-commerce.js', "Color: ${colorName}", 'English color carried into cart');
-requireText('js/pasha-baby-commerce.js', "اللون: ${colorName}", 'Arabic color carried into cart');
+requireText('js/pasha-baby-commerce.js', "compose('en', 'Color')", 'English color carried into cart');
+requireText('js/pasha-baby-commerce.js', "compose('ar', 'اللون')", 'Arabic color carried into cart');
 
 requireText('js/admin-retail-discounts.js', "price_mode: 'both'", 'retail discount backward-compatible price mode');
 forbidText('js/admin-retail-discounts.js', 'داخل المطعم', 'restaurant dining wording');
