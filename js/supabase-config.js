@@ -1,5 +1,5 @@
 // ==========================================
-// RESTBR single-restaurant menu — Supabase configuration
+// RESTBR single-store menu — Supabase configuration
 // ==========================================
 
 const RESTBR_CONFIG = window.RESTBR_CONFIG || {};
@@ -23,7 +23,7 @@ const RESTBR_RETAIL_MODE =
 
 if (!RESTBR_CONFIGURED) {
   console.error(
-    'RESTBR setup is incomplete. Add this restaurant Supabase URL and publishable key to js/runtime-config.js.'
+    'RESTBR setup is incomplete. Add this store Supabase URL and publishable key to js/runtime-config.js.'
   );
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -70,13 +70,13 @@ const supabaseClient = window.supabase.createClient(
 );
 
 if (RESTBR_CONFIGURED) {
-  console.log(`✅ RESTBR connected for ${RESTBR_CONFIG.restaurantName || 'Restaurant'}`);
+  console.log(`✅ RESTBR connected for ${RESTBR_CONFIG.restaurantName || 'Store'}`);
 }
 
 (() => {
-  const name = String(RESTBR_CONFIG.restaurantName || 'Restaurant').trim();
+  const name = String(RESTBR_CONFIG.restaurantName || 'Store').trim();
   const isAdmin = RESTBR_IS_ADMIN_PATH;
-  document.title = isAdmin ? `${name} — Admin Dashboard` : `${name} Menu`;
+  document.title = isAdmin ? `${name} — لوحة الإدارة` : name;
   document.querySelector('meta[name="apple-mobile-web-app-title"]')
     ?.setAttribute('content', name);
   if (isAdmin) {
@@ -87,28 +87,26 @@ if (RESTBR_CONFIGURED) {
   }
 })();
 
-// Load the shared menu-language policy.
-// On admin pages, keep the login screen lightweight: dashboard localization
-// starts only after authentication unlocks the body. This avoids expensive
-// DOM observers/scans while the user is typing email/password on mobile Safari.
+// Pasha Baby is Arabic-only. Load one lightweight policy layer instead of
+// the former multilingual settings / dashboard translation stack.
 (() => {
-  const loadLanguageSettings = () => {
-    if (document.getElementById('restbrLanguageSettingsScript')) return;
+  const loadArabicOnly = () => {
+    if (document.getElementById('pashaArabicOnlyScript')) return;
     const script = document.createElement('script');
-    script.id = 'restbrLanguageSettingsScript';
-    script.src = 'js/language-settings.js?v=1.2';
+    script.id = 'pashaArabicOnlyScript';
+    script.src = 'js/pasha-arabic-only.js?v=1.0';
     script.async = false;
     document.head.appendChild(script);
   };
 
   if (!RESTBR_IS_ADMIN_PATH) {
-    loadLanguageSettings();
+    loadArabicOnly();
     return;
   }
 
   const startAfterUnlock = () => {
     if (!document.body || document.body.classList.contains('auth-locked')) return false;
-    loadLanguageSettings();
+    loadArabicOnly();
     return true;
   };
 
@@ -128,7 +126,7 @@ if (RESTBR_CONFIGURED) {
   }
 })();
 
-// Public-menu only: automatic restaurant opening hours.
+// Public-store only: automatic opening hours.
 (() => {
   if (RESTBR_IS_ADMIN_PATH) return;
   if (document.getElementById('restbrRestaurantHoursScript')) return;
@@ -140,7 +138,7 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Public-menu only: use bullets instead of numeric sequencing in WhatsApp order items.
+// Public-store only: use bullets instead of numeric sequencing in WhatsApp order items.
 (() => {
   if (RESTBR_IS_ADMIN_PATH) return;
   if (document.getElementById('restbrWhatsappOrderBulletsScript')) return;
@@ -200,7 +198,7 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only: use the current restaurant logo when a product has no image.
+// Admin-only: use the current store logo when a product has no image.
 (() => {
   if (!RESTBR_IS_ADMIN_PATH) return;
   if (document.getElementById('restbrAdminProductImageFallbackScript')) return;
@@ -212,7 +210,7 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Admin-only restaurant opening-hours editor.
+// Admin-only store opening-hours editor.
 (() => {
   if (!RESTBR_IS_ADMIN_PATH) return;
   if (document.getElementById('restbrAdminRestaurantHoursScript')) return;
@@ -231,7 +229,7 @@ if (RESTBR_CONFIGURED) {
 
   const script = document.createElement('script');
   script.id = 'restbrAdminLightThemeCompleteScript';
-  script.src = 'js/admin-light-theme-complete.js?v=1.0';
+  script.src = 'js/admin-light-theme-complete.js?v=1.1';
   script.async = false;
   document.head.appendChild(script);
 })();
