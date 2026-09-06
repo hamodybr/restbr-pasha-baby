@@ -34,11 +34,15 @@ async function get(path, { json = false, headers = {} } = {}) {
 async function expectText(path, markers, label) {
   try {
     const { response, body } = await get(path);
-    if (!response.ok) return fail(label, `HTTP ${response.status}`);
-    for (const marker of markers) {
-      if (!body.includes(marker)) return fail(label, `missing marker ${marker}`);
+    if (!response.ok) {
+      fail(label, `HTTP ${response.status}`);
+      return '';
     }
-    ok(`${label} (${response.status})`);
+
+    const missing = markers.filter(marker => !body.includes(marker));
+    if (missing.length) fail(label, `missing marker ${missing.join(', ')}`);
+    else ok(`${label} (${response.status})`);
+
     return body;
   } catch (error) {
     fail(label, error?.message || String(error));
@@ -48,6 +52,7 @@ async function expectText(path, markers, label) {
 
 function localRefs(html) {
   const refs = new Set();
+  if (!html) return [];
   for (const match of html.matchAll(/\b(?:src|href)=["']([^"']+)["']/gi)) {
     const value = match[1].trim();
     if (!value || /^(?:[a-z]+:|\/\/|#|data:|blob:)/i.test(value)) continue;
@@ -78,14 +83,14 @@ const indexHtml = await expectText('/', [
 const adminHtml = await expectText('/admin.html', [
   'Admin Dashboard',
   'js/runtime-config.js',
-  'js/language-settings.js'
+  'js/supabase-config.js'
 ], 'admin page');
 
 await expectText('/js/pasha-baby-admin-copy.js', [
   "[/المنيو/g, 'المتجر']",
   "[/منيو/g, 'متجر']",
   "[/\\bMenu\\b/g, 'Store']",
-  "['🍽️', '📦']"
+  "[/🍽️?/g, '📦']"
 ], 'retail dashboard copy layer');
 
 await expectText('/sw.js', [
