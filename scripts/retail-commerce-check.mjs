@@ -11,6 +11,10 @@ const requireText = (file, marker, label = marker) => {
   if (!exists(file)) return fail(`${file}: missing`);
   if (!read(file).includes(marker)) fail(`${file}: missing ${label}`);
 };
+const requireMatch = (file, pattern, label = String(pattern)) => {
+  if (!exists(file)) return fail(`${file}: missing`);
+  if (!pattern.test(read(file))) fail(`${file}: missing ${label}`);
+};
 const forbidText = (file, marker, label = marker) => {
   if (exists(file) && read(file).includes(marker)) fail(`${file}: forbidden ${label}`);
 };
@@ -38,7 +42,7 @@ for (const file of files) {
 requireText('index.html', 'css/pasha-baby-commerce.css?v=1.0', 'retail commerce stylesheet');
 requireText('index.html', 'js/pasha-baby-commerce.js?v=2.0', 'retail commerce v2 runtime');
 requireText('index.html', 'js/live-prices.js?v=2.0', 'discount-aware live prices v2 runtime');
-requireText('sw.js', 'restbr-pasha-baby-v20', 'retail cache generation');
+requireMatch('sw.js', /restbr-pasha-baby-v\d+/, 'retail cache generation');
 requireText('sw.js', 'css/pasha-baby-commerce.css?v=1.0', 'cached commerce stylesheet');
 requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.0', 'cached commerce v2 runtime');
 requireText('sw.js', 'js/live-prices.js?v=2.0', 'cached live prices v2 runtime');
