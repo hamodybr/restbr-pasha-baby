@@ -57,10 +57,24 @@ await expectText('/js/live-prices.js', [
 ], 'discount-aware live price runtime');
 
 await expectText('/js/language-settings.js', [
-  'js/admin-retail-discounts.js?v=1.0',
-  'js/admin-product-colors.js?v=1.0',
+  'js/admin-retail-discounts.js?v=2.0',
+  'js/admin-product-colors.js?v=2.0',
   'js/admin-large-catalog.js?v=1.0'
 ], 'admin commerce loader');
+
+await expectText('/js/admin-retail-discounts.js', [
+  '__PASHA_ADMIN_RETAIL_DISCOUNTS_V2__',
+  'pbDiscountQuickBtn',
+  "q('#viewProducts')"
+], 'integrated product discounts admin');
+
+await expectText('/js/admin-product-colors.js', [
+  '__PASHA_ADMIN_PRODUCT_COLORS_V2__',
+  'pbProductColorsEditor',
+  'detectColorHex',
+  "['اسود', '#111111']",
+  'data-color-auto'
+], 'integrated automatic product colors admin');
 
 for (const table of ['discounts', 'product_colors']) {
   try {
