@@ -12,7 +12,6 @@
       localStorage.setItem('RESTBR_LANG_V1', 'ar');
       localStorage.removeItem('RESTBR_ENABLED_LANGUAGES_V1');
     } catch (_) {}
-    window.RESTBR_ENABLED_LANGUAGES = ['ar'];
   }
 
   function installArabicOnlyStyle() {
@@ -65,8 +64,8 @@
     if (languageCard) languageCard.dataset.pashaMultilangHidden = '1';
   }
 
-  function loadAdminScript(id, src) {
-    if (!IS_ADMIN || q(`#${id}`)) return;
+  function loadScript(id, src, adminOnly = false) {
+    if ((adminOnly && !IS_ADMIN) || q(`#${id}`)) return;
     const script = document.createElement('script');
     script.id = id;
     script.src = src;
@@ -76,11 +75,11 @@
 
   function loadArabicAdminTools() {
     if (!IS_ADMIN) return;
-    loadAdminScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.1');
-    loadAdminScript('pashaBabyImageOptimizerScript', 'js/admin-image-optimizer.js?v=1.0');
-    loadAdminScript('pashaBabyLargeCatalogScript', 'js/admin-large-catalog.js?v=1.0');
-    loadAdminScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=3.0');
-    loadAdminScript('pashaBabyProductColorsScript', 'js/admin-product-colors.js?v=3.0');
+    loadScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.1', true);
+    loadScript('pashaBabyImageOptimizerScript', 'js/admin-image-optimizer.js?v=1.0', true);
+    loadScript('pashaBabyLargeCatalogScript', 'js/admin-large-catalog.js?v=1.0', true);
+    loadScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=3.0', true);
+    loadScript('pashaBabyProductColorsScript', 'js/admin-product-colors.js?v=3.0', true);
   }
 
   function boot() {
@@ -107,6 +106,8 @@
       observer.observe(document.body, { childList: true, subtree: true });
       return;
     }
+
+    loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.0');
 
     const keepArabic = () => {
       forceArabicState();
