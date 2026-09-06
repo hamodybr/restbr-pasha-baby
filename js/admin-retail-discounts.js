@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_ADMIN_RETAIL_DISCOUNTS_V2__) return;
-  window.__PASHA_ADMIN_RETAIL_DISCOUNTS_V2__ = true;
+  if (window.__PASHA_ADMIN_RETAIL_DISCOUNTS_V3__) return;
+  window.__PASHA_ADMIN_RETAIL_DISCOUNTS_V3__ = true;
 
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
@@ -9,35 +9,29 @@
     categories: [],
     products: [],
     discounts: [],
-    bound: false,
-    refreshing: null
+    refreshing: null,
+    observer: null
   };
 
   const q = selector => document.querySelector(selector);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[ch]));
-  const nameOf = row => row?.name_ar || row?.name_ku || row?.name_en || 'بدون اسم';
+  const nameOf = row => row?.name_ar || row?.name || 'بدون اسم';
 
   async function fetchAll(table, select, order = 'sort_order', ascending = true) {
     const rows = [];
     let from = 0;
 
     while (true) {
-      let query = supabaseClient
-        .from(table)
-        .select(select)
-        .range(from, from + PAGE_SIZE - 1);
-
+      let query = supabaseClient.from(table).select(select).range(from, from + PAGE_SIZE - 1);
       if (order) query = query.order(order, { ascending });
-
       const { data, error } = await query;
       if (error) throw error;
 
       const page = Array.isArray(data) ? data : [];
       rows.push(...page);
       if (page.length < PAGE_SIZE) break;
-
       from += PAGE_SIZE;
       if (from >= MAX_ROWS) throw new Error(`عدد سجلات ${table} أكبر من حد الأمان.`);
     }
@@ -46,10 +40,10 @@
   }
 
   function installStyles() {
-    if (q('#pbAdminDiscountStylesV2')) return;
+    if (q('#pbAdminDiscountStylesV3')) return;
 
     const style = document.createElement('style');
-    style.id = 'pbAdminDiscountStylesV2';
+    style.id = 'pbAdminDiscountStylesV3';
     style.textContent = `
       #pbDiscountQuickBtn{display:inline-flex;align-items:center;justify-content:center;gap:6px}
       #discountsSettingsPanel{margin:0 0 16px;border:1px solid rgba(216,169,88,.2);border-radius:16px;background:rgba(216,169,88,.035);overflow:hidden}
@@ -63,6 +57,7 @@
       #discountsSettingsPanel[open] .settings-chevron{transform:rotate(180deg)}
       #discountsSettingsPanel .settings-accordion-body{padding:0 14px 14px}
       #discountsSettingsPanel .pb-discount-box{padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(0,0,0,.16)}
+      #discountsSettingsPanel .pb-discount-box+ .pb-discount-box{margin-top:10px}
       #discountsSettingsPanel .pb-discount-head{margin-bottom:10px}
       #discountsSettingsPanel .pb-discount-head strong{display:block;color:#f0e5d4;font-size:12px;margin-bottom:3px}
       #discountsSettingsPanel .pb-discount-head small{display:block;color:#968f87;font-size:10px;line-height:1.55}
@@ -74,7 +69,6 @@
       #discountsSettingsPanel input:focus,#discountsSettingsPanel select:focus{border-color:#d8a958}
       #pbDiscountCreateBtn{width:100%;height:43px;margin-top:11px;border:0;border-radius:11px;background:linear-gradient(135deg,#e2b55e,#ad7426);color:#100b05;font-weight:900}
       #pbDiscountStatus{min-height:17px;margin-top:7px;font-size:10px;color:#9b9288}
-      #pbDiscountListWrap{margin-top:10px}
       #pbDiscountList{display:flex;flex-direction:column;gap:8px;margin-top:8px}
       .pb-discount-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(255,255,255,.025)}
       .pb-discount-row.off{opacity:.55}
@@ -84,6 +78,25 @@
       .pb-discount-actions button{height:31px;padding:0 9px;border-radius:9px;border:1px solid rgba(216,169,88,.24);background:#17130f;color:#ddd;font-size:10px;font-weight:800}
       .pb-discount-actions .danger{color:#ffaaa4;border-color:rgba(248,113,113,.25)}
       .pb-discount-empty{padding:16px;text-align:center;color:#8f867a;border:1px dashed rgba(255,255,255,.08);border-radius:11px;font-size:11px}
+
+      body.admin-global-light #discountsSettingsPanel{background:#fffaf3!important;border-color:rgba(112,79,34,.16)!important;color:#30281f!important}
+      body.admin-global-light #discountsSettingsPanel>summary{background:linear-gradient(180deg,#fffdf8,#fff8ee)!important}
+      body.admin-global-light #discountsSettingsPanel .settings-accordion-title strong{color:#b9791f!important}
+      body.admin-global-light #discountsSettingsPanel .settings-accordion-title small,
+      body.admin-global-light #discountsSettingsPanel .pb-discount-head small,
+      body.admin-global-light #pbDiscountStatus{color:#817568!important}
+      body.admin-global-light #discountsSettingsPanel .pb-discount-box,
+      body.admin-global-light .pb-discount-row{background:#fffdf9!important;border-color:rgba(112,79,34,.16)!important;color:#30281f!important;box-shadow:none!important}
+      body.admin-global-light #discountsSettingsPanel .pb-discount-head strong{color:#33291f!important}
+      body.admin-global-light #discountsSettingsPanel label{color:#776b5f!important}
+      body.admin-global-light #discountsSettingsPanel input,
+      body.admin-global-light #discountsSettingsPanel select{background:#fff!important;color:#30281f!important;-webkit-text-fill-color:#30281f!important;border-color:rgba(112,79,34,.22)!important;color-scheme:light!important}
+      body.admin-global-light .pb-discount-row strong{color:#b9791f!important}
+      body.admin-global-light .pb-discount-row small{color:#817568!important}
+      body.admin-global-light .pb-discount-actions button{background:#fff7e9!important;color:#6f4b1b!important;border-color:rgba(112,79,34,.2)!important}
+      body.admin-global-light .pb-discount-actions .danger{background:#fff1f0!important;color:#a63731!important;border-color:rgba(166,55,49,.22)!important}
+      body.admin-global-light .pb-discount-empty{color:#817568!important;border-color:rgba(112,79,34,.16)!important}
+
       @media(max-width:640px){
         #discountsSettingsPanel .pb-discount-grid{grid-template-columns:1fr}
         #discountsSettingsPanel .pb-discount-field.full{grid-column:auto}
@@ -140,7 +153,7 @@
             <button id="pbDiscountCreateBtn" type="button">إضافة الخصم</button>
             <div id="pbDiscountStatus"></div>
           </div>
-          <div id="pbDiscountListWrap" class="pb-discount-box">
+          <div class="pb-discount-box">
             <div class="pb-discount-head">
               <strong>الخصومات الحالية</strong>
               <small>الأولوية: الصنف ثم القسم ثم المتجر. إذا تكرر نفس المستوى يعتمد أعلى خصم.</small>
@@ -151,7 +164,7 @@
       </details>`;
   }
 
-  function installProductsEntry() {
+  function ensureUi() {
     installStyles();
 
     const view = q('#viewProducts');
@@ -173,13 +186,12 @@
       const template = document.createElement('template');
       template.innerHTML = panelHtml().trim();
       panel = template.content.firstElementChild;
-
       const filters = q('#productFilterStrip');
       if (filters && filters.parentElement === view) filters.before(panel);
       else toolbar.insertAdjacentElement('afterend', panel);
     }
 
-    bind(panel, button);
+    bindPanel(panel);
     return panel;
   }
 
@@ -187,24 +199,22 @@
     const el = q('#pbDiscountStatus');
     if (!el) return;
     el.textContent = message;
-    el.style.color = ok ? '#9ccfb7' : '#fecaca';
+    el.style.color = ok
+      ? (document.body.classList.contains('admin-global-light') ? '#568d70' : '#9ccfb7')
+      : '#b5463f';
   }
 
   function scopeLabel(row) {
     if (row.scope_type === 'restaurant') return 'المتجر كامل';
     const source = row.scope_type === 'category' ? state.categories : state.products;
     const target = source.find(item => String(item.id) === String(row.target_id));
-    if (row.scope_type === 'category') return `قسم: ${nameOf(target)}`;
-    return `صنف: ${nameOf(target)}`;
+    return row.scope_type === 'category' ? `قسم: ${nameOf(target)}` : `صنف: ${nameOf(target)}`;
   }
 
   function dateLabel(value) {
     if (!value) return '';
     try {
-      return new Intl.DateTimeFormat('ar-IQ', {
-        dateStyle: 'short',
-        timeStyle: 'short'
-      }).format(new Date(value));
+      return new Intl.DateTimeFormat('ar-IQ', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value));
     } catch (_) {
       return String(value);
     }
@@ -230,9 +240,7 @@
     }
 
     const rows = scope === 'category' ? state.categories : state.products;
-    select.innerHTML = rows
-      .map(row => `<option value="${esc(row.id)}">${esc(nameOf(row))}</option>`)
-      .join('');
+    select.innerHTML = rows.map(row => `<option value="${esc(row.id)}">${esc(nameOf(row))}</option>`).join('');
   }
 
   function renderList() {
@@ -260,8 +268,8 @@
 
   async function loadReferenceData() {
     const [categories, products] = await Promise.all([
-      fetchAll('categories', 'id,name_ar,name_ku,name_en,sort_order,is_visible,is_active', 'sort_order', true),
-      fetchAll('products', 'id,category_id,name_ar,name_ku,name_en,sort_order,is_visible,is_active', 'sort_order', true)
+      fetchAll('categories', 'id,name_ar,sort_order,is_visible,is_active', 'sort_order', true),
+      fetchAll('products', 'id,category_id,name_ar,sort_order,is_visible,is_active', 'sort_order', true)
     ]);
 
     state.categories = categories.filter(row => row.is_visible !== false && row.is_active !== false);
@@ -311,12 +319,10 @@
       status('اكتب نسبة صحيحة من 1 إلى 100.', false);
       return;
     }
-
     if (scope !== 'restaurant' && !targetId) {
       status('اختر القسم أو الصنف.', false);
       return;
     }
-
     if (startsAt && endsAt && new Date(endsAt) <= new Date(startsAt)) {
       status('وقت النهاية لازم يكون بعد وقت البداية.', false);
       return;
@@ -329,7 +335,6 @@
     }
 
     status('جاري حفظ الخصم...');
-
     const { error } = await supabaseClient.from('discounts').insert({
       discount_percent: percent,
       price_mode: 'both',
@@ -364,10 +369,7 @@
 
     const { error } = await supabaseClient
       .from('discounts')
-      .update({
-        is_active: !row.is_active,
-        updated_at: new Date().toISOString()
-      })
+      .update({ is_active: !row.is_active, updated_at: new Date().toISOString() })
       .eq('id', id);
 
     if (error) {
@@ -393,51 +395,83 @@
   }
 
   function openDiscounts() {
-    const panel = installProductsEntry();
+    const panel = ensureUi();
     if (!panel) return;
-
     panel.open = true;
     void refresh();
     requestAnimationFrame(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
 
-  function bind(panel, button) {
-    if (!panel || state.bound) return;
-    state.bound = true;
+  function bindPanel(panel) {
+    if (!panel || panel.dataset.pbDiscountBound === '1') return;
+    panel.dataset.pbDiscountBound = '1';
 
-    button?.addEventListener('click', event => {
-      event.preventDefault();
-      openDiscounts();
-    });
-
-    q('#pbDiscountScope')?.addEventListener('change', renderTargets);
-    q('#pbDiscountCreateBtn')?.addEventListener('click', () => void createDiscount());
-
-    panel.addEventListener('toggle', () => {
-      if (panel.open) void refresh();
+    panel.addEventListener('change', event => {
+      if (event.target.closest('#pbDiscountScope')) renderTargets();
     });
 
     panel.addEventListener('click', event => {
+      if (event.target.closest('#pbDiscountCreateBtn')) {
+        event.preventDefault();
+        void createDiscount();
+        return;
+      }
+
       const toggle = event.target.closest('[data-discount-toggle]');
       if (toggle) {
+        event.preventDefault();
         void toggleDiscount(toggle.dataset.discountToggle);
         return;
       }
 
       const del = event.target.closest('[data-discount-delete]');
-      if (del) void deleteDiscount(del.dataset.discountDelete);
+      if (del) {
+        event.preventDefault();
+        void deleteDiscount(del.dataset.discountDelete);
+      }
     });
+
+    panel.addEventListener('toggle', () => {
+      if (panel.open) void refresh();
+    });
+  }
+
+  function installResilience() {
+    document.addEventListener('click', event => {
+      const quick = event.target.closest('#pbDiscountQuickBtn');
+      if (quick) {
+        event.preventDefault();
+        event.stopPropagation();
+        openDiscounts();
+        return;
+      }
+
+      if (event.target.closest('[data-admin-nav="products"],[data-go-view="products"]')) {
+        setTimeout(ensureUi, 40);
+        setTimeout(ensureUi, 250);
+      }
+    }, true);
+
+    const view = q('#viewProducts');
+    if (!view || state.observer) return;
+
+    state.observer = new MutationObserver(() => {
+      if (!q('#pbDiscountQuickBtn') || !q('#discountsSettingsPanel')) queueMicrotask(ensureUi);
+    });
+    state.observer.observe(view, { childList: true, subtree: true });
   }
 
   function boot() {
     installStyles();
-
-    if (installProductsEntry()) return;
+    ensureUi();
+    installResilience();
 
     let tries = 0;
     const timer = setInterval(() => {
       tries += 1;
-      if (installProductsEntry() || tries > 120) clearInterval(timer);
+      const ready = ensureUi();
+      if (ready) installResilience();
+      if (ready || tries > 120) clearInterval(timer);
     }, 100);
   }
 
