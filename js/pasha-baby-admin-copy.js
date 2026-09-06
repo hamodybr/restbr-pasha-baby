@@ -1,43 +1,15 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_BABY_ADMIN_COPY_V3__) return;
-  window.__PASHA_BABY_ADMIN_COPY_V3__ = true;
+  if (window.__PASHA_BABY_ADMIN_COPY_V4__) return;
+  window.__PASHA_BABY_ADMIN_COPY_V4__ = true;
 
   const EXACT = new Map([
-    ['إعدادات المطعم', 'إعدادات المحل'],
-    ['اسم المطعم', 'اسم المحل'],
-    ['اسم المطعم بالعربي', 'اسم المحل بالعربي'],
-    ['اسم المطعم بالكوردي', 'اسم المحل بالكوردي'],
-    ['اسم المطعم بالإنجليزي', 'اسم المحل بالإنجليزي'],
-    ['شعار المطعم', 'شعار المحل'],
-    ['موقع المطعم', 'موقع المحل'],
-    ['المطعم مفتوح', 'المحل مفتوح'],
-    ['المطعم مغلق', 'المحل مغلق'],
-    ['أوقات المطعم', 'أوقات المحل'],
-    ['ساعات المطعم', 'ساعات المحل'],
-    ['وقت فتح المطعم', 'وقت فتح المحل'],
-    ['وقت إغلاق المطعم', 'وقت إغلاق المحل'],
-    ['حفظ إعدادات المطعم', 'حفظ إعدادات المحل'],
-    ['لم يتم العثور على سجل إعدادات المطعم', 'لم يتم العثور على سجل إعدادات المحل'],
-    ['استلام من المطعم', 'استلام من المحل'],
     ['لغات المنيو', 'لغات المتجر'],
     ['عنوان المنيو', 'عنوان المتجر'],
     ['إظهار عنوان المنيو', 'إظهار عنوان المتجر'],
     ['إحصائيات المنيو', 'إحصائيات المتجر'],
     ['رابط المنيو', 'رابط المتجر'],
     ['واتساب منيو', 'واتساب'],
-    ['Restaurant Settings', 'Store Settings'],
-    ['Restaurant Name', 'Store Name'],
-    ['Restaurant Name (Arabic)', 'Store Name (Arabic)'],
-    ['Restaurant Name (Kurdish)', 'Store Name (Kurdish)'],
-    ['Restaurant Name (English)', 'Store Name (English)'],
-    ['Restaurant Logo', 'Store Logo'],
-    ['Restaurant Location', 'Store Location'],
-    ['Restaurant Hours', 'Store Hours'],
-    ['Restaurant Open', 'Store Open'],
-    ['Restaurant Closed', 'Store Closed'],
-    ['Save Restaurant Settings', 'Save Store Settings'],
-    ['Pickup from Restaurant', 'Pick up from Store'],
     ['Menu Languages', 'Store Languages'],
     ['Menu Title', 'Store Title'],
     ['Menu Analytics', 'Store Analytics'],
@@ -45,24 +17,19 @@
     ['WhatsApp Menu', 'WhatsApp']
   ]);
 
+  // Pasha Baby is retail. Replace the generic business noun instead of trying
+  // to maintain a growing list such as "اسم المطعم", "فتح المطعم", etc.
+  // This runs only on dashboard copy/attributes and never on product/category data.
   const PHRASES = [
-    [/إعدادات المطعم/g, 'إعدادات المحل'],
-    [/اسم المطعم/g, 'اسم المحل'],
-    [/شعار المطعم/g, 'شعار المحل'],
-    [/موقع المطعم/g, 'موقع المحل'],
-    [/أوقات المطعم/g, 'أوقات المحل'],
-    [/ساعات المطعم/g, 'ساعات المحل'],
-    [/المطعم مغلق/g, 'المحل مغلق'],
-    [/المطعم مفتوح/g, 'المحل مفتوح'],
-    [/استلام من المطعم/g, 'استلام من المحل'],
+    [/المطعم/g, 'المحل'],
+    [/مطعم/g, 'محل'],
+    [/\bRESTAURANT\b/g, 'STORE'],
+    [/\bRestaurant\b/g, 'Store'],
+    [/\brestaurant\b/g, 'store'],
+    [/چێشتخانێ/g, 'دوکانێ'],
+    [/چێشتخانەکە/g, 'دوکانەکە'],
     [/لغات المنيو/g, 'لغات المتجر'],
     [/إحصائيات المنيو/g, 'إحصائيات المتجر'],
-    [/Restaurant Settings/gi, 'Store Settings'],
-    [/Restaurant Name/gi, 'Store Name'],
-    [/Restaurant Logo/gi, 'Store Logo'],
-    [/Restaurant Location/gi, 'Store Location'],
-    [/Restaurant Hours/gi, 'Store Hours'],
-    [/Pickup from Restaurant/gi, 'Pick up from Store'],
     [/Menu Languages/gi, 'Store Languages'],
     [/Menu Analytics/gi, 'Store Analytics']
   ];
@@ -121,6 +88,12 @@
 
   function scan(root) {
     if (!root) return;
+
+    if (root.nodeType === Node.TEXT_NODE) {
+      translateTextNode(root);
+      return;
+    }
+
     if (root instanceof Element) translateAttributes(root);
 
     const walker = document.createTreeWalker(
@@ -169,11 +142,59 @@
     else run();
   }
 
+  // Dynamic settings (hours, async status messages, i18n updates) can appear
+  // after the first paint. Observe only changed nodes instead of rescanning the
+  // whole dashboard, which keeps the previous iPhone/Safari performance fix.
+  const pendingNodes = new Set();
+  let mutationFrame = 0;
+
+  function queueNode(node) {
+    if (!node) return;
+    pendingNodes.add(node);
+    if (mutationFrame) return;
+
+    mutationFrame = requestAnimationFrame(() => {
+      mutationFrame = 0;
+      const nodes = Array.from(pendingNodes);
+      pendingNodes.clear();
+      nodes.forEach(scan);
+      applyRetailFeaturePolicy();
+    });
+  }
+
+  function startIncrementalObserver() {
+    if (!document.body || window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V4__) return;
+    window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V4__ = true;
+
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.type === 'characterData') {
+          queueNode(mutation.target);
+          return;
+        }
+
+        if (mutation.type === 'attributes') {
+          queueNode(mutation.target);
+          return;
+        }
+
+        mutation.addedNodes.forEach(queueNode);
+      });
+    });
+
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['placeholder', 'title', 'aria-label']
+    });
+  }
+
   function start() {
-    // One initial pass only. No permanent MutationObserver and no recurring
-    // whole-document scans: those caused severe jank on iPhone/Safari.
     applyRetailFeaturePolicy();
     scan(document.body);
+    startIncrementalObserver();
 
     document.addEventListener('restbr:admin-language-change', () => {
       scheduleScopeScan();
