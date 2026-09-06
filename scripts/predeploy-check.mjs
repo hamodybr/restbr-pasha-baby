@@ -31,11 +31,12 @@ function checkLocalRef(ref, source) {
 }
 
 function requireText(file, marker, label = marker) {
+  if (!exists(file)) return fail(`${file}: missing`);
   if (!read(file).includes(marker)) fail(`${file}: missing ${label}`);
 }
 
 function forbidText(file, marker, label = marker) {
-  if (read(file).includes(marker)) fail(`${file}: forbidden legacy/unsafe marker ${label}`);
+  if (exists(file) && read(file).includes(marker)) fail(`${file}: forbidden legacy/unsafe marker ${label}`);
 }
 
 // 1) JavaScript syntax: no deploy if any browser/service-worker file cannot parse.
@@ -52,10 +53,12 @@ for (const file of jsFiles) {
 }
 note(`JavaScript syntax checked: ${jsFiles.length} files`);
 
-// 2) Manifest must be valid JSON and remain Pasha Baby scoped.
+// 2) Manifest must be valid JSON, Arabic-only, and remain Pasha Baby scoped.
 try {
   const manifest = JSON.parse(read('manifest.webmanifest'));
-  if (!/Pasha Baby/i.test(String(manifest.name || ''))) fail('manifest.webmanifest: wrong app identity');
+  if (!/پاشا\s*بيبي/.test(String(manifest.name || ''))) fail('manifest.webmanifest: wrong Pasha identity');
+  if (String(manifest.lang || '') !== 'ar') fail('manifest.webmanifest: expected Arabic language');
+  if (String(manifest.dir || '') !== 'rtl') fail('manifest.webmanifest: expected RTL direction');
   if (!Array.isArray(manifest.icons) || manifest.icons.length < 1) fail('manifest.webmanifest: no icons configured');
   for (const icon of manifest.icons || []) checkLocalRef(icon.src, 'manifest.webmanifest');
 } catch (error) {
@@ -92,6 +95,8 @@ for (const match of sw.matchAll(/["']\.\/([^"']+)["']/g)) {
   checkLocalRef(ref, 'sw.js');
 }
 if (!sw.includes('js/restbr-hardening.js?v=1.0')) fail('sw.js: hardening layer is not cached');
+if (!sw.includes('js/pasha-arabic-only.js?v=1.0')) fail('sw.js: Arabic-only policy is not cached');
+if (!sw.includes('js/arabic-news-ticker.js?v=1.0')) fail('sw.js: Arabic announcement ticker is not cached');
 
 // 6) Pasha deployment identity / feature isolation.
 const runtime = read('js/runtime-config.js');
@@ -156,15 +161,35 @@ forbidText('admin.html', "const ADMIN_SETTINGS_THEME_KEY='SHORASH_ADMIN_SETTINGS
 forbidText('js/supabase-config.js', 'discount-choice-price-sync.js', 'restaurant discount loader in retail build');
 forbidText('js/supabase-config.js', 'testSupabaseConnection();', 'development connection-test request');
 
-// Pasha keeps generic RestBr technical identifiers, but all visible dashboard
-// business wording is normalized by this lightweight retail-specific layer.
+// Pasha Baby is now intentionally Arabic-only. Keep generic DB columns for
+// compatibility, but remove dedicated multilingual UI/configuration files.
+requireText('js/supabase-config.js', "script.src = 'js/pasha-arabic-only.js?v=1.0'", 'Arabic-only bootstrap');
+forbidText('js/supabase-config.js', 'language-settings.js', 'legacy multilingual loader');
+requireText('js/pasha-arabic-only.js', "localStorage.setItem('RESTBR_LANG_V1', 'ar')", 'Arabic language lock');
+requireText('js/pasha-arabic-only.js', 'data-pasha-multilang-hidden', 'admin multilingual field suppression');
+requireText('js/pasha-arabic-only.js', 'js/arabic-news-ticker.js?v=1.0', 'Arabic announcement ticker loader');
+forbidText('index.html', 'id="smLangs"', 'storefront language picker');
+forbidText('index.html', 'english-card-ltr.css', 'English-only card stylesheet');
+forbidText('index.html', 'english-news-ticker.js', 'legacy multilingual ticker');
+
+const multilingualDeadFiles = [
+  'js/language-settings.js',
+  'js/admin-i18n.js',
+  'js/admin-i18n-supplement.js',
+  'js/admin-i18n-final-cleanup.js',
+  'js/admin-i18n-attribute-guard.js',
+  'css/english-card-ltr.css',
+  'js/english-news-ticker.js'
+];
+for (const file of multilingualDeadFiles) {
+  if (exists(file)) fail(`${file}: multilingual-only code must not ship in Arabic-only Pasha`);
+}
+
+// Visible dashboard business wording stays normalized by the lightweight retail layer.
 requireText('js/pasha-baby-admin-copy.js', "[/المطعم/g, 'المحل']", 'generic Arabic restaurant-to-store normalizer');
 requireText('js/pasha-baby-admin-copy.js', "[/مطعم/g, 'محل']", 'generic Arabic noun normalizer');
 requireText('js/pasha-baby-admin-copy.js', "[/المنيو/g, 'المتجر']", 'generic Arabic menu-to-store normalizer');
 requireText('js/pasha-baby-admin-copy.js', "[/منيو/g, 'متجر']", 'generic Arabic menu noun normalizer');
-requireText('js/pasha-baby-admin-copy.js', "[/\\bRestaurant\\b/g, 'Store']", 'generic English restaurant-to-store normalizer');
-requireText('js/pasha-baby-admin-copy.js', "[/\\bMenu\\b/g, 'Store']", 'generic English menu-to-store normalizer');
-requireText('js/pasha-baby-admin-copy.js', "[/🍽️?/g, '📦']", 'retail product icon normalizer');
 requireText('js/pasha-baby-admin-copy.js', 'new MutationObserver', 'incremental dynamic dashboard-copy observer');
 requireText('js/pasha-baby-admin-copy.js', "attributeFilter: ['placeholder', 'title', 'aria-label']", 'limited retail-copy attribute observer');
 
@@ -201,4 +226,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('✓ Pasha Baby pre-deploy audit passed');
+console.log('✓ Pasha Baby Arabic-only pre-deploy audit passed');
