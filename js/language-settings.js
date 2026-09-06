@@ -248,11 +248,13 @@
   function loadAdminDashboardI18n() {
     // Pasha Baby performance profile:
     // one primary dashboard translator + one lightweight store-copy layer.
-    // The old supplement/final/attribute observers repeatedly rescanned the
-    // whole dashboard and caused severe navigation jank on mobile Safari.
+    // Retail commerce tools are loaded through the same lightweight loader so
+    // admin.html stays stable and the feature remains independently testable.
     appendAdminI18nScript('restbrAdminI18nScript', 'js/admin-i18n.js?v=1.0');
     appendAdminI18nScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.1');
     appendAdminI18nScript('pashaBabyImageOptimizerScript', 'js/admin-image-optimizer.js?v=1.0');
+    appendAdminI18nScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=1.0');
+    appendAdminI18nScript('pashaBabyProductColorsScript', 'js/admin-product-colors.js?v=1.0');
   }
 
   async function initAdmin() {
