@@ -1,13 +1,15 @@
 (() => {
-  if (window.__PASHA_BABY_COMMERCE_V1__) return;
-  window.__PASHA_BABY_COMMERCE_V1__ = true;
+  if (window.__PASHA_BABY_COMMERCE_V2__) return;
+  window.__PASHA_BABY_COMMERCE_V2__ = true;
 
   const PAGE_SIZE = 1000;
+  const MAX_ROWS = 50000;
   let commerceReady = false;
   let currentProduct = null;
   let selectedOptionIndex = null;
   let selectedColorId = '';
   let observer = null;
+  let bootPromise = null;
 
   const lang = () => window.RESTBR_LANG
     ? window.RESTBR_LANG()
@@ -56,31 +58,196 @@
 
       if (page.length < PAGE_SIZE) break;
       from += PAGE_SIZE;
-
-      if (from > 50000) throw new Error(`${table} exceeded storefront safety limit`);
+      if (from >= MAX_ROWS) throw new Error(`${table} exceeded ${MAX_ROWS} row storefront safety limit`);
     }
 
     return rows;
   }
 
+  function iraqMinutesNow() {
+    try {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Baghdad',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).formatToParts(new Date());
+      const h = Number(parts.find(p => p.type === 'hour')?.value || 0);
+      const m = Number(parts.find(p => p.type === 'minute')?.value || 0);
+      return h * 60 + m;
+    } catch (_) {
+      const now = new Date();
+      return now.getHours() * 60 + now.getMinutes();
+    }
+  }
+
+  function timeToMinutes(value) {
+    const match = String(value || '').match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return null;
+    const h = Number(match[1]);
+    const m = Number(match[2]);
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+    return h * 60 + m;
+  }
+
+  function scheduledAvailable(row) {
+    if (row?.availability_schedule_enabled !== true) return true;
+    const from = timeToMinutes(row.available_from);
+    const to = timeToMinutes(row.available_to);
+    if (from === null || to === null || from === to) return true;
+    const now = iraqMinutesNow();
+    return from < to ? now >= from && now < to : now >= from || now < to;
+  }
+
+  function scheduleText(row, category = false) {
+    if (row?.availability_schedule_enabled !== true || !row.available_from || !row.available_to) return '';
+    const from = String(row.available_from).slice(0, 5);
+    const to = String(row.available_to).slice(0, 5);
+    if (category) {
+      return t(`القسم متوفر ${from}–${to}`, `بەشەکە بەردەستە ${from}–${to}`, `Category available ${from}–${to}`);
+    }
+    return t(`متوفر ${from}–${to}`, `بەردەستە ${from}–${to}`, `Available ${from}–${to}`);
+  }
+
+  function mapCatalog(categoriesData, productsData, optionsData) {
+    const categoryMap = new Map();
+
+    (categoriesData || [])
+      .filter(category => category.is_active !== false && category.is_visible !== false)
+      .forEach(category => {
+        categoryMap.set(category.id, {
+          id: category.id,
+          ar: category.name_ar || category.ar || '',
+          ku: category.name_ku || category.ku || category.name_ar || '',
+          en: category.name_en || category.en || category.name_ar || '',
+          order: category.sort_order ?? category.order ?? 999,
+          availability_schedule_enabled: category.availability_schedule_enabled === true,
+          available_from: category.available_from || null,
+          available_to: category.available_to || null
+        });
+      });
+
+    const optionsMap = new Map();
+    (optionsData || []).forEach(option => {
+      const productId = option.product_id;
+      if (!optionsMap.has(productId)) optionsMap.set(productId, []);
+      optionsMap.get(productId).push({
+        id: option.id,
+        ar: option.name_ar || option.ar || '',
+        ku: option.name_ku || option.ku || option.name_ar || '',
+        en: option.name_en || option.en || option.name_ar || '',
+        price: option.price ?? null,
+        order: option.sort_order ?? option.order ?? 999
+      });
+    });
+
+    return (productsData || [])
+      .filter(product =>
+        product.is_active !== false &&
+        product.is_visible !== false &&
+        product.category_id &&
+        categoryMap.has(product.category_id)
+      )
+      .map(product => {
+        const category = categoryMap.get(product.category_id);
+        let productOptions = (optionsMap.get(product.id) || [])
+          .sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
+
+        if (!productOptions.length) {
+          const directPrice = product.base_price ?? product.price;
+          if (directPrice !== null && directPrice !== undefined && directPrice !== '') {
+            productOptions = [{
+              id: `${product.id}-default`,
+              ar: '', ku: '', en: '',
+              price: directPrice,
+              order: 1
+            }];
+          }
+        }
+
+        const manualUnavailable = product.is_available === false || product.available === false;
+        const scheduleUnavailable = product.availability_schedule_enabled === true && !scheduledAvailable(product);
+        const categoryScheduleUnavailable = category.availability_schedule_enabled === true && !scheduledAvailable(category);
+
+        return {
+          id: product.id,
+          manualUnavailable,
+          availability_schedule_enabled: product.availability_schedule_enabled === true,
+          available_from: product.available_from || null,
+          available_to: product.available_to || null,
+          scheduleText: categoryScheduleUnavailable ? scheduleText(category, true) : scheduleText(product, false),
+          name: {
+            ar: product.name_ar || product.ar || '',
+            ku: product.name_ku || product.ku || product.name_ar || '',
+            en: product.name_en || product.en || product.name_ar || ''
+          },
+          category,
+          image: product.image_url || product.image || '',
+          order: product.sort_order ?? product.order ?? 999,
+          badges: {
+            popular: Boolean(product.is_popular ?? product.popular),
+            new: Boolean(product.is_new ?? product.new),
+            hot: Boolean(product.is_hot ?? product.hot),
+            offer: Boolean(product.is_offer ?? product.offer),
+            unavailable: manualUnavailable || categoryScheduleUnavailable || scheduleUnavailable
+          },
+          options: productOptions
+        };
+      })
+      .sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
+  }
+
+  async function ensureFullCatalog() {
+    if (typeof supabaseClient === 'undefined' || !supabaseClient) return false;
+    const DB = window.RESTBR_DB;
+    if (!DB) return false;
+
+    try {
+      const [categoriesData, productsData, optionsData] = await Promise.all([
+        fetchAll('categories', { order: 'sort_order', ascending: true }),
+        fetchAll('products', { order: 'sort_order', ascending: true }),
+        fetchAll('product_options', { order: 'sort_order', ascending: true })
+      ]);
+
+      const products = mapCatalog(categoriesData, productsData, optionsData);
+      DB.products = products;
+
+      window.RESTBR_CATALOG_COUNTS = {
+        categories: categoriesData.length,
+        products: productsData.length,
+        options: optionsData.length,
+        visibleProducts: products.length
+      };
+      window.RESTBR_LARGE_CATALOG_READY = true;
+
+      if (typeof window.renderCats === 'function') window.renderCats();
+      if (typeof window.render === 'function') window.render();
+
+      window.dispatchEvent(new CustomEvent('restbr:catalog-expanded', {
+        detail: window.RESTBR_CATALOG_COUNTS
+      }));
+
+      console.log('✓ Pasha full storefront catalog hydrated', window.RESTBR_CATALOG_COUNTS);
+      return true;
+    } catch (error) {
+      console.error('PASHA LARGE CATALOG ERROR:', error);
+      return false;
+    }
+  }
+
   function discountIsLive(row, now = Date.now()) {
     if (!row || row.is_active === false) return false;
-
     const start = row.starts_at ? Date.parse(row.starts_at) : null;
     const end = row.ends_at ? Date.parse(row.ends_at) : null;
-
     if (Number.isFinite(start) && now < start) return false;
     if (Number.isFinite(end) && now >= end) return false;
-
     return true;
   }
 
   function effectiveDiscount(discounts, product) {
     const productId = String(product?.id || '');
     const categoryId = String(product?.category?.id || '');
-
     const live = discounts.filter(row => discountIsLive(row));
-
     const scopes = [
       live.filter(row => row.scope_type === 'product' && String(row.target_id || '') === productId),
       live.filter(row => row.scope_type === 'category' && String(row.target_id || '') === categoryId),
@@ -93,7 +260,6 @@
         Number(row.discount_percent || 0) > Number(best.discount_percent || 0) ? row : best
       );
     }
-
     return null;
   }
 
@@ -141,24 +307,15 @@
         const discount = effectiveDiscount(discounts, product);
         const percent = Math.max(0, Math.min(100, Number(discount?.discount_percent || 0)));
 
-        if (product.__retailBaseOffer === undefined) {
-          product.__retailBaseOffer = product.badges?.offer === true;
-        }
-
+        if (product.__retailBaseOffer === undefined) product.__retailBaseOffer = product.badges?.offer === true;
         product.discountPercent = percent;
         product.discountScope = discount?.scope_type || '';
-        product.colors = (colorsByProduct.get(String(product.id)) || [])
-          .sort((a, b) => a.order - b.order);
+        product.colors = (colorsByProduct.get(String(product.id)) || []).sort((a, b) => a.order - b.order);
 
-        if (product.badges) {
-          product.badges.offer = product.__retailBaseOffer || percent > 0;
-        }
+        if (product.badges) product.badges.offer = product.__retailBaseOffer || percent > 0;
 
         (product.options || []).forEach(option => {
-          if (option.__retailOriginalPrice === undefined) {
-            option.__retailOriginalPrice = Number(option.price || 0);
-          }
-
+          if (option.__retailOriginalPrice === undefined) option.__retailOriginalPrice = Number(option.price || 0);
           const original = Number(option.__retailOriginalPrice || 0);
           option.originalPrice = original;
           option.price = discountedPrice(original, percent);
@@ -168,10 +325,7 @@
       commerceReady = true;
       window.RESTBR_COMMERCE_READY = true;
 
-      if (typeof window.render === 'function') {
-        window.render();
-      }
-
+      if (typeof window.render === 'function') window.render();
       decorateCards();
       window.dispatchEvent(new CustomEvent('restbr:prices-updated'));
       window.dispatchEvent(new CustomEvent('restbr:commerce-ready', { detail: { discounts, colors: colorRows } }));
@@ -183,7 +337,6 @@
   function colorPreviewHtml(product) {
     const colors = Array.isArray(product?.colors) ? product.colors : [];
     if (!colors.length) return '';
-
     const shown = colors.slice(0, 6);
     return `
       <div class="pb-color-preview" data-pb-color-preview>
@@ -208,23 +361,16 @@
       card.querySelectorAll('.pb-discount-badge,[data-pb-color-preview]').forEach(node => node.remove());
 
       if (Number(product.discountPercent) > 0) {
-        card.insertAdjacentHTML(
-          'beforeend',
-          `<span class="pb-discount-badge">-${Math.round(Number(product.discountPercent))}%</span>`
-        );
+        card.insertAdjacentHTML('beforeend', `<span class="pb-discount-badge">-${Math.round(Number(product.discountPercent))}%</span>`);
       }
 
-      const rows = [...card.querySelectorAll('.sm-option')];
-      rows.forEach((row, index) => {
+      [...card.querySelectorAll('.sm-option')].forEach((row, index) => {
         const option = (product.options || [])[index];
-        if (!option) return;
-
         const buy = row.querySelector('.sm-option-buy');
-        if (!buy) return;
+        if (!option || !buy) return;
 
         const original = Number(option.originalPrice ?? option.price ?? 0);
         const current = Number(option.price ?? 0);
-
         if (original > current && current >= 0) {
           buy.innerHTML = `
             <span class="pb-price-stack">
@@ -236,11 +382,9 @@
 
       const info = card.querySelector('.sm-info');
       const action = card.querySelector('.sm-direct-add,.sm-choose-options');
-
       if (info && action && Array.isArray(product.colors) && product.colors.length) {
         action.insertAdjacentHTML('beforebegin', colorPreviewHtml(product));
         action.dataset.retailColors = '1';
-
         if (action.classList.contains('sm-direct-add')) {
           const label = action.querySelector('b');
           if (label) label.textContent = t('اختيار اللون', 'رەنگ هەڵبژێرە', 'Choose color');
@@ -251,15 +395,13 @@
 
   function ensureChooser() {
     if (document.getElementById('pbCommerceSheet')) return;
-
     document.body.insertAdjacentHTML('beforeend', `
       <div id="pbCommerceBackdrop" class="pb-commerce-backdrop"></div>
       <section id="pbCommerceSheet" class="pb-commerce-sheet" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="pb-commerce-handle"></div>
         <div class="pb-commerce-head">
           <button id="pbCommerceClose" class="pb-commerce-close" type="button" aria-label="Close">×</button>
-          <h3 id="pbCommerceTitle"></h3>
-          <span></span>
+          <h3 id="pbCommerceTitle"></h3><span></span>
         </div>
         <div id="pbCommerceBody" class="pb-commerce-body"></div>
         <button id="pbCommerceAdd" class="pb-commerce-add" type="button"></button>
@@ -268,7 +410,6 @@
     document.getElementById('pbCommerceClose').addEventListener('click', closeChooser);
     document.getElementById('pbCommerceBackdrop').addEventListener('click', closeChooser);
     document.getElementById('pbCommerceAdd').addEventListener('click', confirmChoice);
-
     document.getElementById('pbCommerceBody').addEventListener('click', event => {
       const optionButton = event.target.closest('[data-pb-option-index]');
       if (optionButton) {
@@ -276,7 +417,6 @@
         renderChooserBody();
         return;
       }
-
       const colorButton = event.target.closest('[data-pb-color-id]');
       if (colorButton && !colorButton.disabled) {
         selectedColorId = String(colorButton.dataset.pbColorId || '');
@@ -287,7 +427,6 @@
 
   function renderChooserBody() {
     if (!currentProduct) return;
-
     const options = currentProduct.options || [];
     const colors = currentProduct.colors || [];
     const body = document.getElementById('pbCommerceBody');
@@ -319,9 +458,7 @@
       </div>`;
 
     body.innerHTML = optionSection + colorSection;
-
-    const ready = Number.isInteger(selectedOptionIndex) && !!selectedColorId;
-    add.disabled = !ready;
+    add.disabled = !(Number.isInteger(selectedOptionIndex) && !!selectedColorId);
     add.textContent = t('إضافة للسلة', 'زیادکردن بۆ سەبەتە', 'Add to cart');
   }
 
@@ -330,10 +467,8 @@
     currentProduct = product;
     selectedOptionIndex = (product.options || []).length === 1 ? 0 : null;
     selectedColorId = '';
-
     document.getElementById('pbCommerceTitle').textContent = txt(product.name);
     renderChooserBody();
-
     document.getElementById('pbCommerceBackdrop').classList.add('open');
     const sheet = document.getElementById('pbCommerceSheet');
     sheet.classList.add('open');
@@ -393,7 +528,6 @@
     proxy.dataset.retailBypass = '1';
     proxy.style.display = 'none';
     document.body.appendChild(proxy);
-
     proxy.click();
     proxy.remove();
 
@@ -403,13 +537,8 @@
 
   function confirmChoice() {
     if (!currentProduct || !Number.isInteger(selectedOptionIndex) || !selectedColorId) return;
-
-    const color = (currentProduct.colors || []).find(item =>
-      String(item.id) === String(selectedColorId) && item.isAvailable
-    );
-
+    const color = (currentProduct.colors || []).find(item => String(item.id) === String(selectedColorId) && item.isAvailable);
     if (!color) return;
-
     addSelectedToExistingCart(currentProduct, selectedOptionIndex, color);
     closeChooser();
   }
@@ -417,12 +546,9 @@
   document.addEventListener('click', event => {
     const button = event.target.closest('.sm-direct-add,.sm-choose-options');
     if (!button || button.dataset.retailBypass === '1') return;
-
     const DB = window.RESTBR_DB;
     const product = DB?.products?.find(item => String(item.id) === String(button.dataset.productId || ''));
-
     if (!commerceReady || !product || !Array.isArray(product.colors) || !product.colors.length) return;
-
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
@@ -430,27 +556,36 @@
   }, true);
 
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && document.getElementById('pbCommerceSheet')?.classList.contains('open')) {
-      closeChooser();
-    }
+    if (event.key === 'Escape' && document.getElementById('pbCommerceSheet')?.classList.contains('open')) closeChooser();
   });
 
   function startObserver() {
     if (observer) return;
     const menu = document.getElementById('smMenu');
     if (!menu) return;
-
     observer = new MutationObserver(() => {
       if (commerceReady) requestAnimationFrame(decorateCards);
     });
-
     observer.observe(menu, { childList: true, subtree: true });
   }
 
-  window.addEventListener('restbr:ready', () => {
-    startObserver();
-    void loadCommerceData();
-  });
+  async function bootCommerce() {
+    if (bootPromise) return bootPromise;
+    bootPromise = (async () => {
+      startObserver();
+      await ensureFullCatalog();
+      await loadCommerceData();
+    })().finally(() => {
+      bootPromise = null;
+    });
+    return bootPromise;
+  }
+
+  window.addEventListener('restbr:ready', () => void bootCommerce());
+
+  if (window.RESTBR_DB?.products) {
+    setTimeout(() => void bootCommerce(), 0);
+  }
 
   document.addEventListener('click', event => {
     if (event.target.closest('[data-lang]') && commerceReady) {
