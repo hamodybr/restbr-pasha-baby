@@ -81,12 +81,52 @@ async function checkAsset(ref, source) {
   }
 }
 
+function extractMeta(html, property) {
+  const escaped = property.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const a = html.match(new RegExp(`<meta[^>]+property=["']${escaped}["'][^>]+content=["']([^"']+)["'][^>]*>`, 'i'));
+  if (a?.[1]) return a[1];
+  const b = html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${escaped}["'][^>]*>`, 'i'));
+  return b?.[1] || '';
+}
+
+function pngDimensions(buffer) {
+  if (buffer.length < 24) return null;
+  const sig = [137,80,78,71,13,10,26,10];
+  if (!sig.every((v, i) => buffer[i] === v)) return null;
+  return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+}
+
 const indexHtml = await expectText('/', [
   'Pasha Baby',
   'js/runtime-config.js',
   'js/pasha-baby-storefront-v2.js',
   'css/pasha-baby-footer-v2.css'
 ], 'storefront');
+
+const ogImage = extractMeta(indexHtml, 'og:image');
+if (!ogImage) {
+  fail('social preview image', 'og:image is missing');
+} else {
+  try {
+    const response = await fetch(ogImage, {
+      redirect: 'follow',
+      cache: 'no-store',
+      headers: { 'user-agent': 'WhatsApp/2.26 RestBr-Preview-Smoke/1.0' }
+    });
+    const type = response.headers.get('content-type') || '';
+    const bytes = Buffer.from(await response.arrayBuffer());
+    const dims = pngDimensions(bytes);
+    console.log(`ℹ social preview image: HTTP ${response.status}; ${type || 'unknown type'}; ${bytes.length} bytes${dims ? `; ${dims.width}x${dims.height}` : ''}`);
+    if (!response.ok) fail('social preview image', `HTTP ${response.status}`);
+    else if (!/^image\//i.test(type)) fail('social preview image', `unexpected content-type ${type || 'none'}`);
+    else if (bytes.length < 1024) fail('social preview image', `suspiciously small (${bytes.length} bytes)`);
+    else if (bytes.length > 5 * 1024 * 1024) fail('social preview image', `too large for reliable messaging previews (${bytes.length} bytes)`);
+    else if (dims && (dims.width < 300 || dims.height < 200)) fail('social preview image', `dimensions too small (${dims.width}x${dims.height})`);
+    else ok('social preview image is externally fetchable');
+  } catch (error) {
+    fail('social preview image', error?.message || String(error));
+  }
+}
 
 const adminHtml = await expectText('/admin.html', [
   'Admin Dashboard',
