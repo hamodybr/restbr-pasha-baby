@@ -35,19 +35,31 @@ async function expectText(url, markers, label) {
 
 await expectText('/', [
   'css/pasha-baby-commerce.css?v=1.0',
-  'js/pasha-baby-commerce.js?v=1.0'
+  'js/pasha-baby-commerce.js?v=2.0',
+  'js/live-prices.js?v=2.0'
 ], 'storefront commerce assets');
 
 await expectText('/js/pasha-baby-commerce.js', [
   "fetchAll('discounts'",
   "fetchAll('product_colors'",
+  "fetchAll('products'",
+  'scheduleNextDiscountBoundary',
+  'RESTBR_LARGE_CATALOG_READY',
   'pb-discount-badge',
   'pb-color-choice'
 ], 'storefront commerce runtime');
 
+await expectText('/js/live-prices.js', [
+  '__RESTBR_LIVE_PRICES_V2__',
+  'fetchAllPriceRows',
+  'retailPrice(product, originalPrice)',
+  'restbr:catalog-expanded'
+], 'discount-aware live price runtime');
+
 await expectText('/js/language-settings.js', [
   'js/admin-retail-discounts.js?v=1.0',
-  'js/admin-product-colors.js?v=1.0'
+  'js/admin-product-colors.js?v=1.0',
+  'js/admin-large-catalog.js?v=1.0'
 ], 'admin commerce loader');
 
 for (const table of ['discounts', 'product_colors']) {
