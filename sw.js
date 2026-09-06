@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v17";
+const CACHE_NAME = "restbr-pasha-baby-v18";
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
