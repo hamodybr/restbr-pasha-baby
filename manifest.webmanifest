@@ -1,7 +1,9 @@
 {
-  "name": "Pasha Baby — پاشا بيبي",
-  "short_name": "Pasha Baby",
-  "description": "Pasha Baby children's supplies storefront and ordering experience",
+  "name": "پاشا بيبي",
+  "short_name": "پاشا بيبي",
+  "description": "متجر پاشا بيبي لمستلزمات الأطفال",
+  "lang": "ar",
+  "dir": "rtl",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
