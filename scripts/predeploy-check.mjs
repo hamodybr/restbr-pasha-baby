@@ -160,7 +160,11 @@ forbidText('js/supabase-config.js', 'testSupabaseConnection();', 'development co
 // business wording is normalized by this lightweight retail-specific layer.
 requireText('js/pasha-baby-admin-copy.js', "[/المطعم/g, 'المحل']", 'generic Arabic restaurant-to-store normalizer');
 requireText('js/pasha-baby-admin-copy.js', "[/مطعم/g, 'محل']", 'generic Arabic noun normalizer');
+requireText('js/pasha-baby-admin-copy.js', "[/المنيو/g, 'المتجر']", 'generic Arabic menu-to-store normalizer');
+requireText('js/pasha-baby-admin-copy.js', "[/منيو/g, 'متجر']", 'generic Arabic menu noun normalizer');
 requireText('js/pasha-baby-admin-copy.js', "[/\\bRestaurant\\b/g, 'Store']", 'generic English restaurant-to-store normalizer');
+requireText('js/pasha-baby-admin-copy.js', "[/\\bMenu\\b/g, 'Store']", 'generic English menu-to-store normalizer');
+requireText('js/pasha-baby-admin-copy.js', "[/🍽️?/g, '📦']", 'retail product icon normalizer');
 requireText('js/pasha-baby-admin-copy.js', 'new MutationObserver', 'incremental dynamic dashboard-copy observer');
 requireText('js/pasha-baby-admin-copy.js', "attributeFilter: ['placeholder', 'title', 'aria-label']", 'limited retail-copy attribute observer');
 
