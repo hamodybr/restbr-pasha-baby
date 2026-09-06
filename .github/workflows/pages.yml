@@ -21,6 +21,9 @@ jobs:
       - name: Pre-deploy audit
         run: node scripts/predeploy-check.mjs
 
+      - name: Retail commerce audit
+        run: node scripts/retail-commerce-check.mjs
+
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: validate
@@ -123,3 +126,8 @@ jobs:
         env:
           SMOKE_BASE_URL: https://pashababy.restbr.com
         run: node scripts/live-smoke-test.mjs
+
+      - name: Verify live retail commerce
+        env:
+          SMOKE_BASE_URL: https://pashababy.restbr.com
+        run: node scripts/live-commerce-smoke.mjs
