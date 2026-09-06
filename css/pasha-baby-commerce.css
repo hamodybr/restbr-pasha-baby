@@ -1,0 +1,264 @@
+/* Pasha Baby retail commerce: discounts + product colors */
+.pb-discount-badge{
+  position:absolute;
+  z-index:48;
+  top:8px;
+  inset-inline-end:8px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:43px;
+  height:25px;
+  padding:0 8px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#ff7f9f,#ffb5c7);
+  color:#fff;
+  font-size:10px;
+  line-height:1;
+  font-weight:1000;
+  box-shadow:0 7px 18px rgba(172,71,100,.22);
+  pointer-events:none;
+}
+
+.pb-price-stack{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-end;
+  gap:5px;
+}
+
+.pb-old-price{
+  color:#a79ca0;
+  font-size:9px;
+  line-height:1.2;
+  text-decoration:line-through;
+  text-decoration-thickness:1px;
+  opacity:.9;
+}
+
+.pb-color-preview{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-height:19px;
+  margin:3px 0 5px;
+  overflow:hidden;
+}
+
+.pb-color-preview-label{
+  flex:0 0 auto;
+  color:#8f858a;
+  font-size:8px;
+  font-weight:800;
+}
+
+.pb-color-dot{
+  width:15px;
+  height:15px;
+  flex:0 0 15px;
+  border:2px solid rgba(255,255,255,.82);
+  border-radius:50%;
+  background:var(--pb-color,#ddd);
+  box-shadow:0 0 0 1px rgba(89,74,81,.16),0 3px 8px rgba(73,57,64,.08);
+}
+
+.pb-color-dot.is-unavailable{
+  opacity:.3;
+  position:relative;
+}
+
+.pb-color-dot.is-unavailable::after{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:1px;
+  left:50%;
+  top:50%;
+  background:#786d71;
+  transform:translate(-50%,-50%) rotate(-45deg);
+}
+
+.pb-color-more{
+  color:#8f858a;
+  font-size:8px;
+  font-weight:900;
+}
+
+.pb-commerce-backdrop{
+  position:fixed;
+  z-index:250;
+  inset:0;
+  display:none;
+  background:rgba(63,48,55,.28);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+
+.pb-commerce-backdrop.open{display:block}
+
+.pb-commerce-sheet{
+  position:fixed;
+  z-index:251;
+  left:50%;
+  bottom:0;
+  width:min(100%,520px);
+  max-height:min(78vh,700px);
+  display:flex;
+  flex-direction:column;
+  transform:translate(-50%,105%);
+  transition:transform .24s ease;
+  padding:9px 14px calc(14px + env(safe-area-inset-bottom));
+  border:1px solid rgba(177,130,147,.16);
+  border-bottom:0;
+  border-radius:24px 24px 0 0;
+  background:rgba(255,250,247,.98);
+  box-shadow:0 -18px 55px rgba(111,84,96,.18);
+  color:#4f4147;
+  box-sizing:border-box;
+}
+
+.pb-commerce-sheet.open{transform:translate(-50%,0)}
+
+.pb-commerce-handle{
+  width:44px;
+  height:4px;
+  margin:0 auto 10px;
+  border-radius:999px;
+  background:#ddcfd4;
+}
+
+.pb-commerce-head{
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr) 38px;
+  align-items:center;
+  gap:7px;
+  margin-bottom:9px;
+}
+
+.pb-commerce-head h3{
+  margin:0;
+  color:#55464c;
+  font-size:16px;
+  text-align:center;
+}
+
+.pb-commerce-close{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:11px;
+  background:#f4e9ed;
+  color:#69575f;
+  font-size:19px;
+}
+
+.pb-commerce-body{
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:2px 1px 8px;
+}
+
+.pb-choice-section{margin:10px 0 14px}
+.pb-choice-section-title{
+  margin:0 0 8px;
+  color:#806b74;
+  font-size:11px;
+  font-weight:900;
+}
+
+.pb-option-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+
+.pb-option-choice{
+  min-height:43px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 10px;
+  border:1px solid #eadde2;
+  border-radius:12px;
+  background:#fff;
+  color:#66545c;
+  font:inherit;
+  font-size:11px;
+  text-align:start;
+}
+
+.pb-option-choice b{font-size:10px;white-space:nowrap}
+.pb-option-choice.selected{
+  border-color:#e4a9ba;
+  background:#fff1f5;
+  box-shadow:0 0 0 2px rgba(228,169,186,.12);
+}
+
+.pb-color-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.pb-color-choice{
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:8px 10px;
+  border:1px solid #eadde2;
+  border-radius:13px;
+  background:#fff;
+  color:#5c4c53;
+  font:inherit;
+  font-size:11px;
+  font-weight:800;
+  text-align:start;
+}
+
+.pb-color-choice i{
+  width:23px;
+  height:23px;
+  flex:0 0 23px;
+  border:2px solid #fff;
+  border-radius:50%;
+  background:var(--pb-color,#ddd);
+  box-shadow:0 0 0 1px #d9cbd0;
+}
+
+.pb-color-choice.selected{
+  border-color:#e4a9ba;
+  background:#fff1f5;
+  box-shadow:0 0 0 2px rgba(228,169,186,.12);
+}
+
+.pb-color-choice:disabled{
+  opacity:.38;
+  cursor:not-allowed;
+}
+
+.pb-commerce-add{
+  width:100%;
+  min-height:48px;
+  border:0;
+  border-radius:14px;
+  background:linear-gradient(135deg,#f5a9bd,#e98eaa);
+  color:#fff;
+  font:inherit;
+  font-size:12px;
+  font-weight:1000;
+  box-shadow:0 10px 22px rgba(190,98,127,.18);
+}
+
+.pb-commerce-add:disabled{
+  opacity:.42;
+  box-shadow:none;
+}
+
+@media(max-width:390px){
+  .pb-option-grid,.pb-color-grid{grid-template-columns:1fr}
+}
