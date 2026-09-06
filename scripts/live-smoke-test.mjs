@@ -55,7 +55,8 @@ function localRefs(html) {
   if (!html) return [];
   for (const match of html.matchAll(/\b(?:src|href)=["']([^"']+)["']/gi)) {
     const value = match[1].trim();
-    if (!value || /^(?:[a-z]+:|\/\/|#|data:|blob:)/i.test(value)) continue;
+    if (!value || value.includes('${') || value.includes('{{')) continue;
+    if (/^(?:[a-z]+:|\/\/|#|data:|blob:)/i.test(value)) continue;
     refs.add(value);
   }
   return [...refs];
@@ -85,6 +86,14 @@ const adminHtml = await expectText('/admin.html', [
   'js/runtime-config.js',
   'js/supabase-config.js'
 ], 'admin page');
+
+try {
+  const response = await fetch(`${BASE_URL}/admin`, { redirect: 'manual', cache: 'no-store' });
+  if ([200, 301, 302, 307, 308].includes(response.status)) ok(`friendly admin route /admin (${response.status})`);
+  else console.log(`ℹ friendly admin route /admin returned ${response.status}; canonical admin.html remains healthy`);
+} catch (error) {
+  console.log(`ℹ friendly admin route check skipped: ${error?.message || error}`);
+}
 
 await expectText('/js/pasha-baby-admin-copy.js', [
   "[/المنيو/g, 'المتجر']",
