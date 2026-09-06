@@ -156,6 +156,14 @@ forbidText('admin.html', "const ADMIN_SETTINGS_THEME_KEY='SHORASH_ADMIN_SETTINGS
 forbidText('js/supabase-config.js', 'discount-choice-price-sync.js', 'restaurant discount loader in retail build');
 forbidText('js/supabase-config.js', 'testSupabaseConnection();', 'development connection-test request');
 
+// Pasha keeps generic RestBr technical identifiers, but all visible dashboard
+// business wording is normalized by this lightweight retail-specific layer.
+requireText('js/pasha-baby-admin-copy.js', "[/المطعم/g, 'المحل']", 'generic Arabic restaurant-to-store normalizer');
+requireText('js/pasha-baby-admin-copy.js', "[/مطعم/g, 'محل']", 'generic Arabic noun normalizer');
+requireText('js/pasha-baby-admin-copy.js', "[/\\bRestaurant\\b/g, 'Store']", 'generic English restaurant-to-store normalizer');
+requireText('js/pasha-baby-admin-copy.js', 'new MutationObserver', 'incremental dynamic dashboard-copy observer');
+requireText('js/pasha-baby-admin-copy.js', "attributeFilter: ['placeholder', 'title', 'aria-label']", 'limited retail-copy attribute observer');
+
 const restaurantOnlyDeadFiles = [
   'js/discount-choice-price-sync.js',
   'js/admin-takeaway-prices.js',
