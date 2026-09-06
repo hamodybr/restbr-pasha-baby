@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_BABY_ADMIN_COPY_V5__) return;
-  window.__PASHA_BABY_ADMIN_COPY_V5__ = true;
+  if (window.__PASHA_BABY_ADMIN_COPY_V6__) return;
+  window.__PASHA_BABY_ADMIN_COPY_V6__ = true;
 
   const EXACT = new Map([
     ['لغات المنيو', 'لغات المتجر'],
@@ -109,12 +109,11 @@
     }
   }
 
-  // Pasha Baby is a retail store. These controls belong to the restaurant
-  // template and are intentionally disabled here instead of deleting DB columns.
+  // Pasha Baby is a retail store. Restaurant-only controls stay suppressed,
+  // but the Pasha retail discount panel is intentionally preserved.
   function applyRetailFeaturePolicy() {
     document.getElementById('diningGateSettingsPanel')?.remove();
     document.getElementById('bulkPriceTargetField')?.remove();
-    document.getElementById('discountsSettingsPanel')?.remove();
     document.querySelectorAll('.sm-takeaway-field').forEach(element => element.remove());
 
     const backgroundVideoControl =
@@ -143,9 +142,7 @@
     else run();
   }
 
-  // Dynamic settings (hours, async status messages, i18n updates) can appear
-  // after the first paint. Observe only changed nodes instead of rescanning the
-  // whole dashboard, which keeps the previous iPhone/Safari performance fix.
+  // Observe only incremental copy changes; never add/remove retail commerce UI.
   const pendingNodes = new Set();
   let mutationFrame = 0;
 
@@ -164,8 +161,8 @@
   }
 
   function startIncrementalObserver() {
-    if (!document.body || window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V5__) return;
-    window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V5__ = true;
+    if (!document.body || window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V6__) return;
+    window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V6__ = true;
 
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
