@@ -253,6 +253,7 @@
     appendAdminI18nScript('restbrAdminI18nScript', 'js/admin-i18n.js?v=1.0');
     appendAdminI18nScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.1');
     appendAdminI18nScript('pashaBabyImageOptimizerScript', 'js/admin-image-optimizer.js?v=1.0');
+    appendAdminI18nScript('pashaBabyLargeCatalogScript', 'js/admin-large-catalog.js?v=1.0');
     appendAdminI18nScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=1.0');
     appendAdminI18nScript('pashaBabyProductColorsScript', 'js/admin-product-colors.js?v=1.0');
   }
