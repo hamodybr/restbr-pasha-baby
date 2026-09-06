@@ -49,3 +49,16 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+
+  live-smoke:
+    if: github.ref == 'refs/heads/main'
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Verify deployed Pasha Baby site
+        env:
+          SMOKE_BASE_URL: https://pashababy.restbr.com
+        run: node scripts/live-smoke-test.mjs
