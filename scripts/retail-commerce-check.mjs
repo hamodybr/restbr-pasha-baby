@@ -17,6 +17,8 @@ const forbidText = (file, marker, label = marker) => {
 
 const files = [
   'js/pasha-baby-commerce.js',
+  'js/live-prices.js',
+  'js/admin-large-catalog.js',
   'js/admin-retail-discounts.js',
   'js/admin-product-colors.js'
 ];
@@ -34,23 +36,37 @@ for (const file of files) {
 }
 
 requireText('index.html', 'css/pasha-baby-commerce.css?v=1.0', 'retail commerce stylesheet');
-requireText('index.html', 'js/pasha-baby-commerce.js?v=1.0', 'retail commerce runtime');
-requireText('sw.js', 'restbr-pasha-baby-v19', 'retail cache generation');
+requireText('index.html', 'js/pasha-baby-commerce.js?v=2.0', 'retail commerce v2 runtime');
+requireText('index.html', 'js/live-prices.js?v=2.0', 'discount-aware live prices v2 runtime');
+requireText('sw.js', 'restbr-pasha-baby-v20', 'retail cache generation');
 requireText('sw.js', 'css/pasha-baby-commerce.css?v=1.0', 'cached commerce stylesheet');
-requireText('sw.js', 'js/pasha-baby-commerce.js?v=1.0', 'cached commerce runtime');
+requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.0', 'cached commerce v2 runtime');
+requireText('sw.js', 'js/live-prices.js?v=2.0', 'cached live prices v2 runtime');
 
 requireText('js/language-settings.js', 'js/admin-retail-discounts.js?v=1.0', 'retail discount admin loader');
 requireText('js/language-settings.js', 'js/admin-product-colors.js?v=1.0', 'product colors admin loader');
+requireText('js/language-settings.js', 'js/admin-large-catalog.js?v=1.0', 'large catalog admin loader');
 
 requireText('js/pasha-baby-commerce.js', "scope_type === 'product'", 'product discount priority');
 requireText('js/pasha-baby-commerce.js', "scope_type === 'category'", 'category discount priority');
 requireText('js/pasha-baby-commerce.js', "scope_type === 'restaurant'", 'store-wide discount compatibility');
-requireText('js/pasha-baby-commerce.js', 'starts_at', 'discount start scheduling');
-requireText('js/pasha-baby-commerce.js', 'ends_at', 'discount end scheduling');
+requireText('js/pasha-baby-commerce.js', 'scheduleNextDiscountBoundary', 'automatic scheduled discount boundary refresh');
+requireText('js/pasha-baby-commerce.js', 'observer.observe(menu, { childList: true, subtree: false })', 'non-recursive commerce DOM observer');
+requireText('js/pasha-baby-commerce.js', "fetchAll('products'", 'paginated storefront products');
+requireText('js/pasha-baby-commerce.js', "fetchAll('product_options'", 'paginated storefront options');
+requireText('js/pasha-baby-commerce.js', 'RESTBR_LARGE_CATALOG_READY', 'large storefront catalog readiness');
 requireText('js/pasha-baby-commerce.js', 'product_colors', 'customer product colors loader');
 requireText('js/pasha-baby-commerce.js', 'dataset.retailBypass', 'existing cart integration guard');
 requireText('js/pasha-baby-commerce.js', "compose('en', 'Color')", 'English color carried into cart');
 requireText('js/pasha-baby-commerce.js', "compose('ar', 'اللون')", 'Arabic color carried into cart');
+
+requireText('js/live-prices.js', '__RESTBR_LIVE_PRICES_V2__', 'live price v2 singleton guard');
+requireText('js/live-prices.js', 'fetchAllPriceRows', 'paginated live price sync');
+requireText('js/live-prices.js', 'retailPrice(product, originalPrice)', 'discount-aware live price calculation');
+requireText('js/live-prices.js', "restbr:catalog-expanded", 'large catalog live price resync');
+
+requireText('js/admin-large-catalog.js', 'PAGE_SIZE = 1000', 'paginated admin page size');
+requireText('js/admin-large-catalog.js', "from(table)", 'generic admin pagination loader');
 
 requireText('js/admin-retail-discounts.js', "price_mode: 'both'", 'retail discount backward-compatible price mode');
 forbidText('js/admin-retail-discounts.js', 'داخل المطعم', 'restaurant dining wording');
