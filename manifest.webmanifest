@@ -10,16 +10,16 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "assets/apple-touch-icon.png",
-      "sizes": "180x180",
+      "src": "https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/settings/logo/1788645406355-3ib1w5.png?preview=20260906-4",
+      "sizes": "any",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/favicon.png",
-      "sizes": "512x512",
+      "src": "https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/settings/logo/1788645406355-3ib1w5.png?preview=20260906-4",
+      "sizes": "any",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }
