@@ -36,8 +36,20 @@ async function expectText(url, markers, label) {
 await expectText('/', [
   'css/pasha-baby-commerce.css?v=1.0',
   'js/pasha-baby-commerce.js?v=2.0',
-  'js/live-prices.js?v=2.0'
-], 'storefront commerce assets');
+  'js/live-prices.js?v=2.0',
+  'js/supabase-config.js?v=2.5'
+], 'storefront Arabic-only commerce assets');
+
+await expectText('/js/supabase-config.js', [
+  'js/pasha-arabic-only.js?v=1.0'
+], 'Arabic-only policy loader');
+
+await expectText('/js/pasha-arabic-only.js', [
+  "localStorage.setItem('RESTBR_LANG_V1', 'ar')",
+  'js/admin-retail-discounts.js?v=3.0',
+  'js/admin-product-colors.js?v=3.0',
+  'data-pasha-multilang-hidden'
+], 'Arabic-only storefront/admin policy');
 
 await expectText('/js/pasha-baby-commerce.js', [
   "fetchAll('discounts'",
@@ -56,25 +68,21 @@ await expectText('/js/live-prices.js', [
   'restbr:catalog-expanded'
 ], 'discount-aware live price runtime');
 
-await expectText('/js/language-settings.js', [
-  'js/admin-retail-discounts.js?v=2.0',
-  'js/admin-product-colors.js?v=2.0',
-  'js/admin-large-catalog.js?v=1.0'
-], 'admin commerce loader');
-
 await expectText('/js/admin-retail-discounts.js', [
-  '__PASHA_ADMIN_RETAIL_DISCOUNTS_V2__',
+  '__PASHA_ADMIN_RETAIL_DISCOUNTS_V3__',
   'pbDiscountQuickBtn',
-  "q('#viewProducts')"
-], 'integrated product discounts admin');
+  "event.target.closest('#pbDiscountQuickBtn')",
+  'body.admin-global-light #discountsSettingsPanel'
+], 'reliable light-aware product discounts admin');
 
 await expectText('/js/admin-product-colors.js', [
-  '__PASHA_ADMIN_PRODUCT_COLORS_V2__',
+  '__PASHA_ADMIN_PRODUCT_COLORS_V3__',
   'pbProductColorsEditor',
   'detectColorHex',
   "['اسود', '#111111']",
-  'data-color-auto'
-], 'integrated automatic product colors admin');
+  'data-color-auto',
+  'body.admin-global-light #pbProductColorsEditor'
+], 'Arabic-only light-aware product colors admin');
 
 for (const table of ['discounts', 'product_colors']) {
   try {
@@ -97,4 +105,4 @@ for (const table of ['discounts', 'product_colors']) {
 
 console.log(`\nRetail commerce smoke summary: ${passed} passed, ${failures.length} failed`);
 if (failures.length) process.exit(1);
-console.log('✓ Pasha Baby live retail commerce smoke passed');
+console.log('✓ Pasha Baby live Arabic-only retail commerce smoke passed');
