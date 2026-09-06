@@ -10,6 +10,9 @@
   let selectedColorId = '';
   let observer = null;
   let bootPromise = null;
+  let discountTimer = null;
+  let cachedDiscounts = [];
+  let cachedColorRows = [];
 
   const lang = () => window.RESTBR_LANG
     ? window.RESTBR_LANG()
@@ -284,6 +287,73 @@
     };
   }
 
+  function applyCommerceData(discounts, colorRows, { renderUi = true } = {}) {
+    const DB = window.RESTBR_DB;
+    if (!DB?.products?.length) return false;
+
+    const colorsByProduct = new Map();
+    (colorRows || []).forEach(row => {
+      const key = String(row.product_id || '');
+      if (!key) return;
+      if (!colorsByProduct.has(key)) colorsByProduct.set(key, []);
+      colorsByProduct.get(key).push(normalizeColor(row));
+    });
+
+    DB.products.forEach(product => {
+      const discount = effectiveDiscount(discounts || [], product);
+      const percent = Math.max(0, Math.min(100, Number(discount?.discount_percent || 0)));
+
+      if (product.__retailBaseOffer === undefined) product.__retailBaseOffer = product.badges?.offer === true;
+      product.discountPercent = percent;
+      product.discountScope = discount?.scope_type || '';
+      product.colors = (colorsByProduct.get(String(product.id)) || []).sort((a, b) => a.order - b.order);
+
+      if (product.badges) product.badges.offer = product.__retailBaseOffer || percent > 0;
+
+      (product.options || []).forEach(option => {
+        if (option.__retailOriginalPrice === undefined) option.__retailOriginalPrice = Number(option.price || 0);
+        const original = Number(option.__retailOriginalPrice || 0);
+        option.originalPrice = original;
+        option.price = discountedPrice(original, percent);
+      });
+    });
+
+    commerceReady = true;
+    window.RESTBR_COMMERCE_READY = true;
+
+    if (renderUi && typeof window.render === 'function') window.render();
+    decorateCards();
+    window.dispatchEvent(new CustomEvent('restbr:prices-updated', { detail: { retailDiscounts: true } }));
+    window.dispatchEvent(new CustomEvent('restbr:commerce-ready', { detail: { discounts, colors: colorRows } }));
+    return true;
+  }
+
+  function scheduleNextDiscountBoundary(discounts) {
+    clearTimeout(discountTimer);
+    discountTimer = null;
+
+    const now = Date.now();
+    const future = [];
+
+    (discounts || []).forEach(row => {
+      for (const raw of [row.starts_at, row.ends_at]) {
+        if (!raw) continue;
+        const stamp = Date.parse(raw);
+        if (Number.isFinite(stamp) && stamp > now) future.push(stamp);
+      }
+    });
+
+    if (!future.length) return;
+
+    const next = Math.min(...future);
+    const delay = Math.min(2147483000, Math.max(100, next - now + 120));
+
+    discountTimer = setTimeout(() => {
+      applyCommerceData(cachedDiscounts, cachedColorRows, { renderUi: true });
+      scheduleNextDiscountBoundary(cachedDiscounts);
+    }, delay);
+  }
+
   async function loadCommerceData() {
     if (typeof supabaseClient === 'undefined' || !supabaseClient) return;
     const DB = window.RESTBR_DB;
@@ -295,40 +365,10 @@
         fetchAll('product_colors', { order: 'sort_order', ascending: true, activeOnly: true })
       ]);
 
-      const colorsByProduct = new Map();
-      colorRows.forEach(row => {
-        const key = String(row.product_id || '');
-        if (!key) return;
-        if (!colorsByProduct.has(key)) colorsByProduct.set(key, []);
-        colorsByProduct.get(key).push(normalizeColor(row));
-      });
-
-      DB.products.forEach(product => {
-        const discount = effectiveDiscount(discounts, product);
-        const percent = Math.max(0, Math.min(100, Number(discount?.discount_percent || 0)));
-
-        if (product.__retailBaseOffer === undefined) product.__retailBaseOffer = product.badges?.offer === true;
-        product.discountPercent = percent;
-        product.discountScope = discount?.scope_type || '';
-        product.colors = (colorsByProduct.get(String(product.id)) || []).sort((a, b) => a.order - b.order);
-
-        if (product.badges) product.badges.offer = product.__retailBaseOffer || percent > 0;
-
-        (product.options || []).forEach(option => {
-          if (option.__retailOriginalPrice === undefined) option.__retailOriginalPrice = Number(option.price || 0);
-          const original = Number(option.__retailOriginalPrice || 0);
-          option.originalPrice = original;
-          option.price = discountedPrice(original, percent);
-        });
-      });
-
-      commerceReady = true;
-      window.RESTBR_COMMERCE_READY = true;
-
-      if (typeof window.render === 'function') window.render();
-      decorateCards();
-      window.dispatchEvent(new CustomEvent('restbr:prices-updated'));
-      window.dispatchEvent(new CustomEvent('restbr:commerce-ready', { detail: { discounts, colors: colorRows } }));
+      cachedDiscounts = discounts;
+      cachedColorRows = colorRows;
+      applyCommerceData(cachedDiscounts, cachedColorRows, { renderUi: true });
+      scheduleNextDiscountBoundary(cachedDiscounts);
     } catch (error) {
       console.error('PASHA RETAIL COMMERCE LOAD ERROR:', error);
     }
@@ -566,7 +606,9 @@
     observer = new MutationObserver(() => {
       if (commerceReady) requestAnimationFrame(decorateCards);
     });
-    observer.observe(menu, { childList: true, subtree: true });
+    // Observe only top-level menu rerenders. Commerce decoration mutates inside
+    // cards and must not recursively trigger itself.
+    observer.observe(menu, { childList: true, subtree: false });
   }
 
   async function bootCommerce() {
