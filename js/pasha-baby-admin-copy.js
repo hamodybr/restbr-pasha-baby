@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_BABY_ADMIN_COPY_V4__) return;
-  window.__PASHA_BABY_ADMIN_COPY_V4__ = true;
+  if (window.__PASHA_BABY_ADMIN_COPY_V5__) return;
+  window.__PASHA_BABY_ADMIN_COPY_V5__ = true;
 
   const EXACT = new Map([
     ['لغات المنيو', 'لغات المتجر'],
@@ -17,21 +17,22 @@
     ['WhatsApp Menu', 'WhatsApp']
   ]);
 
-  // Pasha Baby is retail. Replace the generic business noun instead of trying
-  // to maintain a growing list such as "اسم المطعم", "فتح المطعم", etc.
-  // This runs only on dashboard copy/attributes and never on product/category data.
+  // Pasha Baby is retail. Normalize restaurant/menu vocabulary and food icons
+  // only in dashboard copy/attributes; product/category data stays untouched.
   const PHRASES = [
     [/المطعم/g, 'المحل'],
     [/مطعم/g, 'محل'],
+    [/المنيو/g, 'المتجر'],
+    [/منيو/g, 'متجر'],
     [/\bRESTAURANT\b/g, 'STORE'],
     [/\bRestaurant\b/g, 'Store'],
     [/\brestaurant\b/g, 'store'],
+    [/\bMENU\b/g, 'STORE'],
+    [/\bMenu\b/g, 'Store'],
+    [/\bmenu\b/g, 'store'],
     [/چێشتخانێ/g, 'دوکانێ'],
     [/چێشتخانەکە/g, 'دوکانەکە'],
-    [/لغات المنيو/g, 'لغات المتجر'],
-    [/إحصائيات المنيو/g, 'إحصائيات المتجر'],
-    [/Menu Languages/gi, 'Store Languages'],
-    [/Menu Analytics/gi, 'Store Analytics']
+    [/🍽️?/g, '📦']
   ];
 
   const PROTECTED = [
@@ -163,8 +164,8 @@
   }
 
   function startIncrementalObserver() {
-    if (!document.body || window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V4__) return;
-    window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V4__ = true;
+    if (!document.body || window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V5__) return;
+    window.__PASHA_BABY_ADMIN_COPY_OBSERVER_V5__ = true;
 
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
