@@ -97,11 +97,15 @@ function pngDimensions(buffer) {
 }
 
 const indexHtml = await expectText('/', [
-  'Pasha Baby',
+  'پاشا بيبي',
   'js/runtime-config.js',
+  'js/supabase-config.js?v=2.5',
   'js/pasha-baby-storefront-v2.js',
   'css/pasha-baby-footer-v2.css'
 ], 'storefront');
+
+if (indexHtml.includes('id="smLangs"')) fail('Arabic-only storefront', 'language picker still present');
+else ok('Arabic-only storefront has no language picker');
 
 const ogImage = extractMeta(indexHtml, 'og:image');
 if (!ogImage) {
@@ -145,20 +149,29 @@ try {
 await expectText('/js/pasha-baby-admin-copy.js', [
   "[/المنيو/g, 'المتجر']",
   "[/منيو/g, 'متجر']",
-  "[/\\bMenu\\b/g, 'Store']",
   "[/🍽️?/g, '📦']"
 ], 'retail dashboard copy layer');
 
+await expectText('/js/pasha-arabic-only.js', [
+  "localStorage.setItem('RESTBR_LANG_V1', 'ar')",
+  'js/admin-retail-discounts.js?v=3.0',
+  'js/admin-product-colors.js?v=3.0',
+  'js/arabic-news-ticker.js?v=1.0'
+], 'Arabic-only policy');
+
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v',
+  'restbr-pasha-baby-v23',
   'js/restbr-hardening.js',
+  'js/pasha-arabic-only.js?v=1.0',
+  'js/arabic-news-ticker.js?v=1.0',
   'js/pasha-baby-storefront-v2.js'
 ], 'service worker');
 
 try {
   const { response, body } = await get('/manifest.webmanifest', { json: true });
   if (!response.ok) fail('manifest', `HTTP ${response.status}`);
-  else if (!/Pasha Baby/i.test(String(body?.name || ''))) fail('manifest', 'wrong app identity');
+  else if (!/پاشا\s*بيبي/.test(String(body?.name || ''))) fail('manifest', 'wrong app identity');
+  else if (String(body?.lang || '') !== 'ar' || String(body?.dir || '') !== 'rtl') fail('manifest', 'Arabic/RTL metadata missing');
   else {
     ok('manifest');
     for (const icon of body.icons || []) await checkAsset(icon.src, '');
@@ -202,4 +215,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('✓ Pasha Baby live delivery smoke test passed');
+console.log('✓ Pasha Baby live Arabic-only delivery smoke test passed');
