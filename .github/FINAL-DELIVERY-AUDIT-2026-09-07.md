@@ -51,7 +51,7 @@ Software / infrastructure readiness: **PASS with non-blocking follow-up items**.
 
 ### Offline / PWA
 - Bundled `data/menu.json` fallback now contains the real Pasha contact/location/logo and Arabic-only display state instead of blank contact placeholders.
-- Service Worker cache namespace bumped to `restbr-pasha-baby-v26` so old fallback cache is replaced.
+- The Service Worker was changed/reinstalled while preserving the verified `restbr-pasha-baby-v25` namespace; its install path re-fetches and overwrites the bundled fallback in that cache.
 - Admin navigation/assets use network-first/no-store behavior.
 
 ### Storefront / commerce
