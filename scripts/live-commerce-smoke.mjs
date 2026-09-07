@@ -35,10 +35,12 @@ async function expectText(url, markers, label) {
 
 await expectText('/', [
   'css/pasha-baby-commerce.css?v=1.0',
+  'css/pasha-baby-final-tweaks.css?v=1.0',
   'js/pasha-baby-commerce.js?v=2.0',
-  'js/live-prices.js?v=2.0',
+  'js/pasha-baby-fixed-discounts.js?v=1.0',
+  'js/live-prices.js?v=3.0',
   'js/supabase-config.js?v=2.5'
-], 'storefront Arabic-only commerce assets');
+], 'storefront Arabic-only fixed-discount commerce assets');
 
 await expectText('/js/supabase-config.js', [
   'js/pasha-arabic-only.js?v=1.0'
@@ -46,7 +48,7 @@ await expectText('/js/supabase-config.js', [
 
 await expectText('/js/pasha-arabic-only.js', [
   "localStorage.setItem('RESTBR_LANG_V1', 'ar')",
-  'js/admin-retail-discounts.js?v=3.0',
+  'js/admin-retail-discounts.js?v=4.0',
   'js/admin-product-colors.js?v=3.0',
   'data-pasha-multilang-hidden'
 ], 'Arabic-only storefront/admin policy');
@@ -57,23 +59,45 @@ await expectText('/js/pasha-baby-commerce.js', [
   "fetchAll('products'",
   'scheduleNextDiscountBoundary',
   'RESTBR_LARGE_CATALOG_READY',
-  'pb-discount-badge',
   'pb-color-choice'
-], 'storefront commerce runtime');
+], 'storefront commerce compatibility runtime');
+
+await expectText('/js/pasha-baby-fixed-discounts.js', [
+  '__PASHA_BABY_FIXED_DISCOUNTS_V1__',
+  'discount_amount',
+  'product.discountAmount = amount',
+  'fixedPrice(original, amount)',
+  'pb-fixed-discount-chip',
+  "scope_type === 'product'",
+  "scope_type === 'category'",
+  "scope_type === 'restaurant'"
+], 'fixed IQD discount storefront runtime');
 
 await expectText('/js/live-prices.js', [
-  '__RESTBR_LIVE_PRICES_V2__',
+  '__RESTBR_LIVE_PRICES_V3__',
   'fetchAllPriceRows',
   'retailPrice(product, originalPrice)',
+  'product?.discountAmount',
+  'restbr:fixed-discounts-ready',
   'restbr:catalog-expanded'
-], 'discount-aware live price runtime');
+], 'fixed-discount-aware live price runtime');
 
 await expectText('/js/admin-retail-discounts.js', [
-  '__PASHA_ADMIN_RETAIL_DISCOUNTS_V3__',
+  '__PASHA_ADMIN_RETAIL_DISCOUNTS_V4__',
+  'pbDiscountAmount',
+  'discount_amount: amount',
+  'discount_percent: 0',
   'pbDiscountQuickBtn',
   "event.target.closest('#pbDiscountQuickBtn')",
   'body.admin-global-light #discountsSettingsPanel'
-], 'reliable light-aware product discounts admin');
+], 'reliable fixed-IQD discounts admin');
+
+await expectText('/css/pasha-baby-final-tweaks.css', [
+  '#smMenu .sm-display-badge.red',
+  '#smMenu .pb-discount-badge',
+  '.pb-fixed-discount-chip',
+  '1.15s'
+], 'hot-label removal and discount-chip UI');
 
 await expectText('/js/admin-product-colors.js', [
   '__PASHA_ADMIN_PRODUCT_COLORS_V3__',
@@ -103,6 +127,23 @@ for (const table of ['discounts', 'product_colors']) {
   }
 }
 
+try {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/discounts?select=id,discount_amount,discount_percent,scope_type,is_active&limit=1`, {
+    cache: 'no-store',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Accept: 'application/json'
+    }
+  });
+  const text = await response.text();
+  if (!response.ok) fail('Supabase fixed discount schema', `HTTP ${response.status} ${text.slice(0, 160)}`);
+  else if (!Array.isArray(JSON.parse(text))) fail('Supabase fixed discount schema', 'response is not an array');
+  else ok('Supabase fixed discount schema');
+} catch (error) {
+  fail('Supabase fixed discount schema', error?.message || String(error));
+}
+
 console.log(`\nRetail commerce smoke summary: ${passed} passed, ${failures.length} failed`);
 if (failures.length) process.exit(1);
-console.log('✓ Pasha Baby live Arabic-only retail commerce smoke passed');
+console.log('✓ Pasha Baby live Arabic-only fixed-IQD retail commerce smoke passed');
