@@ -1,0 +1,467 @@
+/* PASHA BABY — RETAIL CARD DENSITY V2
+   Gives product options/prices more visual space while keeping cart controls compact. */
+
+html body #smMenu .sm-card .pb-product-description{
+  width:100%!important;
+  margin:-1px 0 2px!important;
+  color:var(--pb-card-muted,#7d8a8e)!important;
+  -webkit-text-fill-color:var(--pb-card-muted,#7d8a8e)!important;
+  font-size:9px!important;
+  line-height:1.38!important;
+  font-weight:650!important;
+  text-align:start!important;
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  white-space:normal!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+html body #smMenu .sm-card .pb-product-description-more{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  align-self:flex-start!important;
+  margin:0 0 5px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:var(--pb-card-primary-dark,#2f7568)!important;
+  -webkit-text-fill-color:var(--pb-card-primary-dark,#2f7568)!important;
+  font:inherit!important;
+  font-size:8px!important;
+  line-height:1.2!important;
+  font-weight:1000!important;
+  text-decoration:underline!important;
+  text-underline-offset:2px!important;
+  cursor:pointer!important;
+}
+
+/* Price / option area gets the space priority. */
+html body #smMenu .sm-card .sm-options-scroll{
+  max-height:116px!important;
+  margin-bottom:3px!important;
+}
+
+html body #smMenu .sm-card .sm-option{
+  min-height:24px!important;
+  padding:3px 0!important;
+  gap:4px!important;
+  font-size:9.5px!important;
+}
+
+html body #smMenu .sm-card .sm-price{
+  font-size:12px!important;
+  line-height:1.18!important;
+  font-weight:1000!important;
+}
+
+html body #smMenu .sm-card .pb-old-price{
+  font-size:8.5px!important;
+}
+
+html body #smMenu .sm-card .pb-color-preview{
+  min-height:18px!important;
+  margin:1px 0 5px!important;
+}
+
+/* Compact action cluster pinned to the physical right side of the card.
+   The cart/choose button is first on the right; discount sits immediately to its left. */
+html body #smMenu .sm-card .pb-product-action-row{
+  display:flex!important;
+  flex-direction:row!important;
+  justify-content:flex-start!important;
+  align-items:center!important;
+  align-self:flex-start!important;
+  gap:5px!important;
+  width:max-content!important;
+  max-width:100%!important;
+  min-height:30px!important;
+  margin-top:auto!important;
+  margin-right:0!important;
+  margin-left:auto!important;
+  padding:0!important;
+  direction:rtl!important;
+}
+
+html body #smMenu .sm-card .sm-direct-add,
+html body #smMenu .sm-card .sm-choose-options{
+  flex:0 1 auto!important;
+  width:auto!important;
+  min-width:78px!important;
+  max-width:104px!important;
+  min-height:30px!important;
+  height:30px!important;
+  margin:0!important;
+  padding:0 7px!important;
+  gap:3px!important;
+  border-radius:9px!important;
+  font-size:8.5px!important;
+}
+
+html body #smMenu .sm-card .pb-product-action-row > .sm-direct-add,
+html body #smMenu .sm-card .pb-product-action-row > .sm-choose-options{
+  margin:0!important;
+  align-self:center!important;
+}
+
+html body #smMenu .sm-card .sm-direct-add > span,
+html body #smMenu .sm-card .sm-choose-options > span{
+  font-size:13px!important;
+}
+
+html body #smMenu .sm-card .pb-fixed-discount-chip{
+  flex:0 0 auto!important;
+  align-self:center!important;
+  min-width:30px!important;
+  width:auto!important;
+  height:25px!important;
+  min-height:25px!important;
+  padding:0 5px!important;
+  border-radius:8px!important;
+  font-size:7.5px!important;
+  line-height:1!important;
+}
+
+/* =========================
+   Full product details sheet
+   ========================= */
+html.pb-product-sheet-open,
+body.pb-product-sheet-open{
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+}
+
+.pb-product-sheet{
+  position:fixed;
+  inset:0;
+  z-index:10040;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:0;
+  pointer-events:none;
+}
+
+.pb-product-sheet[hidden]{
+  display:none!important;
+}
+
+.pb-product-sheet-backdrop{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+  border:0;
+  background:rgba(44,57,57,.28);
+  opacity:0;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  transition:opacity .2s ease;
+}
+
+.pb-product-sheet-panel{
+  position:relative;
+  z-index:2;
+  width:min(100%,620px);
+  max-height:min(88dvh,780px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid rgba(112,155,145,.16);
+  border-bottom:0;
+  border-radius:26px 26px 0 0;
+  background:
+    radial-gradient(circle at 15% 0%,rgba(255,226,234,.62),transparent 34%),
+    radial-gradient(circle at 90% 8%,rgba(218,240,234,.72),transparent 35%),
+    #fffdfb;
+  box-shadow:0 -18px 55px rgba(52,75,70,.20);
+  transform:translateY(102%);
+  transition:transform .24s cubic-bezier(.2,.75,.25,1);
+  direction:rtl;
+}
+
+.pb-product-sheet.open{
+  pointer-events:auto;
+}
+
+.pb-product-sheet.open .pb-product-sheet-backdrop{
+  opacity:1;
+}
+
+.pb-product-sheet.open .pb-product-sheet-panel{
+  transform:translateY(0);
+}
+
+.pb-product-sheet-handle{
+  flex:0 0 auto;
+  width:42px;
+  height:4px;
+  margin:8px auto 3px;
+  border-radius:999px;
+  background:rgba(71,102,96,.20);
+}
+
+.pb-product-sheet-head{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:7px 16px 8px;
+}
+
+.pb-product-sheet-eyebrow{
+  color:#6d817d;
+  font-size:11px;
+  line-height:1;
+  font-weight:900;
+}
+
+.pb-product-sheet-close{
+  appearance:none;
+  -webkit-appearance:none;
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  margin:0;
+  padding:0 0 3px;
+  border:1px solid rgba(86,120,113,.13);
+  border-radius:50%;
+  background:rgba(255,255,255,.82);
+  color:#536966;
+  font:800 24px/1 system-ui,sans-serif;
+  box-shadow:0 4px 12px rgba(61,83,78,.06);
+}
+
+.pb-product-sheet-scroll{
+  min-height:0;
+  overflow:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  padding:0 16px calc(14px + env(safe-area-inset-bottom));
+}
+
+.pb-product-sheet-image{
+  display:block;
+  width:min(100%,260px);
+  aspect-ratio:1/1;
+  margin:2px auto 12px;
+  border-radius:20px;
+  object-fit:cover;
+  object-position:center;
+  background:#f6f8f6;
+  box-shadow:0 8px 24px rgba(61,83,78,.08);
+}
+
+.pb-product-sheet-name{
+  margin:0 0 8px;
+  color:#334348;
+  font-size:20px;
+  line-height:1.35;
+  font-weight:1000;
+  text-align:start;
+}
+
+.pb-product-sheet-description{
+  margin:0 0 14px;
+  color:#657673;
+  font-size:13px;
+  line-height:1.8;
+  font-weight:650;
+  text-align:start;
+  white-space:pre-wrap;
+}
+
+.pb-product-sheet-extras{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  margin:0 0 12px;
+}
+
+.pb-product-sheet-colors.pb-color-preview{
+  width:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  flex-wrap:wrap!important;
+  gap:6px!important;
+  margin:0!important;
+  padding:9px 10px!important;
+  border:1px solid rgba(103,139,132,.10)!important;
+  border-radius:13px!important;
+  background:rgba(255,255,255,.58)!important;
+}
+
+.pb-product-sheet-colors .pb-color-dot{
+  width:20px!important;
+  height:20px!important;
+  flex:0 0 20px!important;
+}
+
+.pb-product-sheet-options.sm-options-scroll{
+  width:100%!important;
+  max-height:none!important;
+  overflow:visible!important;
+  margin:0!important;
+  padding:7px 10px!important;
+  border:1px solid rgba(103,139,132,.10)!important;
+  border-radius:13px!important;
+  background:rgba(255,255,255,.58)!important;
+}
+
+.pb-product-sheet-options .sm-option{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  min-height:35px!important;
+  padding:6px 0!important;
+  border:0!important;
+  border-bottom:1px solid rgba(92,123,117,.09)!important;
+  color:#687a77!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+
+.pb-product-sheet-options .sm-option:last-child{
+  border-bottom:0!important;
+}
+
+.pb-product-sheet-options .sm-option-buy{
+  margin-inline-start:auto!important;
+  text-align:end!important;
+}
+
+.pb-product-sheet-options .sm-price{
+  color:#2f7568!important;
+  -webkit-text-fill-color:#2f7568!important;
+  font-size:14px!important;
+  line-height:1.2!important;
+  font-weight:1000!important;
+  white-space:nowrap!important;
+}
+
+.pb-product-sheet-options .pb-price-stack{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-end!important;
+  gap:1px!important;
+}
+
+.pb-product-sheet-options .pb-old-price{
+  color:#a79ca0!important;
+  -webkit-text-fill-color:#a79ca0!important;
+  font-size:10px!important;
+  line-height:1.1!important;
+  text-decoration:line-through!important;
+  white-space:nowrap!important;
+}
+
+.pb-product-sheet-action{
+  position:sticky;
+  bottom:0;
+  z-index:3;
+  width:100%;
+  min-height:46px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin:4px 0 0;
+  padding:0 14px;
+  border:1px solid rgba(79,143,131,.18);
+  border-radius:14px;
+  background:linear-gradient(135deg,#dcefe9,#e8f4f0);
+  color:#2f7568;
+  -webkit-text-fill-color:#2f7568;
+  box-shadow:0 8px 20px rgba(74,112,103,.09);
+  font:inherit;
+  font-size:13px;
+  line-height:1;
+  font-weight:1000;
+}
+
+.pb-product-sheet-action > span{
+  font-size:20px;
+  line-height:1;
+}
+
+@media(max-width:359px){
+  html body #smMenu .sm-card .pb-product-description{
+    font-size:8.5px!important;
+  }
+
+  html body #smMenu .sm-card .pb-product-description-more{
+    font-size:7.5px!important;
+  }
+
+  html body #smMenu .sm-card .sm-options-scroll{
+    max-height:110px!important;
+  }
+
+  html body #smMenu .sm-card .sm-direct-add,
+  html body #smMenu .sm-card .sm-choose-options{
+    min-width:72px!important;
+    max-width:96px!important;
+    height:29px!important;
+    min-height:29px!important;
+    padding-inline:6px!important;
+    font-size:8px!important;
+  }
+
+  html body #smMenu .sm-card .pb-fixed-discount-chip{
+    min-width:28px!important;
+    height:24px!important;
+    min-height:24px!important;
+    padding-inline:4px!important;
+    font-size:7px!important;
+  }
+
+  .pb-product-sheet-scroll{
+    padding-inline:13px;
+  }
+
+  .pb-product-sheet-name{
+    font-size:18px;
+  }
+}
+
+@media(min-width:600px){
+  html body #smMenu .sm-card .pb-product-description{
+    font-size:9.5px!important;
+  }
+
+  html body #smMenu .sm-card .pb-product-description-more{
+    font-size:8.5px!important;
+  }
+
+  html body #smMenu .sm-card .sm-options-scroll{
+    max-height:132px!important;
+  }
+
+  html body #smMenu .sm-card .sm-direct-add,
+  html body #smMenu .sm-card .sm-choose-options{
+    max-width:112px!important;
+    min-height:31px!important;
+    height:31px!important;
+  }
+
+  .pb-product-sheet{
+    padding:20px 20px 0;
+  }
+
+  .pb-product-sheet-panel{
+    border-radius:28px 28px 0 0;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .pb-product-sheet-backdrop,
+  .pb-product-sheet-panel{
+    transition:none!important;
+  }
+}

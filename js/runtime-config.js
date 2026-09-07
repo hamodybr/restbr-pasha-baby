@@ -142,3 +142,31 @@ window.RESTBR_CONFIG = Object.freeze({
   script.defer = true;
   document.head.appendChild(script);
 })();
+
+// Pasha Baby storefront retail-card V2 helper.
+// Keep it storefront-only: the admin already owns the description editor fields.
+(() => {
+  const path = String(window.location.pathname || '').toLowerCase();
+  if (/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
+  if (document.getElementById('pbProductDescriptionV2Script')) return;
+
+  const script = document.createElement('script');
+  script.id = 'pbProductDescriptionV2Script';
+  script.src = 'js/pasha-baby-product-description-v2.js?v=2.3';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
+
+// Pasha Baby storefront details-button V3.
+// Keeps the description to one line and places Details in the same bottom action row.
+(() => {
+  const path = String(window.location.pathname || '').toLowerCase();
+  if (/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
+  if (document.getElementById('pbCardDetailsButtonV3Script')) return;
+
+  const script = document.createElement('script');
+  script.id = 'pbCardDetailsButtonV3Script';
+  script.src = 'js/pasha-baby-details-button-v3.js?v=3.1';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
