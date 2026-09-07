@@ -3,14 +3,17 @@
 
 html body #smMenu .sm-card .pb-product-description{
   width:100%!important;
-  margin:-1px 0 5px!important;
+  margin:-1px 0 6px!important;
   color:var(--pb-card-muted,#7d8a8e)!important;
   -webkit-text-fill-color:var(--pb-card-muted,#7d8a8e)!important;
-  font-size:8.5px!important;
-  line-height:1.35!important;
+  font-size:9px!important;
+  line-height:1.38!important;
   font-weight:650!important;
   text-align:start!important;
-  white-space:nowrap!important;
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  white-space:normal!important;
   overflow:hidden!important;
   text-overflow:ellipsis!important;
 }
@@ -102,6 +105,10 @@ html body #smMenu .sm-card .pb-fixed-discount-chip{
 }
 
 @media(max-width:359px){
+  html body #smMenu .sm-card .pb-product-description{
+    font-size:8.5px!important;
+  }
+
   html body #smMenu .sm-card .sm-options-scroll{
     max-height:110px!important;
   }
@@ -127,12 +134,7 @@ html body #smMenu .sm-card .pb-fixed-discount-chip{
 
 @media(min-width:600px){
   html body #smMenu .sm-card .pb-product-description{
-    display:-webkit-box!important;
-    -webkit-box-orient:vertical!important;
-    -webkit-line-clamp:2!important;
-    white-space:normal!important;
-    overflow:hidden!important;
-    font-size:9px!important;
+    font-size:9.5px!important;
   }
 
   html body #smMenu .sm-card .sm-options-scroll{
