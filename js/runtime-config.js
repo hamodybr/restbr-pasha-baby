@@ -158,7 +158,7 @@ window.RESTBR_CONFIG = Object.freeze({
 })();
 
 // Pasha Baby storefront details-button V3.
-// Keeps the description to one line and moves the full-details trigger to the card bottom-left.
+// Keeps the description to one line and places Details in the same bottom action row.
 (() => {
   const path = String(window.location.pathname || '').toLowerCase();
   if (/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
@@ -166,7 +166,7 @@ window.RESTBR_CONFIG = Object.freeze({
 
   const script = document.createElement('script');
   script.id = 'pbCardDetailsButtonV3Script';
-  script.src = 'js/pasha-baby-details-button-v3.js?v=3.0';
+  script.src = 'js/pasha-baby-details-button-v3.js?v=3.1';
   script.defer = true;
   document.head.appendChild(script);
 })();
