@@ -222,14 +222,27 @@ if (RESTBR_CONFIGURED) {
   document.head.appendChild(script);
 })();
 
-// Final admin-only light-theme completion layer for hard-coded dark components.
+// Final admin-only day/night theme completion layer for hard-coded components.
 (() => {
   if (!RESTBR_IS_ADMIN_PATH) return;
   if (document.getElementById('restbrAdminLightThemeCompleteScript')) return;
 
   const script = document.createElement('script');
   script.id = 'restbrAdminLightThemeCompleteScript';
-  script.src = 'js/admin-light-theme-complete.js?v=1.1';
+  script.src = 'js/admin-light-theme-complete.js?v=2.0';
+  script.async = false;
+  document.head.appendChild(script);
+})();
+
+// Pasha Baby admin polish: unified accents, sort controls above long lists,
+// one discounts entry point, delete confirmation, and animated option ordering.
+(() => {
+  if (!RESTBR_IS_ADMIN_PATH) return;
+  if (document.getElementById('pashaBabyAdminPolishV3Script')) return;
+
+  const script = document.createElement('script');
+  script.id = 'pashaBabyAdminPolishV3Script';
+  script.src = 'js/pasha-baby-admin-polish-v3.js?v=3.0';
   script.async = false;
   document.head.appendChild(script);
 })();
