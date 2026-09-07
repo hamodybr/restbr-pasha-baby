@@ -2,7 +2,8 @@
   if (window.__PASHA_B2_STORAGE_V1__) return;
   window.__PASHA_B2_STORAGE_V1__ = true;
 
-  const TARGET_BYTES = 650 * 1024;
+  const TARGET_BYTES = 620 * 1024;
+  const SERVER_MAX_BYTES = 700 * 1024;
   const SOURCE_LIMIT = 30 * 1024 * 1024;
   const FUNCTION_NAME = 'b2-images';
   const GB = 1024 * 1024 * 1024;
@@ -85,7 +86,7 @@
     if (file.size > SOURCE_LIMIT) throw new Error('الحد الأقصى للصورة الأصلية قبل الضغط هو 30MB.');
 
     if (/image\/(?:gif|svg\+xml)/i.test(file.type || '')) {
-      if (file.size > TARGET_BYTES) throw new Error('GIF/SVG يجب أن يكون أقل من 650KB.');
+      if (file.size > TARGET_BYTES) throw new Error('GIF/SVG يجب أن يكون أقل من 620KB.');
       return file;
     }
 
@@ -102,7 +103,11 @@
         [1150, .68],
         [1024, .64],
         [900, .60],
-        [800, .56]
+        [800, .56],
+        [720, .52],
+        [640, .48],
+        [560, .44],
+        [480, .40]
       ];
 
       let best = null;
@@ -114,7 +119,7 @@
         if (candidate.size <= TARGET_BYTES) return candidate;
       }
 
-      if (best?.size <= 700 * 1024) return best;
+      if (best?.size <= SERVER_MAX_BYTES) return best;
       throw new Error(`الصورة بقيت كبيرة بعد الضغط (${fmt(best?.size || 0)}). جرّب صورة أخرى.`);
     } finally {
       try { decoded.close?.(decoded.source); } catch (_) {}
