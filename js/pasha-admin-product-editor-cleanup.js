@@ -3,6 +3,12 @@
   if (window.__PASHA_PRODUCT_EDITOR_CLEANUP_V1__) return;
   window.__PASHA_PRODUCT_EDITOR_CLEANUP_V1__ = true;
 
+  const HOT_IDS = ['p_is_hot', 'np_is_hot'];
+  const SCHEDULE_FIELDS = [
+    ['p_availability_schedule_enabled', 'p_available_from', 'p_available_to'],
+    ['np_availability_schedule_enabled', 'np_available_from', 'np_available_to']
+  ];
+
   function removeFieldByInputId(id, selector) {
     const input = document.getElementById(id);
     if (!input) return false;
@@ -17,20 +23,19 @@
     if (!body) return;
 
     // Retail store: no restaurant-style spicy/hot flag.
-    removeFieldByInputId('p_is_hot', '.check-card');
-    removeFieldByInputId('np_is_hot', '.check-card');
+    HOT_IDS.forEach(id => removeFieldByInputId(id, '.check-card'));
 
     // Retail store: availability is manual only. Remove scheduled availability UI.
-    for (const prefix of ['p', 'np']) {
-      const enabled = document.getElementById(`${prefix}_availability_schedule_enabled`);
+    SCHEDULE_FIELDS.forEach(([enabledId, fromId, toId]) => {
+      const enabled = document.getElementById(enabledId);
       if (enabled) enabled.checked = false;
-      const from = document.getElementById(`${prefix}_available_from`);
+      const from = document.getElementById(fromId);
       if (from) from.value = '';
-      const to = document.getElementById(`${prefix}_available_to`);
+      const to = document.getElementById(toId);
       if (to) to.value = '';
       const schedule = enabled?.closest('.schedule-editor') || from?.closest('.schedule-editor') || to?.closest('.schedule-editor');
       schedule?.remove();
-    }
+    });
 
     // Old helper text still describes percentage discounts; Pasha now uses fixed IQD discounts.
     body.querySelectorAll('.schedule-note').forEach(note => {
