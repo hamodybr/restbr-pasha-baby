@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RESTBR_LIVE_PRICES_V2__) return;
-  window.__RESTBR_LIVE_PRICES_V2__ = true;
+  if (window.__RESTBR_LIVE_PRICES_V3__) return;
+  window.__RESTBR_LIVE_PRICES_V3__ = true;
 
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
@@ -48,6 +48,12 @@
     const original = Number(originalPrice);
     if (!Number.isFinite(original) || original < 0) return null;
 
+    const amount = Math.max(0, Number(product?.discountAmount || 0));
+    if (Number.isFinite(amount) && amount > 0) {
+      return Math.max(0, Math.round(original - amount));
+    }
+
+    // Legacy compatibility only. Pasha admin now creates fixed-IQD discounts.
     const percent = Math.max(
       0,
       Math.min(100, Number(product?.discountPercent || 0))
@@ -128,6 +134,7 @@
         optionId: option.id,
         price: nextPrice,
         originalPrice,
+        discountAmount: Number(product.discountAmount || 0),
         discountPercent: Number(product.discountPercent || 0)
       });
     }
@@ -197,7 +204,8 @@
         notifyPriceUpdate({
           bulk: true,
           rows: data.length,
-          retailDiscountAware: true
+          retailDiscountAware: true,
+          fixedAmountAware: true
         });
       }
 
@@ -217,7 +225,7 @@
     void syncAllPrices();
 
     channel = sb
-      .channel("restbr-live-prices-v2")
+      .channel("restbr-live-prices-v3")
       .on(
         "postgres_changes",
         {
@@ -240,7 +248,6 @@
         }
       });
 
-    // Safety sync in case a mobile browser briefly drops the realtime socket.
     window.setInterval(() => void syncAllPrices(), 30000);
   }
 
@@ -260,10 +267,9 @@
     if (document.visibilityState === "visible") void syncAllPrices();
   });
 
-  // The commerce layer can replace the initial truncated catalog with its full
-  // paginated version. Re-sync prices afterwards so every option stays current.
   window.addEventListener("restbr:catalog-expanded", () => void syncAllPrices());
   window.addEventListener("restbr:commerce-ready", () => void syncAllPrices());
+  window.addEventListener("restbr:fixed-discounts-ready", () => void syncAllPrices());
 
   window.addEventListener("restbr:ready", start, { once: true });
 
