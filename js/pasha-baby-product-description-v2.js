@@ -8,18 +8,20 @@
   window.__PB_PRODUCT_DESCRIPTION_V2__ = true;
 
   const STYLE_ID = 'pbCardDensityV2Style';
-  const RETRY_LIMIT = 80;
+  const RETRY_LIMIT = 100;
   let observer = null;
   let langObserver = null;
   let scheduled = false;
   let retries = 0;
+  let descriptionRows = new Map();
+  let descriptionLoadPromise = null;
 
   const ensureStyle = () => {
     if (document.getElementById(STYLE_ID)) return;
     const link = document.createElement('link');
     link.id = STYLE_ID;
     link.rel = 'stylesheet';
-    link.href = 'css/pasha-baby-card-density-v2.css?v=2.0';
+    link.href = 'css/pasha-baby-card-density-v2.css?v=2.2';
     document.head.appendChild(link);
   };
 
@@ -44,17 +46,66 @@
     }
   };
 
-  const descriptionFor = product => {
-    if (!product) return '';
+  const descriptionFromRow = row => {
+    if (!row) return '';
     const language = currentLanguage();
-    const preferred = product[`description_${language}`];
     return String(
-      preferred ||
-      product.description_ar ||
-      product.description_en ||
-      product.description_ku ||
+      row[`description_${language}`] ||
+      row.description_ar ||
+      row.description_en ||
+      row.description_ku ||
       ''
     ).trim();
+  };
+
+  const descriptionFor = product => {
+    if (!product) return '';
+
+    const direct = descriptionFromRow(product);
+    if (direct) return direct;
+
+    const nested = product.description;
+    if (nested && typeof nested === 'object') {
+      const language = currentLanguage();
+      const value = String(
+        nested[language] || nested.ar || nested.en || nested.ku || ''
+      ).trim();
+      if (value) return value;
+    }
+
+    return descriptionFromRow(descriptionRows.get(String(product.id || '')));
+  };
+
+  const loadDescriptions = async () => {
+    if (descriptionLoadPromise) return descriptionLoadPromise;
+
+    descriptionLoadPromise = (async () => {
+      for (let attempt = 0; attempt < 35; attempt += 1) {
+        try {
+          if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+            const { data, error } = await supabaseClient
+              .from('products')
+              .select('id,description_ar,description_ku,description_en');
+
+            if (error) throw error;
+
+            descriptionRows = new Map(
+              (Array.isArray(data) ? data : []).map(row => [String(row.id || ''), row])
+            );
+            scheduleSync();
+            return true;
+          }
+        } catch (error) {
+          console.warn('Pasha Baby product description load failed:', error);
+          return false;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 120));
+      }
+      return false;
+    })();
+
+    return descriptionLoadPromise;
   };
 
   const syncDescriptions = () => {
@@ -89,6 +140,7 @@
 
       if (node.textContent !== description) node.textContent = description;
       node.setAttribute('aria-label', description);
+      node.setAttribute('title', description);
     });
 
     return true;
@@ -120,15 +172,21 @@
       attributeFilter: ['lang', 'dir']
     });
 
+    loadDescriptions();
     scheduleSync();
     setTimeout(scheduleSync, 250);
     setTimeout(scheduleSync, 900);
+    setTimeout(scheduleSync, 1800);
   };
 
   const start = () => {
     ensureStyle();
     attach();
-    window.addEventListener('pageshow', scheduleSync, { passive: true });
+    loadDescriptions();
+    window.addEventListener('pageshow', () => {
+      loadDescriptions();
+      scheduleSync();
+    }, { passive: true });
   };
 
   if (document.readyState === 'loading') {
