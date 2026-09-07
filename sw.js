@@ -1,4 +1,5 @@
-const CACHE_NAME = "restbr-pasha-baby-v26";
+const CACHE_NAME = "restbr-pasha-baby-v25";
+// Handoff refresh 2026-09-07: reinstall this worker so the updated production fallback is re-cached.
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
