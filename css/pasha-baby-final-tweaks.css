@@ -1,0 +1,67 @@
+/* Pasha Baby final retail tweaks: no spicy label, fixed discount chip by cart action, longer cart toast. */
+
+/* Pasha Baby does not use the restaurant-style spicy/hot label. */
+#smMenu .sm-display-badge.red{
+  display:none!important;
+}
+
+/* Fixed discounts use the compact action chip below, never an overlay on product labels. */
+#smMenu .pb-discount-badge,
+#smMenu .sm-live-discount{
+  display:none!important;
+}
+
+#smMenu .sm-direct-add,
+#smMenu .sm-choose-options{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+}
+
+#smMenu .pb-fixed-discount-chip{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:18px;
+  margin-inline-start:2px;
+  padding:3px 6px;
+  border:1px solid #f0bfd0;
+  border-radius:999px;
+  background:#fff0f5;
+  color:#b84f70;
+  font-size:8px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:0;
+  white-space:nowrap;
+  direction:ltr;
+  box-shadow:0 2px 7px rgba(170,79,108,.08);
+  pointer-events:none;
+}
+
+/* cart.js removes .show after 1.3s; delay the hide transition so the success notice
+   remains readable for roughly 2.6 seconds without changing cart behavior. */
+.sm-cart-toast{
+  transition:
+    opacity .18s ease 1.15s,
+    transform .18s ease 1.15s!important;
+}
+
+.sm-cart-toast.show{
+  transition-delay:0s!important;
+}
+
+@media(max-width:390px){
+  #smMenu .sm-direct-add,
+  #smMenu .sm-choose-options{
+    gap:3px!important;
+  }
+
+  #smMenu .pb-fixed-discount-chip{
+    min-height:16px;
+    padding:3px 5px;
+    font-size:7.25px;
+  }
+}
