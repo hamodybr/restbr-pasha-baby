@@ -1,0 +1,143 @@
+/* PASHA BABY — RETAIL CARD DENSITY V2
+   Gives product options/prices more visual space while keeping cart controls compact. */
+
+html body #smMenu .sm-card .pb-product-description{
+  width:100%!important;
+  margin:-1px 0 5px!important;
+  color:var(--pb-card-muted,#7d8a8e)!important;
+  -webkit-text-fill-color:var(--pb-card-muted,#7d8a8e)!important;
+  font-size:8.5px!important;
+  line-height:1.35!important;
+  font-weight:650!important;
+  text-align:start!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+/* Price / option area gets the space priority. */
+html body #smMenu .sm-card .sm-options-scroll{
+  max-height:116px!important;
+  margin-bottom:3px!important;
+}
+
+html body #smMenu .sm-card .sm-option{
+  min-height:24px!important;
+  padding:3px 0!important;
+  gap:4px!important;
+  font-size:9.5px!important;
+}
+
+html body #smMenu .sm-card .sm-price{
+  font-size:12px!important;
+  line-height:1.18!important;
+  font-weight:1000!important;
+}
+
+html body #smMenu .sm-card .pb-old-price{
+  font-size:8.5px!important;
+}
+
+html body #smMenu .sm-card .pb-color-preview{
+  min-height:18px!important;
+  margin:1px 0 5px!important;
+}
+
+/* Compact right-aligned action row: cart/choose first, discount immediately to its left. */
+html body #smMenu .sm-card .pb-product-action-row{
+  display:flex!important;
+  flex-direction:row!important;
+  justify-content:flex-start!important;
+  align-items:center!important;
+  gap:5px!important;
+  width:100%!important;
+  min-height:30px!important;
+  margin-top:auto!important;
+  direction:rtl!important;
+}
+
+html body #smMenu .sm-card .sm-direct-add,
+html body #smMenu .sm-card .sm-choose-options{
+  flex:0 1 auto!important;
+  align-self:flex-start!important;
+  width:auto!important;
+  min-width:78px!important;
+  max-width:104px!important;
+  min-height:30px!important;
+  height:30px!important;
+  margin-top:auto!important;
+  padding:0 7px!important;
+  gap:3px!important;
+  border-radius:9px!important;
+  font-size:8.5px!important;
+}
+
+html body #smMenu .sm-card .pb-product-action-row > .sm-direct-add,
+html body #smMenu .sm-card .pb-product-action-row > .sm-choose-options{
+  margin:0!important;
+  align-self:center!important;
+}
+
+html body #smMenu .sm-card .sm-direct-add > span,
+html body #smMenu .sm-card .sm-choose-options > span{
+  font-size:13px!important;
+}
+
+html body #smMenu .sm-card .pb-fixed-discount-chip{
+  flex:0 0 auto!important;
+  align-self:center!important;
+  min-width:30px!important;
+  width:auto!important;
+  height:25px!important;
+  min-height:25px!important;
+  padding:0 5px!important;
+  border-radius:8px!important;
+  font-size:7.5px!important;
+  line-height:1!important;
+}
+
+@media(max-width:359px){
+  html body #smMenu .sm-card .sm-options-scroll{
+    max-height:110px!important;
+  }
+
+  html body #smMenu .sm-card .sm-direct-add,
+  html body #smMenu .sm-card .sm-choose-options{
+    min-width:72px!important;
+    max-width:96px!important;
+    height:29px!important;
+    min-height:29px!important;
+    padding-inline:6px!important;
+    font-size:8px!important;
+  }
+
+  html body #smMenu .sm-card .pb-fixed-discount-chip{
+    min-width:28px!important;
+    height:24px!important;
+    min-height:24px!important;
+    padding-inline:4px!important;
+    font-size:7px!important;
+  }
+}
+
+@media(min-width:600px){
+  html body #smMenu .sm-card .pb-product-description{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    white-space:normal!important;
+    overflow:hidden!important;
+    font-size:9px!important;
+  }
+
+  html body #smMenu .sm-card .sm-options-scroll{
+    max-height:132px!important;
+  }
+
+  html body #smMenu .sm-card .sm-direct-add,
+  html body #smMenu .sm-card .sm-choose-options{
+    max-width:112px!important;
+    min-height:31px!important;
+    height:31px!important;
+  }
+}
