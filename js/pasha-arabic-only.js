@@ -22,28 +22,12 @@
       #smLangs,#smLangToggle,#smLanguageSettingCard{display:none!important}
       [data-pasha-multilang-hidden="1"]{display:none!important}
 
-      /* Pasha Baby is Arabic-only: remove the unused language tab strip and
-         leave the Arabic field as a normal, clean settings control. */
-      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-tabs{
-        display:none!important;
-      }
-      #viewTools .tri-box[data-pasha-arabic-only-box="1"]{
-        gap:0!important;
-        padding:0!important;
-        background:transparent!important;
-        border:0!important;
-        box-shadow:none!important;
-      }
+      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-tabs{display:none!important}
+      #viewTools .tri-box[data-pasha-arabic-only-box="1"]{gap:0!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
       #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-pane[data-pasha-lang="ku"],
-      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-pane[data-pasha-lang="en"]{
-        display:none!important;
-      }
-      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-pane[data-pasha-lang="ar"]{
-        display:block!important;
-      }
+      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-pane[data-pasha-lang="en"]{display:none!important}
+      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-pane[data-pasha-lang="ar"]{display:block!important}
 
-      /* The Intro duration card was still using its old hard-coded black
-         surface. Make it follow the exact same global Pasha day/night theme. */
       body.admin-global-light #viewTools .appearance-mode-card,
       body.admin-global-dark #viewTools .appearance-mode-card{
         background:var(--pba-surface-strong,#fff)!important;
@@ -53,9 +37,7 @@
         color-scheme:inherit!important;
       }
       body.admin-global-light #viewTools .appearance-mode-card span,
-      body.admin-global-dark #viewTools .appearance-mode-card span{
-        color:var(--pba-muted,#6e7b81)!important;
-      }
+      body.admin-global-dark #viewTools .appearance-mode-card span{color:var(--pba-muted,#6e7b81)!important}
       body.admin-global-light #viewTools .appearance-mode-card input,
       body.admin-global-dark #viewTools .appearance-mode-card input,
       body.admin-global-light #viewTools .appearance-mode-card select,
@@ -84,9 +66,7 @@
   }
 
   function fieldWrapper(el) {
-    return el?.closest?.(
-      '.field,.tri-pane,.settings-field-clean,.dynamic-field,.pb-editor-color-field,.sm-language-setting-option'
-    ) || null;
+    return el?.closest?.('.field,.tri-pane,.settings-field-clean,.dynamic-field,.pb-editor-color-field,.sm-language-setting-option') || null;
   }
 
   function syncArabicFallback(arField) {
@@ -102,7 +82,6 @@
     const key = String(pane?.getAttribute?.('data-tri-pane') || '');
     const match = key.match(/:(ar|ku|en)$/i);
     if (match) return match[1].toLowerCase();
-
     const field = pane?.querySelector?.('input[id],textarea[id],select[id]');
     const idMatch = String(field?.id || '').match(/_(ar|ku|en)$/i);
     return idMatch ? idMatch[1].toLowerCase() : '';
@@ -110,35 +89,23 @@
 
   function collapseTriBoxToArabic(box) {
     if (!(box instanceof Element)) return;
-
     const panes = [...box.querySelectorAll(':scope > .tri-pane')];
     const codes = panes.map(languageCodeFromPane).filter(Boolean);
-    const hasArabic = codes.includes('ar');
-    const hasOther = codes.includes('ku') || codes.includes('en');
-    if (!hasArabic || !hasOther) return;
-
+    if (!codes.includes('ar') || (!codes.includes('ku') && !codes.includes('en'))) return;
     box.dataset.pashaArabicOnlyBox = '1';
-
     panes.forEach(pane => {
       const code = languageCodeFromPane(pane);
       if (!code) return;
       pane.dataset.pashaLang = code;
-      if (code === 'ar') {
-        pane.hidden = false;
-        pane.classList.add('active');
-      } else {
-        pane.hidden = true;
-        pane.classList.remove('active');
-      }
+      if (code === 'ar') { pane.hidden = false; pane.classList.add('active'); }
+      else { pane.hidden = true; pane.classList.remove('active'); }
     });
-
     const tabs = box.querySelector(':scope > .tri-tabs');
     if (tabs) tabs.setAttribute('aria-hidden', 'true');
   }
 
   function cleanupAdminLanguages(root = document) {
     if (!IS_ADMIN) return;
-
     root.querySelectorAll?.('input[id],textarea[id],select[id]').forEach(el => {
       if (/_ar$/.test(el.id)) syncArabicFallback(el);
       if (!isLanguageField(el)) return;
@@ -146,14 +113,11 @@
       if (wrap) wrap.dataset.pashaMultilangHidden = '1';
       else el.dataset.pashaMultilangHidden = '1';
     });
-
     if (root instanceof Element && root.matches('.tri-box')) collapseTriBoxToArabic(root);
     root.querySelectorAll?.('.tri-box').forEach(collapseTriBoxToArabic);
-
     const languageToggle = q('#rs_show_language_switch');
     const toggleWrap = languageToggle?.closest?.('.settings-toggle-card,.settings-field-clean,.field');
     if (toggleWrap) toggleWrap.dataset.pashaMultilangHidden = '1';
-
     const languageCard = q('#smLanguageSettingCard');
     if (languageCard) languageCard.dataset.pashaMultilangHidden = '1';
   }
@@ -171,6 +135,7 @@
     if (!IS_ADMIN) return;
     loadScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.1', true);
     loadScript('pashaBabyImageOptimizerScript', 'js/admin-image-optimizer.js?v=1.0', true);
+    loadScript('pashaBabyB2StorageScript', 'js/admin-b2-storage.js?v=1.0', true);
     loadScript('pashaBabyLargeCatalogScript', 'js/admin-large-catalog.js?v=1.0', true);
     loadScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=4.0', true);
     loadScript('pashaBabyProductColorsScript', 'js/admin-product-colors.js?v=3.0', true);
@@ -180,22 +145,16 @@
   function boot() {
     forceArabicState();
     installArabicOnlyStyle();
-
     if (IS_ADMIN) {
       cleanupAdminLanguages(document);
       loadArabicAdminTools();
-
       document.addEventListener('input', event => {
         const target = event.target;
         if (target?.id && /_ar$/.test(target.id)) syncArabicFallback(target);
       }, true);
-
       const observer = new MutationObserver(mutations => {
-        for (const mutation of mutations) {
-          for (const node of mutation.addedNodes) {
-            if (node.nodeType !== 1) continue;
-            cleanupAdminLanguages(node);
-          }
+        for (const mutation of mutations) for (const node of mutation.addedNodes) {
+          if (node.nodeType === 1) cleanupAdminLanguages(node);
         }
       });
       observer.observe(document.body, { childList: true, subtree: true });
@@ -203,7 +162,6 @@
     }
 
     loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.0');
-
     const keepArabic = () => {
       forceArabicState();
       const langs = q('#smLangs');
@@ -211,18 +169,13 @@
       const toggle = q('#smLangToggle');
       if (toggle) toggle.style.setProperty('display', 'none', 'important');
     };
-
     keepArabic();
     window.addEventListener('restbr:ready', keepArabic);
     window.addEventListener('pageshow', keepArabic, { passive: true });
-
     const observer = new MutationObserver(keepArabic);
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot, { once: true });
-  } else {
-    boot();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+  else boot();
 })();
