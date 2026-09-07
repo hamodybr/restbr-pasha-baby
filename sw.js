@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v24";
+const CACHE_NAME = "restbr-pasha-baby-v25";
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -135,7 +135,7 @@ self.addEventListener("fetch", event => {
   const isAdminAsset =
     /\/js\/admin-[^/]+\.js$/i.test(url.pathname) ||
     /\/js\/(?:runtime|supabase)-config\.js$/i.test(url.pathname) ||
-    /\/js\/(?:restbr-hardening|pasha-arabic-only)\.js$/i.test(url.pathname);
+    /\/js\/(?:restbr-hardening|pasha-arabic-only|pasha-admin-product-editor-cleanup)\.js$/i.test(url.pathname);
 
   if (isAdminPage || isAdminAsset) {
     event.respondWith(networkFirst(request, { noStore: true }));
