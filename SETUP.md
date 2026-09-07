@@ -1,80 +1,59 @@
-# إعداد نسخة مطعم جديدة من RESTBR Master
+# Pasha Baby — دليل التشغيل والتسليم
 
-هذه النسخة مخصصة لمطعم واحد فقط. لكل مطعم جديد يجب إنشاء نسخة مستقلة وقاعدة بيانات مستقلة.
+هذه ليست نسخة مطعم عامة. هذا الـRepository هو نسخة **Pasha Baby Retail** المستقلة ويعمل مع Supabase مستقل.
 
-## 1. انسخ الماستر
+## الروابط
 
-أنشئ Repository جديدًا من `hamodybr/restbr-menu-app` ولا تعمل مباشرة على الماستر بعد ذلك.
+- المتجر: `https://pashababy.restbr.com`
+- الداشبورد: `https://pashababy.restbr.com/admin`
+- Production branch: `main`
+- Supabase project ref: `wlollfpmjzenhkjwxrqo`
 
-## 2. أنشئ Supabase خاصًا بالمطعم
+## إدارة المتجر اليومية
 
-1. أنشئ Project جديدًا.
-2. من Authentication > Users أنشئ حساب صاحب المطعم وفعّل بريده.
-3. افتح SQL Editor.
-4. شغّل `supabase/bootstrap.sql` كاملًا مرة واحدة.
+من الداشبورد يمكن:
 
-الـbootstrap ينشئ الجداول وRLS والإحصائيات والأسعار والخصومات وأوقات التوفر وحاوية `menu-images` والإعدادات اللازمة للنسخة الحالية.
+1. إضافة/تعديل/إخفاء الأصناف والأقسام.
+2. إدارة الخيارات والأسعار والألوان.
+3. ترتيب الأقسام والأصناف وخيارات الصنف بالسحب والإفلات.
+4. تفعيل «جديد»، «الأكثر طلباً»، «عرض مميز» وحالة التوفر.
+5. إنشاء خصم بمبلغ ثابت بالدينار العراقي لصنف أو قسم أو المتجر.
+6. تعديل الشعار والهاتف وWhatsApp والموقع والإعلان والتوصيل وأوقات العمل.
+7. استخدام Excel وBackup/Restore عند الحاجة.
 
-## 3. اربط الموقع
+## قواعد النسخة
 
-من Supabase انسخ:
-- Project URL
-- Publishable key / anon key
+- المتجر Retail وليس مطعماً.
+- لا يوجد داخل المطعم/سفري.
+- واجهة العميل عربية فقط وRTL.
+- الداشبورد عربي ويملك وضع نهاري/ليلي بنفس هوية Pasha Baby.
+- لا تستخدم `service_role` داخل أي ملف يصل للمتصفح.
+- لا تربط هذه النسخة بقاعدة بيانات أو Repository لمشروع آخر.
 
-ثم عدّل فقط القيم الخاصة بالمطعم في أعلى `js/runtime-config.js`:
+## النشر الآمن
 
-```js
-window.RESTBR_CONFIG = Object.freeze({
-  restaurantName: 'Restaurant Name',
-  orderIdPrefix: 'ORD',
-  supabaseUrl: 'https://PROJECT_REF.supabase.co',
-  supabasePublishableKey: 'PUBLISHABLE_KEY',
-  enableUserManagement: false,
-  enableRestaurantReset: false,
-  legacyRestaurantNames: [],
-  legacyBackupFormats: [],
-  legacyLocalStorageKeys: {},
-  legacySessionStorageKeys: {}
-});
-```
+أي Push يمر أولاً عبر Validate. الـDeploy وLive Smoke يعملان فقط عند وصول التغيير إلى `main`.
 
-لا تستخدم `service_role` داخل أي ملف يصل للمتصفح.
+قبل أي تعديل كبير:
 
-## 4. انشر نسخة مستقلة
+1. أنشئ Branch احتياطي من `main`.
+2. نفذ التعديل في Branch معاينة إذا كان بصرياً أو عالي المخاطرة.
+3. لا تعتمد التعديل قبل نجاح الفحوص.
+4. بعد الدمج تحقق من Validate → Deploy → Live Smoke → Retail Commerce.
 
-اربط Repository الجديد باستضافة مستقلة ودومين أو subdomain خاص بالمطعم، مثل:
+## فحص التسليم
 
-`restaurant.restbr.com`
+- الهوية والدومين صحيحان.
+- رقم الهاتف وWhatsApp والموقع حقيقيون.
+- لا توجد أصناف أو أقسام Test ظاهرة.
+- لا توجد روابط Social مزيفة أو Placeholder مفعلة.
+- الأسعار والخيارات راجعها صاحب المتجر.
+- الصور راجعها صاحب المتجر؛ المنتج بدون صورة يستخدم Placeholder آمن.
+- السلة والطلب عبر WhatsApp يعملان.
+- رقم WhatsApp يخرج بصيغة دولية `964...`.
+- اللغة العربية فقط ظاهرة للعميل.
+- Admin محمي بـSupabase Auth وصلاحيات RLS.
+- Backup متوفر قبل أي عملية حساسة.
+- آخر GitHub Actions run ناجح بالكامل.
 
-لا توجّه مطعمين إلى نفس Repository أو نفس Supabase project.
-
-## 5. أكمل إعداد المطعم
-
-بعد النشر:
-
-1. افتح `/admin.html` وسجّل بحساب صاحب المطعم.
-2. أدخل الاسم والشعار والهاتف وWhatsApp والموقع.
-3. اضبط اللغات والتصميم وأوقات المطعم.
-4. أضف الأقسام والأصناف والأسعار أو استورد Excel.
-5. ارفع صور الأصناف إلى Storage الخاص بنفس المطعم.
-
-## 6. فحص قبل التسليم
-
-- Repository مستقل
-- Supabase مستقل
-- Auth owner صحيح
-- `runtime-config.js` يحتوي بيانات هذا المطعم فقط
-- لا يوجد `service_role` في الكود
-- الاسم والشعار والهاتف وWhatsApp والموقع صحيحة
-- اللغة العربية/الكوردية/الإنجليزية تعمل حسب الإعداد
-- الداشبورد عربي/English يعمل
-- الأسعار داخل المطعم/السفري صحيحة
-- أوقات المطعم وأوقات الأقسام تعمل
-- السلة تعمل
-- رقم WhatsApp يخرج بالصيغة الدولية الصحيحة
-- طلب WhatsApp تجريبي ناجح
-- نافذة خاصة لا تعرض أي كاش أو هوية لمطعم سابق
-
-## الميزات الاختيارية
-
-`enableUserManagement` و`enableRestaurantReset` يبقيان `false` افتراضيًا. لا يتم تفعيلهما إلا إذا كانت متطلباتهما منشورة ومختبرة على نسخة المطعم نفسها.
+للتفاصيل الأمنية راجع `.github/AUDIT-HARDENING.md` وتقارير الفحص داخل `.github/`.
