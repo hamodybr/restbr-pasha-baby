@@ -188,3 +188,13 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
   else boot();
 })();
+
+(() => {
+  if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
+  if (document.getElementById('pashaInlineListOrderingScript')) return;
+  const script = document.createElement('script');
+  script.id = 'pashaInlineListOrderingScript';
+  script.src = 'js/admin-inline-list-ordering.js?v=1.0';
+  script.async = false;
+  document.head.appendChild(script);
+})();
