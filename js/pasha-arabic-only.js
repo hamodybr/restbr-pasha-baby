@@ -21,6 +21,59 @@
     style.textContent = `
       #smLangs,#smLangToggle,#smLanguageSettingCard{display:none!important}
       [data-pasha-multilang-hidden="1"]{display:none!important}
+
+      /* Pasha Baby is Arabic-only: remove the unused language tab strip and
+         leave the Arabic field as a normal, clean settings control. */
+      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-tabs{
+        display:none!important;
+      }
+      #viewTools .tri-box[data-pasha-arabic-only-box="1"]{
+        gap:0!important;
+        padding:0!important;
+        background:transparent!important;
+        border:0!important;
+        box-shadow:none!important;
+      }
+      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-pane[data-pasha-lang="ku"],
+      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-pane[data-pasha-lang="en"]{
+        display:none!important;
+      }
+      #viewTools .tri-box[data-pasha-arabic-only-box="1"] > .tri-pane[data-pasha-lang="ar"]{
+        display:block!important;
+      }
+
+      /* The Intro duration card was still using its old hard-coded black
+         surface. Make it follow the exact same global Pasha day/night theme. */
+      body.admin-global-light #viewTools .appearance-mode-card,
+      body.admin-global-dark #viewTools .appearance-mode-card{
+        background:var(--pba-surface-strong,#fff)!important;
+        color:var(--pba-ink,#2f3b42)!important;
+        border-color:var(--pba-border,rgba(47,139,115,.15))!important;
+        box-shadow:none!important;
+        color-scheme:inherit!important;
+      }
+      body.admin-global-light #viewTools .appearance-mode-card span,
+      body.admin-global-dark #viewTools .appearance-mode-card span{
+        color:var(--pba-muted,#6e7b81)!important;
+      }
+      body.admin-global-light #viewTools .appearance-mode-card input,
+      body.admin-global-dark #viewTools .appearance-mode-card input,
+      body.admin-global-light #viewTools .appearance-mode-card select,
+      body.admin-global-dark #viewTools .appearance-mode-card select{
+        background:var(--pba-surface,#fffdfb)!important;
+        color:var(--pba-ink,#2f3b42)!important;
+        -webkit-text-fill-color:var(--pba-ink,#2f3b42)!important;
+        border-color:var(--pba-border,rgba(47,139,115,.15))!important;
+        box-shadow:none!important;
+      }
+      body.admin-global-light #viewTools .appearance-mode-card input:focus,
+      body.admin-global-dark #viewTools .appearance-mode-card input:focus,
+      body.admin-global-light #viewTools .appearance-mode-card select:focus,
+      body.admin-global-dark #viewTools .appearance-mode-card select:focus{
+        border-color:var(--pba-primary,#2f8b73)!important;
+        box-shadow:0 0 0 3px color-mix(in srgb,var(--pba-primary,#2f8b73) 12%,transparent)!important;
+        outline:none!important;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -45,6 +98,44 @@
     }
   }
 
+  function languageCodeFromPane(pane) {
+    const key = String(pane?.getAttribute?.('data-tri-pane') || '');
+    const match = key.match(/:(ar|ku|en)$/i);
+    if (match) return match[1].toLowerCase();
+
+    const field = pane?.querySelector?.('input[id],textarea[id],select[id]');
+    const idMatch = String(field?.id || '').match(/_(ar|ku|en)$/i);
+    return idMatch ? idMatch[1].toLowerCase() : '';
+  }
+
+  function collapseTriBoxToArabic(box) {
+    if (!(box instanceof Element)) return;
+
+    const panes = [...box.querySelectorAll(':scope > .tri-pane')];
+    const codes = panes.map(languageCodeFromPane).filter(Boolean);
+    const hasArabic = codes.includes('ar');
+    const hasOther = codes.includes('ku') || codes.includes('en');
+    if (!hasArabic || !hasOther) return;
+
+    box.dataset.pashaArabicOnlyBox = '1';
+
+    panes.forEach(pane => {
+      const code = languageCodeFromPane(pane);
+      if (!code) return;
+      pane.dataset.pashaLang = code;
+      if (code === 'ar') {
+        pane.hidden = false;
+        pane.classList.add('active');
+      } else {
+        pane.hidden = true;
+        pane.classList.remove('active');
+      }
+    });
+
+    const tabs = box.querySelector(':scope > .tri-tabs');
+    if (tabs) tabs.setAttribute('aria-hidden', 'true');
+  }
+
   function cleanupAdminLanguages(root = document) {
     if (!IS_ADMIN) return;
 
@@ -55,6 +146,9 @@
       if (wrap) wrap.dataset.pashaMultilangHidden = '1';
       else el.dataset.pashaMultilangHidden = '1';
     });
+
+    if (root instanceof Element && root.matches('.tri-box')) collapseTriBoxToArabic(root);
+    root.querySelectorAll?.('.tri-box').forEach(collapseTriBoxToArabic);
 
     const languageToggle = q('#rs_show_language_switch');
     const toggleWrap = languageToggle?.closest?.('.settings-toggle-card,.settings-field-clean,.field');
