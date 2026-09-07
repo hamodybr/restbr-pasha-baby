@@ -101,6 +101,9 @@ const indexHtml = await expectText('/', [
   'js/runtime-config.js',
   'js/supabase-config.js?v=2.5',
   'js/pasha-baby-storefront-v2.js',
+  'js/live-prices.js?v=3.0',
+  'js/pasha-baby-fixed-discounts.js?v=1.0',
+  'css/pasha-baby-final-tweaks.css?v=1.0',
   'css/pasha-baby-footer-v2.css'
 ], 'storefront');
 
@@ -154,15 +157,39 @@ await expectText('/js/pasha-baby-admin-copy.js', [
 
 await expectText('/js/pasha-arabic-only.js', [
   "localStorage.setItem('RESTBR_LANG_V1', 'ar')",
-  'js/admin-retail-discounts.js?v=3.0',
+  'js/admin-retail-discounts.js?v=4.0',
   'js/admin-product-colors.js?v=3.0',
   'js/arabic-news-ticker.js?v=1.0'
 ], 'Arabic-only policy');
 
+await expectText('/js/admin-retail-discounts.js', [
+  '__PASHA_ADMIN_RETAIL_DISCOUNTS_V4__',
+  'pbDiscountAmount',
+  'discount_amount: amount',
+  'discount_percent: 0'
+], 'fixed amount discount admin');
+
+await expectText('/js/pasha-baby-fixed-discounts.js', [
+  '__PASHA_BABY_FIXED_DISCOUNTS_V1__',
+  'discount_amount',
+  'product.discountAmount = amount',
+  'pb-fixed-discount-chip'
+], 'fixed amount storefront discounts');
+
+await expectText('/css/pasha-baby-final-tweaks.css', [
+  '#smMenu .sm-display-badge.red',
+  '#smMenu .pb-discount-badge',
+  '.pb-fixed-discount-chip',
+  '1.15s'
+], 'Pasha final UI tweaks');
+
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v23',
+  'restbr-pasha-baby-v24',
   'js/restbr-hardening.js',
   'js/pasha-arabic-only.js?v=1.0',
+  'js/pasha-baby-fixed-discounts.js?v=1.0',
+  'js/live-prices.js?v=3.0',
+  'css/pasha-baby-final-tweaks.css?v=1.0',
   'js/arabic-news-ticker.js?v=1.0',
   'js/pasha-baby-storefront-v2.js'
 ], 'service worker');
@@ -208,6 +235,26 @@ for (const table of ['categories', 'products', 'product_options', 'restaurant_se
   }
 }
 
+try {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/discounts?select=id,discount_amount,discount_percent,scope_type,is_active&limit=1`, {
+    cache: 'no-store',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Accept: 'application/json'
+    }
+  });
+  const text = await response.text();
+  if (!response.ok) fail('Supabase fixed discount schema', `HTTP ${response.status} ${text.slice(0, 160)}`);
+  else {
+    const rows = JSON.parse(text);
+    if (!Array.isArray(rows)) fail('Supabase fixed discount schema', 'response is not an array');
+    else ok('Supabase fixed discount schema');
+  }
+} catch (error) {
+  fail('Supabase fixed discount schema', error?.message || String(error));
+}
+
 console.log(`\nLive smoke summary: ${passed.length} passed, ${failures.length} failed`);
 if (failures.length) {
   console.error('\nFailures:');
@@ -215,4 +262,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('✓ Pasha Baby live Arabic-only delivery smoke test passed');
+console.log('✓ Pasha Baby live Arabic-only fixed-discount delivery smoke test passed');
