@@ -1,6 +1,6 @@
 /* PASHA BABY — CARD DETAILS BUTTON V3
    Presentation-only helper. Keeps the existing product details sheet logic intact,
-   replaces the inline More link with a small Details button at the bottom-left. */
+   replaces the inline More link with a small Details button in the bottom action row. */
 
 (() => {
   if (window.__PB_CARD_DETAILS_BUTTON_V3__) return;
@@ -16,7 +16,7 @@
     const link = document.createElement('link');
     link.id = STYLE_ID;
     link.rel = 'stylesheet';
-    link.href = 'css/pasha-baby-details-button-v3.css?v=3.0';
+    link.href = 'css/pasha-baby-details-button-v3.css?v=3.1';
     document.head.appendChild(link);
   };
 
@@ -36,7 +36,8 @@
 
       const description = info.querySelector('.pb-product-description');
       const more = info.querySelector('.pb-product-description-more');
-      let details = info.querySelector('.pb-card-details-btn');
+      const actionRow = card.querySelector('.pb-product-action-row');
+      let details = card.querySelector('.pb-card-details-btn');
 
       // The V2 helper only creates the hidden More trigger when the description
       // is long enough to need the full details sheet.
@@ -45,11 +46,21 @@
         return;
       }
 
+      // The fixed-discount layer creates one shared row for the cart action and
+      // discount label. Wait for that row so Details always lives on the same line.
+      if (!actionRow) {
+        details?.remove();
+        return;
+      }
+
       if (!details) {
         details = document.createElement('button');
         details.type = 'button';
         details.className = 'pb-card-details-btn';
-        info.appendChild(details);
+      }
+
+      if (details.parentElement !== actionRow) {
+        actionRow.appendChild(details);
       }
 
       details.textContent = detailsLabel();
@@ -89,6 +100,9 @@
       attributes: true,
       attributeFilter: ['lang', 'dir']
     });
+
+    window.addEventListener('restbr:prices-updated', scheduleSync);
+    window.addEventListener('restbr:fixed-discounts-ready', scheduleSync);
 
     scheduleSync();
     setTimeout(scheduleSync, 350);
