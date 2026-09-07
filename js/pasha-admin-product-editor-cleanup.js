@@ -8,6 +8,29 @@
     ['p_availability_schedule_enabled', 'p_available_from', 'p_available_to'],
     ['np_availability_schedule_enabled', 'np_available_from', 'np_available_to']
   ];
+  const IOS_NO_ZOOM_STYLE_ID = 'pashaProductDescriptionNoZoomStyle';
+
+  function ensureDescriptionNoZoomStyle() {
+    if (document.getElementById(IOS_NO_ZOOM_STYLE_ID)) return;
+
+    const style = document.createElement('style');
+    style.id = IOS_NO_ZOOM_STYLE_ID;
+    style.textContent = `
+      @media (max-width: 768px) {
+        #editorBody textarea#p_description_ar,
+        #editorBody textarea#p_description_ku,
+        #editorBody textarea#p_description_en,
+        #editorBody textarea#np_description_ar,
+        #editorBody textarea#np_description_ku,
+        #editorBody textarea#np_description_en {
+          font-size: 16px !important;
+          line-height: 1.55 !important;
+          -webkit-text-size-adjust: 100%;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   function removeFieldByInputId(id, selector) {
     const input = document.getElementById(id);
@@ -19,6 +42,8 @@
   }
 
   function cleanupEditor() {
+    ensureDescriptionNoZoomStyle();
+
     const body = document.getElementById('editorBody');
     if (!body) return;
 
@@ -44,6 +69,7 @@
   }
 
   function boot() {
+    ensureDescriptionNoZoomStyle();
     cleanupEditor();
     const modal = document.getElementById('editorModal');
     const body = document.getElementById('editorBody');
