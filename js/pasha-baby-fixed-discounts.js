@@ -20,11 +20,6 @@
     return Number.isFinite(amount) && amount > 0 ? amount : 0;
   };
 
-  const money = value => {
-    const amount = Math.max(0, Number(value || 0));
-    return `${amount.toLocaleString('en-US')} د.ع`;
-  };
-
   function discountIsLive(row, now = Date.now()) {
     if (!row || row.is_active === false || amountOf(row) <= 0) return false;
     const start = row.starts_at ? Date.parse(row.starts_at) : null;
@@ -46,19 +41,13 @@
 
     for (const rows of scopes) {
       if (!rows.length) continue;
-      return rows.reduce((best, row) =>
-        amountOf(row) > amountOf(best) ? row : best
-      );
+      return rows.reduce((best, row) => amountOf(row) > amountOf(best) ? row : best);
     }
     return null;
   }
 
   function originalPrice(option) {
-    const candidates = [
-      option?.__retailOriginalPrice,
-      option?.originalPrice,
-      option?.price
-    ];
+    const candidates = [option?.__retailOriginalPrice, option?.originalPrice, option?.price];
     for (const candidate of candidates) {
       const value = Number(candidate);
       if (Number.isFinite(value) && value >= 0) return value;
@@ -105,6 +94,21 @@
     return true;
   }
 
+  function ensureActionRow(card, action) {
+    if (!action) return null;
+    let row = action.closest('.pb-product-action-row');
+    if (!row) {
+      row = document.createElement('div');
+      row.className = 'pb-product-action-row';
+      action.parentNode?.insertBefore(row, action);
+      row.appendChild(action);
+    }
+
+    const preview = row.querySelector('[data-pb-color-preview]');
+    if (preview) row.parentNode?.insertBefore(preview, row);
+    return row;
+  }
+
   function decorateCards() {
     decorationFrame = 0;
     const DB = window.RESTBR_DB;
@@ -120,24 +124,25 @@
 
       const amount = Math.max(0, Number(product.discountAmount || 0));
       const action = card.querySelector('.sm-direct-add,.sm-choose-options');
-      let chip = action?.querySelector('.pb-fixed-discount-chip') || null;
+      const row = ensureActionRow(card, action);
+      let chip = row?.querySelector(':scope > .pb-fixed-discount-chip') || null;
 
-      if (amount > 0 && action) {
+      if (amount > 0 && row && action) {
         if (!chip) {
           chip = document.createElement('span');
           chip.className = 'pb-fixed-discount-chip';
-          action.appendChild(chip);
+          row.appendChild(chip);
         }
-        chip.textContent = `−${Math.round(amount).toLocaleString('en-US')}`;
-        chip.title = `خصم ${money(amount)}`;
-        chip.setAttribute('aria-label', `خصم ${money(amount)}`);
+        chip.textContent = 'خصم';
+        chip.title = 'يوجد خصم على هذا الصنف';
+        chip.setAttribute('aria-label', 'خصم');
       } else {
         chip?.remove();
       }
 
-      [...card.querySelectorAll('.sm-option')].forEach((row, index) => {
+      [...card.querySelectorAll('.sm-option')].forEach((optionRow, index) => {
         const option = (product.options || [])[index];
-        const buy = row.querySelector('.sm-option-buy');
+        const buy = optionRow.querySelector('.sm-option-buy');
         if (!option || !buy) return;
 
         const original = Number(option.originalPrice ?? option.__retailOriginalPrice ?? option.price ?? 0);
@@ -145,8 +150,8 @@
         if (amount > 0 && Number.isFinite(original) && original > current && current >= 0) {
           buy.innerHTML = `
             <span class="pb-price-stack">
-              <span class="pb-old-price">${money(original)}</span>
-              <b class="sm-price">${money(current)}</b>
+              <span class="pb-old-price">${Math.max(0, original).toLocaleString('en-US')} د.ع</span>
+              <b class="sm-price">${Math.max(0, current).toLocaleString('en-US')} د.ع</b>
             </span>`;
         }
       });
@@ -249,9 +254,7 @@
         event: '*',
         schema: 'public',
         table: 'discounts'
-      }, () => {
-        void reload({ render: true });
-      })
+      }, () => void reload({ render: true }))
       .subscribe();
   }
 
@@ -259,10 +262,7 @@
     const menu = document.getElementById('smMenu');
     if (!menu || menu.dataset.pbFixedDiscountObserver === '1') return;
     menu.dataset.pbFixedDiscountObserver = '1';
-    new MutationObserver(scheduleDecoration).observe(menu, {
-      childList: true,
-      subtree: true
-    });
+    new MutationObserver(scheduleDecoration).observe(menu, { childList: true, subtree: true });
   }
 
   function start() {
@@ -271,14 +271,10 @@
     void reload({ render: true });
   }
 
-  window.addEventListener('restbr:catalog-expanded', () => {
-    void reload({ render: true });
-  });
-
+  window.addEventListener('restbr:catalog-expanded', () => void reload({ render: true }));
   window.addEventListener('restbr:commerce-ready', () => {
     if (cachedDiscounts.length) publish({ render: true, detail: { afterCommerce: true } });
   });
-
   window.addEventListener('online', () => void reload({ render: true }));
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') void reload({ render: false });
