@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_CATEGORY_RETAIL_CLEANUP_V1__) return;
-  window.__PASHA_CATEGORY_RETAIL_CLEANUP_V1__ = true;
+  if (window.__PASHA_CATEGORY_RETAIL_CLEANUP_V11__) return;
+  window.__PASHA_CATEGORY_RETAIL_CLEANUP_V11__ = true;
 
   const q = selector => document.querySelector(selector);
 
@@ -75,10 +75,14 @@
 
   function removeScheduleBlock(id) {
     const control = document.getElementById(id);
-    if (!control) return;
+    if (!control) return false;
     const block = control.closest('.schedule-editor,.settings-card,.field');
-    if (block) block.remove();
-    else control.remove();
+    (block || control).remove();
+    return true;
+  }
+
+  function setTextIfChanged(el, value) {
+    if (el && el.textContent !== value) el.textContent = value;
   }
 
   function cleanCategoryEditor() {
@@ -86,23 +90,29 @@
     const body = q('#editorBody');
     if (!body || !modal?.classList.contains('open')) return;
 
-    // Pasha Baby is retail-only: category time scheduling is intentionally removed.
     removeScheduleBlock('c_availability_schedule_enabled');
     removeScheduleBlock('nc_availability_schedule_enabled');
 
-    // Remove the restaurant-only "hot" badge from bulk category controls.
     const hotSelect = q('#c_badge_is_hot');
-    hotSelect?.closest('.field')?.remove();
+    const hotField = hotSelect?.closest('.field');
+    if (hotField) hotField.remove();
 
     const popular = q('#c_badge_is_popular');
     const badgeBlock = popular?.closest('.schedule-editor');
-    if (badgeBlock) {
+    if (!badgeBlock) return;
+
+    if (!badgeBlock.classList.contains('pb-category-badges-clean')) {
       badgeBlock.classList.add('pb-category-badges-clean');
-      const headStrong = badgeBlock.querySelector('.schedule-editor-head strong');
-      const headSmall = badgeBlock.querySelector('.schedule-editor-head small');
-      if (headStrong) headStrong.textContent = '🏷 ليبلات أصناف القسم';
-      if (headSmall) headSmall.textContent = 'طبّق ليبل على كل أصناف القسم أو اتركه «بدون تغيير» حتى تبقى حالة كل صنف مثل ما هي.';
     }
+
+    setTextIfChanged(
+      badgeBlock.querySelector('.schedule-editor-head strong'),
+      '🏷 ليبلات أصناف القسم'
+    );
+    setTextIfChanged(
+      badgeBlock.querySelector('.schedule-editor-head small'),
+      'طبّق ليبل على كل أصناف القسم أو اتركه «بدون تغيير» حتى تبقى حالة كل صنف مثل ما هي.'
+    );
   }
 
   function boot() {
@@ -110,10 +120,24 @@
     cleanCategoryEditor();
 
     const target = q('#editorBody') || document.body;
-    const observer = new MutationObserver(cleanCategoryEditor);
+    let scheduled = false;
+    const scheduleClean = () => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        cleanCategoryEditor();
+      });
+    };
+
+    const observer = new MutationObserver(mutations => {
+      if (mutations.some(mutation => mutation.addedNodes.length || mutation.removedNodes.length)) {
+        scheduleClean();
+      }
+    });
     observer.observe(target, { childList: true, subtree: true });
 
-    document.addEventListener('click', () => setTimeout(cleanCategoryEditor, 0), true);
+    document.addEventListener('click', scheduleClean, true);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
