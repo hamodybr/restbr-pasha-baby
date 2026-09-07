@@ -126,16 +126,49 @@
     }
   }
 
+  async function detailedInvokeError(error) {
+    const fallback = String(error?.message || error || 'فشل الاتصال بخدمة الصور.');
+    try {
+      const response = error?.context;
+      if (response && typeof response.clone === 'function') {
+        const clone = response.clone();
+        const text = await clone.text();
+        if (text) {
+          try {
+            const parsed = JSON.parse(text);
+            const message = String(parsed?.error || parsed?.message || '').trim();
+            if (message) return message;
+          } catch (_) {
+            const clean = String(text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+            if (clean) return clean.slice(0, 500);
+          }
+        }
+        if (response.status) return `${fallback} (HTTP ${response.status})`;
+      }
+    } catch (_) {}
+    return fallback;
+  }
+
   async function invoke(action, body) {
     const sb = client();
     if (!sb?.functions?.invoke) throw new Error('خدمة رفع الصور غير جاهزة.');
-    const { data, error } = await sb.functions.invoke(FUNCTION_NAME, {
-      headers: { 'x-pb-action': action },
-      body
-    });
-    if (error) throw error;
-    if (data?.error) throw new Error(data.error);
-    return data || {};
+
+    let timeoutId = 0;
+    try {
+      const call = sb.functions.invoke(FUNCTION_NAME, {
+        headers: { 'x-pb-action': action },
+        body
+      });
+      const timeout = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error('انتهت مهلة الاتصال بخدمة الصور بعد 40 ثانية.')), 40000);
+      });
+      const { data, error } = await Promise.race([call, timeout]);
+      if (error) throw new Error(await detailedInvokeError(error));
+      if (data?.error) throw new Error(String(data.error));
+      return data || {};
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
   }
 
   async function upload({ inputId, urlInputId, progressId, productId }) {
@@ -233,9 +266,9 @@
       fill.style.width = `${percent.toFixed(2)}%`;
       value.textContent = `${fmt(current)} / 9 GB • ${Number(data.fileCount || 0)} صورة`;
       card.dataset.state = data.blocked ? 'blocked' : data.warning ? 'warn' : 'ok';
-    } catch (_) {
-      value.textContent = 'B2 قيد الإعداد';
-      card.dataset.state = 'ok';
+    } catch (error) {
+      value.textContent = String(error?.message || 'B2 قيد الإعداد').slice(0, 120);
+      card.dataset.state = 'blocked';
     }
   }
 
