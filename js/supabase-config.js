@@ -246,3 +246,16 @@ if (RESTBR_CONFIGURED) {
   script.async = false;
   document.head.appendChild(script);
 })();
+
+// Final Settings-only bridge: sync legacy Settings internals to the same
+// Pasha Baby global day/night theme and remove remaining gold/dark islands.
+(() => {
+  if (!RESTBR_IS_ADMIN_PATH) return;
+  if (document.getElementById('pashaBabyAdminSettingsThemeV4Script')) return;
+
+  const script = document.createElement('script');
+  script.id = 'pashaBabyAdminSettingsThemeV4Script';
+  script.src = 'js/pasha-baby-admin-settings-theme-v4.js?v=4.0';
+  script.async = false;
+  document.head.appendChild(script);
+})();
