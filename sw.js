@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v23";
+const CACHE_NAME = "restbr-pasha-baby-v24";
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -18,10 +18,12 @@ const CORE = [
   "./css/pasha-baby-brand-background.css?v=1.0",
   "./css/pasha-baby-footer-v2.css?v=2.0",
   "./css/pasha-baby-commerce.css?v=1.0",
+  "./css/pasha-baby-final-tweaks.css?v=1.0",
   "./js/offline-status.js?v=1.1",
   "./js/unavailable-card-state.js?v=1.1",
   "./js/app.js?v=18.1",
   "./js/pasha-baby-commerce.js?v=2.0",
+  "./js/pasha-baby-fixed-discounts.js?v=1.0",
   "./js/section-hours-highlight.js?v=1.0",
   "./js/product-image-fallback.js?v=1.3",
   "./js/price-safety.js?v=1.0",
@@ -32,7 +34,7 @@ const CORE = [
   "./js/url-safety.js?v=1.3",
   "./js/supabase-config.js?v=2.5",
   "./js/pasha-arabic-only.js?v=1.0",
-  "./js/live-prices.js?v=2.0",
+  "./js/live-prices.js?v=3.0",
   "./js/restaurant-hours.js?v=1.3",
   "./js/whatsapp-order-bullets.js?v=1.0",
   "./js/arabic-news-ticker.js?v=1.0",
