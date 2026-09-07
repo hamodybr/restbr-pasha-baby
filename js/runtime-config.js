@@ -152,7 +152,7 @@ window.RESTBR_CONFIG = Object.freeze({
 
   const script = document.createElement('script');
   script.id = 'pbProductDescriptionV2Script';
-  script.src = 'js/pasha-baby-product-description-v2.js?v=2.0';
+  script.src = 'js/pasha-baby-product-description-v2.js?v=2.3';
   script.defer = true;
   document.head.appendChild(script);
 })();
