@@ -1,18 +1,33 @@
-/* Pasha Baby final retail tweaks: no spicy label, fixed discount chip by cart action, longer cart toast. */
+/* Pasha Baby final retail tweaks: no spicy label, fixed discount chip beside cart action, longer cart toast. */
 
 /* Pasha Baby does not use the restaurant-style spicy/hot label. */
 #smMenu .sm-display-badge.red{
   display:none!important;
 }
 
-/* Fixed discounts use the compact action chip below, never an overlay on product labels. */
+/* Never overlay discount badges on the product photo/other labels. */
 #smMenu .pb-discount-badge,
 #smMenu .sm-live-discount{
   display:none!important;
 }
 
-#smMenu .sm-direct-add,
-#smMenu .sm-choose-options{
+/* Cart action + discount chip are siblings, not one control. */
+#smMenu .pb-product-action-row{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:stretch;
+  gap:6px;
+  margin-top:6px;
+  direction:rtl;
+}
+
+#smMenu .pb-product-action-row>.sm-direct-add,
+#smMenu .pb-product-action-row>.sm-choose-options{
+  flex:1 1 auto!important;
+  width:auto!important;
+  min-width:0!important;
+  margin:0!important;
   display:flex!important;
   align-items:center!important;
   justify-content:center!important;
@@ -24,19 +39,18 @@
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:18px;
-  margin-inline-start:2px;
-  padding:3px 6px;
+  min-width:42px;
+  min-height:28px;
+  margin:0;
+  padding:0 9px;
   border:1px solid #f0bfd0;
-  border-radius:999px;
+  border-radius:10px;
   background:#fff0f5;
   color:#b84f70;
-  font-size:8px;
+  font-size:9px;
   line-height:1;
   font-weight:1000;
-  letter-spacing:0;
   white-space:nowrap;
-  direction:ltr;
   box-shadow:0 2px 7px rgba(170,79,108,.08);
   pointer-events:none;
 }
@@ -54,14 +68,17 @@
 }
 
 @media(max-width:390px){
-  #smMenu .sm-direct-add,
-  #smMenu .sm-choose-options{
+  #smMenu .pb-product-action-row{gap:5px}
+
+  #smMenu .pb-product-action-row>.sm-direct-add,
+  #smMenu .pb-product-action-row>.sm-choose-options{
     gap:3px!important;
   }
 
   #smMenu .pb-fixed-discount-chip{
-    min-height:16px;
-    padding:3px 5px;
-    font-size:7.25px;
+    min-width:38px;
+    min-height:27px;
+    padding-inline:7px;
+    font-size:8px;
   }
 }
