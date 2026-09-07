@@ -1,9 +1,10 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_CATEGORY_RETAIL_CLEANUP_V11__) return;
-  window.__PASHA_CATEGORY_RETAIL_CLEANUP_V11__ = true;
+  if (window.__PASHA_CATEGORY_RETAIL_CLEANUP_V12__) return;
+  window.__PASHA_CATEGORY_RETAIL_CLEANUP_V12__ = true;
 
   const q = selector => document.querySelector(selector);
+  const qa = selector => [...document.querySelectorAll(selector)];
 
   function installStyle() {
     if (q('#pbCategoryRetailCleanupStyle')) return;
@@ -17,6 +18,7 @@
         border:1px solid var(--pba-border,rgba(47,139,115,.15))!important;
         background:var(--pba-surface-strong,#fff)!important;
         box-shadow:none!important;
+        overflow:visible!important;
       }
       #editorBody .pb-category-badges-clean .schedule-editor-head{margin-bottom:12px!important}
       #editorBody .pb-category-badges-clean .schedule-editor-head strong{
@@ -33,51 +35,91 @@
         display:grid!important;
         grid-template-columns:repeat(3,minmax(0,1fr))!important;
         gap:10px!important;
+        overflow:visible!important;
       }
       #editorBody .pb-category-badges-clean > .form-grid > .field{
         min-width:0!important;
-        gap:7px!important;
+        gap:8px!important;
         padding:10px!important;
         border:1px solid var(--pba-border,rgba(47,139,115,.15))!important;
         border-radius:13px!important;
         background:var(--pba-surface,#fffdfb)!important;
+        overflow:visible!important;
       }
       #editorBody .pb-category-badges-clean > .form-grid > .field > span{
+        display:block!important;
         color:var(--pba-ink,#2f3b42)!important;
-        font-size:11px!important;
-        line-height:1.55!important;
-        font-weight:800!important;
+        font-size:12px!important;
+        line-height:1.65!important;
+        font-weight:850!important;
+        white-space:normal!important;
+        overflow:visible!important;
+        text-overflow:clip!important;
       }
       #editorBody .pb-category-badges-clean select{
+        display:block!important;
         width:100%!important;
         min-width:0!important;
-        height:42px!important;
+        height:48px!important;
+        min-height:48px!important;
+        padding:0 14px!important;
         border-radius:11px!important;
         background:var(--pba-surface-strong,#fff)!important;
         color:var(--pba-ink,#2f3b42)!important;
         -webkit-text-fill-color:var(--pba-ink,#2f3b42)!important;
         border:1px solid var(--pba-border,rgba(47,139,115,.15))!important;
+        font-size:15px!important;
+        font-weight:750!important;
+        line-height:normal!important;
+        text-align:right!important;
+        text-align-last:right!important;
+        opacity:1!important;
+      }
+      #editorBody .pb-category-badges-clean select option{
+        color:var(--pba-ink,#2f3b42)!important;
+        background:var(--pba-surface-strong,#fff)!important;
       }
       body.admin-global-dark #editorBody .pb-category-badges-clean,
       body.admin-global-dark #editorBody .pb-category-badges-clean > .form-grid > .field{
         background:var(--pba-surface-strong,#18211f)!important;
       }
-      body.admin-global-dark #editorBody .pb-category-badges-clean select{
+      body.admin-global-dark #editorBody .pb-category-badges-clean select,
+      body.admin-global-dark #editorBody .pb-category-badges-clean select option{
         background:var(--pba-surface,#101715)!important;
       }
       @media(max-width:700px){
         #editorBody .pb-category-badges-clean > .form-grid{grid-template-columns:1fr!important}
-        #editorBody .pb-category-badges-clean > .form-grid > .field{padding:11px 12px!important}
+        #editorBody .pb-category-badges-clean > .form-grid > .field{padding:12px!important}
+        #editorBody .pb-category-badges-clean select{height:50px!important;min-height:50px!important;font-size:16px!important}
       }
     `;
     document.head.appendChild(style);
   }
 
+  function removeStaleScheduleFolds() {
+    qa('#editorBody details.pb-fold').forEach(details => {
+      const summary = details.querySelector(':scope > summary');
+      const label = String(summary?.textContent || '').replace(/\s+/g, ' ').trim();
+      if (/توفر القسم حسب الوقت|توفر.*القسم.*حسب.*الوقت/.test(label)) details.remove();
+    });
+  }
+
   function removeScheduleBlock(id) {
     const control = document.getElementById(id);
     if (!control) return false;
+
+    const fold = control.closest('details.pb-fold');
     const block = control.closest('.schedule-editor,.settings-card,.field');
     (block || control).remove();
+
+    if (fold?.isConnected) {
+      const foldBody = fold.querySelector(':scope > .pb-fold-body');
+      const hasRealContent = foldBody && [...foldBody.children].some(child => {
+        if (!(child instanceof Element)) return false;
+        return child.matches('input,select,textarea,button') || !!child.querySelector('input,select,textarea,button');
+      });
+      if (!hasRealContent) fold.remove();
+    }
     return true;
   }
 
@@ -92,12 +134,15 @@
 
     removeScheduleBlock('c_availability_schedule_enabled');
     removeScheduleBlock('nc_availability_schedule_enabled');
+    removeStaleScheduleFolds();
 
-    const hotSelect = q('#c_badge_is_hot');
-    const hotField = hotSelect?.closest('.field');
-    if (hotField) hotField.remove();
+    ['#c_badge_is_hot','#nc_badge_is_hot'].forEach(selector => {
+      const hotSelect = q(selector);
+      const hotField = hotSelect?.closest('.field');
+      if (hotField) hotField.remove();
+    });
 
-    const popular = q('#c_badge_is_popular');
+    const popular = q('#c_badge_is_popular') || q('#nc_badge_is_popular');
     const badgeBlock = popular?.closest('.schedule-editor');
     if (!badgeBlock) return;
 
