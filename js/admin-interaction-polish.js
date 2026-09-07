@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_ADMIN_INTERACTION_POLISH_V4__) return;
-  window.__PASHA_ADMIN_INTERACTION_POLISH_V4__ = true;
+  if (window.__PASHA_ADMIN_INTERACTION_POLISH_V5__) return;
+  window.__PASHA_ADMIN_INTERACTION_POLISH_V5__ = true;
 
   const q = (selector, root = document) => root.querySelector(selector);
   const qa = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -12,55 +12,79 @@
     style.id = 'pbAdminInteractionPolishStyle';
     style.textContent = `
       /*
-       * Inline lists now use the ORIGINAL SortableJS state classes from the
-       * old dedicated ordering window: sortable-chosen / sortable-ghost /
-       * sortable-drag / sortable-fallback.  Only the list location is new.
+       * Modern lifted-card reorder behaviour:
+       * the moving card itself follows the finger, while its old slot becomes
+       * only a very light placeholder. This keeps the old Sortable feel but
+       * removes the distracting duplicate-card look on iPhone.
        */
       #categoriesContainer .category-row,
       #productsContainer .product-row{
-        transition:background .18s ease,border-color .18s ease,box-shadow .18s ease,opacity .18s ease!important;
+        transition:
+          background .16s ease,
+          border-color .16s ease,
+          box-shadow .16s ease,
+          opacity .14s ease!important;
       }
 
-      #categoriesContainer .category-row.sortable-chosen,
-      #productsContainer .product-row.sortable-chosen{
-        border-color:var(--pba-primary,#2f8b73)!important;
-        background:linear-gradient(135deg,var(--pba-surface-strong,#fff),var(--pba-mint,#bfe5da))!important;
-        box-shadow:0 14px 30px color-mix(in srgb,var(--pba-primary,#2f8b73) 16%,transparent)!important;
-        transform:none!important;
-        z-index:6!important;
+      /* The original slot stays in the flow only as a faint placeholder. */
+      #categoriesContainer .category-row.sortable-chosen:not(.sortable-fallback),
+      #productsContainer .product-row.sortable-chosen:not(.sortable-fallback),
+      #categoriesContainer .category-row.sortable-ghost:not(.sortable-fallback),
+      #productsContainer .product-row.sortable-ghost:not(.sortable-fallback){
+        opacity:.08!important;
+        border:1px dashed color-mix(in srgb,var(--pba-primary,#2f8b73) 38%,transparent)!important;
+        background:color-mix(in srgb,var(--pba-primary,#2f8b73) 4%,transparent)!important;
+        box-shadow:none!important;
       }
 
-      #categoriesContainer .category-row.sortable-ghost,
-      #productsContainer .product-row.sortable-ghost{
-        opacity:.35!important;
-        border-color:var(--pba-primary,#2f8b73)!important;
-        background:linear-gradient(135deg,var(--pba-surface-strong,#fff),var(--pba-mint,#bfe5da))!important;
-        box-shadow:0 14px 30px color-mix(in srgb,var(--pba-primary,#2f8b73) 16%,transparent)!important;
-        transform:none!important;
-      }
-
-      #categoriesContainer .category-row.sortable-drag,
-      #productsContainer .product-row.sortable-drag,
+      /* This is the lifted card that physically follows the finger/mouse. */
       .sortable-fallback{
-        opacity:.72!important;
-        border-color:var(--pba-primary,#2f8b73)!important;
-        background:linear-gradient(135deg,var(--pba-surface-strong,#fff),var(--pba-mint,#bfe5da))!important;
-        box-shadow:0 14px 30px color-mix(in srgb,var(--pba-primary,#2f8b73) 18%,transparent)!important;
-        transform:none!important;
-      }
-
-      .sortable-fallback{
-        border:1px solid var(--pba-primary,#2f8b73)!important;
-        border-radius:13px!important;
+        opacity:.96!important;
+        scale:.955!important;
+        transform-origin:center center!important;
+        border:1px solid color-mix(in srgb,var(--pba-primary,#2f8b73) 68%,transparent)!important;
+        border-radius:15px!important;
+        background:linear-gradient(
+          135deg,
+          color-mix(in srgb,var(--pba-surface-strong,#fff) 94%,var(--pba-mint,#bfe5da)),
+          color-mix(in srgb,var(--pba-mint,#bfe5da) 48%,var(--pba-surface-strong,#fff))
+        )!important;
+        box-shadow:
+          0 20px 42px color-mix(in srgb,var(--pba-primary,#2f8b73) 20%,transparent),
+          0 5px 14px rgba(0,0,0,.10)!important;
         pointer-events:none!important;
+        cursor:grabbing!important;
         z-index:10050!important;
+        will-change:transform,scale!important;
+        transition:scale .12s ease,opacity .12s ease,box-shadow .12s ease!important;
+      }
+
+      body.admin-global-dark .sortable-fallback{
+        background:linear-gradient(
+          135deg,
+          color-mix(in srgb,var(--pba-surface-strong,#192826) 90%,var(--pba-mint)),
+          color-mix(in srgb,var(--pba-mint) 28%,var(--pba-surface-strong,#192826))
+        )!important;
+        box-shadow:
+          0 22px 46px rgba(0,0,0,.34),
+          0 6px 16px color-mix(in srgb,var(--pba-primary,#8fcdbd) 18%,transparent)!important;
+      }
+
+      /* Native/desktop drag class gets the same lifted feeling. */
+      #categoriesContainer .category-row.sortable-drag,
+      #productsContainer .product-row.sortable-drag{
+        opacity:.96!important;
+        scale:.955!important;
+        border-color:var(--pba-primary,#2f8b73)!important;
+        box-shadow:0 18px 38px color-mix(in srgb,var(--pba-primary,#2f8b73) 18%,transparent)!important;
       }
 
       .pb-list-drag-handle.drag-handle:active{transform:translateY(-50%)!important}
 
       @media(prefers-reduced-motion:reduce){
         #categoriesContainer .category-row,
-        #productsContainer .product-row{transition:none!important}
+        #productsContainer .product-row,
+        .sortable-fallback{transition:none!important}
       }
     `;
     document.head.appendChild(style);
@@ -91,8 +115,8 @@
     prepareOldHandles(container);
     clearNewerStateClasses(container);
 
-    /* Exact options used by the old ordering window. */
     sortable.option('animation', 180);
+    sortable.option('easing', 'cubic-bezier(.2,.8,.2,1)');
     sortable.option('handle', '.drag-handle');
     sortable.option('ghostClass', 'sortable-ghost');
     sortable.option('chosenClass', 'sortable-chosen');
@@ -101,17 +125,18 @@
     sortable.option('delayOnTouchOnly', true);
     sortable.option('touchStartThreshold', 4);
 
-    /* Restore SortableJS defaults for everything the newer inline version tuned. */
+    /* Force the touch fallback mirror so the lifted card follows the finger
+       smoothly on iPhone. The real list slot becomes the faint placeholder. */
     sortable.option('draggable', '>*');
-    sortable.option('forceFallback', false);
-    sortable.option('fallbackOnBody', false);
+    sortable.option('forceFallback', true);
+    sortable.option('fallbackOnBody', true);
     sortable.option('fallbackClass', 'sortable-fallback');
-    sortable.option('fallbackTolerance', 0);
-    sortable.option('swapThreshold', 1);
+    sortable.option('fallbackTolerance', 3);
+    sortable.option('swapThreshold', .65);
     sortable.option('invertSwap', false);
     sortable.option('scroll', true);
-    sortable.option('scrollSensitivity', 30);
-    sortable.option('scrollSpeed', 10);
+    sortable.option('scrollSensitivity', 70);
+    sortable.option('scrollSpeed', 12);
 
     return true;
   }
