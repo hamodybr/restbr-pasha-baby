@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_ADMIN_RETAIL_DISCOUNTS_V3__) return;
-  window.__PASHA_ADMIN_RETAIL_DISCOUNTS_V3__ = true;
+  if (window.__PASHA_ADMIN_RETAIL_DISCOUNTS_V4__) return;
+  window.__PASHA_ADMIN_RETAIL_DISCOUNTS_V4__ = true;
 
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
@@ -9,8 +9,7 @@
     categories: [],
     products: [],
     discounts: [],
-    refreshing: null,
-    observer: null
+    refreshing: null
   };
 
   const q = selector => document.querySelector(selector);
@@ -18,13 +17,18 @@
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[ch]));
   const nameOf = row => row?.name_ar || row?.name || 'بدون اسم';
+  const money = value => `${Math.max(0, Number(value || 0)).toLocaleString('en-US')} د.ع`;
 
-  async function fetchAll(table, select, order = 'sort_order', ascending = true) {
+  async function fetchAll(table, select = '*', order = 'sort_order', ascending = true) {
     const rows = [];
     let from = 0;
 
     while (true) {
-      let query = supabaseClient.from(table).select(select).range(from, from + PAGE_SIZE - 1);
+      let query = supabaseClient
+        .from(table)
+        .select(select)
+        .range(from, from + PAGE_SIZE - 1);
+
       if (order) query = query.order(order, { ascending });
       const { data, error } = await query;
       if (error) throw error;
@@ -40,10 +44,10 @@
   }
 
   function installStyles() {
-    if (q('#pbAdminDiscountStylesV3')) return;
+    if (q('#pbAdminDiscountStylesV4')) return;
 
     const style = document.createElement('style');
-    style.id = 'pbAdminDiscountStylesV3';
+    style.id = 'pbAdminDiscountStylesV4';
     style.textContent = `
       #pbDiscountQuickBtn{display:inline-flex;align-items:center;justify-content:center;gap:6px}
       #discountsSettingsPanel{margin:0 0 16px;border:1px solid rgba(216,169,88,.2);border-radius:16px;background:rgba(216,169,88,.035);overflow:hidden}
@@ -57,7 +61,7 @@
       #discountsSettingsPanel[open] .settings-chevron{transform:rotate(180deg)}
       #discountsSettingsPanel .settings-accordion-body{padding:0 14px 14px}
       #discountsSettingsPanel .pb-discount-box{padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(0,0,0,.16)}
-      #discountsSettingsPanel .pb-discount-box+ .pb-discount-box{margin-top:10px}
+      #discountsSettingsPanel .pb-discount-box+.pb-discount-box{margin-top:10px}
       #discountsSettingsPanel .pb-discount-head{margin-bottom:10px}
       #discountsSettingsPanel .pb-discount-head strong{display:block;color:#f0e5d4;font-size:12px;margin-bottom:3px}
       #discountsSettingsPanel .pb-discount-head small{display:block;color:#968f87;font-size:10px;line-height:1.55}
@@ -114,20 +118,20 @@
           <span class="settings-accordion-icon">🏷️</span>
           <span class="settings-accordion-title">
             <strong>الخصومات</strong>
-            <small>خصم على المتجر كامل أو قسم كامل أو صنف واحد.</small>
+            <small>خصم مبلغ ثابت على المتجر كامل أو قسم كامل أو صنف واحد.</small>
           </span>
           <span class="settings-chevron">⌄</span>
         </summary>
         <div class="settings-accordion-body">
           <div class="pb-discount-box">
             <div class="pb-discount-head">
-              <strong>إنشاء خصم</strong>
-              <small>السعر الأصلي يبقى محفوظ، والسعر بعد الخصم يظهر تلقائياً للزبون وفي السلة.</small>
+              <strong>إنشاء خصم ثابت</strong>
+              <small>مثال: اكتب 5,000 وسيتم تنزيل 5,000 د.ع من سعر كل صنف يشمله الخصم.</small>
             </div>
             <div class="pb-discount-grid">
               <div class="pb-discount-field">
-                <label for="pbDiscountPercent">نسبة الخصم %</label>
-                <input id="pbDiscountPercent" type="number" min="1" max="100" step="1" inputmode="decimal" placeholder="مثال: 20">
+                <label for="pbDiscountAmount">قيمة الخصم (د.ع)</label>
+                <input id="pbDiscountAmount" type="number" min="1" step="250" inputmode="numeric" placeholder="مثال: 5000">
               </div>
               <div class="pb-discount-field">
                 <label for="pbDiscountScope">مكان الخصم</label>
@@ -156,7 +160,7 @@
           <div class="pb-discount-box">
             <div class="pb-discount-head">
               <strong>الخصومات الحالية</strong>
-              <small>الأولوية: الصنف ثم القسم ثم المتجر. إذا تكرر نفس المستوى يعتمد أعلى خصم.</small>
+              <small>الأولوية: الصنف ثم القسم ثم المتجر. إذا تكرر نفس المستوى يعتمد أكبر مبلغ خصم.</small>
             </div>
             <div id="pbDiscountList"><div class="pb-discount-empty">جاري التحميل...</div></div>
           </div>
@@ -192,6 +196,7 @@
     }
 
     bindPanel(panel);
+    renderTargets();
     return panel;
   }
 
@@ -248,51 +253,47 @@
     if (!box) return;
 
     if (!state.discounts.length) {
-      box.innerHTML = '<div class="pb-discount-empty">لا توجد خصومات حالياً.</div>';
+      box.innerHTML = '<div class="pb-discount-empty">لا توجد خصومات ثابتة حالياً.</div>';
       return;
     }
 
     box.innerHTML = state.discounts.map(row => `
       <div class="pb-discount-row ${row.is_active ? '' : 'off'}" data-discount-id="${esc(row.id)}">
         <div>
-          <strong>-${Number(row.discount_percent || 0)}%</strong>
+          <strong>−${esc(money(row.discount_amount))}</strong>
           <small>${esc(scopeLabel(row))} • ${row.is_active ? 'مفعّل' : 'متوقف'}</small>
           <small>${esc(timingLabel(row))}</small>
         </div>
         <div class="pb-discount-actions">
           <button type="button" data-discount-toggle="${esc(row.id)}">${row.is_active ? 'إيقاف' : 'تفعيل'}</button>
-          <button type="button" class="danger" data-discount-delete="${esc(row.id)}">حذف</button>
+          <button class="danger" type="button" data-discount-delete="${esc(row.id)}">حذف</button>
         </div>
       </div>`).join('');
-  }
-
-  async function loadReferenceData() {
-    const [categories, products] = await Promise.all([
-      fetchAll('categories', 'id,name_ar,sort_order,is_visible,is_active', 'sort_order', true),
-      fetchAll('products', 'id,category_id,name_ar,sort_order,is_visible,is_active', 'sort_order', true)
-    ]);
-
-    state.categories = categories.filter(row => row.is_visible !== false && row.is_active !== false);
-    state.products = products.filter(row => row.is_visible !== false && row.is_active !== false);
-    renderTargets();
-  }
-
-  async function loadDiscounts() {
-    state.discounts = await fetchAll('discounts', '*', 'created_at', false);
-    renderList();
   }
 
   async function refresh() {
     if (state.refreshing) return state.refreshing;
 
     state.refreshing = (async () => {
-      status('جاري تحديث الخصومات...');
       try {
-        await Promise.all([loadReferenceData(), loadDiscounts()]);
-        status(`تم تحميل ${state.discounts.length} خصم.`);
+        status('جاري تحديث الخصومات...');
+        const [categories, products, discounts] = await Promise.all([
+          fetchAll('categories', 'id,name_ar,sort_order', 'sort_order', true),
+          fetchAll('products', 'id,name_ar,sort_order', 'sort_order', true),
+          fetchAll('discounts', 'id,discount_amount,discount_percent,price_mode,scope_type,target_id,is_active,starts_at,ends_at,created_at', 'created_at', false)
+        ]);
+
+        state.categories = categories;
+        state.products = products;
+        state.discounts = discounts.filter(row => Number(row.discount_amount || 0) > 0);
+        renderTargets();
+        renderList();
+        status('تم تحديث الخصومات.');
+        return true;
       } catch (error) {
-        console.error('RETAIL DISCOUNTS LOAD ERROR', error);
-        status('فشل تحميل الخصومات: ' + (error?.message || error), false);
+        console.error('PASHA FIXED DISCOUNT ADMIN REFRESH:', error);
+        status(`تعذر تحميل الخصومات: ${error?.message || error}`, false);
+        return false;
       }
     })().finally(() => {
       state.refreshing = null;
@@ -309,22 +310,24 @@
   }
 
   async function createDiscount() {
-    const percent = Number(q('#pbDiscountPercent')?.value);
+    const amount = Math.round(Number(q('#pbDiscountAmount')?.value));
     const scope = q('#pbDiscountScope')?.value || 'restaurant';
     const targetId = scope === 'restaurant' ? null : (q('#pbDiscountTarget')?.value || null);
     const startsAt = dateInputToIso('#pbDiscountStartsAt');
     const endsAt = dateInputToIso('#pbDiscountEndsAt');
 
-    if (!Number.isFinite(percent) || percent <= 0 || percent > 100) {
-      status('اكتب نسبة صحيحة من 1 إلى 100.', false);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      status('اكتب مبلغ خصم صحيح أكبر من صفر.', false);
       return;
     }
+
     if (scope !== 'restaurant' && !targetId) {
-      status('اختر القسم أو الصنف.', false);
+      status('اختر القسم أو الصنف الذي سيطبق عليه الخصم.', false);
       return;
     }
-    if (startsAt && endsAt && new Date(endsAt) <= new Date(startsAt)) {
-      status('وقت النهاية لازم يكون بعد وقت البداية.', false);
+
+    if (startsAt && endsAt && Date.parse(endsAt) <= Date.parse(startsAt)) {
+      status('وقت انتهاء الخصم يجب أن يكون بعد وقت البداية.', false);
       return;
     }
 
@@ -334,63 +337,74 @@
       button.textContent = 'جاري الحفظ...';
     }
 
-    status('جاري حفظ الخصم...');
-    const { error } = await supabaseClient.from('discounts').insert({
-      discount_percent: percent,
-      price_mode: 'both',
-      scope_type: scope,
-      target_id: targetId,
-      is_active: true,
-      starts_at: startsAt,
-      ends_at: endsAt
-    });
+    try {
+      status('جاري حفظ الخصم...');
+      const { error } = await supabaseClient.from('discounts').insert({
+        discount_amount: amount,
+        discount_percent: 0,
+        price_mode: 'both',
+        scope_type: scope,
+        target_id: targetId,
+        is_active: true,
+        starts_at: startsAt,
+        ends_at: endsAt
+      });
 
-    if (button) {
-      button.disabled = false;
-      button.textContent = 'إضافة الخصم';
+      if (error) throw error;
+
+      if (q('#pbDiscountAmount')) q('#pbDiscountAmount').value = '';
+      if (q('#pbDiscountStartsAt')) q('#pbDiscountStartsAt').value = '';
+      if (q('#pbDiscountEndsAt')) q('#pbDiscountEndsAt').value = '';
+      await refresh();
+      status(`تمت إضافة خصم بقيمة ${money(amount)} ✓`);
+    } catch (error) {
+      console.error('PASHA FIXED DISCOUNT CREATE:', error);
+      status(`فشل حفظ الخصم: ${error?.message || error}`, false);
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = 'إضافة الخصم';
+      }
     }
-
-    if (error) {
-      console.error('RETAIL DISCOUNT CREATE ERROR', error);
-      status('فشل حفظ الخصم: ' + (error.message || error), false);
-      return;
-    }
-
-    q('#pbDiscountPercent').value = '';
-    q('#pbDiscountStartsAt').value = '';
-    q('#pbDiscountEndsAt').value = '';
-    await loadDiscounts();
-    status('تم حفظ الخصم ✓');
   }
 
   async function toggleDiscount(id) {
     const row = state.discounts.find(item => String(item.id) === String(id));
     if (!row) return;
 
+    status('جاري تحديث الخصم...');
     const { error } = await supabaseClient
       .from('discounts')
       .update({ is_active: !row.is_active, updated_at: new Date().toISOString() })
-      .eq('id', id);
+      .eq('id', row.id);
 
     if (error) {
-      status('فشل تغيير حالة الخصم: ' + (error.message || error), false);
+      status(`فشل تحديث الخصم: ${error.message}`, false);
       return;
     }
 
-    await loadDiscounts();
-    status(row.is_active ? 'تم إيقاف الخصم.' : 'تم تفعيل الخصم ✓');
+    await refresh();
+    status('تم تحديث حالة الخصم.');
   }
 
   async function deleteDiscount(id) {
-    if (!confirm('حذف هذا الخصم نهائياً؟')) return;
+    const row = state.discounts.find(item => String(item.id) === String(id));
+    if (!row) return;
 
-    const { error } = await supabaseClient.from('discounts').delete().eq('id', id);
+    if (!window.confirm(`حذف خصم ${money(row.discount_amount)}؟`)) return;
+
+    status('جاري حذف الخصم...');
+    const { error } = await supabaseClient
+      .from('discounts')
+      .delete()
+      .eq('id', row.id);
+
     if (error) {
-      status('فشل حذف الخصم: ' + (error.message || error), false);
+      status(`فشل حذف الخصم: ${error.message}`, false);
       return;
     }
 
-    await loadDiscounts();
+    await refresh();
     status('تم حذف الخصم.');
   }
 
@@ -437,6 +451,9 @@
   }
 
   function installResilience() {
+    if (document.documentElement.dataset.pbFixedDiscountDelegation === '1') return;
+    document.documentElement.dataset.pbFixedDiscountDelegation = '1';
+
     document.addEventListener('click', event => {
       const quick = event.target.closest('#pbDiscountQuickBtn');
       if (quick) {
@@ -448,17 +465,9 @@
 
       if (event.target.closest('[data-admin-nav="products"],[data-go-view="products"]')) {
         setTimeout(ensureUi, 40);
-        setTimeout(ensureUi, 250);
+        setTimeout(ensureUi, 220);
       }
     }, true);
-
-    const view = q('#viewProducts');
-    if (!view || state.observer) return;
-
-    state.observer = new MutationObserver(() => {
-      if (!q('#pbDiscountQuickBtn') || !q('#discountsSettingsPanel')) queueMicrotask(ensureUi);
-    });
-    state.observer.observe(view, { childList: true, subtree: true });
   }
 
   function boot() {
@@ -470,9 +479,8 @@
     const timer = setInterval(() => {
       tries += 1;
       const ready = ensureUi();
-      if (ready) installResilience();
-      if (ready || tries > 120) clearInterval(timer);
-    }, 100);
+      if (ready || tries > 50) clearInterval(timer);
+    }, 120);
   }
 
   if (document.readyState === 'loading') {
