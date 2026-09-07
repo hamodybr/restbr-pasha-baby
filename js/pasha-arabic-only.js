@@ -78,7 +78,7 @@
     loadScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.1', true);
     loadScript('pashaBabyImageOptimizerScript', 'js/admin-image-optimizer.js?v=1.0', true);
     loadScript('pashaBabyLargeCatalogScript', 'js/admin-large-catalog.js?v=1.0', true);
-    loadScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=3.0', true);
+    loadScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=4.0', true);
     loadScript('pashaBabyProductColorsScript', 'js/admin-product-colors.js?v=3.0', true);
   }
 
