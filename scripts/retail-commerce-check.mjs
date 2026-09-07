@@ -21,6 +21,7 @@ const forbidText = (file, marker, label = marker) => {
 
 const files = [
   'js/pasha-baby-commerce.js',
+  'js/pasha-baby-fixed-discounts.js',
   'js/live-prices.js',
   'js/admin-large-catalog.js',
   'js/admin-retail-discounts.js',
@@ -42,26 +43,31 @@ for (const file of files) {
 
 requireText('index.html', 'css/pasha-baby-commerce.css?v=1.0', 'retail commerce stylesheet');
 requireText('index.html', 'js/pasha-baby-commerce.js?v=2.0', 'retail commerce v2 runtime');
-requireText('index.html', 'js/live-prices.js?v=2.0', 'discount-aware live prices v2 runtime');
+requireText('index.html', 'js/live-prices.js?v=3.0', 'fixed-discount-aware live prices v3 runtime');
+requireText('index.html', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'fixed discount storefront runtime');
+requireText('index.html', 'css/pasha-baby-final-tweaks.css?v=1.0', 'final Pasha UI tweaks');
 forbidText('index.html', 'css/english-card-ltr.css', 'English-only card stylesheet');
 forbidText('index.html', 'js/english-news-ticker.js', 'English ticker layer');
 forbidText('index.html', 'id="smLangs"', 'storefront language picker');
+
 requireMatch('sw.js', /restbr-pasha-baby-v\d+/, 'retail cache generation');
 requireText('sw.js', 'css/pasha-baby-commerce.css?v=1.0', 'cached commerce stylesheet');
+requireText('sw.js', 'css/pasha-baby-final-tweaks.css?v=1.0', 'cached final Pasha UI tweaks');
 requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.0', 'cached commerce v2 runtime');
-requireText('sw.js', 'js/live-prices.js?v=2.0', 'cached live prices v2 runtime');
+requireText('sw.js', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'cached fixed discount runtime');
+requireText('sw.js', 'js/live-prices.js?v=3.0', 'cached live prices v3 runtime');
 requireText('sw.js', 'js/pasha-arabic-only.js?v=1.0', 'cached Arabic-only policy');
 
 requireText('js/supabase-config.js', 'js/pasha-arabic-only.js?v=1.0', 'Arabic-only policy loader');
 forbidText('js/supabase-config.js', 'language-settings.js', 'legacy multilingual loader');
 requireText('js/pasha-arabic-only.js', "localStorage.setItem('RESTBR_LANG_V1', 'ar')", 'Arabic language lock');
 requireText('js/pasha-arabic-only.js', 'data-pasha-multilang-hidden', 'admin multilingual field suppression');
-requireText('js/pasha-arabic-only.js', 'js/admin-retail-discounts.js?v=3.0', 'retail discount admin v3 loader');
+requireText('js/pasha-arabic-only.js', 'js/admin-retail-discounts.js?v=4.0', 'fixed retail discount admin v4 loader');
 requireText('js/pasha-arabic-only.js', 'js/admin-product-colors.js?v=3.0', 'product colors admin v3 loader');
 requireText('js/pasha-arabic-only.js', 'js/admin-large-catalog.js?v=1.0', 'large catalog admin loader');
 
-requireText('js/pasha-baby-commerce.js', "scope_type === 'product'", 'product discount priority');
-requireText('js/pasha-baby-commerce.js', "scope_type === 'category'", 'category discount priority');
+requireText('js/pasha-baby-commerce.js', "scope_type === 'product'", 'product discount priority compatibility');
+requireText('js/pasha-baby-commerce.js', "scope_type === 'category'", 'category discount priority compatibility');
 requireText('js/pasha-baby-commerce.js', "scope_type === 'restaurant'", 'store-wide discount compatibility');
 requireText('js/pasha-baby-commerce.js', 'scheduleNextDiscountBoundary', 'automatic scheduled discount boundary refresh');
 requireText('js/pasha-baby-commerce.js', 'observer.observe(menu, { childList: true, subtree: false })', 'non-recursive commerce DOM observer');
@@ -72,20 +78,38 @@ requireText('js/pasha-baby-commerce.js', 'product_colors', 'customer product col
 requireText('js/pasha-baby-commerce.js', 'dataset.retailBypass', 'existing cart integration guard');
 requireText('js/pasha-baby-commerce.js', "compose('ar', 'اللون')", 'Arabic color carried into cart');
 
-requireText('js/live-prices.js', '__RESTBR_LIVE_PRICES_V2__', 'live price v2 singleton guard');
+requireText('js/pasha-baby-fixed-discounts.js', '__PASHA_BABY_FIXED_DISCOUNTS_V1__', 'fixed discount storefront guard');
+requireText('js/pasha-baby-fixed-discounts.js', 'discount_amount', 'fixed amount DB field');
+requireText('js/pasha-baby-fixed-discounts.js', 'product.discountAmount = amount', 'fixed amount stored on product');
+requireText('js/pasha-baby-fixed-discounts.js', 'fixedPrice(original, amount)', 'fixed amount price calculation');
+requireText('js/pasha-baby-fixed-discounts.js', 'pb-fixed-discount-chip', 'discount chip beside add action');
+requireText('js/pasha-baby-fixed-discounts.js', 'restbr:fixed-discounts-ready', 'fixed discount readiness event');
+requireText('js/pasha-baby-fixed-discounts.js', "scope_type === 'product'", 'fixed product priority');
+requireText('js/pasha-baby-fixed-discounts.js', "scope_type === 'category'", 'fixed category priority');
+requireText('js/pasha-baby-fixed-discounts.js', "scope_type === 'restaurant'", 'fixed store priority');
+
+requireText('js/live-prices.js', '__RESTBR_LIVE_PRICES_V3__', 'live price v3 singleton guard');
 requireText('js/live-prices.js', 'fetchAllPriceRows', 'paginated live price sync');
 requireText('js/live-prices.js', 'retailPrice(product, originalPrice)', 'discount-aware live price calculation');
+requireText('js/live-prices.js', 'product?.discountAmount', 'fixed amount live price calculation');
+requireText('js/live-prices.js', 'restbr:fixed-discounts-ready', 'fixed amount live price resync');
 requireText('js/live-prices.js', 'restbr:catalog-expanded', 'large catalog live price resync');
 
 requireText('js/admin-large-catalog.js', 'PAGE_SIZE = 1000', 'paginated admin page size');
 requireText('js/admin-large-catalog.js', 'from(table)', 'generic admin pagination loader');
 
-requireText('js/admin-retail-discounts.js', '__PASHA_ADMIN_RETAIL_DISCOUNTS_V3__', 'discount admin v3 guard');
+requireText('js/admin-retail-discounts.js', '__PASHA_ADMIN_RETAIL_DISCOUNTS_V4__', 'discount admin v4 guard');
+requireText('js/admin-retail-discounts.js', 'pbDiscountAmount', 'fixed amount input');
+requireText('js/admin-retail-discounts.js', 'قيمة الخصم (د.ع)', 'fixed amount Arabic label');
+requireText('js/admin-retail-discounts.js', 'discount_amount: amount', 'fixed amount insert');
+requireText('js/admin-retail-discounts.js', 'discount_percent: 0', 'legacy percent neutralization');
 requireText('js/admin-retail-discounts.js', "event.target.closest('#pbDiscountQuickBtn')", 'resilient discount button delegation');
 requireText('js/admin-retail-discounts.js', 'body.admin-global-light #discountsSettingsPanel', 'discount light-theme support');
 requireText('js/admin-retail-discounts.js', "price_mode: 'both'", 'retail discount backward-compatible price mode');
 requireText('js/admin-retail-discounts.js', 'starts_at: startsAt', 'discount start scheduling');
 requireText('js/admin-retail-discounts.js', 'ends_at: endsAt', 'discount end scheduling');
+forbidText('js/admin-retail-discounts.js', 'pbDiscountPercent', 'percentage discount input');
+forbidText('js/admin-retail-discounts.js', 'نسبة الخصم %', 'percentage discount wording');
 forbidText('js/admin-retail-discounts.js', 'داخل المطعم', 'restaurant dining wording');
 forbidText('js/admin-retail-discounts.js', 'سفري', 'takeaway wording');
 requireText('js/admin-retail-discounts.js', 'المتجر كامل', 'store-wide discount wording');
@@ -98,6 +122,11 @@ forbidText(
   "document.getElementById('discountsSettingsPanel')?.remove();",
   'discount panel deletion / Products freeze loop'
 );
+
+requireText('css/pasha-baby-final-tweaks.css', '#smMenu .sm-display-badge.red', 'hot/spicy label suppression');
+requireText('css/pasha-baby-final-tweaks.css', '#smMenu .pb-discount-badge', 'old overlay discount suppression');
+requireText('css/pasha-baby-final-tweaks.css', '.pb-fixed-discount-chip', 'fixed discount action chip styling');
+requireText('css/pasha-baby-final-tweaks.css', '1.15s', 'extended add-to-cart toast visibility');
 
 requireText('js/admin-product-colors.js', '__PASHA_ADMIN_PRODUCT_COLORS_V3__', 'product colors v3 guard');
 requireText('js/admin-product-colors.js', 'pbProductColorsEditor', 'colors embedded inside product editor');
@@ -113,13 +142,20 @@ forbidText('js/admin-product-colors.js', 'pb-edit-color-name-en', 'visible Engli
 forbidText('js/admin-product-colors.js', 'pb-edit-color-name-ku', 'visible Kurdish color field');
 forbidText('js/admin-product-colors.js', 'productColorsSettingsPanel', 'standalone product colors tools panel');
 
-const migration = 'supabase/migrations/20260906230500_pasha_retail_discounts_and_colors.sql';
-requireText(migration, 'create table if not exists public.product_colors', 'product_colors table');
-requireText(migration, 'alter table public.product_colors enable row level security', 'product_colors RLS');
-requireText(migration, 'private.can_manage_menu()', 'admin-only color writes');
-requireText(migration, 'starts_at timestamptz', 'discount starts_at');
-requireText(migration, 'ends_at timestamptz', 'discount ends_at');
-requireText(migration, 'on delete cascade', 'color cleanup with product deletion');
+const colorsMigration = 'supabase/migrations/20260906230500_pasha_retail_discounts_and_colors.sql';
+requireText(colorsMigration, 'create table if not exists public.product_colors', 'product_colors table');
+requireText(colorsMigration, 'alter table public.product_colors enable row level security', 'product_colors RLS');
+requireText(colorsMigration, 'private.can_manage_menu()', 'admin-only color writes');
+requireText(colorsMigration, 'starts_at timestamptz', 'discount starts_at');
+requireText(colorsMigration, 'ends_at timestamptz', 'discount ends_at');
+requireText(colorsMigration, 'on delete cascade', 'color cleanup with product deletion');
+
+const fixedMigration = 'supabase/migrations/20260907113000_pasha_fixed_amount_discounts.sql';
+requireText(fixedMigration, 'discount_amount numeric(12,2)', 'fixed discount amount column');
+requireText(fixedMigration, 'discounts_discount_amount_check', 'fixed discount amount constraint');
+requireText(fixedMigration, 'discounts_discount_value_check', 'discount value compatibility constraint');
+requireText(fixedMigration, 'discount_percent >= 0', 'zeroed percent compatibility');
+requireText(fixedMigration, 'set is_active = false', 'legacy percentage discounts disabled');
 
 if (failures.length) {
   console.error('\nRetail commerce audit failed:');
@@ -127,4 +163,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('✓ Pasha Baby Arabic-only retail commerce audit passed');
+console.log('✓ Pasha Baby Arabic-only fixed-discount retail commerce audit passed');
