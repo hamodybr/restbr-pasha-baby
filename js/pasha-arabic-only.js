@@ -141,6 +141,8 @@
     loadScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=4.0', true);
     loadScript('pashaBabyProductColorsScript', 'js/admin-product-colors.js?v=3.0', true);
     loadScript('pashaProductEditorCleanupScript', 'js/pasha-admin-product-editor-cleanup.js?v=1.0', true);
+    loadScript('pashaCategoryRetailCleanupScript', 'js/admin-category-retail-cleanup.js?v=1.0', true);
+    loadScript('pashaNewProductColorsScript', 'js/admin-new-product-colors.js?v=1.0', true);
   }
 
   function boot() {
