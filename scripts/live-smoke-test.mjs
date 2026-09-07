@@ -159,8 +159,16 @@ await expectText('/js/pasha-arabic-only.js', [
   "localStorage.setItem('RESTBR_LANG_V1', 'ar')",
   'js/admin-retail-discounts.js?v=4.0',
   'js/admin-product-colors.js?v=3.0',
+  'js/pasha-admin-product-editor-cleanup.js?v=1.0',
   'js/arabic-news-ticker.js?v=1.0'
 ], 'Arabic-only policy');
+
+await expectText('/js/pasha-admin-product-editor-cleanup.js', [
+  'p_is_hot',
+  'np_is_hot',
+  'p_availability_schedule_enabled',
+  'np_availability_schedule_enabled'
+], 'Pasha retail product editor cleanup');
 
 await expectText('/js/admin-retail-discounts.js', [
   '__PASHA_ADMIN_RETAIL_DISCOUNTS_V4__',
@@ -173,18 +181,20 @@ await expectText('/js/pasha-baby-fixed-discounts.js', [
   '__PASHA_BABY_FIXED_DISCOUNTS_V1__',
   'discount_amount',
   'product.discountAmount = amount',
-  'pb-fixed-discount-chip'
+  'pb-product-action-row',
+  "chip.textContent = 'خصم'"
 ], 'fixed amount storefront discounts');
 
 await expectText('/css/pasha-baby-final-tweaks.css', [
   '#smMenu .sm-display-badge.red',
   '#smMenu .pb-discount-badge',
+  '.pb-product-action-row',
   '.pb-fixed-discount-chip',
   '1.15s'
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v24',
+  'restbr-pasha-baby-v25',
   'js/restbr-hardening.js',
   'js/pasha-arabic-only.js?v=1.0',
   'js/pasha-baby-fixed-discounts.js?v=1.0',
