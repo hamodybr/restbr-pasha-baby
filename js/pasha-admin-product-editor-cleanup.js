@@ -9,6 +9,7 @@
     ['np_availability_schedule_enabled', 'np_available_from', 'np_available_to']
   ];
   const IOS_NO_ZOOM_STYLE_ID = 'pashaProductDescriptionNoZoomStyle';
+  const COMPACT_SETTINGS_STYLE_ID = 'pashaProductCompactSettingsStyle';
 
   function ensureDescriptionNoZoomStyle() {
     if (document.getElementById(IOS_NO_ZOOM_STYLE_ID)) return;
@@ -32,6 +33,81 @@
     document.head.appendChild(style);
   }
 
+  function ensureCompactSettingsStyle() {
+    if (document.getElementById(COMPACT_SETTINGS_STYLE_ID)) return;
+
+    const style = document.createElement('style');
+    style.id = COMPACT_SETTINGS_STYLE_ID;
+    style.textContent = `
+      #editorBody .checks {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        margin: 12px 0 !important;
+        align-items: stretch !important;
+      }
+
+      #editorBody .checks .check-card {
+        min-width: 0 !important;
+        min-height: 50px !important;
+        margin: 0 !important;
+        padding: 9px 10px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 7px !important;
+        border-radius: 12px !important;
+        font-size: 14px !important;
+        line-height: 1.25 !important;
+        font-weight: 750 !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+      }
+
+      #editorBody .checks .check-card input[type="checkbox"] {
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px !important;
+        flex: 0 0 20px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        accent-color: #3f8f80;
+      }
+
+      #editorBody .checks .check-card:has(input[type="checkbox"]:checked) {
+        border-color: rgba(63, 143, 128, .26) !important;
+        background: rgba(219, 240, 234, .34) !important;
+      }
+
+      @media (max-width: 650px) {
+        #editorBody .checks {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 7px !important;
+          margin: 10px 0 12px !important;
+        }
+
+        #editorBody .checks .check-card {
+          min-height: 48px !important;
+          padding: 8px 7px !important;
+          gap: 6px !important;
+          border-radius: 11px !important;
+          font-size: 13px !important;
+          letter-spacing: 0 !important;
+        }
+
+        #editorBody .checks .check-card input[type="checkbox"] {
+          width: 19px !important;
+          height: 19px !important;
+          min-width: 19px !important;
+          flex-basis: 19px !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function removeFieldByInputId(id, selector) {
     const input = document.getElementById(id);
     if (!input) return false;
@@ -43,6 +119,7 @@
 
   function cleanupEditor() {
     ensureDescriptionNoZoomStyle();
+    ensureCompactSettingsStyle();
 
     const body = document.getElementById('editorBody');
     if (!body) return;
@@ -70,6 +147,7 @@
 
   function boot() {
     ensureDescriptionNoZoomStyle();
+    ensureCompactSettingsStyle();
     cleanupEditor();
     const modal = document.getElementById('editorModal');
     const body = document.getElementById('editorBody');
