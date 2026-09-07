@@ -1,10 +1,14 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_ADMIN_PROGRESSIVE_DISCLOSURE_V1__) return;
-  window.__PASHA_ADMIN_PROGRESSIVE_DISCLOSURE_V1__ = true;
+  if (window.__PASHA_ADMIN_PROGRESSIVE_DISCLOSURE_V2__) return;
+  window.__PASHA_ADMIN_PROGRESSIVE_DISCLOSURE_V2__ = true;
 
   const q = (selector, root = document) => root.querySelector(selector);
   const qa = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const REMOVED_CATEGORY_SCHEDULE_IDS = [
+    'c_availability_schedule_enabled','c_available_from','c_available_to',
+    'nc_availability_schedule_enabled','nc_available_from','nc_available_to'
+  ];
 
   function installStyle() {
     if (q('#pbAdminProgressiveDisclosureStyle')) return;
@@ -139,6 +143,23 @@
     return String(el?.textContent || '').replace(/\s+/g, ' ').trim();
   }
 
+  function isRemovedCategoryScheduleBlock(block) {
+    if (!(block instanceof Element)) return false;
+    if (REMOVED_CATEGORY_SCHEDULE_IDS.some(id => block.querySelector(`#${id}`))) return true;
+    return /توفر القسم حسب الوقت|توفر.*القسم.*حسب.*الوقت/.test(text(block));
+  }
+
+  function cleanupRemovedCategoryFolds(root = document) {
+    qa('details.pb-fold', root).forEach(details => {
+      const summaryText = text(q(':scope > summary', details));
+      const body = q(':scope > .pb-fold-body', details);
+      const source = body?.querySelector(':scope > .pb-fold-source');
+      const removedCategorySummary = /توفر القسم حسب الوقت|توفر.*القسم.*حسب.*الوقت/.test(summaryText);
+      const empty = !body || !source || !source.isConnected;
+      if (removedCategorySummary || empty) details.remove();
+    });
+  }
+
   function sourceMeta(block, fallbackTitle, fallbackSubtitle) {
     const head = q('.schedule-editor-head', block) || q('.pb-editor-colors-head', block) || q('.pb-npc-head', block);
     const directLabel = block.matches('.field') ? q(':scope > label', block) : null;
@@ -154,6 +175,7 @@
 
   function foldElement(block, options = {}) {
     if (!(block instanceof Element)) return null;
+    if (isRemovedCategoryScheduleBlock(block)) return null;
     if (block.dataset.pbFoldWrapped === '1' || block.closest('details.pb-fold')) return block.closest('details.pb-fold');
     if (!block.parentElement) return null;
 
@@ -212,8 +234,11 @@
     const body = q('#editorBody');
     if (!body || !modal?.classList.contains('open')) return;
 
+    cleanupRemovedCategoryFolds(body);
+
     // Category bulk badges in both edit/add flows (when present).
     qa('.pb-category-badges-clean,.schedule-editor', body).forEach(block => {
+      if (isRemovedCategoryScheduleBlock(block)) return;
       const content = text(block);
       if (!/ليبلات.*أصناف القسم|ليبلات أصناف القسم|ليبلات كل أصناف القسم/.test(content)) return;
       foldElement(block, {
@@ -261,6 +286,7 @@
 
     // Any other long schedule/advanced block: progressively disclose only when it has several controls.
     qa('.schedule-editor', body).forEach(block => {
+      if (isRemovedCategoryScheduleBlock(block)) return;
       if (block.dataset.pbFoldWrapped === '1' || block.closest('details.pb-fold')) return;
       const controls = qa('input,select,textarea,button', block).length;
       if (controls < 3) return;
@@ -270,6 +296,8 @@
         subtitle: meta.subtitle || 'افتح هذا القسم فقط عند الحاجة.'
       });
     });
+
+    cleanupRemovedCategoryFolds(body);
   }
 
   function revealTarget(target) {
@@ -284,6 +312,7 @@
   function process(root = document) {
     installStyle();
     closeDefaultDetails(root);
+    cleanupRemovedCategoryFolds(root);
     foldEditorSections();
   }
 
