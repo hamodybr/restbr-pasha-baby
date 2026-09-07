@@ -143,6 +143,7 @@
     loadScript('pashaProductEditorCleanupScript', 'js/pasha-admin-product-editor-cleanup.js?v=1.0', true);
     loadScript('pashaCategoryRetailCleanupScript', 'js/admin-category-retail-cleanup.js?v=1.0', true);
     loadScript('pashaNewProductColorsScript', 'js/admin-new-product-colors.js?v=1.0', true);
+    loadScript('pashaAdminProgressiveDisclosureScript', 'js/admin-progressive-disclosure.js?v=1.0', true);
   }
 
   function boot() {
