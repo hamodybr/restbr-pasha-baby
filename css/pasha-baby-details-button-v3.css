@@ -1,0 +1,76 @@
+/* PASHA BABY — CARD DETAILS BUTTON V3
+   Keep description to one compact line; use a separate Details control at the card bottom-left. */
+
+html body #smMenu .sm-card .pb-product-description{
+  display:block!important;
+  width:100%!important;
+  margin:-1px 0 5px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
+}
+
+/* The old inline "More" trigger remains as the sheet controller, but is hidden visually. */
+html body #smMenu .sm-card .pb-product-description-more{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  clip:rect(0 0 0 0)!important;
+  clip-path:inset(50%)!important;
+  white-space:nowrap!important;
+  border:0!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+
+html body #smMenu .sm-card .pb-card-details-btn{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  flex:0 0 auto!important;
+  align-self:flex-end!important;
+  width:auto!important;
+  min-width:38px!important;
+  min-height:20px!important;
+  margin:5px 0 0!important;
+  margin-right:auto!important;
+  margin-left:0!important;
+  padding:0 7px!important;
+  border:1px solid rgba(100,140,132,.16)!important;
+  border-radius:7px!important;
+  background:rgba(255,255,255,.72)!important;
+  color:#607a75!important;
+  -webkit-text-fill-color:#607a75!important;
+  box-shadow:0 2px 8px rgba(70,98,92,.05)!important;
+  font:inherit!important;
+  font-size:7.5px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  cursor:pointer!important;
+}
+
+html body #smMenu .sm-card .pb-card-details-btn:active{
+  transform:translateY(1px)!important;
+}
+
+@media(max-width:359px){
+  html body #smMenu .sm-card .pb-card-details-btn{
+    min-width:35px!important;
+    min-height:19px!important;
+    padding-inline:6px!important;
+    font-size:7px!important;
+  }
+}
+
+@media(min-width:600px){
+  html body #smMenu .sm-card .pb-card-details-btn{
+    min-width:42px!important;
+    min-height:22px!important;
+    padding-inline:8px!important;
+    font-size:8px!important;
+  }
+}
