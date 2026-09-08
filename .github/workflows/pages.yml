@@ -79,7 +79,7 @@ jobs:
 
           path = Path('index.html')
           html = path.read_text(encoding='utf-8')
-          image_url = 'https://pashababy.restbr.com/assets/pasha-social-preview.jpg?v=20260906-5'
+          image_url = 'https://pashababyiq.com/assets/pasha-social-preview.jpg?v=20260906-5'
 
           html = re.sub(r'(<meta\s+property=["\']og:image["\']\s+content=["\'])[^"\']+(["\'])', rf'\g<1>{image_url}\2', html, flags=re.I)
           html = re.sub(r'(<meta\s+property=["\']og:image:secure_url["\']\s+content=["\'])[^"\']+(["\'])', rf'\g<1>{image_url}\2', html, flags=re.I)
@@ -96,7 +96,7 @@ jobs:
 
           test -s assets/pasha-social-preview.jpg
           test "$(stat -c%s assets/pasha-social-preview.jpg)" -le 307200
-          grep -Fq 'https://pashababy.restbr.com/assets/pasha-social-preview.jpg?v=20260906-5' index.html
+          grep -Fq 'https://pashababyiq.com/assets/pasha-social-preview.jpg?v=20260906-5' index.html
           grep -Fq 'property="og:image:width" content="600"' index.html
           grep -Fq 'property="og:image:height" content="600"' index.html
 
@@ -124,10 +124,10 @@ jobs:
 
       - name: Verify deployed Pasha Baby site
         env:
-          SMOKE_BASE_URL: https://pashababy.restbr.com
+          SMOKE_BASE_URL: https://pashababyiq.com
         run: node scripts/live-smoke-test.mjs
 
       - name: Verify live retail commerce
         env:
-          SMOKE_BASE_URL: https://pashababy.restbr.com
+          SMOKE_BASE_URL: https://pashababyiq.com
         run: node scripts/live-commerce-smoke.mjs
