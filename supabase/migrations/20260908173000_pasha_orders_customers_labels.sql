@@ -78,15 +78,9 @@ create table if not exists private.pasha_order_rate_limit (
 );
 revoke all on table private.pasha_order_rate_limit from public, anon, authenticated;
 
--- Reuse the project's existing updated_at helper when available.
-do $$
-begin
-  if to_regprocedure('private.set_updated_at()') is not null then
-    execute 'drop trigger if exists customers_updated_at on public.customers';
-    execute 'create trigger customers_updated_at before update on public.customers for each row execute function private.set_updated_at()';
-  end if;
-end;
-$$;
+-- customers.updated_at is maintained explicitly by the server-side order RPC.
+-- We intentionally avoid dropping/recreating an optional trigger here because
+-- that DDL can take a heavyweight table lock on an active production project.
 
 alter table public.customers enable row level security;
 alter table public.orders enable row level security;
@@ -258,11 +252,9 @@ begin
     raise exception 'Client token is required';
   end if;
 
-  -- Serialize retries for the same client token so two simultaneous requests
-  -- cannot race past the idempotency check and create a unique-index error.
-  perform pg_catalog.pg_advisory_xact_lock(
-    pg_catalog.hashtextextended(v_client_token::text, 0)
-  );
+  -- Serialize simultaneous retries for the same client token without locking
+  -- unrelated orders. This prevents a unique-key race from surfacing as 500.
+  perform pg_advisory_xact_lock(hashtextextended(v_client_token::text, 0));
 
   select o.id, o.order_number, o.total, o.customer_id
   into v_existing
