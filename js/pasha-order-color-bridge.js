@@ -44,6 +44,10 @@
       .join(' | ');
   }
 
+  function itemName(item) {
+    return String(item?.name?.ar || item?.name?.ku || item?.name?.en || 'منتج').trim();
+  }
+
   function resolveColor(item) {
     const product = productFor(item);
     const colors = Array.isArray(product?.colors) ? product.colors.filter(color => color?.isAvailable !== false) : [];
@@ -140,6 +144,13 @@
     return cart;
   }
 
+  function colorSummary(cart) {
+    const colored = cart.filter(item => String(item?.colorName || '').trim());
+    if (!colored.length) return '';
+    const lines = colored.map(item => `• ${itemName(item)} × ${Math.max(1, Number(item.qty || 1))}: ${String(item.colorName).trim()}`);
+    return `🎨 الألوان:\n${lines.join('\n')}`;
+  }
+
   document.addEventListener('click', event => {
     if (!event.target.closest?.('#smSendWhatsApp')) return;
     enrichCart();
@@ -155,13 +166,18 @@
     try {
       const payload = JSON.parse(init.body);
       const cart = enrichCart();
+      const summary = colorSummary(cart);
       if (Array.isArray(payload?.items)) {
         payload.items = payload.items.map((item, index) => ({
           ...item,
           colorId: String(cart[index]?.colorId || ''),
         }));
-        init = { ...init, body: JSON.stringify(payload) };
       }
+      if (summary) {
+        const currentNotes = String(payload.notes || '').trim();
+        payload.notes = `${summary}${currentNotes ? `\n\n${currentNotes}` : ''}`.slice(0, 500);
+      }
+      init = { ...init, body: JSON.stringify(payload) };
     } catch (_) {}
 
     return originalFetch(input, init);
