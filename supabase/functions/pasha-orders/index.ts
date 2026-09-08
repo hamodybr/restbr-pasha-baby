@@ -10,6 +10,16 @@ const ALLOWED_ORIGINS = new Set([
 const MAX_ITEMS = 100;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const E164_RE = /^\+[1-9][0-9]{7,14}$/;
+const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+const DAY_FROM_SHORT: Record<string, string> = {
+  Sun: "sun",
+  Mon: "mon",
+  Tue: "tue",
+  Wed: "wed",
+  Thu: "thu",
+  Fri: "fri",
+  Sat: "sat",
+};
 
 type CatalogProduct = {
   id: string;
@@ -57,6 +67,15 @@ type DiscountRow = {
   ends_at?: string | null;
 };
 
+type RestaurantSettings = {
+  is_open?: boolean | null;
+  orders_enabled?: boolean | null;
+  delivery_enabled?: boolean | null;
+  pickup_enabled?: boolean | null;
+  restaurant_schedule_mode?: string | null;
+  restaurant_schedule?: unknown;
+};
+
 function cors(req: Request) {
   const origin = req.headers.get("origin") || "";
   const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "https://pashababyiq.com";
@@ -92,7 +111,7 @@ function normalizePhone(value: unknown) {
   raw = raw.replace(/[\s().-]+/g, "");
   if (raw.startsWith("00")) raw = "+" + raw.slice(2);
 
-  let digits = raw.replace(/\D/g, "");
+  const digits = raw.replace(/\D/g, "");
   if (/^07\d{9}$/.test(digits)) return "+964" + digits.slice(1);
   if (/^7\d{9}$/.test(digits)) return "+964" + digits;
   if (/^9647\d{9}$/.test(digits)) return "+" + digits;
@@ -101,16 +120,40 @@ function normalizePhone(value: unknown) {
   return "";
 }
 
-function localMinutesBaghdad() {
-  const parts = new Intl.DateTimeFormat("en-GB", {
+function safeObject(value: unknown): Record<string, any> {
+  if (value && typeof value === "object" && !Array.isArray(value)) return value as Record<string, any>;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? parsed as Record<string, any>
+        : {};
+    } catch (_) {}
+  }
+  return {};
+}
+
+function baghdadNow() {
+  const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Baghdad",
+    weekday: "short",
+    year: "2-digit",
+    month: "2-digit",
+    day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23",
   }).formatToParts(new Date());
-  const hour = Number(parts.find((p) => p.type === "hour")?.value || 0);
-  const minute = Number(parts.find((p) => p.type === "minute")?.value || 0);
-  return hour * 60 + minute;
+  const get = (type: string) => parts.find((part) => part.type === type)?.value || "";
+  return {
+    day: DAY_FROM_SHORT[get("weekday")] || "sun",
+    minute: Number(get("hour") || 0) * 60 + Number(get("minute") || 0),
+    stamp: `${get("year")}${get("month")}${get("day")}`,
+  };
+}
+
+function localMinutesBaghdad() {
+  return baghdadNow().minute;
 }
 
 function timeToMinutes(value: unknown) {
@@ -129,6 +172,56 @@ function scheduleAllows(row: { availability_schedule_enabled?: boolean | null; a
   if (start === null || end === null || start === end) return true;
   const now = localMinutesBaghdad();
   return start < end ? now >= start && now < end : now >= start || now < end;
+}
+
+function sameDaySlotOpen(slotValue: unknown, nowMinute: number) {
+  const slot = safeObject(slotValue);
+  if (slot.enabled === false) return false;
+  const start = timeToMinutes(slot.open);
+  const end = timeToMinutes(slot.close);
+  if (start === null || end === null) return false;
+  if (start === end) return true;
+  if (start < end) return nowMinute >= start && nowMinute < end;
+  return nowMinute >= start;
+}
+
+function carriesFromPreviousDay(slotValue: unknown, nowMinute: number) {
+  const slot = safeObject(slotValue);
+  if (slot.enabled === false) return false;
+  const start = timeToMinutes(slot.open);
+  const end = timeToMinutes(slot.close);
+  if (start === null || end === null || start === end) return false;
+  return start > end && nowMinute < end;
+}
+
+function restaurantScheduleAllows(modeValue: unknown, scheduleValue: unknown) {
+  const mode = String(modeValue || "always").toLowerCase();
+  if (mode === "always") return true;
+
+  const schedule = safeObject(scheduleValue);
+  const now = baghdadNow();
+
+  if (mode === "daily") {
+    const slot = safeObject(schedule.daily);
+    if (slot.enabled === false) return false;
+    const start = timeToMinutes(slot.open);
+    const end = timeToMinutes(slot.close);
+    if (start === null || end === null) return false;
+    if (start === end) return true;
+    return start < end
+      ? now.minute >= start && now.minute < end
+      : now.minute >= start || now.minute < end;
+  }
+
+  if (mode === "weekly") {
+    const weekly = safeObject(schedule.weekly);
+    const todayIndex = DAY_KEYS.indexOf(now.day);
+    if (sameDaySlotOpen(weekly[now.day], now.minute)) return true;
+    const previousKey = DAY_KEYS[(todayIndex + 6) % 7];
+    return carriesFromPreviousDay(weekly[previousKey], now.minute);
+  }
+
+  return true;
 }
 
 function discountLive(row: DiscountRow, now = Date.now()) {
@@ -163,7 +256,7 @@ function displayName(row: { name_ar?: string | null; name_ku?: string | null; na
 }
 
 function orderNumberFromToken(clientToken: string) {
-  const stamp = new Date().toISOString().slice(2, 10).replaceAll("-", "");
+  const stamp = baghdadNow().stamp;
   return `PB-${stamp}-${clientToken.replaceAll("-", "").slice(0, 8).toUpperCase()}`;
 }
 
@@ -202,6 +295,9 @@ Deno.serve(async (req: Request) => {
     if (!phoneE164 || !E164_RE.test(phoneE164)) return json(req, { ok: false, error: "Valid phone number is required" }, 400);
     if (!["delivery", "pickup"].includes(orderType)) return json(req, { ok: false, error: "Invalid order type" }, 400);
     if (orderType === "delivery" && !address) return json(req, { ok: false, error: "Delivery address is required" }, 400);
+    if (locationUrl && !/^https:\/\/maps\.google\.com\/\?q=-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$/i.test(locationUrl)) {
+      return json(req, { ok: false, error: "Invalid location reference" }, 400);
+    }
     if (!UUID_RE.test(clientToken)) return json(req, { ok: false, error: "Invalid client token" }, 400);
     if (rawItems.length < 1 || rawItems.length > MAX_ITEMS) return json(req, { ok: false, error: "Invalid item count" }, 400);
 
@@ -221,7 +317,13 @@ Deno.serve(async (req: Request) => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    const [productsResult, optionsResult, discountsResult] = await Promise.all([
+    const [settingsResult, productsResult, optionsResult, discountsResult] = await Promise.all([
+      admin
+        .from("restaurant_settings")
+        .select("is_open,orders_enabled,delivery_enabled,pickup_enabled,restaurant_schedule_mode,restaurant_schedule,updated_at")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
       admin
         .from("products")
         .select("id,category_id,name_ar,name_ku,name_en,base_price,is_active,is_visible,is_available,availability_schedule_enabled,available_from,available_to")
@@ -237,9 +339,24 @@ Deno.serve(async (req: Request) => {
         .eq("is_active", true),
     ]);
 
+    if (settingsResult.error) throw settingsResult.error;
     if (productsResult.error) throw productsResult.error;
     if (optionsResult.error) throw optionsResult.error;
     if (discountsResult.error) throw discountsResult.error;
+
+    const settings = settingsResult.data as RestaurantSettings | null;
+    if (!settings || settings.is_open === false || settings.orders_enabled === false) {
+      throw new Error("Ordering is currently unavailable");
+    }
+    if (!restaurantScheduleAllows(settings.restaurant_schedule_mode, settings.restaurant_schedule)) {
+      throw new Error("Ordering is currently unavailable according to opening hours");
+    }
+    if (orderType === "delivery" && settings.delivery_enabled === false) {
+      throw new Error("Delivery is currently unavailable");
+    }
+    if (orderType === "pickup" && settings.pickup_enabled === false) {
+      throw new Error("Pickup is currently unavailable");
+    }
 
     const products = (productsResult.data || []) as CatalogProduct[];
     const options = (optionsResult.data || []) as CatalogOption[];
@@ -329,7 +446,7 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error("PASHA ORDERS ERROR", error);
     const message = error instanceof Error ? error.message : String(error);
-    const safeMessage = /not available|invalid|required|exist|reference|quantity|catalog/i.test(message)
+    const safeMessage = /not available|unavailable|invalid|required|exist|reference|quantity|catalog|opening hours|delivery|pickup/i.test(message)
       ? message
       : "Could not save order";
     return json(req, { ok: false, error: safeMessage }, 400);
