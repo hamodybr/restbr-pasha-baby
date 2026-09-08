@@ -35,13 +35,22 @@ requireText(migration, 'security definer', 'server-only transactional RPC');
 requireText(migration, 'revoke all on function public.create_pasha_order', 'RPC public revoke');
 requireText(migration, 'grant execute on function public.create_pasha_order', 'service role RPC grant');
 requireText(migration, 'with (security_invoker = true)', 'RLS-respecting customer summary');
+requireText(migration, 'private.pasha_order_rate_limit', 'private order rate-limit buckets');
+requireText(migration, 'claim_pasha_order_rate_limit', 'server-only order rate limiter');
+requireText(migration, 'accepted_count < 240', 'global per-minute abuse ceiling');
+requireText(migration, 'accepted_count < 5', 'per-phone per-minute abuse ceiling');
+requireText(migration, 'pg_advisory_xact_lock', 'idempotency concurrency lock');
 forbidText(migration, 'grant insert on public.orders to anon', 'public order insert');
 forbidText(migration, 'grant select on public.customers to anon', 'public customer read');
+forbidText(migration, 'grant execute on function public.claim_pasha_order_rate_limit(text) to anon', 'public rate-limit RPC execution');
 
 requireText(edge, 'https://pashababyiq.com', 'production origin');
 requireText(edge, 'SUPABASE_SERVICE_ROLE_KEY', 'server-only service role');
+requireText(edge, 'MAX_BODY_BYTES', 'request body size cap');
 requireText(edge, 'effectiveDiscount', 'authoritative fixed discount calculation');
 requireText(edge, 'create_pasha_order', 'transactional order RPC call');
+requireText(edge, 'claim_pasha_order_rate_limit', 'rate limiter call');
+requireText(edge, 'existingOrderResult', 'duplicate fast-path');
 requireText(edge, 'One of the products is not available right now', 'availability validation');
 requireText(edge, 'Origin not allowed', 'origin rejection');
 requireText(edge, 'restaurant_schedule_mode', 'server opening-hours validation');
@@ -50,6 +59,7 @@ requireText(edge, 'settings.delivery_enabled === false', 'server delivery valida
 requireText(edge, 'settings.pickup_enabled === false', 'server pickup validation');
 requireText(edge, 'Invalid location reference', 'server delivery location validation');
 requireText(edge, 'baghdadNow().stamp', 'Baghdad order-number date');
+requireText(edge, 'تمت محاولات طلب كثيرة خلال دقيقة واحدة', 'Arabic rate-limit response');
 
 requireText('js/pasha-order-submit.js', "const CART_KEY = 'RESTBR_CART_V1'", 'existing cart integration');
 requireText('js/pasha-order-submit.js', '/functions/v1/pasha-orders', 'order Edge Function call');
