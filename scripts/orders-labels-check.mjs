@@ -15,7 +15,17 @@ const forbidText = (file, text, label = text) => {
   if (exists(file) && read(file).includes(text)) fail(`${file}: forbidden ${label}`);
 };
 
-for (const file of ['js/pasha-order-submit.js', 'js/admin-orders-customers.js', 'js/pasha-arabic-only.js', 'js/admin-role-ui.js']) {
+for (const file of [
+  'js/pasha-order-submit.js',
+  'js/admin-orders-customers.js',
+  'js/pasha-arabic-only.js',
+  'js/admin-role-ui.js',
+  'js/admin-orders-enhancements.js',
+  'js/pasha-order-color-bridge.js',
+  'js/pasha-color-image-gallery.js',
+  'js/admin-color-image-upload.js',
+  'js/admin-orders-nav-hotfix.js'
+]) {
   if (!exists(file)) { fail(`${file}: missing`); continue; }
   try {
     execFileSync(process.execPath, ['--check', path.join(root, file)], { stdio: 'pipe' });
@@ -25,7 +35,9 @@ for (const file of ['js/pasha-order-submit.js', 'js/admin-orders-customers.js', 
 }
 
 const migration = 'supabase/migrations/20260908173000_pasha_orders_customers_labels.sql';
+const deleteMigration = 'supabase/migrations/20260908204500_orders_customers_delete_permissions.sql';
 const edge = 'supabase/functions/pasha-orders/index.ts';
+const colorImageEdge = 'supabase/functions/b2-color-images/index.ts';
 
 requireText(migration, 'create table if not exists public.customers', 'customers table');
 requireText(migration, 'phone_e164 text not null unique', 'unique E.164 phone identifier');
@@ -43,6 +55,12 @@ requireText(migration, 'pg_advisory_xact_lock', 'idempotency concurrency lock');
 forbidText(migration, 'grant insert on public.orders to anon', 'public order insert');
 forbidText(migration, 'grant select on public.customers to anon', 'public customer read');
 forbidText(migration, 'grant execute on function public.claim_pasha_order_rate_limit(text) to anon', 'public rate-limit RPC execution');
+
+requireText(deleteMigration, 'restbr_orders_delete', 'order delete RLS policy');
+requireText(deleteMigration, 'pasha_customers_delete', 'customer delete RLS policy');
+requireText(deleteMigration, 'private.can_manage_orders()', 'delete permission guard');
+requireText(deleteMigration, 'grant delete on public.orders to authenticated', 'authenticated order delete grant');
+requireText(deleteMigration, 'grant delete on public.customers to authenticated', 'authenticated customer delete grant');
 
 requireText(edge, 'https://pashababyiq.com', 'production origin');
 requireText(edge, 'SUPABASE_SERVICE_ROLE_KEY', 'server-only service role');
@@ -74,10 +92,30 @@ requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard'
 requireText('js/admin-orders-customers.js', 'PDF / طباعة 100×150', 'label action');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.0", 'public order loader');
 requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.0", 'admin orders loader');
+requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.0", 'color persistence loader');
+requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=1.0", 'color gallery loader');
 requireText('js/admin-role-ui.js', "'pasha-orders'", 'orders view role allowlist');
 requireText('js/admin-role-ui.js', "'pasha-customers'", 'customers view role allowlist');
 requireText('js/admin-role-ui.js', "const ORDERS_ROLES = new Set(['super_admin','owner','manager'])", 'orders/customer role policy');
 requireText('js/admin-role-ui.js', "qa('.bottom-nav .nav-btn')", 'dynamic bottom-nav column count');
+
+requireText('js/admin-orders-nav-hotfix.js', 'js/admin-orders-enhancements.js?v=1.0', 'orders UI enhancement loader');
+requireText('js/admin-orders-nav-hotfix.js', 'js/admin-color-image-upload.js?v=1.0', 'color image upload loader');
+requireText('js/admin-orders-enhancements.js', "from('orders').delete()", 'order delete action');
+requireText('js/admin-orders-enhancements.js', "from('customers').delete()", 'customer delete action');
+requireText('js/admin-orders-enhancements.js', 'body.admin-global-dark #viewPashaOrders', 'orders dark theme');
+requireText('js/admin-orders-enhancements.js', 'body.admin-global-dark #viewPashaCustomers', 'customers dark theme');
+requireText('js/pasha-order-color-bridge.js', 'colorSummary(cart)', 'color summary persistence');
+requireText('js/pasha-order-color-bridge.js', 'payload.notes =', 'invoice color note persistence');
+requireText('js/pasha-order-color-bridge.js', "ar: ['اللون'", 'Arabic explicit color label');
+requireText('js/pasha-color-image-gallery.js', 'pb-color-choice-image', 'color thumbnail chooser');
+requireText('js/pasha-color-image-gallery.js', 'pb-color-large-preview', 'selected color image preview');
+requireText('js/admin-color-image-upload.js', "sb.functions.invoke('b2-color-images'", 'B2 color image upload invocation');
+requireText('js/admin-color-image-upload.js', '.pb-edit-color-image,.pb-npc-image', 'existing and new product color image fields');
+requireText(colorImageEdge, 'COLOR_PREFIX = `${B2_PREFIX}color-assets/`', 'isolated color image B2 prefix');
+requireText(colorImageEdge, 'MAX_UPLOAD_BYTES = 700 * 1024', 'color image max upload size');
+requireText(colorImageEdge, 'requireMenuManager', 'color image admin authorization');
+requireText(colorImageEdge, 'HARD_STOP_BYTES = 9 * 1024 * 1024 * 1024', 'B2 hard stop');
 
 if (failures.length) {
   console.error('\nOrders/customers/labels audit failed:');
@@ -85,4 +123,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('✓ Pasha Baby orders, customers and 100x150 label audit passed');
+console.log('✓ Pasha Baby orders, customers, colors and 100x150 label audit passed');
