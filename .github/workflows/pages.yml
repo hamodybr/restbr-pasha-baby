@@ -24,6 +24,9 @@ jobs:
       - name: Retail commerce audit
         run: node scripts/retail-commerce-check.mjs
 
+      - name: Orders customers and labels audit
+        run: node scripts/orders-labels-check.mjs
+
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: validate
