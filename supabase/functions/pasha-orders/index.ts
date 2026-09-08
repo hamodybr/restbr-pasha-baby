@@ -8,6 +8,7 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 
 const MAX_ITEMS = 100;
+const MAX_BODY_BYTES = 64 * 1024;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const E164_RE = /^\+[1-9][0-9]{7,14}$/;
 const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
@@ -260,6 +261,31 @@ function orderNumberFromToken(clientToken: string) {
   return `PB-${stamp}-${clientToken.replaceAll("-", "").slice(0, 8).toUpperCase()}`;
 }
 
+function publicErrorMessage(message: string) {
+  if (/opening hours|Ordering is currently unavailable/i.test(message)) {
+    return "الطلبات غير متاحة حالياً.";
+  }
+  if (/Delivery is currently unavailable/i.test(message)) {
+    return "خدمة التوصيل غير متاحة حالياً.";
+  }
+  if (/Pickup is currently unavailable/i.test(message)) {
+    return "خدمة الاستلام غير متاحة حالياً.";
+  }
+  if (/products? .*not available|product categories? .*not available|selected options? .*not available/i.test(message)) {
+    return "أحد المنتجات أو الخيارات في السلة غير متوفر حالياً.";
+  }
+  if (/no longer exist|Invalid product reference|Invalid option reference/i.test(message)) {
+    return "أحد المنتجات في السلة تغيّر أو لم يعد موجوداً. حدّث الصفحة وحاول مرة ثانية.";
+  }
+  if (/Invalid quantity|Invalid item count|Invalid catalog price/i.test(message)) {
+    return "تعذر التحقق من تفاصيل السلة. حدّث الصفحة وحاول مرة ثانية.";
+  }
+  if (/Invalid location reference/i.test(message)) {
+    return "الموقع المرسل غير صالح. أعد تحديد الموقع وحاول مرة ثانية.";
+  }
+  return "تعذر تسجيل الطلب. حاول مرة ثانية.";
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin") || "";
   if (req.method === "OPTIONS") {
@@ -270,6 +296,11 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json(req, { ok: false, error: "Method not allowed" }, 405);
   if (!ALLOWED_ORIGINS.has(origin)) return json(req, { ok: false, error: "Origin not allowed" }, 403);
 
+  const contentLength = Number(req.headers.get("content-length") || 0);
+  if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
+    return json(req, { ok: false, error: "الطلب أكبر من الحد المسموح." }, 413);
+  }
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
@@ -279,7 +310,7 @@ Deno.serve(async (req: Request) => {
     try {
       body = await req.json();
     } catch {
-      return json(req, { ok: false, error: "Invalid JSON" }, 400);
+      return json(req, { ok: false, error: "بيانات الطلب غير صالحة." }, 400);
     }
 
     const name = cleanText(body.name, 80);
@@ -291,15 +322,15 @@ Deno.serve(async (req: Request) => {
     const clientToken = cleanText(body.clientToken, 64).toLowerCase();
     const rawItems = Array.isArray(body.items) ? body.items : [];
 
-    if (!name) return json(req, { ok: false, error: "Customer name is required" }, 400);
-    if (!phoneE164 || !E164_RE.test(phoneE164)) return json(req, { ok: false, error: "Valid phone number is required" }, 400);
-    if (!["delivery", "pickup"].includes(orderType)) return json(req, { ok: false, error: "Invalid order type" }, 400);
-    if (orderType === "delivery" && !address) return json(req, { ok: false, error: "Delivery address is required" }, 400);
+    if (!name) return json(req, { ok: false, error: "الاسم مطلوب." }, 400);
+    if (!phoneE164 || !E164_RE.test(phoneE164)) return json(req, { ok: false, error: "رقم الهاتف غير صحيح." }, 400);
+    if (!["delivery", "pickup"].includes(orderType)) return json(req, { ok: false, error: "نوع الطلب غير صحيح." }, 400);
+    if (orderType === "delivery" && !address) return json(req, { ok: false, error: "العنوان مطلوب للتوصيل." }, 400);
     if (locationUrl && !/^https:\/\/maps\.google\.com\/\?q=-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$/i.test(locationUrl)) {
-      return json(req, { ok: false, error: "Invalid location reference" }, 400);
+      return json(req, { ok: false, error: "الموقع المرسل غير صالح." }, 400);
     }
-    if (!UUID_RE.test(clientToken)) return json(req, { ok: false, error: "Invalid client token" }, 400);
-    if (rawItems.length < 1 || rawItems.length > MAX_ITEMS) return json(req, { ok: false, error: "Invalid item count" }, 400);
+    if (!UUID_RE.test(clientToken)) return json(req, { ok: false, error: "تعذر تثبيت رقم الطلب. حاول مرة ثانية." }, 400);
+    if (rawItems.length < 1 || rawItems.length > MAX_ITEMS) return json(req, { ok: false, error: "عدد عناصر الطلب غير صالح." }, 400);
 
     const requested = rawItems.map((raw: any) => {
       const productId = cleanText(raw?.productId, 64).toLowerCase();
@@ -316,6 +347,41 @@ Deno.serve(async (req: Request) => {
     const admin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
+
+    // Fast idempotency path. A network retry for an already-created order
+    // should return the original order without consuming rate-limit capacity.
+    const existingOrderResult = await admin
+      .from("orders")
+      .select("id,order_number,total,customer_id,customer_phone")
+      .eq("client_token", clientToken)
+      .maybeSingle();
+    if (existingOrderResult.error) throw existingOrderResult.error;
+    if (existingOrderResult.data) {
+      const existingPhone = normalizePhone(existingOrderResult.data.customer_phone);
+      if (existingPhone !== phoneE164) {
+        return json(req, { ok: false, error: "تعذر التحقق من إعادة إرسال الطلب." }, 409);
+      }
+      return json(req, {
+        ok: true,
+        duplicate: true,
+        order_id: existingOrderResult.data.id,
+        order_number: existingOrderResult.data.order_number,
+        customer_id: existingOrderResult.data.customer_id,
+        total: Number(existingOrderResult.data.total || 0),
+        phone_e164: phoneE164,
+      }, 200);
+    }
+
+    const rateResult = await admin.rpc("claim_pasha_order_rate_limit", {
+      p_phone: phoneE164,
+    });
+    if (rateResult.error) throw rateResult.error;
+    if (rateResult.data !== true) {
+      return json(req, {
+        ok: false,
+        error: "تمت محاولات طلب كثيرة خلال دقيقة واحدة. انتظر قليلاً ثم حاول مرة ثانية.",
+      }, 429);
+    }
 
     const [settingsResult, productsResult, optionsResult, discountsResult] = await Promise.all([
       admin
@@ -446,9 +512,6 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error("PASHA ORDERS ERROR", error);
     const message = error instanceof Error ? error.message : String(error);
-    const safeMessage = /not available|unavailable|invalid|required|exist|reference|quantity|catalog|opening hours|delivery|pickup/i.test(message)
-      ? message
-      : "Could not save order";
-    return json(req, { ok: false, error: safeMessage }, 400);
+    return json(req, { ok: false, error: publicErrorMessage(message) }, 400);
   }
 });
