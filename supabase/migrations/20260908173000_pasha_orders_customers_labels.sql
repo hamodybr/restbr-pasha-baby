@@ -69,6 +69,15 @@ create index if not exists orders_created_at_idx on public.orders(created_at des
 create index if not exists orders_status_idx on public.orders(status);
 create index if not exists order_items_order_id_idx on public.order_items(order_id);
 
+-- Private abuse-control buckets. No IP/device identifier is stored.
+create table if not exists private.pasha_order_rate_limit (
+  minute_bucket timestamptz not null,
+  limiter_key text not null,
+  accepted_count integer not null default 1 check (accepted_count > 0),
+  primary key (minute_bucket, limiter_key)
+);
+revoke all on table private.pasha_order_rate_limit from public, anon, authenticated;
+
 -- Reuse the project's existing updated_at helper when available.
 do $$
 begin
@@ -123,6 +132,58 @@ grant select on public.order_items to authenticated;
 grant select on public.categories, public.products, public.product_options, public.discounts to service_role;
 grant select, insert, update on public.customers to service_role;
 grant select, insert on public.orders, public.order_items to service_role;
+
+-- Server-only rate limiter: 5 accepted submissions per phone/minute and
+-- 240 accepted submissions globally/minute. Rejected attempts never create
+-- customers or orders. This deliberately stores no IP/device fingerprint.
+create or replace function public.claim_pasha_order_rate_limit(p_phone text)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $function$
+declare
+  v_bucket timestamptz := date_trunc('minute', now());
+  v_phone text := left(trim(coalesce(p_phone, '')), 20);
+  v_count integer;
+begin
+  if v_phone !~ '^\+[1-9][0-9]{7,14}$' then
+    return false;
+  end if;
+
+  insert into private.pasha_order_rate_limit(minute_bucket, limiter_key, accepted_count)
+  values (v_bucket, '__global__', 1)
+  on conflict (minute_bucket, limiter_key)
+  do update set accepted_count = private.pasha_order_rate_limit.accepted_count + 1
+  where private.pasha_order_rate_limit.accepted_count < 240
+  returning accepted_count into v_count;
+
+  if not found then
+    return false;
+  end if;
+
+  insert into private.pasha_order_rate_limit(minute_bucket, limiter_key, accepted_count)
+  values (v_bucket, 'phone:' || v_phone, 1)
+  on conflict (minute_bucket, limiter_key)
+  do update set accepted_count = private.pasha_order_rate_limit.accepted_count + 1
+  where private.pasha_order_rate_limit.accepted_count < 5
+  returning accepted_count into v_count;
+
+  if not found then
+    return false;
+  end if;
+
+  if random() < 0.02 then
+    delete from private.pasha_order_rate_limit
+    where minute_bucket < now() - interval '2 days';
+  end if;
+
+  return true;
+end;
+$function$;
+
+revoke all on function public.claim_pasha_order_rate_limit(text) from public, anon, authenticated;
+grant execute on function public.claim_pasha_order_rate_limit(text) to service_role;
 
 -- Transactional server-only RPC. The Edge Function validates catalog state and
 -- prices, then this function atomically upserts the customer + order + items.
@@ -196,6 +257,12 @@ begin
   if v_client_token is null then
     raise exception 'Client token is required';
   end if;
+
+  -- Serialize retries for the same client token so two simultaneous requests
+  -- cannot race past the idempotency check and create a unique-index error.
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(v_client_token::text, 0)
+  );
 
   select o.id, o.order_number, o.total, o.customer_id
   into v_existing
