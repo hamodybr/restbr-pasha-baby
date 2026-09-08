@@ -1,5 +1,5 @@
-const CACHE_NAME = "restbr-pasha-baby-v25";
-// Handoff refresh 2026-09-07: reinstall this worker so the updated production fallback is re-cached.
+const CACHE_NAME = "restbr-pasha-baby-v26";
+// Final handoff refresh 2026-09-08: purge the previous cache and keep only active retail assets.
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -25,7 +25,6 @@ const CORE = [
   "./js/app.js?v=18.1",
   "./js/pasha-baby-commerce.js?v=2.0",
   "./js/pasha-baby-fixed-discounts.js?v=1.0",
-  "./js/section-hours-highlight.js?v=1.0",
   "./js/product-image-fallback.js?v=1.3",
   "./js/price-safety.js?v=1.0",
   "./js/cart.js?v=4.5",
