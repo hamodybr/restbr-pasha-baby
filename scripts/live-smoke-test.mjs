@@ -194,7 +194,7 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v25',
+  'restbr-pasha-baby-v26',
   'js/restbr-hardening.js',
   'js/pasha-arabic-only.js?v=1.0',
   'js/pasha-baby-fixed-discounts.js?v=1.0',
