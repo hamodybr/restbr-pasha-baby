@@ -44,11 +44,20 @@ requireText(edge, 'effectiveDiscount', 'authoritative fixed discount calculation
 requireText(edge, 'create_pasha_order', 'transactional order RPC call');
 requireText(edge, 'One of the products is not available right now', 'availability validation');
 requireText(edge, 'Origin not allowed', 'origin rejection');
+requireText(edge, 'restaurant_schedule_mode', 'server opening-hours validation');
+requireText(edge, 'settings.orders_enabled === false', 'server orders enabled validation');
+requireText(edge, 'settings.delivery_enabled === false', 'server delivery validation');
+requireText(edge, 'settings.pickup_enabled === false', 'server pickup validation');
+requireText(edge, 'Invalid location reference', 'server delivery location validation');
+requireText(edge, 'baghdadNow().stamp', 'Baghdad order-number date');
 
 requireText('js/pasha-order-submit.js', "const CART_KEY = 'RESTBR_CART_V1'", 'existing cart integration');
 requireText('js/pasha-order-submit.js', '/functions/v1/pasha-orders', 'order Edge Function call');
 requireText('js/pasha-order-submit.js', 'clientToken', 'idempotency token');
 requireText('js/pasha-order-submit.js', 'event.stopImmediatePropagation()', 'persist-before-WhatsApp interception');
+requireText('js/pasha-order-submit.js', 'capturedLocationUrl', 'captured delivery location');
+requireText('js/pasha-order-submit.js', 'https://maps.google.com/?q=', 'Google Maps location payload');
+requireText('js/pasha-order-submit.js', 'if (checkout.locationUrl)', 'WhatsApp location preservation');
 requireText('js/admin-orders-customers.js', '@page{size:100mm 150mm;margin:0}', '100x150 print page');
 requireText('js/admin-orders-customers.js', "from('customer_order_summary')", 'customer summary');
 requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard');
