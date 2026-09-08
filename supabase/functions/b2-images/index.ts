@@ -8,6 +8,7 @@ const HARD_STOP_BYTES = 9 * 1024 * 1024 * 1024;
 const MAX_UPLOAD_BYTES = 700 * 1024;
 const AUTH_URL = "https://api.backblazeb2.com/b2api/v4/b2_authorize_account";
 const ALLOWED_ORIGINS = new Set([
+  "https://pashababyiq.com",
   "https://pashababy.restbr.com"
 ]);
 
@@ -15,7 +16,7 @@ type B2Auth = { token: string; apiUrl: string; downloadUrl: string };
 
 function corsFor(req: Request) {
   const origin = req.headers.get("origin") || "";
-  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "https://pashababy.restbr.com";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "https://pashababyiq.com";
   return {
     "Access-Control-Allow-Origin": allowOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-pb-action",

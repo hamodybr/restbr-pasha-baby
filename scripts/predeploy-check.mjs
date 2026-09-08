@@ -112,7 +112,7 @@ for (const fragment of requiredRuntimeFragments) {
   if (!runtime.includes(fragment)) fail(`js/runtime-config.js: missing required guard: ${fragment}`);
 }
 
-if (read('CNAME').trim() !== 'pashababy.restbr.com') fail('CNAME: expected pashababy.restbr.com');
+if (read('CNAME').trim() !== 'pashababyiq.com') fail('CNAME: expected pashababyiq.com');
 if (read('index.html').includes('js/dining-mode.js')) fail('index.html: restaurant dining-mode script must not load in retail mode');
 
 // 7) Detect secret keys accidentally committed to browser-delivered files.
