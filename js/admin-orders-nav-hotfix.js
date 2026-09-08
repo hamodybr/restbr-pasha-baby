@@ -5,6 +5,15 @@
 
   const STYLE_ID = 'pbOrdersNavHotfixStyles';
 
+  function loadAddon(id, src) {
+    if (document.getElementById(id)) return;
+    const script = document.createElement('script');
+    script.id = id;
+    script.src = src;
+    script.async = false;
+    document.head.appendChild(script);
+  }
+
   function installStyles() {
     if (document.getElementById(STYLE_ID)) return;
     const style = document.createElement('style');
@@ -94,6 +103,8 @@
   function boot() {
     installStyles();
     tagQuickActions();
+    loadAddon('pbOrdersEnhancementsScript', 'js/admin-orders-enhancements.js?v=1.0');
+    loadAddon('pbColorImageUploadScript', 'js/admin-color-image-upload.js?v=1.0');
 
     document.addEventListener('click', event => {
       const kind = kindFromTarget(event.target);
