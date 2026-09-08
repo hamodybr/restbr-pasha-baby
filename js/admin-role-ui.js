@@ -12,6 +12,7 @@
   };
 
   const VALID_ROLES = new Set(Object.keys(ROLE_LABELS));
+  const ORDERS_ROLES = new Set(['super_admin','owner','manager']);
   let currentProfile = null;
   let observer = null;
   let applyTimer = null;
@@ -65,6 +66,10 @@
     el.classList.toggle('restbr-role-hidden', !!hidden);
   }
 
+  function canSeeOrders(role){
+    return ORDERS_ROLES.has(role);
+  }
+
   function setNavVisibility(role){
     const allowed = {
       super_admin: ['home','products','categories','analytics','tools'],
@@ -76,8 +81,12 @@
 
     qa('[data-admin-nav]').forEach(btn => setHidden(btn, !allowed.includes(btn.dataset.adminNav)));
 
+    const ordersAllowed = canSeeOrders(role);
+    setHidden(q('#pbOrdersNav'), !ordersAllowed);
+    setHidden(q('#pbCustomersNav'), !ordersAllowed);
+
     const nav = q('.bottom-nav');
-    const visible = qa('[data-admin-nav]').filter(btn => !btn.classList.contains('restbr-role-hidden')).length;
+    const visible = qa('.bottom-nav .nav-btn').filter(btn => !btn.classList.contains('restbr-role-hidden')).length;
     if (nav && visible) nav.style.gridTemplateColumns = `repeat(${visible},1fr)`;
 
     const toolsBtn = q('[data-admin-nav="tools"]');
@@ -117,12 +126,20 @@
     const canMenu = ['super_admin','owner','manager','menu_editor'].includes(role);
     const canReports = ['super_admin','owner','manager','viewer'].includes(role);
     const canFullTools = ['super_admin','owner','manager'].includes(role);
+    const canOrders = canSeeOrders(role);
 
     setHidden(q('#homeAddProductBtn'), !canMenu);
     setHidden(q('#homeAddCategoryBtn'), !canMenu);
     qa('#viewHome [data-go-view="products"]').forEach(el => setHidden(el, !canMenu));
     qa('#viewHome [data-go-view="analytics"]').forEach(el => setHidden(el, !canReports));
     qa('#viewHome [data-go-view="tools"]').forEach(el => setHidden(el, !canFullTools));
+
+    qa('#viewHome .quick-action').forEach(el => {
+      const text = (el.textContent || '').replace(/\s+/g,' ').trim();
+      const isOrders = text.includes('متابعة وطباعة طلبات المتجر');
+      const isCustomers = text.includes('عدد الزبائن وسجل مشترياتهم');
+      if (isOrders || isCustomers) setHidden(el, !canOrders);
+    });
   }
 
   function filterDeleteControls(role){
@@ -167,9 +184,9 @@
   function ensureAllowedView(role){
     const active = q('.admin-view.active')?.dataset.view || 'home';
     const allowed = {
-      super_admin: ['home','products','categories','analytics','tools'],
-      owner: ['home','products','categories','analytics','tools'],
-      manager: ['home','products','categories','analytics','tools'],
+      super_admin: ['home','products','categories','analytics','tools','pasha-orders','pasha-customers'],
+      owner: ['home','products','categories','analytics','tools','pasha-orders','pasha-customers'],
+      manager: ['home','products','categories','analytics','tools','pasha-orders','pasha-customers'],
       menu_editor: ['home','products','categories','tools'],
       viewer: ['home','analytics','tools']
     }[role] || ['home'];
