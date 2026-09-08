@@ -28,19 +28,22 @@ Function name: `pasha-orders`
 
 JWT verification: **OFF**
 
-Reason: checkout is public/anonymous. The function is the server boundary and performs its own origin, payload, store-state, catalog, availability, pricing, discount, idempotency and rate-limit validation before a service-role-only transactional RPC. No service-role credential is present in the browser.
+Reason: checkout is public/anonymous. The function is the server boundary and performs its own origin, payload-size, store-state, catalog, availability, pricing, discount, idempotency and rate-limit validation before a service-role-only transactional RPC. No service-role credential is present in the browser.
 
 Allowed storefront origins are limited in function code.
 
 ## 3. Production activation
 
 Only after migration + function deployment succeed:
-1. Test one delivery checkout and one pickup checkout from the feature version or immediately after controlled merge.
-2. Confirm the order appears under Admin > الطلبات.
-3. Confirm the customer appears under Admin > الزبائن using normalized phone number.
-4. Print the order with `PDF / طباعة 100×150` and verify page size.
-5. Confirm WhatsApp contains the same order number and totals.
-6. Merge PR #15 to `main` and monitor GitHub Pages validation/deploy/live-smoke.
+1. Merge PR #15 to `main`.
+2. Monitor GitHub Pages validation/deploy/live-smoke until all production checks pass.
+3. Test one delivery checkout and one pickup checkout on the production domain.
+4. Confirm each order appears under Admin > الطلبات.
+5. Confirm each customer appears under Admin > الزبائن using normalized phone number.
+6. Print the order with `PDF / طباعة 100×150` and verify page size.
+7. Confirm WhatsApp contains the same order number and totals.
+
+If any production check or checkout test fails, restore `main` to the pre-feature snapshot and leave the additive database objects in place until the issue is diagnosed; they are private and unused by the old storefront.
 
 ## Safety points
 
