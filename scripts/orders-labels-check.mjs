@@ -15,7 +15,7 @@ const forbidText = (file, text, label = text) => {
   if (exists(file) && read(file).includes(text)) fail(`${file}: forbidden ${label}`);
 };
 
-for (const file of ['js/pasha-order-submit.js', 'js/admin-orders-customers.js', 'js/pasha-arabic-only.js']) {
+for (const file of ['js/pasha-order-submit.js', 'js/admin-orders-customers.js', 'js/pasha-arabic-only.js', 'js/admin-role-ui.js']) {
   if (!exists(file)) { fail(`${file}: missing`); continue; }
   try {
     execFileSync(process.execPath, ['--check', path.join(root, file)], { stdio: 'pipe' });
@@ -74,6 +74,10 @@ requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard'
 requireText('js/admin-orders-customers.js', 'PDF / طباعة 100×150', 'label action');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.0", 'public order loader');
 requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.0", 'admin orders loader');
+requireText('js/admin-role-ui.js', "'pasha-orders'", 'orders view role allowlist');
+requireText('js/admin-role-ui.js', "'pasha-customers'", 'customers view role allowlist');
+requireText('js/admin-role-ui.js', "const ORDERS_ROLES = new Set(['super_admin','owner','manager'])", 'orders/customer role policy');
+requireText('js/admin-role-ui.js', "qa('.bottom-nav .nav-btn')", 'dynamic bottom-nav column count');
 
 if (failures.length) {
   console.error('\nOrders/customers/labels audit failed:');
