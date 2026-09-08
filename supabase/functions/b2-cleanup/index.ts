@@ -3,7 +3,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 const B2_BUCKET_ID = "1d84e1a751897ddca4000717";
 const B2_PREFIX = "products/";
 const AUTH_URL = "https://api.backblazeb2.com/b2api/v4/b2_authorize_account";
-const ALLOWED_ORIGIN = "https://pashababy.restbr.com";
+const ALLOWED_ORIGIN = "https://pashababyiq.com";
 const PAGE_SIZE = 1000;
 
 function cors() {
