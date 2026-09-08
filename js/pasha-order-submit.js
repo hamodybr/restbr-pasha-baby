@@ -6,6 +6,7 @@
   const TOKEN_KEY = 'PASHA_ORDER_TOKEN_V1';
   const LAST_ORDER_KEY = 'PASHA_LAST_ORDER_V1';
   let submitting = false;
+  let capturedLocationUrl = '';
 
   const config = () => window.RESTBR_CONFIG || {};
   const db = () => window.RESTBR_DB || {};
@@ -105,6 +106,7 @@
       phone: payload.phone,
       orderType: payload.orderType,
       address: payload.address,
+      locationUrl: payload.locationUrl,
       notes: payload.notes,
       items: payload.items.map(item => [item.productId, item.optionId || '', item.optionIndex, item.quantity]),
     });
@@ -146,6 +148,7 @@
 
     if (checkout.orderType === 'delivery' && checkout.address) {
       lines.push(`📍 ${checkout.address}`);
+      if (checkout.locationUrl) lines.push(`🗺️ ${checkout.locationUrl}`);
     }
 
     lines.push('', '━━━━━━━━━━━━', '🛒 *تفاصيل الطلب*', '');
@@ -166,11 +169,51 @@
         orderId: order.order_id || order.orderId || '',
         total: Number(order.total || 0),
         phone: checkout.phone,
+        locationUrl: checkout.locationUrl || '',
         savedAt: new Date().toISOString(),
       }));
     } catch (_) {}
 
     window.location.href = `https://wa.me/${number}?text=${encodeURIComponent(lines.join('\n'))}`;
+  }
+
+  function captureLocation(event, button) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    if (!navigator.geolocation) {
+      toast('تعذر تحديد الموقع على هذا الجهاز.', true);
+      return;
+    }
+
+    button.disabled = true;
+    const status = document.getElementById('smLocationStatus');
+    if (status) status.textContent = 'جاري تحديد الموقع...';
+
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const lat = Number(pos.coords.latitude);
+        const lng = Number(pos.coords.longitude);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+          capturedLocationUrl = '';
+          if (status) status.textContent = '';
+          button.disabled = false;
+          toast('تعذر تحديد الموقع.', true);
+          return;
+        }
+
+        capturedLocationUrl = `https://maps.google.com/?q=${lat},${lng}`;
+        if (status) status.textContent = '✓ تم تحديد الموقع';
+        button.disabled = false;
+      },
+      () => {
+        capturedLocationUrl = '';
+        if (status) status.textContent = '';
+        button.disabled = false;
+        toast('تعذر تحديد الموقع.', true);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
   }
 
   async function submit(event, button) {
@@ -189,6 +232,7 @@
     const orderType = currentOrderType();
     const address = String(document.getElementById('smCustomerAddress')?.value || '').trim().slice(0, 300);
     const notes = String(document.getElementById('smCustomerNotes')?.value || '').trim().slice(0, 500);
+    const locationUrl = orderType === 'delivery' ? capturedLocationUrl : '';
 
     if (!name || !phone || (orderType === 'delivery' && !address)) return;
 
@@ -202,10 +246,10 @@
       quantity: Math.max(1, Math.min(99, Math.trunc(Number(item?.qty || 1)))),
     }));
 
-    const checkout = { name, phone, orderType, address, notes, items };
+    const checkout = { name, phone, orderType, address, locationUrl, notes, items };
     const signature = buildSignature(checkout);
     const clientToken = stableToken(signature);
-    const payload = { ...checkout, clientToken, locationUrl: '' };
+    const payload = { ...checkout, clientToken };
 
     submitting = true;
     const originalText = button.textContent;
@@ -227,6 +271,12 @@
   }
 
   document.addEventListener('click', event => {
+    const locationButton = event.target?.closest?.('#smGetLocation');
+    if (locationButton) {
+      captureLocation(event, locationButton);
+      return;
+    }
+
     const button = event.target?.closest?.('#smSendWhatsApp');
     if (!button) return;
     void submit(event, button);
