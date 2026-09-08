@@ -145,6 +145,7 @@
     loadScript('pashaNewProductColorsScript', 'js/admin-new-product-colors.js?v=1.0', true);
     loadScript('pashaAdminProgressiveDisclosureScript', 'js/admin-progressive-disclosure.js?v=2.0', true);
     loadScript('pashaOrdersCustomersScript', 'js/admin-orders-customers.js?v=1.0', true);
+    loadScript('pashaOrdersNavHotfixScript', 'js/admin-orders-nav-hotfix.js?v=1.0', true);
   }
 
   function boot() {
