@@ -8,8 +8,7 @@ const HARD_STOP_BYTES = 9 * 1024 * 1024 * 1024;
 const MAX_UPLOAD_BYTES = 700 * 1024;
 const AUTH_URL = "https://api.backblazeb2.com/b2api/v4/b2_authorize_account";
 const ALLOWED_ORIGINS = new Set([
-  "https://pashababy.restbr.com",
-  "https://raw.githack.com"
+  "https://pashababy.restbr.com"
 ]);
 
 type B2Auth = { token: string; apiUrl: string; downloadUrl: string };
@@ -206,7 +205,6 @@ async function uploadFile(auth: B2Auth, file: File, productId: string) {
   if (fileId) {
     const cleanup = cleanupOlderVersions(auth, fileName, fileId);
     try {
-      // Do not hold the admin save screen open while old versions are cleaned.
       // @ts-ignore EdgeRuntime is available in hosted Supabase functions.
       if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) EdgeRuntime.waitUntil(cleanup);
       else cleanup.catch(() => {});
