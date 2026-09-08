@@ -105,6 +105,7 @@ requireText('js/admin-orders-enhancements.js', "from('orders').delete()", 'order
 requireText('js/admin-orders-enhancements.js', "from('customers').delete()", 'customer delete action');
 requireText('js/admin-orders-enhancements.js', 'body.admin-global-dark #viewPashaOrders', 'orders dark theme');
 requireText('js/admin-orders-enhancements.js', 'body.admin-global-dark #viewPashaCustomers', 'customers dark theme');
+requireText('js/admin-orders-enhancements.js', 'button.pb-danger-delete', 'specific delete button danger styling');
 requireText('js/pasha-order-color-bridge.js', 'colorSummary(cart)', 'color summary persistence');
 requireText('js/pasha-order-color-bridge.js', 'payload.notes =', 'invoice color note persistence');
 requireText('js/pasha-order-color-bridge.js', "ar: ['اللون'", 'Arabic explicit color label');
