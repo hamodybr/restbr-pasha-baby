@@ -3,12 +3,17 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 const B2_BUCKET_ID = "1d84e1a751897ddca4000717";
 const B2_PREFIX = "products/";
 const AUTH_URL = "https://api.backblazeb2.com/b2api/v4/b2_authorize_account";
-const ALLOWED_ORIGIN = "https://pashababyiq.com";
+const ALLOWED_ORIGINS = new Set([
+  "https://pashababyiq.com",
+  "https://pashababy.restbr.com"
+]);
 const PAGE_SIZE = 1000;
 
-function cors() {
+function cors(req: Request) {
+  const origin = req.headers.get("origin") || "";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "https://pashababyiq.com";
   return {
-    "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+    "Access-Control-Allow-Origin": allowOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST,OPTIONS",
     "Vary": "Origin",
@@ -16,10 +21,10 @@ function cors() {
   };
 }
 
-function json(body: unknown, status = 200) {
+function json(req: Request, body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...cors(), "Content-Type": "application/json; charset=utf-8" }
+    headers: { ...cors(req), "Content-Type": "application/json; charset=utf-8" }
   });
 }
 
@@ -172,11 +177,11 @@ function productIdFromFileName(fileName: string) {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors() });
-  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(req) });
+  if (req.method !== "POST") return json(req, { error: "Method not allowed" }, 405);
 
   try {
-    if (!(await requireMenuManager(req))) return json({ error: "Forbidden" }, 403);
+    if (!(await requireMenuManager(req))) return json(req, { error: "Forbidden" }, 403);
 
     const [auth, productIds] = await Promise.all([authorizeB2(), listProductIds(req)]);
     const files = await listCurrentFiles(auth);
@@ -205,7 +210,7 @@ Deno.serve(async (req: Request) => {
       0
     );
 
-    return json({
+    return json(req, {
       ok: true,
       scannedFiles: files.length,
       deletedFiles: orphanFiles.length,
@@ -216,6 +221,6 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error("B2 CLEANUP ERROR", error);
     const message = error instanceof Error ? error.message : String(error);
-    return json({ error: message }, /timed out/i.test(message) ? 504 : 500);
+    return json(req, { error: message }, /timed out/i.test(message) ? 504 : 500);
   }
 });
