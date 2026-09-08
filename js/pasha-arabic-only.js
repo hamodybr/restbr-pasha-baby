@@ -167,6 +167,8 @@
       return;
     }
 
+    loadScript('pashaOrderColorBridgeScript', 'js/pasha-order-color-bridge.js?v=1.0');
+    loadScript('pashaColorImageGalleryScript', 'js/pasha-color-image-gallery.js?v=1.0');
     loadScript('pashaOrderSubmitScript', 'js/pasha-order-submit.js?v=1.0');
     loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.0');
     const keepArabic = () => {
