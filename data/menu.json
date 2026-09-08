@@ -2,7 +2,7 @@
   "restaurant": {
     "name": "Pasha Baby",
     "nameAr": "پاشا بيبي",
-    "nameKu": "پاشا بيبي",
+    "nameKu": "پاشا بەیبی",
     "nameEn": "Pasha Baby",
     "phone": "07500200660",
     "whatsapp": "https://wa.me/9647500200660",
@@ -21,162 +21,137 @@
     "footerLocation": {"ar":"دهوك — بروشكي","ku":"دهوك — بروشكي","en":"دهوك — بروشكي"},
     "closedMessage": {"ar":"الطلبات متوقفة مؤقتاً. يرجى المحاولة مرة أخرى لاحقاً.","ku":"الطلبات متوقفة مؤقتاً. يرجى المحاولة مرة أخرى لاحقاً.","en":"الطلبات متوقفة مؤقتاً. يرجى المحاولة مرة أخرى لاحقاً."},
     "introDurationMs": 2000,
-    "display": {
-      "logo": true,
-      "menuTitle": true,
-      "subtitle": true,
-      "languageSwitch": false,
-      "categoryNav": true,
-      "backToTop": true,
-      "intro": true,
-      "backgroundVideo": false,
-      "footer": true,
-      "footerBrand": true,
-      "footerLocation": true,
-      "footerPhone": true,
-      "footerSocials": true,
-      "footerCopy": true
-    }
+    "display": {"logo":true,"menuTitle":true,"subtitle":true,"languageSwitch":false,"categoryNav":true,"backToTop":true,"intro":true,"backgroundVideo":false,"footer":true,"footerBrand":true,"footerLocation":true,"footerPhone":true,"footerSocials":true,"footerCopy":true}
   },
   "products": [
     {
-      "id": "demo-diapers-1",
-      "category": {"id":"cat-diapers","ar":"الحفاضات والمناديل","ku":"الحفاضات والمناديل","en":"الحفاضات والمناديل","order":1},
-      "name": {"ar":"حفاضات أطفال","ku":"حفاضات أطفال","en":"حفاضات أطفال"},
-      "description": {"ar":"حفاضات أطفال ناعمة ومريحة للاستخدام اليومي، بامتصاص جيد وملمس لطيف على بشرة الطفل، مناسبة لفترات طويلة وتساعد على إبقاء الطفل جافًا ومرتاحًا.","ku":"","en":""},
-      "image": "https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/9c4f903c-a78b-4620-9279-3c696235e55c/1788634107392-fon3m9.png",
-      "badges": {"popular":true},
-      "options": [
-        {"id":"demo-diapers-s","ar":"قياس 3","ku":"قياس 3","en":"قياس 3","price":18000},
-        {"id":"demo-diapers-m","ar":"قياس 4","ku":"قياس 4","en":"قياس 4","price":19000},
-        {"id":"demo-diapers-l","ar":"قياس 5","ku":"قياس 5","en":"قياس 5","price":20000}
-      ]
+      "id":"dde1bc5c-1a0b-42e1-85dc-d95bcda123d1",
+      "category":{"id":"94238647-ef96-491b-89d6-a85b3eacc94e","ar":"الحفاضات والمناديل","ku":"پەمپەرس و دەستمال","en":"Diapers & Wipes","order":1},
+      "name":{"ar":"مناديل مبللة للأطفال","ku":"دەستمالێن تەڕ بۆ زاروکان","en":"Baby Wet Wipes"},
+      "image":"https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/dde1bc5c-1a0b-42e1-85dc-d95bcda123d1/1788634136394-xslac8.png",
+      "badges":{"new":true},
+      "options":[{"id":"a5a55bf3-3f0f-4967-8122-d27c64aafeed","ar":"عبوة","ku":"پاکێت","en":"Pack","price":3500}]
     },
     {
-      "id": "demo-wipes-1",
-      "category": {"id":"cat-diapers","ar":"الحفاضات والمناديل","ku":"الحفاضات والمناديل","en":"الحفاضات والمناديل","order":1},
-      "name": {"ar":"مناديل مبللة للأطفال","ku":"مناديل مبللة للأطفال","en":"مناديل مبللة للأطفال"},
-      "image": "https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/dde1bc5c-1a0b-42e1-85dc-d95bcda123d1/1788634136394-xslac8.png",
-      "badges": {"new":true},
-      "options": [{"id":"demo-wipes-pack","ar":"عبوة","ku":"عبوة","en":"عبوة","price":3500}]
+      "id":"9c4f903c-a78b-4620-9279-3c696235e55c",
+      "category":{"id":"94238647-ef96-491b-89d6-a85b3eacc94e","ar":"الحفاضات والمناديل","ku":"پەمپەرس و دەستمال","en":"Diapers & Wipes","order":1},
+      "name":{"ar":"حفاضات أطفال","ku":"حفاضات أطفال","en":"حفاضات أطفال"},
+      "description":{"ar":"حفاضات أطفال ناعمة ومريحة للاستخدام اليومي، بامتصاص جيد وملمس لطيف على بشرة الطفل، مناسبة لفترات طويلة وتساعد على إبقاء الطفل جافًا ومرتاحًا.","ku":"","en":""},
+      "image":"https://f003.backblazeb2.com/file/pasha-baby-products/products/9c4f903c-a78b-4620-9279-3c696235e55c/main?v=4_z1d84e1a751897ddca4000717_f10347959c23b475f_d20260907_m205622_c003_v0312018_t0019_u01788814582688",
+      "badges":{"popular":true},
+      "options":[{"id":"a64d1fc1-d525-49ce-95ca-8ed9ae268763","ar":"قياس 3","ku":"قەبارە 3","en":"Size 3","price":18000},{"id":"ade1ae6a-3c58-4fb2-a20f-783435541ee1","ar":"قياس 4","ku":"قەبارە 4","en":"Size 4","price":19000},{"id":"2f5a0c96-1fa9-4f7a-8d6e-659a3455bd95","ar":"قياس 5","ku":"قەبارە 5","en":"Size 5","price":20000}]
     },
     {
-      "id": "demo-bottle-1",
-      "category": {"id":"cat-feeding","ar":"الرضاعة والتغذية","ku":"الرضاعة والتغذية","en":"الرضاعة والتغذية","order":3},
-      "name": {"ar":"رضاعة أطفال","ku":"رضاعة أطفال","en":"رضاعة أطفال"},
-      "image": "https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/c3d8409c-14cc-4039-854c-e16530b8a45d/1788634119956-jjc218.png",
-      "badges": {},
-      "options": [
-        {"id":"demo-bottle-150","ar":"150 مل","ku":"150 مل","en":"150 مل","price":8500},
-        {"id":"demo-bottle-250","ar":"250 مل","ku":"250 مل","en":"250 مل","price":10500}
-      ]
+      "id":"e9d7795f-a464-4e6a-96ee-84734aec9cf6",
+      "category":{"id":"8eb0af75-509c-423a-80ce-d120b601c657","ar":"العناية بالطفل","ku":"چاڤدێریا زاروکان","en":"Baby Care","order":2},
+      "name":{"ar":"شامبو أطفال","ku":"شامپۆی زاروکان","en":"Baby Shampoo"},
+      "image":"https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/e9d7795f-a464-4e6a-96ee-84734aec9cf6/1788636613124-2e2fhr.png",
+      "badges":{},
+      "options":[{"id":"7a8eb642-aa0b-4733-bb0e-284538d87b6c","ar":"عبوة","ku":"بوتل","en":"Bottle","price":6500}]
     },
     {
-      "id": "demo-pacifier-1",
-      "category": {"id":"cat-feeding","ar":"الرضاعة والتغذية","ku":"الرضاعة والتغذية","en":"الرضاعة والتغذية","order":3},
-      "name": {"ar":"لهاية أطفال","ku":"لهاية أطفال","en":"لهاية أطفال"},
-      "image": "",
-      "badges": {},
-      "options": [{"id":"demo-pacifier-piece","ar":"قطعة","ku":"قطعة","en":"قطعة","price":4500}]
+      "id":"856ee19f-c52b-41ff-9605-503973a7c8f4",
+      "category":{"id":"8eb0af75-509c-423a-80ce-d120b601c657","ar":"العناية بالطفل","ku":"چاڤدێریا زاروکان","en":"Baby Care","order":2},
+      "name":{"ar":"كريم عناية للأطفال","ku":"کرێما چاڤدێریا زاروکان","en":"Baby Care Cream"},
+      "image":"",
+      "badges":{"popular":true},
+      "options":[{"id":"d81bcdb2-16d2-4eff-8a5b-9395fa2d3805","ar":"عبوة","ku":"بوتل","en":"Pack","price":5500}]
     },
     {
-      "id": "demo-care-1",
-      "category": {"id":"cat-care","ar":"العناية بالطفل","ku":"العناية بالطفل","en":"العناية بالطفل","order":4},
-      "name": {"ar":"شامبو أطفال","ku":"شامبو أطفال","en":"شامبو أطفال"},
-      "image": "https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/e9d7795f-a464-4e6a-96ee-84734aec9cf6/1788636613124-2e2fhr.png",
-      "badges": {},
-      "options": [{"id":"demo-care-bottle","ar":"عبوة","ku":"عبوة","en":"عبوة","price":6500}]
+      "id":"2ec60f5b-b6a8-42fb-8c39-153bc0fe99b7",
+      "category":{"id":"d07771a3-c65d-44ec-98d5-fc7675cd805e","ar":"الألعاب","ku":"یاری","en":"Toys","order":3},
+      "name":{"ar":"خشخيشة أطفال","ku":"یارییا دەنگدار یا زاروکان","en":"Baby Rattle"},
+      "image":"",
+      "badges":{},
+      "options":[{"id":"28255d1a-d802-4b60-9ed6-941efa36cfcd","ar":"قطعة","ku":"دانە","en":"Piece","price":6000}]
     },
     {
-      "id": "demo-cream-1",
-      "category": {"id":"cat-care","ar":"العناية بالطفل","ku":"العناية بالطفل","en":"العناية بالطفل","order":4},
-      "name": {"ar":"كريم عناية للأطفال","ku":"كريم عناية للأطفال","en":"كريم عناية للأطفال"},
-      "image": "",
-      "badges": {"popular":true},
-      "options": [{"id":"demo-cream-piece","ar":"عبوة","ku":"عبوة","en":"عبوة","price":5500}]
+      "id":"405d2b55-b0bc-410d-a2d9-9c0ebb660f87",
+      "category":{"id":"d07771a3-c65d-44ec-98d5-fc7675cd805e","ar":"الألعاب","ku":"یاری","en":"Toys","order":3},
+      "name":{"ar":"لعبة قماش ناعمة","ku":"یارییا نەرم یا پارچەیی","en":"Soft Plush Toy"},
+      "image":"",
+      "badges":{"new":true},
+      "options":[{"id":"57e02c35-9f96-49aa-bd3e-0e080f77e0c8","ar":"قطعة","ku":"دانە","en":"Piece","price":12000}]
     },
     {
-      "id": "demo-bath-1",
-      "category": {"id":"cat-bath","ar":"الاستحمام","ku":"الاستحمام","en":"الاستحمام","order":5},
-      "name": {"ar":"بانيو أطفال","ku":"بانيو أطفال","en":"بانيو أطفال"},
-      "image": "https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/7f3e4c53-efd0-455e-88d8-d0af37ea9c51/1788638561419-t65fuy.jpg",
-      "badges": {},
-      "options": [{"id":"demo-bath-piece","ar":"قطعة","ku":"قطعة","en":"قطعة","price":22000}]
+      "id":"c36a33f6-f3d3-44b0-a2a6-bc1aeb3646f5",
+      "category":{"id":"1124b8e9-b314-44e2-be0b-43c42e7d2596","ar":"ملابس الأطفال","ku":"جل و بەرگێن زاروکان","en":"Baby Clothes","order":4},
+      "name":{"ar":"طقم قطني للأطفال","ku":"سێتا پەمبوویی یا زاروکان","en":"Cotton Baby Set"},
+      "image":"",
+      "badges":{},
+      "options":[{"id":"4af7bfb6-59fc-4273-a61d-a6ff4e85e78e","ar":"0-3 أشهر","ku":"0-3 هەیڤ","en":"0-3 months","price":15000},{"id":"d18eb9c5-17d5-4da5-a7f6-54b47e3e624b","ar":"3-6 أشهر","ku":"3-6 هەیڤ","en":"3-6 months","price":16000}]
     },
     {
-      "id": "demo-towel-1",
-      "category": {"id":"cat-bath","ar":"الاستحمام","ku":"الاستحمام","en":"الاستحمام","order":5},
-      "name": {"ar":"منشفة أطفال بقبعة","ku":"منشفة أطفال بقبعة","en":"منشفة أطفال بقبعة"},
-      "image": "",
-      "badges": {"new":true},
-      "options": [{"id":"demo-towel-piece","ar":"قطعة","ku":"قطعة","en":"قطعة","price":10000}]
+      "id":"3e37e98d-cf26-44e8-8ae7-0dbb904069bc",
+      "category":{"id":"1124b8e9-b314-44e2-be0b-43c42e7d2596","ar":"ملابس الأطفال","ku":"جل و بەرگێن زاروکان","en":"Baby Clothes","order":4},
+      "name":{"ar":"جوارب أطفال","ku":"گۆرەویێن زاروکان","en":"Baby Socks"},
+      "image":"",
+      "badges":{},
+      "options":[{"id":"8db5f280-7e30-46ec-af64-926e0447a014","ar":"طقم","ku":"سێت","en":"Set","price":5000}]
     },
     {
-      "id": "demo-clothes-1",
-      "category": {"id":"cat-clothes","ar":"ملابس الأطفال","ku":"ملابس الأطفال","en":"ملابس الأطفال","order":6},
-      "name": {"ar":"طقم قطني للأطفال","ku":"طقم قطني للأطفال","en":"طقم قطني للأطفال"},
-      "image": "",
-      "badges": {},
-      "options": [
-        {"id":"demo-clothes-0-3","ar":"0-3 أشهر","ku":"0-3 أشهر","en":"0-3 أشهر","price":15000},
-        {"id":"demo-clothes-3-6","ar":"3-6 أشهر","ku":"3-6 أشهر","en":"3-6 أشهر","price":16000}
-      ]
+      "id":"c3d8409c-14cc-4039-854c-e16530b8a45d",
+      "category":{"id":"d325ada5-5af8-4d3d-b5a0-5ce96808a126","ar":"الرضاعة والتغذية","ku":"شیردان و خوارن","en":"Feeding","order":5},
+      "name":{"ar":"رضاعة أطفال","ku":"شیردانا زاروکان","en":"Baby Bottle"},
+      "image":"https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/c3d8409c-14cc-4039-854c-e16530b8a45d/1788634119956-jjc218.png",
+      "badges":{},
+      "options":[{"id":"f0505385-18e5-4a8f-a221-170012907291","ar":"150 مل","ku":"150 مل","en":"150 ml","price":8500},{"id":"d75d86fd-bf44-4fd7-ad46-572cb13394fb","ar":"250 مل","ku":"250 مل","en":"250 ml","price":10500}]
     },
     {
-      "id": "demo-socks-1",
-      "category": {"id":"cat-clothes","ar":"ملابس الأطفال","ku":"ملابس الأطفال","en":"ملابس الأطفال","order":6},
-      "name": {"ar":"جوارب أطفال","ku":"جوارب أطفال","en":"جوارب أطفال"},
-      "image": "",
-      "badges": {},
-      "options": [{"id":"demo-socks-set","ar":"طقم","ku":"طقم","en":"طقم","price":5000}]
+      "id":"5dff2759-d057-4f91-a9c5-114a98217cd3",
+      "category":{"id":"d325ada5-5af8-4d3d-b5a0-5ce96808a126","ar":"الرضاعة والتغذية","ku":"شیردان و خوارن","en":"Feeding","order":5},
+      "name":{"ar":"لهاية أطفال","ku":"پستانکا زاروکان","en":"Baby Pacifier"},
+      "image":"",
+      "badges":{},
+      "options":[{"id":"9dbcf4e4-e744-4684-8fc9-11901572197e","ar":"قطعة","ku":"دانە","en":"Piece","price":4500}]
     },
     {
-      "id": "demo-sleep-1",
-      "category": {"id":"cat-sleep","ar":"النوم والراحة","ku":"النوم والراحة","en":"النوم والراحة","order":7},
-      "name": {"ar":"بطانية أطفال ناعمة","ku":"بطانية أطفال ناعمة","en":"بطانية أطفال ناعمة"},
-      "image": "",
-      "badges": {"popular":true},
-      "options": [{"id":"demo-sleep-piece","ar":"قطعة","ku":"قطعة","en":"قطعة","price":18000}]
+      "id":"7f3e4c53-efd0-455e-88d8-d0af37ea9c51",
+      "category":{"id":"5720e835-12a1-4baa-a806-81714d48dbd0","ar":"الاستحمام","ku":"خۆشوشتن","en":"Bath Time","order":6},
+      "name":{"ar":"بانيو أطفال","ku":"تەشتا خۆشوشتنا زاروکان","en":"Baby Bath Tub"},
+      "image":"https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/7f3e4c53-efd0-455e-88d8-d0af37ea9c51/1788638561419-t65fuy.jpg",
+      "badges":{},
+      "options":[{"id":"608bbe89-4bcd-48f1-9eb1-b791e62ff3e0","ar":"قطعة","ku":"دانە","en":"Piece","price":22000}]
     },
     {
-      "id": "demo-pillow-1",
-      "category": {"id":"cat-sleep","ar":"النوم والراحة","ku":"النوم والراحة","en":"النوم والراحة","order":7},
-      "name": {"ar":"وسادة أطفال","ku":"وسادة أطفال","en":"وسادة أطفال"},
-      "image": "",
-      "badges": {},
-      "options": [{"id":"demo-pillow-piece","ar":"قطعة","ku":"قطعة","en":"قطعة","price":8000}]
+      "id":"ae519495-054b-4a91-996f-e50d265a80ad",
+      "category":{"id":"5720e835-12a1-4baa-a806-81714d48dbd0","ar":"الاستحمام","ku":"خۆشوشتن","en":"Bath Time","order":6},
+      "name":{"ar":"منشفة أطفال بقبعة","ku":"خاولیا زاروکان ب کڵاو","en":"Hooded Baby Towel"},
+      "image":"",
+      "badges":{"new":true},
+      "options":[{"id":"45af0fe7-ed77-48d7-8f86-d1c1322e50a0","ar":"قطعة","ku":"دانە","en":"Piece","price":10000}]
     },
     {
-      "id": "demo-toy-1",
-      "category": {"id":"cat-toys","ar":"الألعاب","ku":"الألعاب","en":"الألعاب","order":8},
-      "name": {"ar":"خشخيشة أطفال","ku":"خشخيشة أطفال","en":"خشخيشة أطفال"},
-      "image": "",
-      "badges": {},
-      "options": [{"id":"demo-toy-piece","ar":"قطعة","ku":"قطعة","en":"قطعة","price":6000}]
+      "id":"e880e3a8-b517-472e-9fb3-58fc345197e9",
+      "category":{"id":"1647d2de-1e6a-47b4-bbe7-b4f1518d0ee1","ar":"النوم والراحة","ku":"نڤستن و ئارامی","en":"Sleep & Comfort","order":7},
+      "name":{"ar":"بطانية أطفال ناعمة","ku":"بەتانیا نەرم یا زاروکان","en":"Soft Baby Blanket"},
+      "image":"",
+      "badges":{"popular":true},
+      "options":[{"id":"6c4ee04b-8a60-4a6f-a641-8941ee56c9c5","ar":"قطعة","ku":"دانە","en":"Piece","price":18000}]
     },
     {
-      "id": "demo-plush-1",
-      "category": {"id":"cat-toys","ar":"الألعاب","ku":"الألعاب","en":"الألعاب","order":8},
-      "name": {"ar":"لعبة قماش ناعمة","ku":"لعبة قماش ناعمة","en":"لعبة قماش ناعمة"},
-      "image": "",
-      "badges": {"new":true},
-      "options": [{"id":"demo-plush-piece","ar":"قطعة","ku":"قطعة","en":"قطعة","price":12000}]
+      "id":"566b051c-0252-43cb-92a1-087917d80403",
+      "category":{"id":"1647d2de-1e6a-47b4-bbe7-b4f1518d0ee1","ar":"النوم والراحة","ku":"نڤستن و ئارامی","en":"Sleep & Comfort","order":7},
+      "name":{"ar":"وسادة أطفال","ku":"بالگەها زاروکان","en":"Baby Pillow"},
+      "image":"",
+      "badges":{},
+      "options":[{"id":"1a0658a0-f4ff-41ed-ac64-826ba198b5e7","ar":"قطعة","ku":"دانە","en":"Piece","price":8000}]
     },
     {
-      "id": "demo-stroller-1",
-      "category": {"id":"cat-travel","ar":"العربات والكراسي","ku":"العربات والكراسي","en":"العربات والكراسي","order":9},
-      "name": {"ar":"عربة أطفال","ku":"عربة أطفال","en":"عربة أطفال"},
-      "image": "",
-      "badges": {"popular":true},
-      "options": [{"id":"demo-stroller-piece","ar":"قطعة","ku":"قطعة","en":"قطعة","price":95000}]
+      "id":"a83a88f3-acc9-4653-a3d3-b4df89a13927",
+      "category":{"id":"40ef98bd-ab5c-4468-a113-40ecce7ba986","ar":"العربات والكراسي","ku":"عەرەبانە و کورسی","en":"Strollers & Seats","order":8},
+      "name":{"ar":"عربة أطفال","ku":"عەرەبانەیا زاروکان","en":"Baby Stroller"},
+      "image":"",
+      "badges":{"popular":true},
+      "options":[{"id":"14b3a48d-60cc-4366-86b7-685e15823f8a","ar":"قطعة","ku":"دانە","en":"Piece","price":95000}]
     },
     {
-      "id": "demo-seat-1",
-      "category": {"id":"cat-travel","ar":"العربات والكراسي","ku":"العربات والكراسي","en":"العربات والكراسي","order":9},
-      "name": {"ar":"كرسي سيارة للأطفال","ku":"كرسي سيارة للأطفال","en":"كرسي سيارة للأطفال"},
-      "image": "",
-      "badges": {},
-      "options": [{"id":"demo-seat-piece","ar":"قطعة","ku":"قطعة","en":"قطعة","price":85000}]
+      "id":"d95b64c3-2ed6-481d-b589-d64a72aa8468",
+      "category":{"id":"40ef98bd-ab5c-4468-a113-40ecce7ba986","ar":"العربات والكراسي","ku":"عەرەبانە و کورسی","en":"Strollers & Seats","order":8},
+      "name":{"ar":"كرسي سيارة للأطفال","ku":"کورسییا ئۆتۆمبێلێ بۆ زاروکان","en":"Baby Car Seat"},
+      "image":"",
+      "badges":{},
+      "options":[{"id":"293f14c9-920d-4033-ad3e-bc66f7fce0c1","ar":"قطعة","ku":"دانە","en":"Piece","price":85000}]
     }
   ]
 }
