@@ -132,6 +132,14 @@
       body.admin-global-dark #viewPashaCustomers .pb-customer-actions button{
         background:#18221f!important;color:#e8d2a2!important;border-color:rgba(227,183,91,.15)!important
       }
+      #viewPashaOrders .pb-order-actions button.pb-danger-delete,
+      #viewPashaCustomers .pb-customer-actions button.pb-danger-delete{
+        background:var(--pb-ops-danger-bg)!important;color:var(--pb-ops-danger)!important;border-color:rgba(181,72,72,.28)!important
+      }
+      body.admin-global-dark #viewPashaOrders .pb-order-actions button.pb-danger-delete,
+      body.admin-global-dark #viewPashaCustomers .pb-customer-actions button.pb-danger-delete{
+        background:var(--pb-ops-danger-bg)!important;color:var(--pb-ops-danger)!important;border-color:rgba(255,157,157,.28)!important
+      }
       body.admin-global-dark #viewPashaCustomers .pb-customer-stat{background:#0f1715!important}
       @media(max-width:650px){
         #viewPashaOrders .pb-order-card,#viewPashaCustomers .pb-customer-card{padding:14px!important}
