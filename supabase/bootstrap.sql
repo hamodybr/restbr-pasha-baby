@@ -276,6 +276,7 @@ create table if not exists public.order_items (
   option_id uuid references public.product_options(id) on delete set null,
   product_name text not null,
   option_name text,
+  selected_color text,
   quantity integer not null default 1 check (quantity > 0),
   unit_price numeric not null check (unit_price >= 0),
   line_total numeric not null check (line_total >= 0),

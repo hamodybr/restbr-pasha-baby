@@ -5,6 +5,7 @@
   const CART_KEY = 'RESTBR_CART_V1';
   const TOKEN_KEY = 'PASHA_ORDER_TOKEN_V1';
   const LAST_ORDER_KEY = 'PASHA_LAST_ORDER_V1';
+  const WHATSAPP_DELAY_MS = 2600;
   let submitting = false;
   let capturedLocationUrl = '';
 
@@ -51,7 +52,33 @@
     return document.querySelector('[data-order-type].active')?.dataset?.orderType || 'delivery';
   }
 
-  function toast(message, error = false) {
+  function installConfirmationStyle() {
+    if (document.getElementById('pbOrderConfirmationStyle')) return;
+    const style = document.createElement('style');
+    style.id = 'pbOrderConfirmationStyle';
+    style.textContent = `
+      #smCartToast.pb-order-confirmed,#pbOrderToast.pb-order-confirmed{
+        left:50%!important;bottom:50%!important;transform:translate(-50%,50%) scale(1)!important;
+        width:min(84vw,360px)!important;max-width:360px!important;padding:24px 22px!important;
+        border:2px solid rgba(255,255,255,.72)!important;border-radius:24px!important;
+        background:linear-gradient(145deg,#2f8b73,#246e5c)!important;color:#fff!important;
+        font:950 22px/1.5 system-ui,sans-serif!important;text-align:center!important;
+        box-shadow:0 24px 70px rgba(31,89,75,.38),0 0 0 9999px rgba(25,43,39,.2)!important;
+        white-space:normal!important;opacity:1!important;z-index:100000!important;
+        animation:pbOrderConfirmedIn .34s cubic-bezier(.2,.9,.25,1.25) both!important
+      }
+      #smCartToast.pb-order-confirmed::before,#pbOrderToast.pb-order-confirmed::before{
+        content:'✓';display:grid;place-items:center;width:54px;height:54px;margin:0 auto 9px;
+        border-radius:50%;background:#fff;color:#2f8b73;font-size:31px;line-height:1
+      }
+      @keyframes pbOrderConfirmedIn{from{opacity:0;transform:translate(-50%,50%) scale(.72)}to{opacity:1;transform:translate(-50%,50%) scale(1)}}
+      @media(prefers-reduced-motion:reduce){#smCartToast.pb-order-confirmed,#pbOrderToast.pb-order-confirmed{animation:none!important}}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function toast(message, error = false, duration = 0, confirmed = false) {
+    installConfirmationStyle();
     let el = document.getElementById('smCartToast');
     if (!el) {
       el = document.createElement('div');
@@ -60,14 +87,21 @@
       document.body.appendChild(el);
     }
     el.textContent = message;
+    el.classList.toggle('pb-order-confirmed', confirmed);
+    const visibleFor = duration || (error ? 3000 : 1800);
     if (el.id === 'smCartToast') {
       el.classList.add('show');
       clearTimeout(el.__pbTimer);
-      el.__pbTimer = setTimeout(() => el.classList.remove('show'), error ? 3000 : 1800);
+      el.__pbTimer = setTimeout(() => {
+        el.classList.remove('show', 'pb-order-confirmed');
+      }, visibleFor);
     } else {
       el.style.display = 'block';
       clearTimeout(el.__pbTimer);
-      el.__pbTimer = setTimeout(() => { el.style.display = 'none'; }, error ? 3500 : 2000);
+      el.__pbTimer = setTimeout(() => {
+        el.style.display = 'none';
+        el.classList.remove('pb-order-confirmed');
+      }, visibleFor);
     }
   }
 
@@ -108,7 +142,7 @@
       address: payload.address,
       locationUrl: payload.locationUrl,
       notes: payload.notes,
-      items: payload.items.map(item => [item.productId, item.optionId || '', item.optionIndex, item.quantity]),
+      items: payload.items.map(item => [item.productId, item.optionId || '', item.colorId || '', item.optionIndex, item.quantity]),
     });
   }
 
@@ -242,6 +276,7 @@
     const items = cart.map(item => ({
       productId: String(item?.productId || ''),
       optionId: item?.optionId == null ? '' : String(item.optionId),
+      colorId: item?.colorId == null ? '' : String(item.colorId),
       optionIndex: Math.max(0, Math.trunc(Number(item?.optionIndex || 0))),
       quantity: Math.max(1, Math.min(99, Math.trunc(Number(item?.qty || 1)))),
     }));
@@ -258,9 +293,9 @@
 
     try {
       const order = await saveOrder(payload);
-      button.textContent = '✓ تم تسجيل الطلب';
-      toast(`تم تسجيل الطلب ${order.order_number || ''} ✓`);
-      setTimeout(() => openWhatsApp(order, checkout, cart), 180);
+      button.textContent = '✓ تم تثبيت الطلب';
+      toast('تم تثبيت الطلب', false, WHATSAPP_DELAY_MS, true);
+      setTimeout(() => openWhatsApp(order, checkout, cart), WHATSAPP_DELAY_MS);
     } catch (error) {
       console.error('PASHA ORDER SUBMIT ERROR:', error);
       button.disabled = false;

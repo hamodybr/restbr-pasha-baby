@@ -29,6 +29,11 @@
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
 
+  const englishDigits = value => String(value ?? '')
+    .replace(/[٠-٩]/g, digit => String(digit.charCodeAt(0) - 1632))
+    .replace(/[۰-۹]/g, digit => String(digit.charCodeAt(0) - 1776))
+    .replace(/[０-９]/g, digit => String(digit.charCodeAt(0) - 65296));
+
   const money = value => Number(value || 0).toLocaleString('en-US') + ' د.ع';
   const when = value => {
     try {
@@ -39,6 +44,58 @@
       });
     } catch (_) { return String(value || ''); }
   };
+
+  const itemKey = value => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+
+  function legacyColors(notes) {
+    const queues = new Map();
+    const text = String(notes || '');
+    if (!/^🎨\s*الألوان:/m.test(text)) return queues;
+    text.split(/\r?\n/).forEach(line => {
+      const match = line.match(/^\s*•\s*(.*?)\s*×\s*[0-9٠-٩۰-۹]+\s*:\s*(.+?)\s*$/);
+      if (!match) return;
+      const key = itemKey(match[1]);
+      const color = String(match[2] || '').trim().slice(0, 80);
+      if (!key || !color) return;
+      if (!queues.has(key)) queues.set(key, []);
+      queues.get(key).push(color);
+    });
+    return queues;
+  }
+
+  function orderItemsWithColors(order) {
+    const queues = legacyColors(order?.notes);
+    const rows = Array.isArray(order?.order_items) ? order.order_items : [];
+    return rows.map(item => {
+      const explicit = String(item?.selected_color || '').trim();
+      if (explicit) return { ...item, selected_color: explicit };
+      const queue = queues.get(itemKey(item?.product_name));
+      return { ...item, selected_color: queue?.shift?.() || '' };
+    });
+  }
+
+  function cleanOrderNotes(value) {
+    return String(value || '')
+      .replace(/^\s*🎨\s*الألوان:\s*\r?\n(?:\s*•[^\r\n]*(?:\r?\n|$))+\s*/i, '')
+      .trim();
+  }
+
+  function itemOptionText(item) {
+    const option = String(item?.option_name || '').trim();
+    const color = String(item?.selected_color || '').trim();
+    if (option && color) return `${option} • اللون: ${color}`;
+    if (color) return `اللون: ${color}`;
+    return option;
+  }
+
+  function parseFee(value) {
+    const normalized = englishDigits(value)
+      .replace(/[٬،,\s]/g, '')
+      .replace(/٫/g, '.');
+    if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) return null;
+    const fee = Number(normalized);
+    return Number.isFinite(fee) && fee >= 0 && fee <= 10000000 ? fee : null;
+  }
 
   function injectStyles() {
     if (document.getElementById('pbOrdersCustomersStyles')) return;
@@ -60,16 +117,17 @@
       .pb-order-customer{margin:10px 0 7px;font-weight:800;color:#ece7e1}.pb-order-customer a{color:inherit;text-decoration:none;direction:ltr;display:inline-block}
       .pb-order-address{color:#a9a097;font-size:11px;line-height:1.6;margin-bottom:8px}
       .pb-order-items{display:grid;gap:4px;padding:8px 0;border-top:1px dashed rgba(255,255,255,.08);border-bottom:1px dashed rgba(255,255,255,.08)}
-      .pb-order-item{display:flex;justify-content:space-between;gap:8px;font-size:11px;line-height:1.5}.pb-order-item span{min-width:0}.pb-order-item b{white-space:nowrap;color:#d7c4a5}
+      .pb-order-item{display:flex;justify-content:space-between;gap:8px;font-size:11px;line-height:1.5}.pb-order-item span{min-width:0}.pb-order-item span strong{display:block;color:inherit}.pb-order-item span small{display:block;margin-top:2px;color:#a99d91;font-size:10px;font-weight:700}.pb-order-item b{white-space:nowrap;color:#d7c4a5}.pb-order-item.pb-delivery-line{color:#6eb89f}.pb-order-item.pb-delivery-line span strong{color:inherit}
       .pb-order-total{display:flex;align-items:center;justify-content:space-between;margin-top:9px;font-weight:900}.pb-order-total b{font-size:17px;color:#e2b55e}
       .pb-order-notes{margin-top:7px;padding:7px 8px;border-radius:9px;background:rgba(255,255,255,.03);color:#b5ada4;font-size:10px;line-height:1.55}
+      .pb-delivery-fee-editor{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:end;margin-top:9px;padding:9px;border:1px solid rgba(110,184,159,.18);border-radius:11px;background:rgba(72,151,126,.06)}.pb-delivery-fee-editor label{min-width:0}.pb-delivery-fee-editor label span{display:block;margin:0 2px 5px;color:#aebdb7;font-size:10px;font-weight:850}.pb-delivery-fee-editor input{width:100%;min-width:0;height:39px;padding:0 10px;border:1px solid rgba(110,184,159,.24);border-radius:9px;background:#0d1412;color:#f1f5f3;-webkit-text-fill-color:#f1f5f3;font:800 16px/1 ui-monospace,monospace;direction:ltr;text-align:left;outline:none}.pb-delivery-fee-editor input:focus{border-color:#72c4a7;box-shadow:0 0 0 3px rgba(114,196,167,.1)}.pb-delivery-fee-editor button{height:39px;padding:0 12px;border:1px solid rgba(110,184,159,.25);border-radius:9px;background:#19362e;color:#a6e2ce;font:inherit;font-size:10px;font-weight:900;cursor:pointer}.pb-delivery-fee-editor button:disabled{opacity:.58;cursor:wait}
       .pb-order-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.pb-order-actions button,.pb-customer-actions button{flex:1 1 105px;border:1px solid rgba(255,255,255,.08);background:#15110e;color:#ddd4ca;border-radius:10px;padding:9px 10px;font:inherit;font-size:10px;font-weight:800;cursor:pointer}.pb-order-actions .primary{border-color:rgba(216,169,88,.25);background:linear-gradient(135deg,#e2b55e,#b67c2d);color:#171009}
       .pb-status-select{width:100%;margin-top:7px;border:1px solid rgba(255,255,255,.08);background:#0e0b09;color:inherit;border-radius:9px;padding:8px;font:inherit;font-size:13px}
       .pb-customer-id{font:900 14px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;color:#e2b55e;direction:ltr;text-align:left}.pb-customer-name{font-weight:900;color:#ece7e1;margin-top:4px}.pb-customer-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}.pb-customer-stat{padding:8px;border-radius:10px;background:rgba(255,255,255,.025);text-align:center}.pb-customer-stat span{display:block;color:#827b73;font-size:8px}.pb-customer-stat b{display:block;margin-top:3px;font-size:11px;color:#d9d1c7}.pb-customer-actions{display:flex;gap:6px;margin-top:9px}
       .pb-empty{padding:30px 14px;text-align:center;color:#8b847c;border:1px dashed rgba(255,255,255,.08);border-radius:14px}
       .pb-nav-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#e2b55e;color:#24170a;font-size:8px;font-weight:900;margin-inline-start:4px}
       @media(max-width:650px){.pb-ops-kpis{grid-template-columns:1fr 1fr}.pb-ops-kpi:last-child{grid-column:1/-1}.pb-order-head,.pb-customer-head{gap:6px}.pb-customer-stats{grid-template-columns:1fr 1fr 1fr}}
-      body.admin-global-light .pb-order-card,body.admin-global-light .pb-customer-card{background:#fffaf4;border-color:rgba(86,57,19,.13);color:#33291f}body.admin-global-light .pb-ops-toolbar input,body.admin-global-light .pb-ops-toolbar select,body.admin-global-light .pb-status-select{background:#fff;color:#33291f;border-color:rgba(86,57,19,.14)}body.admin-global-light .pb-order-actions button,body.admin-global-light .pb-customer-actions button{background:#fff7ec;color:#44372a;border-color:rgba(86,57,19,.13)}
+      body.admin-global-light .pb-order-card,body.admin-global-light .pb-customer-card{background:#fffaf4;border-color:rgba(86,57,19,.13);color:#33291f}body.admin-global-light .pb-ops-toolbar input,body.admin-global-light .pb-ops-toolbar select,body.admin-global-light .pb-status-select{background:#fff;color:#33291f;border-color:rgba(86,57,19,.14)}body.admin-global-light .pb-order-actions button,body.admin-global-light .pb-customer-actions button{background:#fff7ec;color:#44372a;border-color:rgba(86,57,19,.13)}body.admin-global-light .pb-delivery-fee-editor{background:#f2fbf7;border-color:#cee7de}body.admin-global-light .pb-delivery-fee-editor label span{color:#55736a}body.admin-global-light .pb-delivery-fee-editor input{background:#fff;color:#263c35;-webkit-text-fill-color:#263c35;border-color:#c8dfd7}body.admin-global-light .pb-delivery-fee-editor button{background:#dff3ec;color:#235f50;border-color:#b9dacf}
     `;
     document.head.appendChild(style);
   }
@@ -198,7 +256,7 @@
 
     const result = await client
       .from('orders')
-      .select('id,order_number,customer_id,customer_name,customer_phone,order_type,address,location_url,notes,status,subtotal,delivery_fee,total,created_at,updated_at,order_items(id,product_id,option_id,product_name,option_name,quantity,unit_price,line_total)')
+      .select('id,order_number,customer_id,customer_name,customer_phone,order_type,address,location_url,notes,status,subtotal,delivery_fee,total,created_at,updated_at,order_items(id,product_id,option_id,product_name,option_name,selected_color,quantity,unit_price,line_total)')
       .order('created_at', { ascending: false })
       .limit(500);
 
@@ -292,7 +350,9 @@
     }
 
     list.innerHTML = filtered.map(order => {
-      const items = Array.isArray(order.order_items) ? order.order_items : [];
+      const items = orderItemsWithColors(order);
+      const notes = cleanOrderNotes(order.notes);
+      const fee = Number(order.delivery_fee || 0);
       const status = STATUS[order.status] || [order.status || '—', '•'];
       return `<article class="pb-order-card" data-order-id="${esc(order.id)}">
         <div class="pb-order-head">
@@ -301,8 +361,9 @@
         </div>
         <div class="pb-order-customer">${esc(order.customer_name)} — <a href="tel:${esc(order.customer_phone)}">${esc(order.customer_phone)}</a></div>
         ${order.address ? `<div class="pb-order-address">📍 ${esc(order.address)}</div>` : ''}
-        <div class="pb-order-items">${items.map(item => `<div class="pb-order-item"><span>${Number(item.quantity || 0)}× ${esc(item.product_name)}${item.option_name ? ` — ${esc(item.option_name)}` : ''}</span><b>${money(item.line_total)}</b></div>`).join('')}</div>
-        ${order.notes ? `<div class="pb-order-notes">📝 ${esc(order.notes)}</div>` : ''}
+        <div class="pb-order-items">${items.map(item => { const option = itemOptionText(item); return `<div class="pb-order-item"><span><strong>${Number(item.quantity || 0)}× ${esc(item.product_name)}</strong>${option ? `<small>${esc(option)}</small>` : ''}</span><b>${money(item.line_total)}</b></div>`; }).join('')}${fee > 0 ? `<div class="pb-order-item pb-delivery-line"><span><strong>1× أجور التوصيل</strong></span><b>${money(fee)}</b></div>` : ''}</div>
+        ${notes ? `<div class="pb-order-notes">📝 ${esc(notes)}</div>` : ''}
+        ${order.order_type === 'delivery' ? `<div class="pb-delivery-fee-editor"><label><span>أجور التوصيل — تنضاف للفاتورة والمجموع</span><input type="text" inputmode="numeric" data-pb-numeric data-delivery-fee-input="${esc(order.id)}" value="${esc(englishDigits(fee))}" aria-label="أجور التوصيل"></label><button type="button" data-save-delivery-fee="${esc(order.id)}">حفظ الأجور</button></div>` : ''}
         <div class="pb-order-total"><span>المجموع الكلي</span><b>${money(order.total)}</b></div>
         <select class="pb-status-select" data-order-status="${esc(order.id)}">${Object.entries(STATUS).map(([key, value]) => `<option value="${key}" ${key === order.status ? 'selected' : ''}>${value[0]}</option>`).join('')}</select>
         <div class="pb-order-actions">
@@ -314,6 +375,15 @@
     }).join('');
 
     list.querySelectorAll('[data-order-status]').forEach(select => select.addEventListener('change', () => void updateStatus(select.dataset.orderStatus, select.value)));
+    list.querySelectorAll('[data-save-delivery-fee]').forEach(button => button.addEventListener('click', () => {
+      const input = list.querySelector(`[data-delivery-fee-input="${CSS.escape(button.dataset.saveDeliveryFee || '')}"]`);
+      void updateDeliveryFee(button.dataset.saveDeliveryFee, input?.value || '', button);
+    }));
+    list.querySelectorAll('[data-delivery-fee-input]').forEach(input => input.addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      list.querySelector(`[data-save-delivery-fee="${CSS.escape(input.dataset.deliveryFeeInput || '')}"]`)?.click();
+    }));
     list.querySelectorAll('[data-print-order]').forEach(button => button.addEventListener('click', () => printOrder(button.dataset.printOrder)));
     list.querySelectorAll('[data-open-location]').forEach(button => button.addEventListener('click', () => {
       const order = orders.find(row => String(row.id) === String(button.dataset.openLocation));
@@ -343,6 +413,48 @@
     if (order) order.status = status;
     updateOrderKPIs();
     renderOrders();
+    void loadCustomers(false);
+  }
+
+  async function updateDeliveryFee(orderId, rawValue, button) {
+    const fee = parseFee(rawValue);
+    if (fee === null) {
+      alert('أدخل أجور توصيل صحيحة بين 0 و 10,000,000 د.ع. تقدر تستخدم الأرقام العربية أو الإنجليزية.');
+      return;
+    }
+    const order = orders.find(row => String(row.id) === String(orderId));
+    const client = sb();
+    if (!order || !client) return;
+
+    const total = Number(order.subtotal || 0) + fee;
+    const oldText = button?.textContent || 'حفظ الأجور';
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'جاري الحفظ...';
+    }
+
+    const result = await client
+      .from('orders')
+      .update({ delivery_fee: fee, total, updated_at: new Date().toISOString() })
+      .eq('id', orderId)
+      .select('delivery_fee,total,updated_at')
+      .single();
+
+    if (result.error) {
+      if (button) {
+        button.disabled = false;
+        button.textContent = oldText;
+      }
+      alert('فشل حفظ أجور التوصيل: ' + (result.error.message || result.error));
+      return;
+    }
+
+    order.delivery_fee = Number(result.data?.delivery_fee ?? fee);
+    order.total = Number(result.data?.total ?? total);
+    order.updated_at = result.data?.updated_at || order.updated_at;
+    updateOrderKPIs();
+    if (button) button.textContent = '✓ تم الحفظ';
+    setTimeout(() => renderOrders(), 850);
     void loadCustomers(false);
   }
 
@@ -379,9 +491,13 @@
   function printOrder(orderId) {
     const order = orders.find(row => String(row.id) === String(orderId));
     if (!order) return;
-    const items = Array.isArray(order.order_items) ? order.order_items : [];
+    const items = orderItemsWithColors(order);
+    const notes = cleanOrderNotes(order.notes);
+    const fee = Number(order.delivery_fee || 0);
+    const invoiceEsc = value => esc(englishDigits(value));
     const logo = document.querySelector('.admin-logo')?.src || '';
-    const compactClass = items.length > 14 ? 'ultra-compact' : items.length > 10 ? 'compact' : '';
+    const printedItemCount = items.length + (fee > 0 ? 1 : 0);
+    const compactClass = printedItemCount > 14 ? 'ultra-compact' : printedItemCount > 10 ? 'compact' : '';
     const popup = window.open('', '_blank', 'width=520,height=780');
     if (!popup) {
       alert('اسمح بالنوافذ المنبثقة حتى تفتح معاينة الطباعة.');
@@ -392,20 +508,20 @@
     popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(order.order_number)} — Pasha Baby</title><style>
       @page{size:100mm 150mm;margin:0}
       *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      html,body{margin:0;padding:0;width:100mm;min-width:100mm;background:#fff;color:#111;font-family:Arial,Tahoma,"Segoe UI",sans-serif}
+      html,body{margin:0;padding:0;width:100mm;min-width:100mm;background:#fff;color:#111;font-family:Arial,Tahoma,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums}
       .label{width:100mm;height:150mm;padding:5mm 5mm 4mm;display:flex;flex-direction:column;overflow:hidden;border:0}
       .brand{text-align:center;border-bottom:.35mm solid #111;padding-bottom:2.2mm;margin-bottom:2.3mm}.brand img{width:16mm;height:16mm;object-fit:contain;display:block;margin:0 auto 1mm}.brand h1{margin:0;font:900 5mm/1.05 Georgia,serif;letter-spacing:.5mm}.brand small{font-size:2.4mm;letter-spacing:.35mm}
       .orderline{display:flex;justify-content:space-between;align-items:center;gap:2mm;margin-bottom:2mm}.orderline strong{font:900 4.1mm/1.1 ui-monospace,monospace;direction:ltr}.orderline span{font-size:2.6mm}
       .customer{border:.35mm solid #111;border-radius:2mm;padding:2.2mm;margin-bottom:2.2mm;font-size:3mm;line-height:1.45}.customer b{font-size:3.4mm}.phone{direction:ltr;display:inline-block;font-weight:900}.address{margin-top:1mm;font-weight:700}
-      .items{flex:1;min-height:0;overflow:hidden;border-top:.3mm solid #111;border-bottom:.3mm solid #111;padding:1.2mm 0}.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2mm;align-items:start;padding:1mm 0;border-bottom:.18mm dotted #777;font-size:2.75mm;line-height:1.32}.item:last-child{border-bottom:0}.item strong{white-space:nowrap}.option{font-size:2.3mm;color:#333}.compact .item{font-size:2.35mm;padding:.65mm 0}.compact .option{font-size:2mm}.ultra-compact .item{font-size:1.95mm;padding:.4mm 0;line-height:1.16}.ultra-compact .option{font-size:1.75mm}
+      .items{flex:1;min-height:0;overflow:hidden;border-top:.3mm solid #111;border-bottom:.3mm solid #111;padding:1.2mm 0}.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2mm;align-items:start;padding:1mm 0;border-bottom:.18mm dotted #777;font-size:2.75mm;line-height:1.32}.item:last-child{border-bottom:0}.item strong{white-space:nowrap}.option{font-size:2.3mm;color:#333;font-weight:700}.delivery-item{color:#176d57}.delivery-item .option{color:inherit}.compact .item{font-size:2.35mm;padding:.65mm 0}.compact .option{font-size:2mm}.ultra-compact .item{font-size:1.95mm;padding:.4mm 0;line-height:1.16}.ultra-compact .option{font-size:1.75mm}
       .notes{margin-top:1.6mm;padding:1.5mm;border:.25mm solid #555;border-radius:1.5mm;font-size:2.45mm;line-height:1.35;max-height:15mm;overflow:hidden}.totals{margin-top:2mm;border:.45mm solid #111;border-radius:1.8mm;padding:2mm;display:grid;gap:.8mm}.row{display:flex;justify-content:space-between;gap:2mm;font-size:2.7mm}.row.grand{font-size:4.2mm;font-weight:900;border-top:.3mm solid #111;padding-top:1.2mm}.footer{text-align:center;margin-top:1.7mm;font-size:2.5mm;font-weight:800}.screen-actions{display:flex;gap:8px;padding:12px;position:fixed;left:0;right:0;bottom:0;background:#eee;z-index:5}.screen-actions button{flex:1;padding:12px;border:0;border-radius:8px;background:#111;color:#fff;font-weight:800}@media print{.screen-actions{display:none}}
     </style></head><body><div class="label ${compactClass}">
       <div class="brand">${logo ? `<img src="${esc(logo)}" alt="Pasha Baby">` : ''}<h1>PASHA BABY</h1><small>PREMIUM BABY BOUTIQUE</small></div>
-      <div class="orderline"><strong>${esc(order.order_number)}</strong><span>${esc(when(order.created_at))}</span></div>
-      <div class="customer"><b>${esc(order.customer_name)}</b><br><span class="phone">${esc(order.customer_phone)}</span> · ${order.order_type === 'delivery' ? 'توصيل' : 'استلام'}${order.address ? `<div class="address">${esc(order.address)}</div>` : ''}</div>
-      <div class="items">${items.map(item => `<div class="item"><span><b>${Number(item.quantity || 0)}× ${esc(item.product_name)}</b>${item.option_name ? `<div class="option">${esc(item.option_name)}</div>` : ''}</span><strong>${money(item.line_total)}</strong></div>`).join('')}</div>
-      ${order.notes ? `<div class="notes"><b>ملاحظة:</b> ${esc(order.notes)}</div>` : ''}
-      <div class="totals">${Number(order.delivery_fee || 0) > 0 ? `<div class="row"><span>المجموع</span><b>${money(order.subtotal)}</b></div><div class="row"><span>التوصيل</span><b>${money(order.delivery_fee)}</b></div>` : ''}<div class="row grand"><span>المجموع الكلي</span><b>${money(order.total)}</b></div></div>
+      <div class="orderline"><strong>${invoiceEsc(order.order_number)}</strong><span>${invoiceEsc(when(order.created_at))}</span></div>
+      <div class="customer"><b>${invoiceEsc(order.customer_name)}</b><br><span class="phone">${invoiceEsc(order.customer_phone)}</span> · ${order.order_type === 'delivery' ? 'توصيل' : 'استلام'}${order.address ? `<div class="address">${invoiceEsc(order.address)}</div>` : ''}</div>
+      <div class="items">${items.map(item => { const option = itemOptionText(item); return `<div class="item"><span><b>${Number(item.quantity || 0)}× ${invoiceEsc(item.product_name)}</b>${option ? `<div class="option">${invoiceEsc(option)}</div>` : ''}</span><strong>${money(item.line_total)}</strong></div>`; }).join('')}${fee > 0 ? `<div class="item delivery-item"><span><b>1× أجور التوصيل</b><div class="option">خدمة التوصيل</div></span><strong>${money(fee)}</strong></div>` : ''}</div>
+      ${notes ? `<div class="notes"><b>ملاحظة:</b> ${invoiceEsc(notes)}</div>` : ''}
+      <div class="totals">${fee > 0 ? `<div class="row"><span>مجموع الأصناف</span><b>${money(order.subtotal)}</b></div>` : ''}<div class="row grand"><span>المجموع الكلي</span><b>${money(order.total)}</b></div></div>
       <div class="footer">شكراً لاختياركم PASHA BABY</div>
     </div><div class="screen-actions"><button onclick="window.print()">طباعة / حفظ PDF 100×150</button></div></body></html>`);
     popup.document.close();

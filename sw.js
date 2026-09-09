@@ -1,5 +1,5 @@
-const CACHE_NAME = "restbr-pasha-baby-v26";
-// Final handoff refresh 2026-09-08: purge the previous cache and keep only active retail assets.
+const CACHE_NAME = "restbr-pasha-baby-v27";
+// Order confirmation, delivery fee, English digit, and invoice refresh 2026-09-09.
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -14,7 +14,7 @@ const CORE = [
   "./css/pasha-baby-theme.css?v=1.1",
   "./css/pasha-baby-storefront-v2.css?v=2.0",
   "./css/pasha-baby-retail-fixes.css?v=1.0",
-  "./css/pasha-baby-retail-polish-v3.css?v=3.0",
+  "./css/pasha-baby-retail-polish-v3.css?v=3.1",
   "./css/pasha-baby-retail-v4.css?v=5.0",
   "./css/pasha-baby-brand-background.css?v=1.0",
   "./css/pasha-baby-footer-v2.css?v=2.0",
@@ -27,13 +27,14 @@ const CORE = [
   "./js/pasha-baby-fixed-discounts.js?v=1.0",
   "./js/product-image-fallback.js?v=1.3",
   "./js/price-safety.js?v=1.0",
-  "./js/cart.js?v=4.5",
+  "./js/cart.js?v=4.6",
   "./js/cart-stale-item-guard.js?v=1.1",
   "./js/runtime-config.js?v=2.1",
   "./js/restbr-hardening.js?v=1.0",
   "./js/url-safety.js?v=1.3",
-  "./js/supabase-config.js?v=2.5",
-  "./js/pasha-arabic-only.js?v=1.0",
+  "./js/supabase-config.js?v=2.6",
+  "./js/pasha-arabic-only.js?v=1.1",
+  "./js/pasha-number-normalizer.js?v=1.0",
   "./js/live-prices.js?v=3.0",
   "./js/restaurant-hours.js?v=1.3",
   "./js/whatsapp-order-bullets.js?v=1.0",

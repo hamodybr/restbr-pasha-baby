@@ -56,9 +56,10 @@ requireText('sw.js', 'css/pasha-baby-final-tweaks.css?v=1.0', 'cached final Pash
 requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.0', 'cached commerce v2 runtime');
 requireText('sw.js', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'cached fixed discount runtime');
 requireText('sw.js', 'js/live-prices.js?v=3.0', 'cached live prices v3 runtime');
-requireText('sw.js', 'js/pasha-arabic-only.js?v=1.0', 'cached Arabic-only policy');
+requireText('sw.js', 'js/pasha-arabic-only.js?v=1.1', 'cached Arabic-only policy');
+requireText('sw.js', 'js/pasha-number-normalizer.js?v=1.0', 'cached English-digit normalizer');
 
-requireText('js/supabase-config.js', 'js/pasha-arabic-only.js?v=1.0', 'Arabic-only policy loader');
+requireText('js/supabase-config.js', 'js/pasha-arabic-only.js?v=1.1', 'Arabic-only policy loader');
 forbidText('js/supabase-config.js', 'language-settings.js', 'legacy multilingual loader');
 requireText('js/pasha-arabic-only.js', "localStorage.setItem('RESTBR_LANG_V1', 'ar')", 'Arabic language lock');
 requireText('js/pasha-arabic-only.js', 'data-pasha-multilang-hidden', 'admin multilingual field suppression');
