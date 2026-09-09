@@ -16,6 +16,7 @@
   const TOUCH_POINTS = Number(globalThis.navigator?.maxTouchPoints || 0);
   const IS_IOS = /iP(?:hone|ad|od)/i.test(UA) || (PLATFORM === 'MacIntel' && TOUCH_POINTS > 1);
   const USE_IOS_TEXT_FALLBACK = IS_ADMIN && IS_IOS;
+  const PREPARED = new WeakSet();
 
   function toEnglishDigits(value) {
     return String(value ?? '')
@@ -77,15 +78,14 @@
   }
 
   function prepareInput(input) {
-    if (!(input instanceof HTMLInputElement)) return;
+    if (!(input instanceof HTMLInputElement)) return false;
+    if (PREPARED.has(input)) return isNumericInput(input);
 
     const isNumber = String(input.type || '').toLowerCase() === 'number';
     if (isNumber && !input.inputMode) input.inputMode = numericInputMode(input);
 
-    // iOS/WebKit can reject Arabic/Persian glyphs inside type=number before JS can
-    // normalize them. On the admin only, switch number controls to a text-backed
-    // numeric field before the keyboard opens. The original constraints stay as
-    // attributes and our normalizer keeps number-only semantics.
+    // Safari/iPhone rejects Arabic/Persian glyphs in native type=number before
+    // JavaScript gets a useful input value. Convert once, before editing starts.
     if (USE_IOS_TEXT_FALLBACK && isNumber) {
       input.setAttribute('data-pb-native-number', '1');
       input.setAttribute('data-pb-numeric', '');
@@ -95,12 +95,38 @@
       input.spellcheck = false;
     }
 
-    if (!isNumericInput(input)) return;
-    input.lang = 'en';
-    input.dir = 'ltr';
+    const numeric = isNumericInput(input);
+    if (numeric) {
+      input.lang = 'en';
+      input.dir = 'ltr';
+    }
+    PREPARED.add(input);
+    return numeric;
   }
 
-  function emitInput(input, inputType = 'insertText', data = null) {
+  function normalizeCurrent(input) {
+    if (!(input instanceof HTMLInputElement)) return false;
+    if (!prepareInput(input)) return false;
+    const current = String(input.value ?? '');
+    const normalized = normalizeForInput(input, current);
+    if (normalized === current) return false;
+
+    // Performance-critical path: mutate during the browser's own input event and
+    // never emit a second synthetic input on iPhone. Capture phase means every
+    // downstream dashboard listener sees the normalized value immediately.
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    input.value = normalized;
+    try {
+      if (Number.isInteger(start) && Number.isInteger(end) && input.type !== 'number') {
+        const shift = current.length - normalized.length;
+        input.setSelectionRange(Math.max(0, start - shift), Math.max(0, end - shift));
+      }
+    } catch (_) {}
+    return true;
+  }
+
+  function emitNativeCompatibleInput(input, inputType = 'insertText', data = null) {
     try {
       input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType, data }));
     } catch (_) {
@@ -108,55 +134,14 @@
     }
   }
 
-  function insertNormalized(input, text, inputType = 'insertText') {
-    prepareInput(input);
-    const normalized = normalizeForInput(input, text);
-    const type = String(input.type || '').toLowerCase();
-
-    // Non-iOS native number fields have no usable selection range. Keep the old
-    // direct-write path there; the iOS admin fallback is text-backed and therefore
-    // uses setRangeText so editing in the middle of a price works correctly.
+  // Legacy fallback only for non-iOS browsers that still use native number fields.
+  function insertIntoNativeNumber(input, text, inputType = 'insertText') {
+    const type = String(input?.type || '').toLowerCase();
     if (type === 'number') {
+      const normalized = normalizeForInput(input, text);
       input.value = normalizeForInput(input, `${input.value || ''}${normalized}`);
-      emitInput(input, inputType, normalized);
-      return;
+      emitNativeCompatibleInput(input, inputType, normalized);
     }
-
-    let start = null;
-    let end = null;
-    try {
-      start = input.selectionStart;
-      end = input.selectionEnd;
-    } catch (_) {}
-
-    if (Number.isInteger(start) && Number.isInteger(end) && typeof input.setRangeText === 'function') {
-      try {
-        input.setRangeText(normalized, start, end, 'end');
-        emitInput(input, inputType, normalized);
-        return;
-      } catch (_) {}
-    }
-
-    const previous = String(input.value || '');
-    try {
-      input.focus({ preventScroll: true });
-      document.execCommand?.('insertText', false, normalized);
-      if (String(input.value || '') !== previous) return;
-    } catch (_) {}
-
-    input.value = normalizeForInput(input, `${input.value || ''}${normalized}`);
-    emitInput(input, inputType, normalized);
-  }
-
-  function normalizeCurrent(input) {
-    if (!(input instanceof HTMLInputElement)) return;
-    prepareInput(input);
-    if (!isNumericInput(input)) return;
-    const current = String(input.value ?? '');
-    const normalized = normalizeForInput(input, current);
-    if (normalized === current) return;
-    input.value = normalized;
-    emitInput(input, 'insertReplacementText', normalized);
   }
 
   function enhance(root = document) {
@@ -167,13 +152,13 @@
       prepareInput(input);
       normalizeCurrent(input);
     });
-    if (IS_ADMIN) normalizeTextTree(root);
   }
 
   function normalizeTextNode(node) {
     const parent = node?.parentElement;
     if (!parent || SKIP_TEXT_TAGS.has(parent.tagName) || parent.closest?.('[contenteditable="true"]')) return;
     const current = String(node.data ?? '');
+    if (!/[٠-٩۰-۹０-９]/.test(current)) return;
     const normalized = toEnglishDigits(current);
     if (normalized !== current) node.data = normalized;
   }
@@ -189,8 +174,7 @@
     while ((node = walker.nextNode())) normalizeTextNode(node);
   }
 
-  // focusin runs before the software keyboard starts editing. This is the critical
-  // iPhone path: convert the control before WebKit gets a chance to reject ١٢٣/۱۲۳.
+  // Critical iPhone path: this runs before the software keyboard edits the field.
   document.addEventListener('focusin', event => {
     const input = event.target;
     if (!(input instanceof HTMLInputElement)) return;
@@ -198,66 +182,82 @@
     normalizeCurrent(input);
   }, true);
 
-  // Extra keyboard fallback for iOS versions that expose the localized digit on
-  // keydown but do not provide a reliable beforeinput.data value.
-  document.addEventListener('keydown', event => {
-    const input = event.target;
-    if (!(input instanceof HTMLInputElement)) return;
-    prepareInput(input);
-    if (!isNumericInput(input) || event.metaKey || event.ctrlKey || event.altKey) return;
-    const key = typeof event.key === 'string' ? event.key : '';
-    if (!/[٠-٩۰-۹０-９٫٬،]/.test(key)) return;
-    const normalized = normalizeForInput(input, key);
-    if (!normalized || normalized === key) return;
-    event.preventDefault();
-    insertNormalized(input, normalized, 'insertText');
+  // Fast path: let iPhone insert ١٢٣/۱۲۳ normally into the text-backed field,
+  // then normalize in-place during the SAME native input event.
+  document.addEventListener('input', event => {
+    normalizeCurrent(event.target);
   }, true);
 
+  document.addEventListener('change', event => {
+    normalizeCurrent(event.target);
+  }, true);
+
+  document.addEventListener('compositionend', event => {
+    normalizeCurrent(event.target);
+  }, true);
+
+  // Kept only as a zero-work compatibility hook for non-iOS native number fields.
+  // iPhone exits on the first condition, so this adds no normalization work while typing.
+  document.addEventListener('keydown', event => {
+    if (USE_IOS_TEXT_FALLBACK) return;
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || String(input.type || '').toLowerCase() !== 'number') return;
+  }, true);
+
+  // Non-iOS compatibility path for native number controls that can reject localized
+  // glyphs before a normal input event is produced.
   document.addEventListener('beforeinput', event => {
     const input = event.target;
     if (!(input instanceof HTMLInputElement)) return;
     prepareInput(input);
-    if (!isNumericInput(input) || typeof event.data !== 'string') return;
+    if (USE_IOS_TEXT_FALLBACK || String(input.type || '').toLowerCase() !== 'number') return;
+    if (typeof event.data !== 'string' || !/[٠-٩۰-۹０-９٫٬،]/.test(event.data)) return;
     const normalized = normalizeForInput(input, event.data);
-    if (normalized === event.data) return;
+    if (!normalized || normalized === event.data) return;
     event.preventDefault();
-    insertNormalized(input, normalized, event.inputType || 'insertText');
+    insertIntoNativeNumber(input, normalized, event.inputType || 'insertText');
   }, true);
 
   document.addEventListener('paste', event => {
     const input = event.target;
     if (!(input instanceof HTMLInputElement)) return;
     prepareInput(input);
-    if (!isNumericInput(input)) return;
+    if (USE_IOS_TEXT_FALLBACK || String(input.type || '').toLowerCase() !== 'number') return;
     const pasted = event.clipboardData?.getData('text') || '';
+    if (!/[٠-٩۰-۹０-９٫٬،]/.test(pasted)) return;
     const normalized = normalizeForInput(input, pasted);
-    if (!pasted || normalized === pasted) return;
+    if (!normalized || normalized === pasted) return;
     event.preventDefault();
-    insertNormalized(input, normalized, 'insertFromPaste');
+    insertIntoNativeNumber(input, normalized, 'insertFromPaste');
   }, true);
-
-  document.addEventListener('input', event => normalizeCurrent(event.target), true);
-  document.addEventListener('change', event => normalizeCurrent(event.target), true);
-  document.addEventListener('compositionend', event => normalizeCurrent(event.target), true);
 
   const observer = new MutationObserver(mutations => {
     for (const mutation of mutations) {
-      if (mutation.type === 'characterData') normalizeTextNode(mutation.target);
+      if (mutation.type === 'characterData') {
+        normalizeTextNode(mutation.target);
+        continue;
+      }
       for (const node of mutation.addedNodes) {
-        if (node.nodeType === 1) enhance(node);
-        else if (node.nodeType === 3 && IS_ADMIN) normalizeTextNode(node);
+        if (node.nodeType === 1) {
+          enhance(node);
+          if (IS_ADMIN) normalizeTextTree(node);
+        } else if (node.nodeType === 3 && IS_ADMIN) {
+          normalizeTextNode(node);
+        }
       }
     }
   });
 
   const boot = () => {
     enhance(document);
+    if (IS_ADMIN) normalizeTextTree(document.body);
     observer.observe(document.body, { childList: true, subtree: true, characterData: IS_ADMIN });
   };
 
   window.RESTBR_TO_ENGLISH_DIGITS = toEnglishDigits;
   window.RESTBR_NORMALIZE_NUMERIC_INPUT = normalizeCurrent;
   window.RESTBR_IOS_NUMERIC_FALLBACK_ACTIVE = USE_IOS_TEXT_FALLBACK;
+  window.RESTBR_NUMERIC_FAST_PATH_V2 = true;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
   else boot();
