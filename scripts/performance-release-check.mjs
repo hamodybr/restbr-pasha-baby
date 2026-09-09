@@ -1,0 +1,96 @@
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+
+const failures = [];
+const read = file => fs.readFileSync(file, 'utf8');
+const requireText = (file, marker, label = marker) => {
+  const source = read(file);
+  if (!source.includes(marker)) failures.push(`${file}: missing ${label}`);
+};
+const forbidText = (file, marker, label = marker) => {
+  const source = read(file);
+  if (source.includes(marker)) failures.push(`${file}: forbidden ${label}`);
+};
+
+for (const file of [
+  'js/live-prices.js',
+  'js/pasha-arabic-only.js',
+  'js/admin-large-catalog.js',
+  'sw.js'
+]) {
+  try {
+    execFileSync(process.execPath, ['--check', file], { stdio: 'pipe' });
+  } catch (error) {
+    failures.push(`${file}: syntax error ${String(error?.stderr || error?.message || error)}`);
+  }
+}
+
+// Live prices: Realtime stays immediate, full-table reconciliation is only a
+// low-frequency safety net and never runs while the storefront tab is hidden.
+requireText('js/live-prices.js', 'const PRICE_SYNC_INTERVAL_MS = 5 * 60 * 1000', '5-minute price reconciliation');
+requireText('js/live-prices.js', 'document.visibilityState !== "visible"', 'hidden-tab price-sync guard');
+requireText('js/live-prices.js', 'status === "SUBSCRIBED"', 'Realtime subscription sync');
+forbidText('js/live-prices.js', 'setInterval(() => void syncAllPrices(), 30000)', 'legacy 30-second full price polling');
+
+// Arabic-only storefront must not watch every DOM mutation. It also throttles
+// the existing scroll work to one animation frame and removes the one-minute
+// schedule timer entirely when the loaded catalog has no scheduled items.
+forbidText('js/pasha-arabic-only.js', 'new MutationObserver(keepArabic)', 'storefront-wide Arabic MutationObserver');
+requireText('js/pasha-arabic-only.js', "window.addEventListener('restbr:ready', keepArabic, { once: true })", 'one-shot Arabic ready handler');
+requireText('js/pasha-arabic-only.js', "window.removeEventListener('scroll', baseScrollEffects)", 'raw scroll listener replacement');
+requireText('js/pasha-arabic-only.js', 'requestAnimationFrame(() => {', 'scroll rAF throttle');
+requireText('js/pasha-arabic-only.js', 'clearInterval(window.__RESTBR_SCHEDULE_TIMER__)', 'unused schedule timer removal');
+requireText('js/pasha-arabic-only.js', 'availability_schedule_enabled === true', 'schedule-aware timer guard');
+
+// Admin large-catalog fallback should only paginate when a normal Supabase page
+// could actually be truncated at the 1000-row boundary.
+requireText('js/admin-large-catalog.js', 'function catalogMayBeTruncated()', 'large-catalog truncation guard');
+requireText('js/admin-large-catalog.js', 'async function ensureCompleteCatalog()', 'conditional full-catalog hydration');
+requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row boundary detection');
+
+// Repeat public visits should come from local cache immediately while a fresh
+// copy is revalidated in the background. Admin remains network-first/no-store.
+requireText('sw.js', 'restbr-pasha-baby-v30', 'final delivery cache generation');
+requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
+requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
+requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
+
+// First visit: avoid a second 2MB+ logo request for favicon/apple icon, warm the
+// two cross-origin connections that are needed for Supabase + its browser SDK,
+// and never rescan the entire document for logo mutations.
+requireText('index.html', 'rel="preconnect" href="https://cdn.jsdelivr.net"', 'jsDelivr preconnect');
+requireText('index.html', 'rel="preconnect" href="https://wlollfpmjzenhkjwxrqo.supabase.co"', 'Supabase preconnect');
+requireText('index.html', 'href="assets/favicon.png"', 'local lightweight favicon');
+requireText('index.html', 'href="assets/apple-touch-icon.png"', 'local lightweight Apple icon');
+requireText('index.html', 'window.addEventListener("restbr:ready",scanBrandLogo,{once:true})', 'one-shot live brand icon refresh');
+forbidText('index.html', 'new MutationObserver(scanBrandLogo)', 'global brand-logo MutationObserver');
+
+// Existing image pipeline is part of the release performance contract: product
+// uploads are compressed to WebP/JPEG, image elements lazy-load, and immutable
+// product URLs get one-year browser/cache lifetime.
+requireText('js/admin-image-optimizer.js', "canvasToBlob(canvas, 'image/webp'", 'WebP product-image optimization');
+requireText('js/admin-image-optimizer.js', "cacheControl: '31536000'", 'one-year product image cache');
+requireText('js/app.js', 'loading="lazy"', 'lazy product images');
+requireText('js/app.js', 'decoding="async"', 'async product image decode');
+requireText('index.html', 'js/app.js?v=18.1', 'storefront core loader');
+
+// Keep key client files under generous regression ceilings. These are not bundle
+// targets; they only catch accidental megabyte-scale artifacts before delivery.
+for (const [file, maxBytes] of [
+  ['js/app.js', 250 * 1024],
+  ['admin.html', 600 * 1024],
+  ['js/pasha-baby-commerce.js', 100 * 1024],
+  ['js/live-prices.js', 40 * 1024],
+  ['sw.js', 30 * 1024]
+]) {
+  const size = fs.statSync(file).size;
+  if (size > maxBytes) failures.push(`${file}: ${size} bytes exceeds release ceiling ${maxBytes}`);
+}
+
+if (failures.length) {
+  console.error('\nPerformance release audit failed:');
+  failures.forEach(item => console.error(`  ✗ ${item}`));
+  process.exit(1);
+}
+
+console.log('✓ Pasha Baby final performance release audit passed');

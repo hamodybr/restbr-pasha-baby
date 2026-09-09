@@ -161,7 +161,8 @@ await expectText('/js/pasha-arabic-only.js', [
   'js/admin-product-colors.js?v=3.0',
   'js/pasha-admin-product-editor-cleanup.js?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
-  'js/pasha-number-normalizer.js?v=1.2'
+  'js/pasha-number-normalizer.js?v=1.2',
+  "window.addEventListener('restbr:ready', keepArabic, { once: true })"
 ], 'Arabic-only policy');
 
 await expectText('/js/pasha-admin-product-editor-cleanup.js', [
@@ -186,6 +187,18 @@ await expectText('/js/pasha-baby-fixed-discounts.js', [
   "chip.textContent = 'خصم'"
 ], 'fixed amount storefront discounts');
 
+await expectText('/js/live-prices.js', [
+  'const PRICE_SYNC_INTERVAL_MS = 5 * 60 * 1000',
+  'document.visibilityState !== "visible"',
+  'status === "SUBSCRIBED"'
+], 'low-overhead Realtime price sync');
+
+await expectText('/js/admin-large-catalog.js', [
+  'function catalogMayBeTruncated()',
+  'async function ensureCompleteCatalog()',
+  'rows.length >= PAGE_SIZE'
+], 'conditional large-catalog hydration');
+
 await expectText('/css/pasha-baby-final-tweaks.css', [
   '#smMenu .sm-display-badge.red',
   '#smMenu .pb-discount-badge',
@@ -195,7 +208,9 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v29',
+  'restbr-pasha-baby-v30',
+  'function staleWhileRevalidate(event, request)',
+  'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
   'js/pasha-arabic-only.js?v=1.2',
   'js/pasha-number-normalizer.js?v=1.2',
