@@ -540,7 +540,11 @@ Deno.serve(async (req: Request) => {
     return json(req, { ok: true, ...result }, 201);
   } catch (error) {
     console.error("PASHA ORDERS ERROR", error);
-    const message = error instanceof Error ? error.message : String(error);
+    const message = error instanceof Error
+      ? error.message
+      : error && typeof error === "object" && "message" in error
+        ? String((error as { message?: unknown }).message || error)
+        : String(error);
     return json(req, { ok: false, error: publicErrorMessage(message) }, 400);
   }
 });
