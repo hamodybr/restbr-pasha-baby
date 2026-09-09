@@ -6,11 +6,15 @@
   const q = selector => document.querySelector(selector);
 
   function forceArabicState() {
-    document.documentElement.lang = 'ar';
-    document.documentElement.dir = 'rtl';
+    if (document.documentElement.lang !== 'ar') document.documentElement.lang = 'ar';
+    if (document.documentElement.dir !== 'rtl') document.documentElement.dir = 'rtl';
     try {
-      localStorage.setItem('RESTBR_LANG_V1', 'ar');
-      localStorage.removeItem('RESTBR_ENABLED_LANGUAGES_V1');
+      if (localStorage.getItem('RESTBR_LANG_V1') !== 'ar') {
+        localStorage.setItem('RESTBR_LANG_V1', 'ar');
+      }
+      if (localStorage.getItem('RESTBR_ENABLED_LANGUAGES_V1') !== null) {
+        localStorage.removeItem('RESTBR_ENABLED_LANGUAGES_V1');
+      }
     } catch (_) {}
   }
 
@@ -160,6 +164,8 @@
         const target = event.target;
         if (target?.id && /_ar$/.test(target.id)) syncArabicFallback(target);
       }, true);
+      // Admin editors are created dynamically, so the scoped admin observer is
+      // still required to hide/sync the generated Kurdish/English fields.
       const observer = new MutationObserver(mutations => {
         for (const mutation of mutations) for (const node of mutation.addedNodes) {
           if (node.nodeType === 1) cleanupAdminLanguages(node);
@@ -181,10 +187,11 @@
       if (toggle) toggle.style.setProperty('display', 'none', 'important');
     };
     keepArabic();
-    window.addEventListener('restbr:ready', keepArabic);
+    window.addEventListener('restbr:ready', keepArabic, { once: true });
     window.addEventListener('pageshow', keepArabic, { passive: true });
-    const observer = new MutationObserver(keepArabic);
-    observer.observe(document.body, { childList: true, subtree: true });
+    // No storefront-wide MutationObserver here. The CSS policy already keeps
+    // language UI hidden, and restbr:ready/pageshow cover the only lifecycle
+    // points that need an explicit Arabic state refresh.
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
