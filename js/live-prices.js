@@ -4,6 +4,7 @@
 
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
+  const PRICE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
   let channel = null;
   let started = false;
   let activeChoiceProductId = null;
@@ -222,8 +223,9 @@
     if (started || !sb || !db()?.products) return;
     started = true;
 
-    void syncAllPrices();
-
+    // Realtime is the primary price-update path. One full sync after the channel
+    // subscribes closes the small race window between the first menu load and
+    // Realtime becoming active without doing two immediate catalog reads.
     channel = sb
       .channel("restbr-live-prices-v3")
       .on(
@@ -248,7 +250,12 @@
         }
       });
 
-    window.setInterval(() => void syncAllPrices(), 30000);
+    // Reconciliation remains as a safety net for missed Realtime events, but it
+    // no longer re-downloads every price every 30 seconds or while the tab is hidden.
+    window.setInterval(() => {
+      if (document.visibilityState !== "visible" || navigator.onLine === false) return;
+      void syncAllPrices();
+    }, PRICE_SYNC_INTERVAL_MS);
   }
 
   document.addEventListener("click", event => {
