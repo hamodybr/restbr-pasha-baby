@@ -143,3 +143,8 @@ jobs:
         env:
           SMOKE_BASE_URL: https://pashababyiq.com
         run: node scripts/live-commerce-smoke.mjs
+
+      - name: Verify live option price and color preview
+        env:
+          SMOKE_BASE_URL: https://pashababyiq.com
+        run: node scripts/live-option-color-smoke.mjs
