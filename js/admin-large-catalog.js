@@ -9,6 +9,7 @@
   let baseLoader = null;
   let wrapped = false;
   let firstHydrationScheduled = false;
+  let readySignature = '';
 
   async function fetchAll(table, { order = null, ascending = true } = {}) {
     const rows = [];
@@ -34,6 +35,32 @@
     }
 
     return rows;
+  }
+
+  function catalogMayBeTruncated() {
+    return [adminCategories, adminProducts, adminOptions]
+      .some(rows => Array.isArray(rows) && rows.length >= PAGE_SIZE);
+  }
+
+  function publishReady() {
+    const counts = {
+      categories: Array.isArray(adminCategories) ? adminCategories.length : 0,
+      products: Array.isArray(adminProducts) ? adminProducts.length : 0,
+      options: Array.isArray(adminOptions) ? adminOptions.length : 0
+    };
+    const signature = `${counts.categories}:${counts.products}:${counts.options}`;
+
+    window.RESTBR_ADMIN_CATALOG_COUNTS = counts;
+    window.RESTBR_ADMIN_LARGE_CATALOG_READY = true;
+
+    if (readySignature !== signature) {
+      readySignature = signature;
+      window.dispatchEvent(new CustomEvent('restbr:admin-catalog-ready', {
+        detail: counts
+      }));
+    }
+
+    return counts;
   }
 
   function rerenderAdminCatalog() {
@@ -71,18 +98,9 @@
       adminOptions = options;
 
       rerenderAdminCatalog();
+      const counts = publishReady();
 
-      window.RESTBR_ADMIN_CATALOG_COUNTS = {
-        categories: categories.length,
-        products: products.length,
-        options: options.length
-      };
-      window.RESTBR_ADMIN_LARGE_CATALOG_READY = true;
-      window.dispatchEvent(new CustomEvent('restbr:admin-catalog-ready', {
-        detail: window.RESTBR_ADMIN_CATALOG_COUNTS
-      }));
-
-      console.log('✓ Pasha admin full catalog hydrated', window.RESTBR_ADMIN_CATALOG_COUNTS);
+      console.log('✓ Pasha admin full catalog hydrated', counts);
       return true;
     })().catch(error => {
       console.error('PASHA ADMIN LARGE CATALOG ERROR:', error);
@@ -96,6 +114,17 @@
     return inFlight;
   }
 
+  async function ensureCompleteCatalog() {
+    // Supabase's normal Data API page is capped at PAGE_SIZE. For the common
+    // case (<1000 rows per table), the base dashboard request is already the
+    // complete catalog, so a second three-table download only wastes time.
+    if (!catalogMayBeTruncated()) {
+      publishReady();
+      return true;
+    }
+    return hydrateFullCatalog();
+  }
+
   function wrapDashboardLoader() {
     if (wrapped || typeof loadAdminDashboard !== 'function') return false;
     wrapped = true;
@@ -103,7 +132,7 @@
 
     loadAdminDashboard = async function (...args) {
       const result = await baseLoader.apply(this, args);
-      await hydrateFullCatalog();
+      await ensureCompleteCatalog();
       return result;
     };
 
@@ -119,7 +148,7 @@
       const connected = document.getElementById('connectionStatus')?.classList.contains('success');
 
       if (unlocked && connected) {
-        void hydrateFullCatalog();
+        void ensureCompleteCatalog();
         return true;
       }
       return false;
@@ -138,7 +167,7 @@
     setTimeout(() => {
       observer.disconnect();
       if (document.body && !document.body.classList.contains('auth-locked')) {
-        void hydrateFullCatalog();
+        void ensureCompleteCatalog();
       }
     }, 5000);
   }
