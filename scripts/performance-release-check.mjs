@@ -32,10 +32,15 @@ requireText('js/live-prices.js', 'document.visibilityState !== "visible"', 'hidd
 requireText('js/live-prices.js', 'status === "SUBSCRIBED"', 'Realtime subscription sync');
 forbidText('js/live-prices.js', 'setInterval(() => void syncAllPrices(), 30000)', 'legacy 30-second full price polling');
 
-// Arabic-only storefront must not watch every DOM mutation. Admin still keeps
-// its scoped editor observer because editor fields are created dynamically.
+// Arabic-only storefront must not watch every DOM mutation. It also throttles
+// the existing scroll work to one animation frame and removes the one-minute
+// schedule timer entirely when the loaded catalog has no scheduled items.
 forbidText('js/pasha-arabic-only.js', 'new MutationObserver(keepArabic)', 'storefront-wide Arabic MutationObserver');
 requireText('js/pasha-arabic-only.js', "window.addEventListener('restbr:ready', keepArabic, { once: true })", 'one-shot Arabic ready handler');
+requireText('js/pasha-arabic-only.js', "window.removeEventListener('scroll', baseScrollEffects)", 'raw scroll listener replacement');
+requireText('js/pasha-arabic-only.js', 'requestAnimationFrame(() => {', 'scroll rAF throttle');
+requireText('js/pasha-arabic-only.js', 'clearInterval(window.__RESTBR_SCHEDULE_TIMER__)', 'unused schedule timer removal');
+requireText('js/pasha-arabic-only.js', 'availability_schedule_enabled === true', 'schedule-aware timer guard');
 
 // Admin large-catalog fallback should only paginate when a normal Supabase page
 // could actually be truncated at the 1000-row boundary.
