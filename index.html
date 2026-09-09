@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#f7f8f6">
   <meta name="description" content="پاشا بيبي — متجر مستلزمات الأطفال">
 
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://wlollfpmjzenhkjwxrqo.supabase.co" crossorigin>
   <link rel="canonical" href="https://pashababyiq.com/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Pasha Baby">
@@ -62,8 +64,8 @@
 
   <title>پاشا بيبي</title>
 
-  <link id="smFavicon" rel="icon" type="image/png" href="https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/settings/logo/1788645406355-3ib1w5.png?preview=20260906-4">
-  <link id="smAppleTouchIcon" rel="apple-touch-icon" href="https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/settings/logo/1788645406355-3ib1w5.png?preview=20260906-4">
+  <link id="smFavicon" rel="icon" type="image/png" href="assets/favicon.png">
+  <link id="smAppleTouchIcon" rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link id="smWebManifest" rel="manifest" href="manifest.webmanifest">
 
   <script>
@@ -144,20 +146,15 @@
         return false;
       };
 
-      const observer=new MutationObserver(scanBrandLogo);
-      observer.observe(document.documentElement,{
-        subtree:true,
-        childList:true,
-        attributes:true,
-        attributeFilter:["src"]
-      });
-
+      // The old version watched every src/DOM mutation forever. The real logo is
+      // available from cache or once RESTBR finishes loading, so lifecycle checks
+      // are enough and avoid rescanning the whole document while product cards render.
       if(document.readyState==="loading"){
         document.addEventListener("DOMContentLoaded",scanBrandLogo,{once:true});
       }else{
         scanBrandLogo();
       }
-
+      window.addEventListener("restbr:ready",scanBrandLogo,{once:true});
       window.addEventListener("pageshow",scanBrandLogo,{passive:true});
     })();
   </script>
