@@ -38,6 +38,7 @@ for (const file of [
 const migration = 'supabase/migrations/20260908173000_pasha_orders_customers_labels.sql';
 const deleteMigration = 'supabase/migrations/20260908204500_orders_customers_delete_permissions.sql';
 const deliveryMigration = 'supabase/migrations/20260909031732_pasha_order_item_colors_and_delivery_fees.sql';
+const colorGrantMigration = 'supabase/migrations/20260909040910_grant_pasha_orders_color_read.sql';
 const edge = 'supabase/functions/pasha-orders/index.ts';
 const colorImageEdge = 'supabase/functions/b2-color-images/index.ts';
 
@@ -66,6 +67,7 @@ requireText(deleteMigration, 'grant delete on public.customers to authenticated'
 requireText(deliveryMigration, 'add column if not exists selected_color text', 'per-item selected color column');
 requireText(deliveryMigration, 'option_name, selected_color', 'selected color order item insert');
 requireText(deliveryMigration, 'revoke all on function public.create_pasha_order', 'order RPC remains server-only');
+requireText(colorGrantMigration, 'grant select on table public.product_colors to service_role', 'order function color catalog read grant');
 
 requireText(edge, 'https://pashababyiq.com', 'production origin');
 requireText(edge, 'SUPABASE_SERVICE_ROLE_KEY', 'server-only service role');
