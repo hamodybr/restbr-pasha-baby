@@ -9,6 +9,8 @@
     'input[inputmode="decimal"]',
     'input[data-pb-numeric]'
   ].join(',');
+  const IS_ADMIN = /(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname);
+  const SKIP_TEXT_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA']);
 
   function toEnglishDigits(value) {
     return String(value ?? '')
@@ -44,18 +46,37 @@
 
   function insertNormalized(input, text, inputType = 'insertText') {
     const normalized = normalizeForInput(input, text);
-    const start = input.selectionStart;
-    const end = input.selectionEnd;
+    const type = String(input.type || '').toLowerCase();
 
-    if (Number.isInteger(start) && Number.isInteger(end) && typeof input.setRangeText === 'function') {
-      input.setRangeText(normalized, start, end, 'end');
+    // iOS exposes Arabic/Persian keyboard digits through beforeinput, but number
+    // fields do not expose a selection range. execCommand may then report success
+    // without changing the value, so write the ASCII value directly for numbers.
+    if (type === 'number') {
+      input.value = normalizeForInput(input, `${input.value || ''}${normalized}`);
       emitInput(input, inputType, normalized);
       return;
     }
 
+    let start = null;
+    let end = null;
+    try {
+      start = input.selectionStart;
+      end = input.selectionEnd;
+    } catch (_) {}
+
+    if (Number.isInteger(start) && Number.isInteger(end) && typeof input.setRangeText === 'function') {
+      try {
+        input.setRangeText(normalized, start, end, 'end');
+        emitInput(input, inputType, normalized);
+        return;
+      } catch (_) {}
+    }
+
+    const previous = String(input.value || '');
     try {
       input.focus({ preventScroll: true });
-      if (document.execCommand?.('insertText', false, normalized)) return;
+      document.execCommand?.('insertText', false, normalized);
+      if (String(input.value || '') !== previous) return;
     } catch (_) {}
 
     input.value = normalizeForInput(input, `${input.value || ''}${normalized}`);
@@ -85,6 +106,26 @@
       }
       normalizeCurrent(input);
     });
+    if (IS_ADMIN) normalizeTextTree(root);
+  }
+
+  function normalizeTextNode(node) {
+    const parent = node?.parentElement;
+    if (!parent || SKIP_TEXT_TAGS.has(parent.tagName) || parent.closest?.('[contenteditable="true"]')) return;
+    const current = String(node.data ?? '');
+    const normalized = toEnglishDigits(current);
+    if (normalized !== current) node.data = normalized;
+  }
+
+  function normalizeTextTree(root) {
+    if (!root) return;
+    if (root.nodeType === 3) {
+      normalizeTextNode(root);
+      return;
+    }
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) normalizeTextNode(node);
   }
 
   document.addEventListener('beforeinput', event => {
@@ -111,14 +152,18 @@
   document.addEventListener('compositionend', event => normalizeCurrent(event.target), true);
 
   const observer = new MutationObserver(mutations => {
-    for (const mutation of mutations) for (const node of mutation.addedNodes) {
-      if (node.nodeType === 1) enhance(node);
+    for (const mutation of mutations) {
+      if (mutation.type === 'characterData') normalizeTextNode(mutation.target);
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType === 1) enhance(node);
+        else if (node.nodeType === 3 && IS_ADMIN) normalizeTextNode(node);
+      }
     }
   });
 
   const boot = () => {
     enhance(document);
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: IS_ADMIN });
   };
 
   window.RESTBR_TO_ENGLISH_DIGITS = toEnglishDigits;

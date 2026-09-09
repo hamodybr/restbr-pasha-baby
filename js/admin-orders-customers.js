@@ -15,7 +15,7 @@
   let orders = [];
   let customers = [];
   let currentCustomView = '';
-  let orderFilter = 'all';
+  let orderFilter = 'new';
   let orderSearch = '';
   let customerSearch = '';
   let customerFilterPhone = '';
@@ -37,12 +37,12 @@
   const money = value => Number(value || 0).toLocaleString('en-US') + ' د.ع';
   const when = value => {
     try {
-      return new Date(value).toLocaleString('ar-IQ', {
+      return englishDigits(new Date(value).toLocaleString('ar-IQ', {
         timeZone: 'Asia/Baghdad',
         year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit',
-      });
-    } catch (_) { return String(value || ''); }
+      }));
+    } catch (_) { return englishDigits(String(value || '')); }
   };
 
   const itemKey = value => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -103,8 +103,11 @@
     style.id = 'pbOrdersCustomersStyles';
     style.textContent = `
       .pb-ops-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 13px}
-      .pb-ops-toolbar input,.pb-ops-toolbar select{flex:1 1 170px;min-width:0;border:1px solid rgba(255,255,255,.09);background:#0d0b09;color:inherit;border-radius:12px;padding:11px 12px;font:inherit;font-size:16px;outline:none}
+      .pb-ops-toolbar input{flex:1 1 170px;min-width:0;border:1px solid rgba(255,255,255,.09);background:#0d0b09;color:inherit;border-radius:12px;padding:11px 12px;font:inherit;font-size:16px;outline:none}
       .pb-ops-toolbar button{border:1px solid rgba(216,169,88,.2);background:rgba(216,169,88,.08);color:#e2b55e;border-radius:12px;padding:10px 12px;font:inherit;font-weight:800;cursor:pointer}
+      .pb-status-filter-bar{display:flex;gap:7px;overflow-x:auto;margin:-2px 0 14px;padding:2px 1px 7px;scroll-snap-type:x proximity;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+      .pb-status-filter-bar button{flex:0 0 auto;scroll-snap-align:start;border:1px solid rgba(216,169,88,.17);border-radius:999px;background:rgba(216,169,88,.055);color:#bdb3a8;padding:8px 12px;font:800 11px/1.2 inherit;white-space:nowrap;cursor:pointer;transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease}
+      .pb-status-filter-bar button:active{transform:scale(.97)}.pb-status-filter-bar button.active{border-color:#d8a958;background:linear-gradient(135deg,#e3b85f,#bd8330);color:#181008;box-shadow:0 5px 14px rgba(181,121,38,.2)}
       .pb-ops-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:13px}
       .pb-ops-kpi{padding:13px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.025)}
       .pb-ops-kpi span{display:block;color:#918a82;font-size:10px;margin-bottom:5px}.pb-ops-kpi b{font-size:20px;color:#e2b55e}
@@ -127,7 +130,7 @@
       .pb-empty{padding:30px 14px;text-align:center;color:#8b847c;border:1px dashed rgba(255,255,255,.08);border-radius:14px}
       .pb-nav-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#e2b55e;color:#24170a;font-size:8px;font-weight:900;margin-inline-start:4px}
       @media(max-width:650px){.pb-ops-kpis{grid-template-columns:1fr 1fr}.pb-ops-kpi:last-child{grid-column:1/-1}.pb-order-head,.pb-customer-head{gap:6px}.pb-customer-stats{grid-template-columns:1fr 1fr 1fr}}
-      body.admin-global-light .pb-order-card,body.admin-global-light .pb-customer-card{background:#fffaf4;border-color:rgba(86,57,19,.13);color:#33291f}body.admin-global-light .pb-ops-toolbar input,body.admin-global-light .pb-ops-toolbar select,body.admin-global-light .pb-status-select{background:#fff;color:#33291f;border-color:rgba(86,57,19,.14)}body.admin-global-light .pb-order-actions button,body.admin-global-light .pb-customer-actions button{background:#fff7ec;color:#44372a;border-color:rgba(86,57,19,.13)}body.admin-global-light .pb-delivery-fee-editor{background:#f2fbf7;border-color:#cee7de}body.admin-global-light .pb-delivery-fee-editor label span{color:#55736a}body.admin-global-light .pb-delivery-fee-editor input{background:#fff;color:#263c35;-webkit-text-fill-color:#263c35;border-color:#c8dfd7}body.admin-global-light .pb-delivery-fee-editor button{background:#dff3ec;color:#235f50;border-color:#b9dacf}
+      body.admin-global-light .pb-order-card,body.admin-global-light .pb-customer-card{background:#fffaf4;border-color:rgba(86,57,19,.13);color:#33291f}body.admin-global-light .pb-ops-toolbar input,body.admin-global-light .pb-status-select{background:#fff;color:#33291f;border-color:rgba(86,57,19,.14)}body.admin-global-light .pb-status-filter-bar button{background:#fffaf2;color:#79664e;border-color:rgba(141,100,37,.18)}body.admin-global-light .pb-status-filter-bar button.active{background:linear-gradient(135deg,#e3b85f,#bd8330);color:#181008;border-color:#c28b38}body.admin-global-light .pb-order-actions button,body.admin-global-light .pb-customer-actions button{background:#fff7ec;color:#44372a;border-color:rgba(86,57,19,.13)}body.admin-global-light .pb-delivery-fee-editor{background:#f2fbf7;border-color:#cee7de}body.admin-global-light .pb-delivery-fee-editor label span{color:#55736a}body.admin-global-light .pb-delivery-fee-editor input{background:#fff;color:#263c35;-webkit-text-fill-color:#263c35;border-color:#c8dfd7}body.admin-global-light .pb-delivery-fee-editor button{background:#dff3ec;color:#235f50;border-color:#b9dacf}
     `;
     document.head.appendChild(style);
   }
@@ -169,17 +172,11 @@
         </div>
         <div class="pb-ops-toolbar">
           <input id="pbOrderSearch" type="search" placeholder="رقم الطلب، اسم أو هاتف...">
-          <select id="pbOrderFilter">
-            <option value="all">كل الحالات</option>
-            <option value="new">جديد</option>
-            <option value="confirmed">مؤكد</option>
-            <option value="preparing">قيد التجهيز</option>
-            <option value="ready">جاهز</option>
-            <option value="delivering">قيد التوصيل</option>
-            <option value="completed">مكتمل</option>
-            <option value="cancelled">ملغي</option>
-          </select>
           <button id="pbRefreshOrders" type="button">↻ تحديث</button>
+        </div>
+        <div id="pbOrderStatusBar" class="pb-status-filter-bar" role="toolbar" aria-label="تصفية الطلبات حسب الحالة">
+          ${Object.entries(STATUS).map(([key, value]) => `<button type="button" data-order-filter="${key}" class="${key === orderFilter ? 'active' : ''}" aria-pressed="${key === orderFilter}">${value[1]} ${value[0]}</button>`).join('')}
+          <button type="button" data-order-filter="all" class="${orderFilter === 'all' ? 'active' : ''}" aria-pressed="${orderFilter === 'all'}">كل الحالات</button>
         </div>
         <div id="pbOrdersList" class="pb-order-list"><div class="pb-empty">جاري تحميل الطلبات...</div></div>
       </section>
@@ -199,7 +196,14 @@
       </section>`);
 
     document.getElementById('pbOrderSearch')?.addEventListener('input', e => { orderSearch = e.target.value || ''; renderOrders(); });
-    document.getElementById('pbOrderFilter')?.addEventListener('change', e => { orderFilter = e.target.value || 'all'; renderOrders(); });
+    document.getElementById('pbOrderStatusBar')?.addEventListener('click', event => {
+      const button = event.target.closest?.('[data-order-filter]');
+      if (!button) return;
+      orderFilter = button.dataset.orderFilter || 'new';
+      customerFilterPhone = '';
+      syncOrderFilterBar();
+      renderOrders();
+    });
     document.getElementById('pbCustomerSearch')?.addEventListener('input', e => { customerSearch = e.target.value || ''; renderCustomers(); });
     document.getElementById('pbRefreshOrders')?.addEventListener('click', () => void loadOrders(true));
     document.getElementById('pbRefreshCustomers')?.addEventListener('click', () => void loadCustomers(true));
@@ -228,6 +232,14 @@
       customerQuick.addEventListener('click', () => showView('customers'));
       homeGrid.appendChild(customerQuick);
     }
+  }
+
+  function syncOrderFilterBar() {
+    document.querySelectorAll('[data-order-filter]').forEach(button => {
+      const active = button.dataset.orderFilter === orderFilter;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
   }
 
   function showView(view) {
@@ -345,7 +357,10 @@
     });
 
     if (!filtered.length) {
-      list.innerHTML = `<div class="pb-empty">${customerFilterPhone ? 'لا توجد طلبات لهذا الزبون.' : 'لا توجد طلبات مطابقة.'}</div>`;
+      const emptyText = customerFilterPhone
+        ? 'لا توجد طلبات لهذا الزبون.'
+        : orderFilter === 'new' && !needle ? 'لا توجد طلبات جديدة.' : 'لا توجد طلبات مطابقة.';
+      list.innerHTML = `<div class="pb-empty">${emptyText}</div>`;
       return;
     }
 
@@ -394,7 +409,7 @@
       orderFilter = 'all';
       orderSearch = '';
       const search = document.getElementById('pbOrderSearch'); if (search) search.value = '';
-      const filter = document.getElementById('pbOrderFilter'); if (filter) filter.value = 'all';
+      syncOrderFilterBar();
       renderOrders();
     }));
   }

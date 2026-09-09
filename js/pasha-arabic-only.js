@@ -144,14 +144,15 @@
     loadScript('pashaCategoryRetailCleanupScript', 'js/admin-category-retail-cleanup.js?v=1.2', true);
     loadScript('pashaNewProductColorsScript', 'js/admin-new-product-colors.js?v=1.0', true);
     loadScript('pashaAdminProgressiveDisclosureScript', 'js/admin-progressive-disclosure.js?v=2.0', true);
-    loadScript('pashaOrdersCustomersScript', 'js/admin-orders-customers.js?v=1.1', true);
+    loadScript('pashaAdminInteractionPolishScript', 'js/admin-interaction-polish.js?v=1.5', true);
+    loadScript('pashaOrdersCustomersScript', 'js/admin-orders-customers.js?v=1.2', true);
     loadScript('pashaOrdersNavHotfixScript', 'js/admin-orders-nav-hotfix.js?v=1.0', true);
   }
 
   function boot() {
     forceArabicState();
     installArabicOnlyStyle();
-    loadScript('pashaNumberNormalizerScript', 'js/pasha-number-normalizer.js?v=1.0');
+    loadScript('pashaNumberNormalizerScript', 'js/pasha-number-normalizer.js?v=1.1');
     if (IS_ADMIN) {
       cleanupAdminLanguages(document);
       loadArabicAdminTools();
@@ -171,7 +172,7 @@
     loadScript('pashaOrderColorBridgeScript', 'js/pasha-order-color-bridge.js?v=1.1');
     loadScript('pashaColorImageGalleryScript', 'js/pasha-color-image-gallery.js?v=1.0');
     loadScript('pashaOrderSubmitScript', 'js/pasha-order-submit.js?v=1.1');
-    loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.0');
+    loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.1');
     const keepArabic = () => {
       forceArabicState();
       const langs = q('#smLangs');

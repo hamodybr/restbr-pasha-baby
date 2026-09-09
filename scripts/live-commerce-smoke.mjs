@@ -39,11 +39,11 @@ await expectText('/', [
   'js/pasha-baby-commerce.js?v=2.0',
   'js/pasha-baby-fixed-discounts.js?v=1.0',
   'js/live-prices.js?v=3.0',
-  'js/supabase-config.js?v=2.6'
+  'js/supabase-config.js?v=2.7'
 ], 'storefront Arabic-only fixed-discount commerce assets');
 
 await expectText('/js/supabase-config.js', [
-  'js/pasha-arabic-only.js?v=1.1'
+  'js/pasha-arabic-only.js?v=1.2'
 ], 'Arabic-only policy loader');
 
 await expectText('/js/pasha-arabic-only.js', [
