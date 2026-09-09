@@ -1,5 +1,5 @@
-const CACHE_NAME = "restbr-pasha-baby-v28";
-// Order confirmation, delivery fee, English digit, and invoice refresh 2026-09-09.
+const CACHE_NAME = "restbr-pasha-baby-v29";
+// iPhone Arabic/Persian numeric input hard fix and cache refresh 2026-09-09.
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -34,7 +34,7 @@ const CORE = [
   "./js/url-safety.js?v=1.3",
   "./js/supabase-config.js?v=2.7",
   "./js/pasha-arabic-only.js?v=1.2",
-  "./js/pasha-number-normalizer.js?v=1.1",
+  "./js/pasha-number-normalizer.js?v=1.2",
   "./js/live-prices.js?v=3.0",
   "./js/restaurant-hours.js?v=1.3",
   "./js/whatsapp-order-bullets.js?v=1.0",
@@ -136,7 +136,7 @@ self.addEventListener("fetch", event => {
   const isAdminAsset =
     /\/js\/admin-[^/]+\.js$/i.test(url.pathname) ||
     /\/js\/(?:runtime|supabase)-config\.js$/i.test(url.pathname) ||
-    /\/js\/(?:restbr-hardening|pasha-arabic-only|pasha-admin-product-editor-cleanup)\.js$/i.test(url.pathname);
+    /\/js\/(?:restbr-hardening|pasha-arabic-only|pasha-admin-product-editor-cleanup|pasha-number-normalizer)\.js$/i.test(url.pathname);
 
   if (isAdminPage || isAdminAsset) {
     event.respondWith(networkFirst(request, { noStore: true }));
