@@ -51,10 +51,12 @@ requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
 
 // Existing image pipeline is part of the release performance contract: product
-// uploads are compressed to WebP/JPEG and immutable product URLs get 1-year cache.
+// uploads are compressed to WebP/JPEG, image elements lazy-load, and immutable
+// product URLs get one-year browser/cache lifetime.
 requireText('js/admin-image-optimizer.js', "canvasToBlob(canvas, 'image/webp'", 'WebP product-image optimization');
 requireText('js/admin-image-optimizer.js', "cacheControl: '31536000'", 'one-year product image cache');
-requireText('index.html', 'loading="lazy"', 'lazy product image contract source');
+requireText('js/app.js', 'loading="lazy"', 'lazy product images');
+requireText('js/app.js', 'decoding="async"', 'async product image decode');
 requireText('index.html', 'js/app.js?v=18.1', 'storefront core loader');
 
 // Keep key client files under generous regression ceilings. These are not bundle
