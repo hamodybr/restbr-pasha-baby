@@ -3,22 +3,32 @@ import vm from 'node:vm';
 
 const source = fs.readFileSync('js/pasha-number-normalizer.js', 'utf8');
 
-function createRuntime(pathname, textNodes = []) {
+function createRuntime(pathname, textNodes = [], navigatorInfo = {}) {
   const listeners = new Map();
 
   class FakeInput {
     constructor(type = 'number') {
       this.type = type;
       this.value = '';
-      this.inputMode = 'numeric';
+      this.inputMode = '';
       this.lang = '';
       this.dir = '';
       this.events = [];
+      this.selectionStart = 0;
+      this.selectionEnd = 0;
+      this.attributes = new Map();
+      this.autocapitalize = '';
+      this.spellcheck = true;
     }
     matches() { return true; }
-    hasAttribute(name) { return name === 'data-pb-numeric'; }
-    getAttribute() { return ''; }
+    hasAttribute(name) { return this.attributes.has(name); }
+    getAttribute(name) { return this.attributes.get(name) ?? ''; }
+    setAttribute(name, value) { this.attributes.set(name, String(value)); }
     focus() {}
+    setRangeText(text, start, end) {
+      this.value = this.value.slice(0, start) + text + this.value.slice(end);
+      this.selectionStart = this.selectionEnd = start + text.length;
+    }
     dispatchEvent(event) { this.events.push(event); return true; }
   }
 
@@ -44,9 +54,17 @@ function createRuntime(pathname, textNodes = []) {
   };
 
   const window = {};
+  const navigator = {
+    userAgent: '',
+    platform: '',
+    maxTouchPoints: 0,
+    ...navigatorInfo
+  };
+
   vm.runInNewContext(source, {
     window,
     document,
+    navigator,
     location: { pathname },
     HTMLInputElement: FakeInput,
     MutationObserver: FakeMutationObserver,
@@ -59,6 +77,7 @@ function createRuntime(pathname, textNodes = []) {
   return { listeners, FakeInput, window };
 }
 
+// Keep the generic fallback working on non-iOS number inputs.
 const storefront = createRuntime('/');
 const input = new storefront.FakeInput('number');
 const beforeInput = storefront.listeners.get('beforeinput');
@@ -76,6 +95,54 @@ for (const [localized, expected] of [['١', '1'], ['٢', '12'], ['۳', '123'], [
   }
 }
 
+// Simulate the actual iPhone admin path. Safari/WebKit rejects localized glyphs
+// in type=number, so the field must become text-backed before keyboard input.
+const iosAdmin = createRuntime('/admin', [], {
+  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
+  platform: 'iPhone',
+  maxTouchPoints: 5
+});
+const iosPrice = new iosAdmin.FakeInput('number');
+iosPrice.setAttribute('min', '0');
+iosPrice.setAttribute('step', '1');
+
+iosAdmin.listeners.get('focusin')({ target: iosPrice });
+if (iosPrice.type !== 'text' || iosPrice.getAttribute('data-pb-native-number') !== '1' || iosPrice.inputMode !== 'numeric') {
+  throw new Error(`iOS numeric fallback was not armed before keyboard input: type=${iosPrice.type}, mode=${iosPrice.inputMode}`);
+}
+if (iosAdmin.window.RESTBR_IOS_NUMERIC_FALLBACK_ACTIVE !== true) {
+  throw new Error('iOS fallback flag is not active in the simulated iPhone admin runtime');
+}
+
+const iosBeforeInput = iosAdmin.listeners.get('beforeinput');
+for (const [localized, expected] of [['١', '1'], ['٢', '12'], ['۳', '123'], ['٤', '1234']]) {
+  let prevented = false;
+  iosBeforeInput({
+    target: iosPrice,
+    data: localized,
+    inputType: 'insertText',
+    preventDefault() { prevented = true; }
+  });
+  if (!prevented || iosPrice.value !== expected) {
+    throw new Error(`iPhone text-backed typing failed: ${localized} produced ${iosPrice.value}, expected ${expected}`);
+  }
+}
+
+// Persian digits must use the same path.
+iosPrice.value = '';
+iosPrice.selectionStart = iosPrice.selectionEnd = 0;
+for (const [localized, expected] of [['۱', '1'], ['۲', '12'], ['۳', '123']]) {
+  iosBeforeInput({
+    target: iosPrice,
+    data: localized,
+    inputType: 'insertText',
+    preventDefault() {}
+  });
+  if (iosPrice.value !== expected) {
+    throw new Error(`iPhone Persian digit typing failed: ${localized} produced ${iosPrice.value}, expected ${expected}`);
+  }
+}
+
 const parentElement = { tagName: 'DIV', closest: () => null };
 const dashboardText = { nodeType: 3, data: '٢٠٢٦/٠٩/٠٩ ٧:٤٤ — ۱۲۳ طلب', parentElement };
 createRuntime('/admin', [dashboardText]);
@@ -83,4 +150,4 @@ if (dashboardText.data !== '2026/09/09 7:44 — 123 طلب') {
   throw new Error(`Dashboard digit normalization failed: ${dashboardText.data}`);
 }
 
-console.log('✓ Arabic/Persian numeric input and dashboard English-digit checks passed');
+console.log('✓ Arabic/Persian numeric input, iPhone fallback, and dashboard English-digit checks passed');

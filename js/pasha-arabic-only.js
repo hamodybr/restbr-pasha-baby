@@ -152,7 +152,7 @@
   function boot() {
     forceArabicState();
     installArabicOnlyStyle();
-    loadScript('pashaNumberNormalizerScript', 'js/pasha-number-normalizer.js?v=1.1');
+    loadScript('pashaNumberNormalizerScript', 'js/pasha-number-normalizer.js?v=1.2');
     if (IS_ADMIN) {
       cleanupAdminLanguages(document);
       loadArabicAdminTools();
