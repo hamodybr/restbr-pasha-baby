@@ -96,7 +96,7 @@ for (const match of sw.matchAll(/["']\.\/([^"']+)["']/g)) {
 }
 if (!sw.includes('js/restbr-hardening.js?v=1.0')) fail('sw.js: hardening layer is not cached');
 if (!sw.includes('js/pasha-arabic-only.js?v=1.2')) fail('sw.js: Arabic-only policy is not cached');
-if (!sw.includes('js/pasha-number-normalizer.js?v=1.1')) fail('sw.js: English-digit normalizer is not cached');
+if (!sw.includes('js/pasha-number-normalizer.js?v=1.2')) fail('sw.js: English-digit normalizer is not cached');
 if (!sw.includes('js/arabic-news-ticker.js?v=1.1')) fail('sw.js: Arabic announcement ticker is not cached');
 
 // 6) Pasha deployment identity / feature isolation.
