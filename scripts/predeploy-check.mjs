@@ -95,9 +95,9 @@ for (const match of sw.matchAll(/["']\.\/([^"']+)["']/g)) {
   checkLocalRef(ref, 'sw.js');
 }
 if (!sw.includes('js/restbr-hardening.js?v=1.0')) fail('sw.js: hardening layer is not cached');
-if (!sw.includes('js/pasha-arabic-only.js?v=1.1')) fail('sw.js: Arabic-only policy is not cached');
-if (!sw.includes('js/pasha-number-normalizer.js?v=1.0')) fail('sw.js: English-digit normalizer is not cached');
-if (!sw.includes('js/arabic-news-ticker.js?v=1.0')) fail('sw.js: Arabic announcement ticker is not cached');
+if (!sw.includes('js/pasha-arabic-only.js?v=1.2')) fail('sw.js: Arabic-only policy is not cached');
+if (!sw.includes('js/pasha-number-normalizer.js?v=1.1')) fail('sw.js: English-digit normalizer is not cached');
+if (!sw.includes('js/arabic-news-ticker.js?v=1.1')) fail('sw.js: Arabic announcement ticker is not cached');
 
 // 6) Pasha deployment identity / feature isolation.
 const runtime = read('js/runtime-config.js');
@@ -164,11 +164,11 @@ forbidText('js/supabase-config.js', 'testSupabaseConnection();', 'development co
 
 // Pasha Baby is now intentionally Arabic-only. Keep generic DB columns for
 // compatibility, but remove dedicated multilingual UI/configuration files.
-requireText('js/supabase-config.js', "script.src = 'js/pasha-arabic-only.js?v=1.1'", 'Arabic-only bootstrap');
+requireText('js/supabase-config.js', "script.src = 'js/pasha-arabic-only.js?v=1.2'", 'Arabic-only bootstrap');
 forbidText('js/supabase-config.js', 'language-settings.js', 'legacy multilingual loader');
 requireText('js/pasha-arabic-only.js', "localStorage.setItem('RESTBR_LANG_V1', 'ar')", 'Arabic language lock');
 requireText('js/pasha-arabic-only.js', 'data-pasha-multilang-hidden', 'admin multilingual field suppression');
-requireText('js/pasha-arabic-only.js', 'js/arabic-news-ticker.js?v=1.0', 'Arabic announcement ticker loader');
+requireText('js/pasha-arabic-only.js', 'js/arabic-news-ticker.js?v=1.1', 'Arabic announcement ticker loader');
 forbidText('index.html', 'id="smLangs"', 'storefront language picker');
 forbidText('index.html', 'english-card-ltr.css', 'English-only card stylesheet');
 forbidText('index.html', 'english-news-ticker.js', 'legacy multilingual ticker');

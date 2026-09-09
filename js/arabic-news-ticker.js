@@ -65,7 +65,7 @@
     // Arabic text stays RTL while the ticker physically travels LEFT -> RIGHT.
     ticker.style.setProperty('--sm-news-motion-start', `${-(trackWidth + edge)}px`);
     ticker.style.setProperty('--sm-news-motion-end', `${windowWidth + edge}px`);
-    ticker.style.setProperty('--sm-news-motion-duration', `${Math.max(12, baseDurationSeconds(ticker) * 1.15).toFixed(1)}s`);
+    ticker.style.setProperty('--sm-news-motion-duration', `${Math.max(15, baseDurationSeconds(ticker) * 1.35).toFixed(1)}s`);
 
     if (restartAnimation) restart(track);
   }

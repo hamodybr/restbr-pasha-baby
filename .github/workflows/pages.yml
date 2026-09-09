@@ -27,6 +27,9 @@ jobs:
       - name: Orders customers and labels audit
         run: node scripts/orders-labels-check.mjs
 
+      - name: Numeric input behavior audit
+        run: node scripts/numeric-input-check.mjs
+
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: validate

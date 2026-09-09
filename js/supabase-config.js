@@ -94,7 +94,7 @@ if (RESTBR_CONFIGURED) {
     if (document.getElementById('pashaArabicOnlyScript')) return;
     const script = document.createElement('script');
     script.id = 'pashaArabicOnlyScript';
-    script.src = 'js/pasha-arabic-only.js?v=1.1';
+    script.src = 'js/pasha-arabic-only.js?v=1.2';
     script.async = false;
     document.head.appendChild(script);
   };

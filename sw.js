@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v27";
+const CACHE_NAME = "restbr-pasha-baby-v28";
 // Order confirmation, delivery fee, English digit, and invoice refresh 2026-09-09.
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
@@ -32,13 +32,13 @@ const CORE = [
   "./js/runtime-config.js?v=2.1",
   "./js/restbr-hardening.js?v=1.0",
   "./js/url-safety.js?v=1.3",
-  "./js/supabase-config.js?v=2.6",
-  "./js/pasha-arabic-only.js?v=1.1",
-  "./js/pasha-number-normalizer.js?v=1.0",
+  "./js/supabase-config.js?v=2.7",
+  "./js/pasha-arabic-only.js?v=1.2",
+  "./js/pasha-number-normalizer.js?v=1.1",
   "./js/live-prices.js?v=3.0",
   "./js/restaurant-hours.js?v=1.3",
   "./js/whatsapp-order-bullets.js?v=1.0",
-  "./js/arabic-news-ticker.js?v=1.0",
+  "./js/arabic-news-ticker.js?v=1.1",
   "./js/card-life-effects.js?v=1.0",
   "./js/live-card-badges.js?v=1.0",
   "./js/pasha-baby-ui.js?v=1.2",
