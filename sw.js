@@ -1,5 +1,5 @@
-const CACHE_NAME = "restbr-pasha-baby-v29";
-// iPhone Arabic/Persian numeric input hard fix and cache refresh 2026-09-09.
+const CACHE_NAME = "restbr-pasha-baby-v30";
+// Final delivery performance release 2026-09-09.
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -119,6 +119,28 @@ async function cacheFirst(request) {
   return response;
 }
 
+function staleWhileRevalidate(event, request) {
+  const networkUpdate = fetch(request, { cache: "no-cache" })
+    .then(async response => {
+      if (response && response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, response.clone()).catch(() => {});
+      }
+      return response;
+    })
+    .catch(() => null);
+
+  event.waitUntil(networkUpdate.then(() => {}).catch(() => {}));
+
+  return (async () => {
+    const cached =
+      await caches.match(request) ||
+      await caches.match(request, { ignoreSearch: true });
+    if (cached) return cached;
+    return (await networkUpdate) || Response.error();
+  })();
+}
+
 self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -166,7 +188,9 @@ self.addEventListener("fetch", event => {
 
   const isCode = /\.(?:css|js|webmanifest|json)$/i.test(url.pathname);
   if (isCode) {
-    event.respondWith(networkFirst(request));
+    // Public assets are already versioned and precached. Serve the local copy
+    // immediately on repeat visits, then refresh it in the background.
+    event.respondWith(staleWhileRevalidate(event, request));
     return;
   }
 
