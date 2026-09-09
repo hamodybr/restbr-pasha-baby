@@ -57,7 +57,7 @@ requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.0', 'cached commerce v2 runt
 requireText('sw.js', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'cached fixed discount runtime');
 requireText('sw.js', 'js/live-prices.js?v=3.0', 'cached live prices v3 runtime');
 requireText('sw.js', 'js/pasha-arabic-only.js?v=1.2', 'cached Arabic-only policy');
-requireText('sw.js', 'js/pasha-number-normalizer.js?v=1.1', 'cached English-digit normalizer');
+requireText('sw.js', 'js/pasha-number-normalizer.js?v=1.2', 'cached English-digit normalizer');
 
 requireText('js/supabase-config.js', 'js/pasha-arabic-only.js?v=1.2', 'Arabic-only policy loader');
 forbidText('js/supabase-config.js', 'language-settings.js', 'legacy multilingual loader');
