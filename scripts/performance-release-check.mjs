@@ -50,6 +50,16 @@ requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-whi
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
 
+// First visit: avoid a second 2MB+ logo request for favicon/apple icon, warm the
+// two cross-origin connections that are needed for Supabase + its browser SDK,
+// and never rescan the entire document for logo mutations.
+requireText('index.html', 'rel="preconnect" href="https://cdn.jsdelivr.net"', 'jsDelivr preconnect');
+requireText('index.html', 'rel="preconnect" href="https://wlollfpmjzenhkjwxrqo.supabase.co"', 'Supabase preconnect');
+requireText('index.html', 'href="assets/favicon.png"', 'local lightweight favicon');
+requireText('index.html', 'href="assets/apple-touch-icon.png"', 'local lightweight Apple icon');
+requireText('index.html', 'window.addEventListener("restbr:ready",scanBrandLogo,{once:true})', 'one-shot live brand icon refresh');
+forbidText('index.html', 'new MutationObserver(scanBrandLogo)', 'global brand-logo MutationObserver');
+
 // Existing image pipeline is part of the release performance contract: product
 // uploads are compressed to WebP/JPEG, image elements lazy-load, and immutable
 // product URLs get one-year browser/cache lifetime.
