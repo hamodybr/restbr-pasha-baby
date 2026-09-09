@@ -111,10 +111,9 @@
     const normalized = normalizeForInput(input, current);
     if (normalized === current) return false;
 
-    // Important for performance: mutate the value inside the browser's own input
-    // event and DO NOT dispatch a second synthetic input event. Because this
-    // listener runs in capture phase, downstream dashboard listeners receive the
-    // already-normalized English value in the same event.
+    // Performance-critical path: mutate during the browser's own input event and
+    // never emit a second synthetic input on iPhone. Capture phase means every
+    // downstream dashboard listener sees the normalized value immediately.
     const start = input.selectionStart;
     const end = input.selectionEnd;
     input.value = normalized;
@@ -135,12 +134,14 @@
     }
   }
 
-  // Legacy fallback only for browsers that still use a native number field.
-  // iPhone never reaches this path after prepareInput() converts the field to text.
+  // Legacy fallback only for non-iOS browsers that still use native number fields.
   function insertIntoNativeNumber(input, text, inputType = 'insertText') {
-    const normalized = normalizeForInput(input, text);
-    input.value = normalizeForInput(input, `${input.value || ''}${normalized}`);
-    emitNativeCompatibleInput(input, inputType, normalized);
+    const type = String(input?.type || '').toLowerCase();
+    if (type === 'number') {
+      const normalized = normalizeForInput(input, text);
+      input.value = normalizeForInput(input, `${input.value || ''}${normalized}`);
+      emitNativeCompatibleInput(input, inputType, normalized);
+    }
   }
 
   function enhance(root = document) {
@@ -182,7 +183,7 @@
   }, true);
 
   // Fast path: let iPhone insert ١٢٣/۱۲۳ normally into the text-backed field,
-  // then normalize the value in-place during the SAME native input event.
+  // then normalize in-place during the SAME native input event.
   document.addEventListener('input', event => {
     normalizeCurrent(event.target);
   }, true);
@@ -195,8 +196,16 @@
     normalizeCurrent(event.target);
   }, true);
 
-  // Keep a compatibility path for non-iOS native number controls that may reject
-  // localized glyphs before a normal input event is produced.
+  // Kept only as a zero-work compatibility hook for non-iOS native number fields.
+  // iPhone exits on the first condition, so this adds no normalization work while typing.
+  document.addEventListener('keydown', event => {
+    if (USE_IOS_TEXT_FALLBACK) return;
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || String(input.type || '').toLowerCase() !== 'number') return;
+  }, true);
+
+  // Non-iOS compatibility path for native number controls that can reject localized
+  // glyphs before a normal input event is produced.
   document.addEventListener('beforeinput', event => {
     const input = event.target;
     if (!(input instanceof HTMLInputElement)) return;
