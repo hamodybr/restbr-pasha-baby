@@ -160,7 +160,8 @@ await expectText('/js/pasha-arabic-only.js', [
   'js/admin-retail-discounts.js?v=4.0',
   'js/admin-product-colors.js?v=3.0',
   'js/pasha-admin-product-editor-cleanup.js?v=1.0',
-  'js/arabic-news-ticker.js?v=1.1'
+  'js/arabic-news-ticker.js?v=1.1',
+  'js/pasha-number-normalizer.js?v=1.2'
 ], 'Arabic-only policy');
 
 await expectText('/js/pasha-admin-product-editor-cleanup.js', [
@@ -194,16 +195,23 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v28',
+  'restbr-pasha-baby-v29',
   'js/restbr-hardening.js',
   'js/pasha-arabic-only.js?v=1.2',
-  'js/pasha-number-normalizer.js?v=1.1',
+  'js/pasha-number-normalizer.js?v=1.2',
   'js/pasha-baby-fixed-discounts.js?v=1.0',
   'js/live-prices.js?v=3.0',
   'css/pasha-baby-final-tweaks.css?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
   'js/pasha-baby-storefront-v2.js'
 ], 'service worker');
+
+await expectText('/js/pasha-number-normalizer.js', [
+  'RESTBR_IOS_NUMERIC_FALLBACK_ACTIVE',
+  'data-pb-native-number',
+  "document.addEventListener('focusin'",
+  "document.addEventListener('keydown'"
+], 'iPhone localized-number hard fix');
 
 try {
   const { response, body } = await get('/manifest.webmanifest', { json: true });
