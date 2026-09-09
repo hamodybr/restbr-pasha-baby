@@ -99,7 +99,7 @@ function pngDimensions(buffer) {
 const indexHtml = await expectText('/', [
   'پاشا بيبي',
   'js/runtime-config.js',
-  'js/supabase-config.js?v=2.5',
+  'js/supabase-config.js?v=2.6',
   'js/pasha-baby-storefront-v2.js',
   'js/live-prices.js?v=3.0',
   'js/pasha-baby-fixed-discounts.js?v=1.0',
@@ -194,9 +194,10 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v26',
+  'restbr-pasha-baby-v27',
   'js/restbr-hardening.js',
-  'js/pasha-arabic-only.js?v=1.0',
+  'js/pasha-arabic-only.js?v=1.1',
+  'js/pasha-number-normalizer.js?v=1.0',
   'js/pasha-baby-fixed-discounts.js?v=1.0',
   'js/live-prices.js?v=3.0',
   'css/pasha-baby-final-tweaks.css?v=1.0',

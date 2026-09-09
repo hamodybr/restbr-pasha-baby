@@ -376,6 +376,31 @@ body #smMenu .sm-display-badge.sm-live-discount{
   color:var(--pb3-primary-dark)!important;
 }
 .sm-location-status{color:var(--pb3-primary-dark)!important}
+#smDeliveryInfo{
+  position:relative!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;
+  align-items:center!important;gap:11px!important;margin:2px 0 14px!important;padding:13px 14px!important;
+  overflow:hidden!important;border:1px solid #e4c45f!important;border-radius:16px!important;
+  background:linear-gradient(120deg,#fff8cc 0%,#fffdf0 48%,#e9f8f2 100%)!important;
+  color:#5e5128!important;font-size:13px!important;line-height:1.7!important;font-weight:850!important;
+  box-shadow:0 9px 24px rgba(159,133,46,.15),inset 0 1px 0 rgba(255,255,255,.92)!important
+}
+#smDeliveryInfo[hidden]{display:none!important}
+#smDeliveryInfo::after{
+  content:"";position:absolute;inset:-45% auto -45% -35%;width:24%;transform:skewX(-18deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.8),transparent);
+  animation:pbDeliveryShine 3.6s ease-in-out infinite
+}
+#smDeliveryInfo .pb-delivery-live-icon{
+  position:relative;z-index:1;display:grid;place-items:center;width:42px;height:42px;border-radius:14px;
+  background:#fff;color:#2f8b73;font-size:21px;box-shadow:0 5px 14px rgba(47,139,115,.15)
+}
+#smDeliveryInfo .pb-delivery-live-icon i{
+  position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:#ef6f67;
+  border:2px solid #fff;box-shadow:0 0 0 0 rgba(239,111,103,.48);animation:pbDeliveryPulse 1.8s ease-out infinite
+}
+#smDeliveryInfo strong{position:relative;z-index:1;font-weight:900!important}
+@keyframes pbDeliveryShine{0%,58%{left:-35%}84%,100%{left:125%}}
+@keyframes pbDeliveryPulse{0%{box-shadow:0 0 0 0 rgba(239,111,103,.48)}75%,100%{box-shadow:0 0 0 8px rgba(239,111,103,0)}}
 .sm-checkout-review{
   border:1px solid var(--pb3-line)!important;
   background:#fbfcfb!important;
@@ -397,5 +422,5 @@ body #smMenu .sm-display-badge.sm-live-discount{
 }
 
 @media(prefers-reduced-motion:reduce){
-  #smCartFab,.sm-direct-add,.sm-add-cart,.sm-choose-options,.pb-category-tile{transition:none!important;animation:none!important}
+  #smCartFab,.sm-direct-add,.sm-add-cart,.sm-choose-options,.pb-category-tile,#smDeliveryInfo::after,#smDeliveryInfo .pb-delivery-live-icon i{transition:none!important;animation:none!important}
 }

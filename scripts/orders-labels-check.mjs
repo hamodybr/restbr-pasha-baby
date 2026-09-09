@@ -24,6 +24,7 @@ for (const file of [
   'js/pasha-order-color-bridge.js',
   'js/pasha-color-image-gallery.js',
   'js/admin-color-image-upload.js',
+  'js/pasha-number-normalizer.js',
   'js/admin-orders-nav-hotfix.js'
 ]) {
   if (!exists(file)) { fail(`${file}: missing`); continue; }
@@ -36,6 +37,7 @@ for (const file of [
 
 const migration = 'supabase/migrations/20260908173000_pasha_orders_customers_labels.sql';
 const deleteMigration = 'supabase/migrations/20260908204500_orders_customers_delete_permissions.sql';
+const deliveryMigration = 'supabase/migrations/20260909031732_pasha_order_item_colors_and_delivery_fees.sql';
 const edge = 'supabase/functions/pasha-orders/index.ts';
 const colorImageEdge = 'supabase/functions/b2-color-images/index.ts';
 
@@ -61,6 +63,9 @@ requireText(deleteMigration, 'pasha_customers_delete', 'customer delete RLS poli
 requireText(deleteMigration, 'private.can_manage_orders()', 'delete permission guard');
 requireText(deleteMigration, 'grant delete on public.orders to authenticated', 'authenticated order delete grant');
 requireText(deleteMigration, 'grant delete on public.customers to authenticated', 'authenticated customer delete grant');
+requireText(deliveryMigration, 'add column if not exists selected_color text', 'per-item selected color column');
+requireText(deliveryMigration, 'option_name, selected_color', 'selected color order item insert');
+requireText(deliveryMigration, 'revoke all on function public.create_pasha_order', 'order RPC remains server-only');
 
 requireText(edge, 'https://pashababyiq.com', 'production origin');
 requireText(edge, 'SUPABASE_SERVICE_ROLE_KEY', 'server-only service role');
@@ -76,6 +81,8 @@ requireText(edge, 'settings.orders_enabled === false', 'server orders enabled va
 requireText(edge, 'settings.delivery_enabled === false', 'server delivery validation');
 requireText(edge, 'settings.pickup_enabled === false', 'server pickup validation');
 requireText(edge, 'Invalid location reference', 'server delivery location validation');
+requireText(edge, '.from("product_colors")', 'authoritative color lookup');
+requireText(edge, 'selected_color: selectedColor', 'authoritative selected color persistence');
 requireText(edge, 'baghdadNow().stamp', 'Baghdad order-number date');
 requireText(edge, 'تمت محاولات طلب كثيرة خلال دقيقة واحدة', 'Arabic rate-limit response');
 
@@ -90,10 +97,11 @@ requireText('js/admin-orders-customers.js', '@page{size:100mm 150mm;margin:0}', 
 requireText('js/admin-orders-customers.js', "from('customer_order_summary')", 'customer summary');
 requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard');
 requireText('js/admin-orders-customers.js', 'PDF / طباعة 100×150', 'label action');
-requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.0", 'public order loader');
-requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.0", 'admin orders loader');
-requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.0", 'color persistence loader');
+requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.1", 'public order loader');
+requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.1", 'admin orders loader');
+requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.1", 'color persistence loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=1.0", 'color gallery loader');
+requireText('js/pasha-arabic-only.js', 'js/pasha-number-normalizer.js?v=1.0', 'number normalizer loader');
 requireText('js/admin-role-ui.js', "'pasha-orders'", 'orders view role allowlist');
 requireText('js/admin-role-ui.js', "'pasha-customers'", 'customers view role allowlist');
 requireText('js/admin-role-ui.js', "const ORDERS_ROLES = new Set(['super_admin','owner','manager'])", 'orders/customer role policy');
@@ -106,9 +114,20 @@ requireText('js/admin-orders-enhancements.js', "from('customers').delete()", 'cu
 requireText('js/admin-orders-enhancements.js', 'body.admin-global-dark #viewPashaOrders', 'orders dark theme');
 requireText('js/admin-orders-enhancements.js', 'body.admin-global-dark #viewPashaCustomers', 'customers dark theme');
 requireText('js/admin-orders-enhancements.js', 'button.pb-danger-delete', 'specific delete button danger styling');
-requireText('js/pasha-order-color-bridge.js', 'colorSummary(cart)', 'color summary persistence');
-requireText('js/pasha-order-color-bridge.js', 'payload.notes =', 'invoice color note persistence');
+requireText('js/pasha-order-color-bridge.js', "colorId: String(cart[index]?.colorId || '')", 'selected color id payload');
+forbidText('js/pasha-order-color-bridge.js', 'payload.notes =', 'color summary inside order notes');
 requireText('js/pasha-order-color-bridge.js', "ar: ['اللون'", 'Arabic explicit color label');
+requireText('js/admin-orders-customers.js', 'orderItemsWithColors(order)', 'per-item invoice color mapping');
+requireText('js/admin-orders-customers.js', 'data-save-delivery-fee', 'delivery fee editor');
+requireText('js/admin-orders-customers.js', '1× أجور التوصيل', 'delivery fee invoice line');
+requireText('js/admin-orders-customers.js', 'englishDigits', 'English invoice digits');
+requireText('js/pasha-order-submit.js', "toast('تم تثبيت الطلب'", 'order confirmation notice');
+requireText('js/pasha-order-submit.js', 'WHATSAPP_DELAY_MS = 2600', 'visible notice before WhatsApp');
+requireText('js/cart.js', 'send:"تثبيت الطلب"', 'confirm order button label');
+requireText('js/cart.js', 'pb-delivery-live-icon', 'prominent delivery notice');
+requireText('js/pasha-number-normalizer.js', 'RESTBR_TO_ENGLISH_DIGITS', 'global English digit normalizer');
+requireText('js/pasha-number-normalizer.js', "document.addEventListener('beforeinput'", 'localized digit typing normalization');
+requireText('js/pasha-number-normalizer.js', "document.addEventListener('paste'", 'localized digit paste normalization');
 requireText('js/pasha-color-image-gallery.js', 'pb-color-choice-image', 'color thumbnail chooser');
 requireText('js/pasha-color-image-gallery.js', 'pb-color-large-preview', 'selected color image preview');
 requireText('js/admin-color-image-upload.js', "sb.functions.invoke('b2-color-images'", 'B2 color image upload invocation');

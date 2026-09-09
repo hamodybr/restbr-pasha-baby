@@ -2,9 +2,9 @@
   const KEY="RESTBR_CART_V1";
   let cart=[];
   const T={
-    ar:{cart:"السلة",empty:"السلة فارغة",total:"الإجمالي",continue:"متابعة الطلب",added:"تمت الإضافة للسلة",choose:"اختر النوع",add:"إضافة للسلة",close:"إغلاق",clear:"إفراغ السلة",clearConfirm:"هل تريد إفراغ السلة بالكامل؟",checkout:"إكمال الطلب",name:"الاسم",phone:"رقم الهاتف",orderType:"نوع الطلب",delivery:"توصيل",pickup:"استلام من المطعم",address:"العنوان",location:"الموقع",getLocation:"تحديد موقعي",notes:"ملاحظات الطلب (اختياري)",review:"مراجعة الطلب",send:"إرسال الطلب عبر WhatsApp",required:"يرجى إكمال الحقول المطلوبة",phoneInvalid:"يرجى إدخال رقم هاتف صحيح",locationOk:"تم تحديد الموقع",locationFail:"تعذر تحديد الموقع",back:"رجوع",increase:"زيادة الكمية",decrease:"تقليل الكمية",remove:"إزالة الصنف"},
-    ku:{cart:"سەبەتە",empty:"سەبەتە بەتاڵە",total:"کۆی گشتی",continue:"بەردەوام بە",added:"زیاد کرا",choose:"جۆر هەڵبژێرە",add:"زیادکردن بۆ سەبەتە",close:"داخستن",clear:"بەتاڵکردنەوەی سەبەتە",clearConfirm:"دڵنیایت لە بەتاڵکردنەوەی تەواوی سەبەتە؟",checkout:"تەواوکردنی داواکاری",name:"ناو",phone:"ژمارەی مۆبایل",orderType:"جۆری داواکاری",delivery:"گەیاندن",pickup:"وەرگرتن لە چێشتخانە",address:"ناونیشان",location:"شوێن",getLocation:"شوێنم دیاری بکە",notes:"تێبینی (ئارەزوومەندانە)",review:"پێداچوونەوە",send:"ناردنی داواکاری بە WhatsApp",required:"تکایە خانە پێویستەکان پڕ بکەرەوە",phoneInvalid:"ژمارەی مۆبایل دروست نییە",locationOk:"شوێن دیاری کرا",locationFail:"نەتوانرا شوێن دیاری بکرێت",back:"گەڕانەوە",increase:"زیادکردنی ژمارە",decrease:"کەمکردنەوەی ژمارە",remove:"لابردنی بەرهەم"},
-    en:{cart:"Cart",empty:"Your cart is empty",total:"Total",continue:"Continue order",added:"Added to cart",choose:"Choose an option",add:"Add to cart",close:"Close",clear:"Clear cart",clearConfirm:"Clear the entire cart?",checkout:"Checkout",name:"Name",phone:"Phone number",orderType:"Order type",delivery:"Delivery",pickup:"Pickup",address:"Address",location:"Location",getLocation:"Use my location",notes:"Order notes (optional)",review:"Review order",send:"Send order via WhatsApp",required:"Please complete the required fields",phoneInvalid:"Please enter a valid phone number",locationOk:"Location captured",locationFail:"Could not get location",back:"Back",increase:"Increase quantity",decrease:"Decrease quantity",remove:"Remove item"}
+    ar:{cart:"السلة",empty:"السلة فارغة",total:"الإجمالي",continue:"متابعة الطلب",added:"تمت الإضافة للسلة",choose:"اختر النوع",add:"إضافة للسلة",close:"إغلاق",clear:"إفراغ السلة",clearConfirm:"هل تريد إفراغ السلة بالكامل؟",checkout:"إكمال الطلب",name:"الاسم",phone:"رقم الهاتف",orderType:"نوع الطلب",delivery:"توصيل",pickup:"استلام من المطعم",address:"العنوان",location:"الموقع",getLocation:"تحديد موقعي",notes:"ملاحظات الطلب (اختياري)",review:"مراجعة الطلب",send:"تثبيت الطلب",required:"يرجى إكمال الحقول المطلوبة",phoneInvalid:"يرجى إدخال رقم هاتف صحيح",locationOk:"تم تحديد الموقع",locationFail:"تعذر تحديد الموقع",back:"رجوع",increase:"زيادة الكمية",decrease:"تقليل الكمية",remove:"إزالة الصنف"},
+    ku:{cart:"سەبەتە",empty:"سەبەتە بەتاڵە",total:"کۆی گشتی",continue:"بەردەوام بە",added:"زیاد کرا",choose:"جۆر هەڵبژێرە",add:"زیادکردن بۆ سەبەتە",close:"داخستن",clear:"بەتاڵکردنەوەی سەبەتە",clearConfirm:"دڵنیایت لە بەتاڵکردنەوەی تەواوی سەبەتە؟",checkout:"تەواوکردنی داواکاری",name:"ناو",phone:"ژمارەی مۆبایل",orderType:"جۆری داواکاری",delivery:"گەیاندن",pickup:"وەرگرتن لە چێشتخانە",address:"ناونیشان",location:"شوێن",getLocation:"شوێنم دیاری بکە",notes:"تێبینی (ئارەزوومەندانە)",review:"پێداچوونەوە",send:"پشتڕاستکردنەوەی داواکاری",required:"تکایە خانە پێویستەکان پڕ بکەرەوە",phoneInvalid:"ژمارەی مۆبایل دروست نییە",locationOk:"شوێن دیاری کرا",locationFail:"نەتوانرا شوێن دیاری بکرێت",back:"گەڕانەوە",increase:"زیادکردنی ژمارە",decrease:"کەمکردنەوەی ژمارە",remove:"لابردنی بەرهەم"},
+    en:{cart:"Cart",empty:"Your cart is empty",total:"Total",continue:"Continue order",added:"Added to cart",choose:"Choose an option",add:"Add to cart",close:"Close",clear:"Clear cart",clearConfirm:"Clear the entire cart?",checkout:"Checkout",name:"Name",phone:"Phone number",orderType:"Order type",delivery:"Delivery",pickup:"Pickup",address:"Address",location:"Location",getLocation:"Use my location",notes:"Order notes (optional)",review:"Review order",send:"Confirm order",required:"Please complete the required fields",phoneInvalid:"Please enter a valid phone number",locationOk:"Location captured",locationFail:"Could not get location",back:"Back",increase:"Increase quantity",decrease:"Decrease quantity",remove:"Remove item"}
   };
   const lang=()=>window.RESTBR_LANG?window.RESTBR_LANG():(localStorage.getItem("RESTBR_LANG_V1")||"ar");
   const tr=k=>(T[lang()]||T.ar)[k]||T.ar[k];
@@ -305,7 +305,7 @@
     document.getElementById("smReviewLabel").textContent=tr("review");
     document.getElementById("smCheckoutTotalLabel").textContent=tr("total");
     document.getElementById("smCheckoutTotal").textContent=money(sum);
-    document.getElementById("smSendWhatsApp").textContent="🟢 "+tr("send");
+    document.getElementById("smSendWhatsApp").textContent=tr("send");
 
     document.getElementById("smCheckoutSummary").innerHTML=
       cart.map(x=>`<div class="sm-review-item"><span>${x.qty}× ${esc(txt(x.name))} <small>${esc(txt(x.option))}</small></span><b>${money(x.qty*x.price)}</b></div>`).join("");
@@ -322,7 +322,8 @@
       String(infoText).trim();
 
     if(info){
-      info.textContent=infoText;
+      info.innerHTML=`<span class="pb-delivery-live-icon" aria-hidden="true"><i></i>🚚</span><strong>${esc(infoText)}</strong>`;
+      info.setAttribute("role","status");
       info.hidden=!showInfo;
       info.style.display=showInfo?"block":"none";
     }

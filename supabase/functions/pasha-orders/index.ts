@@ -49,6 +49,16 @@ type CatalogOption = {
   is_available?: boolean | null;
 };
 
+type CatalogColor = {
+  id: string;
+  product_id: string;
+  name_ar?: string | null;
+  name_ku?: string | null;
+  name_en?: string | null;
+  is_active?: boolean | null;
+  is_available?: boolean | null;
+};
+
 type CatalogCategory = {
   id: string;
   is_active?: boolean | null;
@@ -271,10 +281,10 @@ function publicErrorMessage(message: string) {
   if (/Pickup is currently unavailable/i.test(message)) {
     return "خدمة الاستلام غير متاحة حالياً.";
   }
-  if (/products? .*not available|product categories? .*not available|selected options? .*not available/i.test(message)) {
-    return "أحد المنتجات أو الخيارات في السلة غير متوفر حالياً.";
+  if (/products? .*not available|product categories? .*not available|selected options? .*not available|selected colors? .*not available/i.test(message)) {
+    return "أحد المنتجات أو الخيارات أو الألوان في السلة غير متوفر حالياً.";
   }
-  if (/no longer exist|Invalid product reference|Invalid option reference/i.test(message)) {
+  if (/no longer exist|Invalid product reference|Invalid option reference|Invalid color reference/i.test(message)) {
     return "أحد المنتجات في السلة تغيّر أو لم يعد موجوداً. حدّث الصفحة وحاول مرة ثانية.";
   }
   if (/Invalid quantity|Invalid item count|Invalid catalog price/i.test(message)) {
@@ -335,12 +345,14 @@ Deno.serve(async (req: Request) => {
     const requested = rawItems.map((raw: any) => {
       const productId = cleanText(raw?.productId, 64).toLowerCase();
       const optionId = cleanText(raw?.optionId, 64).toLowerCase();
+      const colorId = cleanText(raw?.colorId, 64).toLowerCase();
       const optionIndex = Math.max(0, Math.trunc(Number(raw?.optionIndex || 0)));
       const quantity = Math.trunc(Number(raw?.quantity || 0));
       if (!UUID_RE.test(productId)) throw new Error("Invalid product reference");
       if (optionId && !UUID_RE.test(optionId)) throw new Error("Invalid option reference");
+      if (colorId && !UUID_RE.test(colorId)) throw new Error("Invalid color reference");
       if (!Number.isFinite(quantity) || quantity < 1 || quantity > 99) throw new Error("Invalid quantity");
-      return { productId, optionId, optionIndex, quantity };
+      return { productId, optionId, colorId, optionIndex, quantity };
     });
 
     const productIds = [...new Set(requested.map((item) => item.productId))];
@@ -383,7 +395,7 @@ Deno.serve(async (req: Request) => {
       }, 429);
     }
 
-    const [settingsResult, productsResult, optionsResult, discountsResult] = await Promise.all([
+    const [settingsResult, productsResult, optionsResult, colorsResult, discountsResult] = await Promise.all([
       admin
         .from("restaurant_settings")
         .select("is_open,orders_enabled,delivery_enabled,pickup_enabled,restaurant_schedule_mode,restaurant_schedule,updated_at")
@@ -400,6 +412,10 @@ Deno.serve(async (req: Request) => {
         .in("product_id", productIds)
         .order("sort_order", { ascending: true }),
       admin
+        .from("product_colors")
+        .select("id,product_id,name_ar,name_ku,name_en,is_active,is_available")
+        .in("product_id", productIds),
+      admin
         .from("discounts")
         .select("id,discount_amount,scope_type,target_id,is_active,starts_at,ends_at")
         .eq("is_active", true),
@@ -408,6 +424,7 @@ Deno.serve(async (req: Request) => {
     if (settingsResult.error) throw settingsResult.error;
     if (productsResult.error) throw productsResult.error;
     if (optionsResult.error) throw optionsResult.error;
+    if (colorsResult.error) throw colorsResult.error;
     if (discountsResult.error) throw discountsResult.error;
 
     const settings = settingsResult.data as RestaurantSettings | null;
@@ -426,6 +443,7 @@ Deno.serve(async (req: Request) => {
 
     const products = (productsResult.data || []) as CatalogProduct[];
     const options = (optionsResult.data || []) as CatalogOption[];
+    const colors = (colorsResult.data || []) as CatalogColor[];
     const discounts = (discountsResult.data || []) as DiscountRow[];
 
     if (products.length !== productIds.length) throw new Error("One or more products no longer exist");
@@ -446,6 +464,7 @@ Deno.serve(async (req: Request) => {
       if (!optionsByProduct.has(key)) optionsByProduct.set(key, []);
       optionsByProduct.get(key)!.push(option);
     }
+    const colorMap = new Map(colors.map((color) => [String(color.id), color]));
 
     const authoritativeItems = requested.map((item) => {
       const product = productMap.get(item.productId);
@@ -473,6 +492,15 @@ Deno.serve(async (req: Request) => {
         optionName = displayName(option, "خيار");
       }
 
+      let selectedColor = "";
+      if (item.colorId) {
+        const color = colorMap.get(item.colorId);
+        if (!color || String(color.product_id) !== item.productId || color.is_active === false || color.is_available === false) {
+          throw new Error("One of the selected colors is not available right now");
+        }
+        selectedColor = displayName(color, "لون").slice(0, 80);
+      }
+
       if (!Number.isFinite(basePrice) || basePrice < 0) throw new Error("Invalid catalog price");
       const discount = effectiveDiscount(discounts, String(product.id), String(product.category_id));
       const amount = Math.max(0, Number(discount?.discount_amount || 0));
@@ -483,6 +511,7 @@ Deno.serve(async (req: Request) => {
         option_id: optionId,
         product_name: displayName(product, "منتج"),
         option_name: optionName,
+        selected_color: selectedColor,
         quantity: item.quantity,
         unit_price: unitPrice,
       };
