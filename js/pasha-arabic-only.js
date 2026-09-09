@@ -153,6 +153,60 @@
     loadScript('pashaOrdersNavHotfixScript', 'js/admin-orders-nav-hotfix.js?v=1.0', true);
   }
 
+  function installStorefrontPerformanceGuards() {
+    if (IS_ADMIN || window.__PASHA_STOREFRONT_PERF_GUARDS__) return;
+
+    const installScrollRaf = () => {
+      if (window.__PASHA_SCROLL_RAF_GUARD__ || typeof window.scrollEffects !== 'function') return false;
+      const baseScrollEffects = window.scrollEffects;
+      window.removeEventListener('scroll', baseScrollEffects);
+      let frame = 0;
+      const scheduledScrollEffects = () => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          baseScrollEffects();
+        });
+      };
+      window.addEventListener('scroll', scheduledScrollEffects, { passive: true });
+      window.__PASHA_SCROLL_RAF_GUARD__ = true;
+      return true;
+    };
+
+    const disableUnusedScheduleTimer = () => {
+      const products = window.RESTBR_DB?.products;
+      if (!Array.isArray(products)) return false;
+      const hasScheduledAvailability = products.some(product =>
+        product?.availability_schedule_enabled === true ||
+        product?.category?.availability_schedule_enabled === true
+      );
+      if (!hasScheduledAvailability && window.__RESTBR_SCHEDULE_TIMER__) {
+        clearInterval(window.__RESTBR_SCHEDULE_TIMER__);
+        window.__RESTBR_SCHEDULE_TIMER__ = 0;
+      }
+      return true;
+    };
+
+    const install = () => {
+      const scrollReady = installScrollRaf();
+      if (scrollReady || window.__PASHA_SCROLL_RAF_GUARD__) {
+        window.__PASHA_STOREFRONT_PERF_GUARDS__ = true;
+      }
+    };
+
+    install();
+    if (!window.__PASHA_SCROLL_RAF_GUARD__) {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', install, { once: true });
+      } else {
+        queueMicrotask(install);
+      }
+    }
+
+    window.addEventListener('restbr:ready', disableUnusedScheduleTimer, { once: true });
+    if (window.RESTBR_DB?.products) disableUnusedScheduleTimer();
+  }
+
   function boot() {
     forceArabicState();
     installArabicOnlyStyle();
@@ -179,6 +233,7 @@
     loadScript('pashaColorImageGalleryScript', 'js/pasha-color-image-gallery.js?v=1.0');
     loadScript('pashaOrderSubmitScript', 'js/pasha-order-submit.js?v=1.1');
     loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.1');
+    installStorefrontPerformanceGuards();
     const keepArabic = () => {
       forceArabicState();
       const langs = q('#smLangs');
