@@ -142,6 +142,7 @@
     loadScript('pashaBabyB2StorageScript', 'js/admin-b2-storage.js?v=1.1', true);
     loadScript('pashaBabyB2CleanupScript', 'js/admin-b2-cleanup.js?v=1.0', true);
     loadScript('pashaBabyLargeCatalogScript', 'js/admin-large-catalog.js?v=1.0', true);
+    loadScript('pashaOptionPriceFastScript', 'js/admin-option-price-fast.js?v=1.0', true);
     loadScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=4.0', true);
     loadScript('pashaBabyProductColorsScript', 'js/admin-product-colors.js?v=3.0', true);
     loadScript('pashaProductEditorCleanupScript', 'js/pasha-admin-product-editor-cleanup.js?v=1.0', true);
@@ -230,7 +231,7 @@
     }
 
     loadScript('pashaOrderColorBridgeScript', 'js/pasha-order-color-bridge.js?v=1.1');
-    loadScript('pashaColorImageGalleryScript', 'js/pasha-color-image-gallery.js?v=1.0');
+    loadScript('pashaColorImageGalleryScript', 'js/pasha-color-image-gallery.js?v=2.0');
     loadScript('pashaOrderSubmitScript', 'js/pasha-order-submit.js?v=1.1');
     loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.1');
     installStorefrontPerformanceGuards();

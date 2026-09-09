@@ -30,6 +30,9 @@ jobs:
       - name: Numeric input behavior audit
         run: node scripts/numeric-input-check.mjs
 
+      - name: Option price and color preview audit
+        run: node scripts/option-price-color-preview-check.mjs
+
       - name: Final performance release audit
         run: node scripts/performance-release-check.mjs
 
@@ -140,3 +143,8 @@ jobs:
         env:
           SMOKE_BASE_URL: https://pashababyiq.com
         run: node scripts/live-commerce-smoke.mjs
+
+      - name: Verify live option price and color preview
+        env:
+          SMOKE_BASE_URL: https://pashababyiq.com
+        run: node scripts/live-option-color-smoke.mjs
