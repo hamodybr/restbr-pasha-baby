@@ -21,6 +21,8 @@ const forbidText = (file, marker, label = marker) => {
 
 const files = [
   'js/pasha-baby-commerce.js',
+  'js/pasha-baby-product-description-v2.js',
+  'js/pasha-baby-retail-v4.js',
   'js/pasha-baby-fixed-discounts.js',
   'js/live-prices.js',
   'js/admin-large-catalog.js',
@@ -42,7 +44,9 @@ for (const file of files) {
 }
 
 requireText('index.html', 'css/pasha-baby-commerce.css?v=1.0', 'retail commerce stylesheet');
-requireText('index.html', 'js/pasha-baby-commerce.js?v=2.0', 'retail commerce v2 runtime');
+requireText('index.html', 'js/runtime-config.js?v=2.2', 'product gallery runtime config');
+requireText('index.html', 'js/pasha-baby-commerce.js?v=2.1', 'retail commerce preferred-color runtime');
+requireText('index.html', 'js/pasha-baby-retail-v4.js?v=5.1', 'placeholder detail opener runtime');
 requireText('index.html', 'js/live-prices.js?v=3.0', 'fixed-discount-aware live prices v3 runtime');
 requireText('index.html', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'fixed discount storefront runtime');
 requireText('index.html', 'css/pasha-baby-final-tweaks.css?v=1.0', 'final Pasha UI tweaks');
@@ -53,7 +57,9 @@ forbidText('index.html', 'id="smLangs"', 'storefront language picker');
 requireMatch('sw.js', /restbr-pasha-baby-v\d+/, 'retail cache generation');
 requireText('sw.js', 'css/pasha-baby-commerce.css?v=1.0', 'cached commerce stylesheet');
 requireText('sw.js', 'css/pasha-baby-final-tweaks.css?v=1.0', 'cached final Pasha UI tweaks');
-requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.0', 'cached commerce v2 runtime');
+requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.1', 'cached preferred-color commerce runtime');
+requireText('sw.js', 'js/runtime-config.js?v=2.2', 'cached product gallery runtime config');
+requireText('sw.js', 'js/pasha-baby-retail-v4.js?v=5.1', 'cached placeholder detail opener runtime');
 requireText('sw.js', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'cached fixed discount runtime');
 requireText('sw.js', 'js/live-prices.js?v=3.0', 'cached live prices v3 runtime');
 requireText('sw.js', 'js/pasha-arabic-only.js?v=1.2', 'cached Arabic-only policy');
@@ -77,7 +83,18 @@ requireText('js/pasha-baby-commerce.js', "fetchAll('product_options'", 'paginate
 requireText('js/pasha-baby-commerce.js', 'RESTBR_LARGE_CATALOG_READY', 'large storefront catalog readiness');
 requireText('js/pasha-baby-commerce.js', 'product_colors', 'customer product colors loader');
 requireText('js/pasha-baby-commerce.js', 'dataset.retailBypass', 'existing cart integration guard');
+requireText('js/pasha-baby-commerce.js', 'dataset.pbPreferredColorId', 'detail-sheet preferred color handoff');
 requireText('js/pasha-baby-commerce.js', "compose('ar', 'اللون')", 'Arabic color carried into cart');
+
+requireText('js/runtime-config.js', 'js/pasha-baby-product-description-v2.js?v=3.0', 'product details gallery v3 loader');
+requireText('js/pasha-baby-product-description-v2.js', '__PB_PRODUCT_DETAILS_GALLERY_V3__', 'product details gallery v3 guard');
+requireText('js/pasha-baby-product-description-v2.js', 'window.PASHA_OPEN_PRODUCT_DETAILS', 'public product details opener');
+requireText('js/pasha-baby-product-description-v2.js', 'data-pb-detail-color-id', 'interactive detail color picker');
+requireText('js/pasha-baby-product-description-v2.js', "stage.addEventListener('pointerdown'", 'touch swipe start');
+requireText('js/pasha-baby-product-description-v2.js', "stage.addEventListener('pointerup'", 'touch swipe finish');
+requireText('js/pasha-baby-retail-v4.js', 'window.PASHA_OPEN_PRODUCT_DETAILS(card, image)', 'placeholder image details routing');
+requireText('css/pasha-baby-card-density-v2.css', '.pb-product-sheet-gallery', 'details image carousel styling');
+requireText('css/pasha-baby-card-density-v2.css', '.pb-product-sheet-color-list', 'details color selector styling');
 
 requireText('js/pasha-baby-fixed-discounts.js', '__PASHA_BABY_FIXED_DISCOUNTS_V1__', 'fixed discount storefront guard');
 requireText('js/pasha-baby-fixed-discounts.js', 'discount_amount', 'fixed amount DB field');

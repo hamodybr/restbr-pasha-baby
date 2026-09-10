@@ -1,5 +1,5 @@
-const CACHE_NAME = "restbr-pasha-baby-v30";
-// Final delivery performance release 2026-09-09.
+const CACHE_NAME = "restbr-pasha-baby-v31";
+// Product-details image gallery release 2026-09-10.
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -23,13 +23,13 @@ const CORE = [
   "./js/offline-status.js?v=1.1",
   "./js/unavailable-card-state.js?v=1.1",
   "./js/app.js?v=18.1",
-  "./js/pasha-baby-commerce.js?v=2.0",
+  "./js/pasha-baby-commerce.js?v=2.1",
   "./js/pasha-baby-fixed-discounts.js?v=1.0",
   "./js/product-image-fallback.js?v=1.3",
   "./js/price-safety.js?v=1.0",
   "./js/cart.js?v=4.6",
   "./js/cart-stale-item-guard.js?v=1.1",
-  "./js/runtime-config.js?v=2.1",
+  "./js/runtime-config.js?v=2.2",
   "./js/restbr-hardening.js?v=1.0",
   "./js/url-safety.js?v=1.3",
   "./js/supabase-config.js?v=2.7",
@@ -44,7 +44,7 @@ const CORE = [
   "./js/pasha-baby-ui.js?v=1.2",
   "./js/pasha-baby-storefront-v2.js?v=2.2",
   "./js/pasha-baby-retail-interactions-v3.js?v=3.0",
-  "./js/pasha-baby-retail-v4.js?v=5.0",
+  "./js/pasha-baby-retail-v4.js?v=5.1",
   "./data/menu.json?v=32",
   "./assets/restaurant-placeholder.svg",
   "./assets/pasha-baby-product-placeholder.svg",
