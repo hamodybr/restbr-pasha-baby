@@ -405,7 +405,12 @@
       PLACEHOLDER_RE.test(String(image.dataset.fullImage || ''));
 
     if (!placeholder) return;
+    const card = image.closest('[data-product-card]');
+    if (card && typeof window.PASHA_OPEN_PRODUCT_DETAILS === 'function') {
+      window.PASHA_OPEN_PRODUCT_DETAILS(card, image);
+    }
     event.preventDefault();
+    event.stopPropagation();
     event.stopImmediatePropagation();
   }, true);
 
