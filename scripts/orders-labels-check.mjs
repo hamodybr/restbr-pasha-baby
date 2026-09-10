@@ -95,12 +95,18 @@ requireText('js/pasha-order-submit.js', 'event.stopImmediatePropagation()', 'per
 requireText('js/pasha-order-submit.js', 'capturedLocationUrl', 'captured delivery location');
 requireText('js/pasha-order-submit.js', 'https://maps.google.com/?q=', 'Google Maps location payload');
 requireText('js/pasha-order-submit.js', 'if (checkout.locationUrl)', 'WhatsApp location preservation');
-requireText('js/admin-orders-customers.js', '@page{size:100mm 150mm;margin:0}', '100x150 print page');
+requireText('js/admin-orders-customers.js', '@page{size:auto;margin:8mm}', 'laser-printer page sizing');
+requireText('js/admin-orders-customers.js', 'font-size:11.5pt', 'laser-safe invoice item font');
+requireText('js/admin-orders-customers.js', 'border:2pt solid #000', 'high-contrast laser total border');
+requireText('js/admin-orders-customers.js', 'class="print-logo-mark"', 'monochrome printer-safe Pasha logo');
+requireText('js/admin-orders-customers.js', 'طباعة بالحجم الكامل / حفظ PDF', 'full-size laser print action');
+forbidText('js/admin-orders-customers.js', 'width:100mm', 'fixed narrow invoice width');
+forbidText('js/admin-orders-customers.js', 'font-size:1.95mm', 'unreadable ultra-compact invoice font');
 requireText('js/admin-orders-customers.js', "from('customer_order_summary')", 'customer summary');
 requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard');
-requireText('js/admin-orders-customers.js', 'PDF / طباعة 100×150', 'label action');
+requireText('js/admin-orders-customers.js', 'PDF / طباعة ليزر واضحة', 'laser invoice action');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.1", 'public order loader');
-requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.2", 'admin orders loader');
+requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.3", 'admin orders loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.1", 'color persistence loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=2.0", 'color gallery v2 loader');
 requireText('js/pasha-arabic-only.js', 'js/pasha-number-normalizer.js?v=1.2', 'number normalizer loader');
@@ -151,4 +157,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('✓ Pasha Baby orders, customers, colors and 100x150 label audit passed');
+console.log('✓ Pasha Baby orders, customers, colors and laser invoice audit passed');
