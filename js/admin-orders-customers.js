@@ -164,7 +164,7 @@
 
     main.insertAdjacentHTML('beforeend', `
       <section id="viewPashaOrders" class="admin-view" data-view="pasha-orders">
-        <div class="view-title-row"><div><h2>الطلبات</h2><div class="view-subtitle">الطلبات الجديدة، التجهيز والطباعة 100×150</div></div></div>
+        <div class="view-title-row"><div><h2>الطلبات</h2><div class="view-subtitle">الطلبات الجديدة، التجهيز وطباعة فواتير الليزر</div></div></div>
         <div class="pb-ops-kpis">
           <div class="pb-ops-kpi"><span>طلبات جديدة</span><b id="pbOrdersNewCount">0</b></div>
           <div class="pb-ops-kpi"><span>طلبات اليوم</span><b id="pbOrdersTodayCount">0</b></div>
@@ -382,7 +382,7 @@
         <div class="pb-order-total"><span>المجموع الكلي</span><b>${money(order.total)}</b></div>
         <select class="pb-status-select" data-order-status="${esc(order.id)}">${Object.entries(STATUS).map(([key, value]) => `<option value="${key}" ${key === order.status ? 'selected' : ''}>${value[0]}</option>`).join('')}</select>
         <div class="pb-order-actions">
-          <button class="primary" type="button" data-print-order="${esc(order.id)}">🖨 PDF / طباعة 100×150</button>
+          <button class="primary" type="button" data-print-order="${esc(order.id)}">🖨 PDF / طباعة ليزر واضحة</button>
           ${order.location_url ? `<button type="button" data-open-location="${esc(order.id)}">📍 الموقع</button>` : ''}
           <button type="button" data-customer-orders="${esc(order.customer_phone)}">👤 سجل الزبون</button>
         </div>
@@ -510,10 +510,7 @@
     const notes = cleanOrderNotes(order.notes);
     const fee = Number(order.delivery_fee || 0);
     const invoiceEsc = value => esc(englishDigits(value));
-    const logo = document.querySelector('.admin-logo')?.src || '';
-    const printedItemCount = items.length + (fee > 0 ? 1 : 0);
-    const compactClass = printedItemCount > 14 ? 'ultra-compact' : printedItemCount > 10 ? 'compact' : '';
-    const popup = window.open('', '_blank', 'width=520,height=780');
+    const popup = window.open('', '_blank', 'width=900,height=1000');
     if (!popup) {
       alert('اسمح بالنوافذ المنبثقة حتى تفتح معاينة الطباعة.');
       return;
@@ -521,24 +518,26 @@
 
     popup.document.open();
     popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(order.order_number)} — Pasha Baby</title><style>
-      @page{size:100mm 150mm;margin:0}
-      *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      html,body{margin:0;padding:0;width:100mm;min-width:100mm;background:#fff;color:#111;font-family:Arial,Tahoma,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums}
-      .label{width:100mm;height:150mm;padding:5mm 5mm 4mm;display:flex;flex-direction:column;overflow:hidden;border:0}
-      .brand{text-align:center;border-bottom:.35mm solid #111;padding-bottom:2.2mm;margin-bottom:2.3mm}.brand img{width:16mm;height:16mm;object-fit:contain;display:block;margin:0 auto 1mm}.brand h1{margin:0;font:900 5mm/1.05 Georgia,serif;letter-spacing:.5mm}.brand small{font-size:2.4mm;letter-spacing:.35mm}
-      .orderline{display:flex;justify-content:space-between;align-items:center;gap:2mm;margin-bottom:2mm}.orderline strong{font:900 4.1mm/1.1 ui-monospace,monospace;direction:ltr}.orderline span{font-size:2.6mm}
-      .customer{border:.35mm solid #111;border-radius:2mm;padding:2.2mm;margin-bottom:2.2mm;font-size:3mm;line-height:1.45}.customer b{font-size:3.4mm}.phone{direction:ltr;display:inline-block;font-weight:900}.address{margin-top:1mm;font-weight:700}
-      .items{flex:1;min-height:0;overflow:hidden;border-top:.3mm solid #111;border-bottom:.3mm solid #111;padding:1.2mm 0}.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2mm;align-items:start;padding:1mm 0;border-bottom:.18mm dotted #777;font-size:2.75mm;line-height:1.32}.item:last-child{border-bottom:0}.item strong{white-space:nowrap}.option{font-size:2.3mm;color:#333;font-weight:700}.delivery-item{color:#176d57}.delivery-item .option{color:inherit}.compact .item{font-size:2.35mm;padding:.65mm 0}.compact .option{font-size:2mm}.ultra-compact .item{font-size:1.95mm;padding:.4mm 0;line-height:1.16}.ultra-compact .option{font-size:1.75mm}
-      .notes{margin-top:1.6mm;padding:1.5mm;border:.25mm solid #555;border-radius:1.5mm;font-size:2.45mm;line-height:1.35;max-height:15mm;overflow:hidden}.totals{margin-top:2mm;border:.45mm solid #111;border-radius:1.8mm;padding:2mm;display:grid;gap:.8mm}.row{display:flex;justify-content:space-between;gap:2mm;font-size:2.7mm}.row.grand{font-size:4.2mm;font-weight:900;border-top:.3mm solid #111;padding-top:1.2mm}.footer{text-align:center;margin-top:1.7mm;font-size:2.5mm;font-weight:800}.screen-actions{display:flex;gap:8px;padding:12px;position:fixed;left:0;right:0;bottom:0;background:#eee;z-index:5}.screen-actions button{flex:1;padding:12px;border:0;border-radius:8px;background:#111;color:#fff;font-weight:800}@media print{.screen-actions{display:none}}
-    </style></head><body><div class="label ${compactClass}">
-      <div class="brand">${logo ? `<img src="${esc(logo)}" alt="Pasha Baby">` : ''}<h1>PASHA BABY</h1><small>PREMIUM BABY BOUTIQUE</small></div>
+      @page{size:auto;margin:8mm}
+      *{box-sizing:border-box}
+      html,body{margin:0;padding:0;min-width:0;background:#fff;color:#000;font-family:Tahoma,Arial,"Segoe UI",sans-serif;font-size:12pt;font-weight:600;line-height:1.45;font-variant-numeric:tabular-nums;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      body{padding:10mm 8mm 28mm}
+      .label{width:100%;max-width:190mm;margin:0 auto;background:#fff;color:#000}
+      .brand{display:flex;align-items:center;justify-content:center;gap:4mm;border-top:1.5pt solid #000;border-bottom:1.5pt solid #000;padding:3.5mm 0;margin-bottom:4mm;text-align:right;break-inside:avoid}.print-logo-mark{width:15mm;height:15mm;flex:0 0 15mm;border:2pt solid #000;border-radius:50%;display:grid;place-items:center;font:900 14pt/1 Arial Black,Arial,sans-serif;letter-spacing:.4pt}.brand-copy h1{margin:0;color:#000;font:900 22pt/1 Arial Black,Arial,sans-serif;letter-spacing:1pt}.brand-ar{margin-top:1.2mm;font-size:11pt;font-weight:900;letter-spacing:0}
+      .orderline{display:flex;justify-content:space-between;align-items:center;gap:5mm;margin-bottom:3mm;border-bottom:1pt solid #000;padding-bottom:2.5mm;break-inside:avoid}.orderline strong{font:900 14pt/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;direction:ltr;text-align:left}.orderline span{font-size:11pt;font-weight:800}
+      .customer{border:1.5pt solid #000;border-radius:2mm;padding:3mm;margin-bottom:3.5mm;font-size:12pt;font-weight:700;line-height:1.55;break-inside:avoid}.customer b{font-size:14pt;font-weight:900}.phone{direction:ltr;display:inline-block;font-weight:900}.address{margin-top:1.5mm;font-weight:800}
+      .items{border-top:1.5pt solid #000;border-bottom:1.5pt solid #000}.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6mm;align-items:start;padding:2.6mm 1mm;border-bottom:1pt solid #000;font-size:11.5pt;font-weight:700;line-height:1.45;break-inside:avoid}.item:last-child{border-bottom:0}.item b{font-weight:900}.item strong{white-space:nowrap;font-weight:900;direction:ltr;text-align:left}.option{margin-top:.8mm;font-size:10.5pt;color:#000;font-weight:800}.delivery-item,.delivery-item .option{color:#000}
+      .notes{margin-top:3.5mm;padding:3mm;border:1.25pt solid #000;border-radius:1.5mm;font-size:11pt;font-weight:700;line-height:1.5;break-inside:avoid}.totals{margin-top:4mm;border:2pt solid #000;border-radius:1.8mm;padding:3mm;display:grid;gap:1.5mm;break-inside:avoid}.row{display:flex;justify-content:space-between;gap:5mm;font-size:12pt;font-weight:800}.row b{white-space:nowrap;direction:ltr}.row.grand{font-size:17pt;font-weight:900;border-top:1.5pt solid #000;padding-top:2.2mm}.footer{text-align:center;margin-top:3mm;font-size:10.5pt;font-weight:900;break-inside:avoid}.screen-actions{display:flex;gap:8px;padding:12px;position:fixed;left:0;right:0;bottom:0;background:#eee;z-index:5}.screen-actions button{flex:1;padding:12px;border:0;border-radius:8px;background:#000;color:#fff;font-size:16px;font-weight:900}
+      @media print{html,body{width:auto!important;min-width:0!important;background:#fff!important;color:#000!important}body{padding:0!important}.label{width:100%!important;max-width:none!important;margin:0!important;overflow:visible!important}.screen-actions{display:none!important}}
+    </style></head><body><div class="label">
+      <div class="brand" aria-label="Pasha Baby"><div class="print-logo-mark" aria-hidden="true">PB</div><div class="brand-copy"><h1>PASHA BABY</h1><div class="brand-ar">باشا بيبي · مستلزمات الأطفال</div></div></div>
       <div class="orderline"><strong>${invoiceEsc(order.order_number)}</strong><span>${invoiceEsc(when(order.created_at))}</span></div>
       <div class="customer"><b>${invoiceEsc(order.customer_name)}</b><br><span class="phone">${invoiceEsc(order.customer_phone)}</span> · ${order.order_type === 'delivery' ? 'توصيل' : 'استلام'}${order.address ? `<div class="address">${invoiceEsc(order.address)}</div>` : ''}</div>
       <div class="items">${items.map(item => { const option = itemOptionText(item); return `<div class="item"><span><b>${Number(item.quantity || 0)}× ${invoiceEsc(item.product_name)}</b>${option ? `<div class="option">${invoiceEsc(option)}</div>` : ''}</span><strong>${money(item.line_total)}</strong></div>`; }).join('')}${fee > 0 ? `<div class="item delivery-item"><span><b>1× أجور التوصيل</b><div class="option">خدمة التوصيل</div></span><strong>${money(fee)}</strong></div>` : ''}</div>
       ${notes ? `<div class="notes"><b>ملاحظة:</b> ${invoiceEsc(notes)}</div>` : ''}
       <div class="totals">${fee > 0 ? `<div class="row"><span>مجموع الأصناف</span><b>${money(order.subtotal)}</b></div>` : ''}<div class="row grand"><span>المجموع الكلي</span><b>${money(order.total)}</b></div></div>
       <div class="footer">شكراً لاختياركم PASHA BABY</div>
-    </div><div class="screen-actions"><button onclick="window.print()">طباعة / حفظ PDF 100×150</button></div></body></html>`);
+    </div><div class="screen-actions"><button onclick="window.print()">طباعة بالحجم الكامل / حفظ PDF</button></div></body></html>`);
     popup.document.close();
     popup.focus();
   }
