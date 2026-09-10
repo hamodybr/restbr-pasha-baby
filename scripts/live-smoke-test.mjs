@@ -159,7 +159,8 @@ await expectText('/js/pasha-arabic-only.js', [
   "localStorage.setItem('RESTBR_LANG_V1', 'ar')",
   'js/admin-retail-discounts.js?v=4.0',
   'js/admin-product-colors.js?v=3.0',
-  'js/admin-orders-customers.js?v=1.6',
+  'js/admin-invoice-settings.js?v=1.0',
+  'js/admin-orders-customers.js?v=1.7',
   'js/pasha-admin-product-editor-cleanup.js?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
   'js/pasha-number-normalizer.js?v=1.2',
@@ -167,12 +168,20 @@ await expectText('/js/pasha-arabic-only.js', [
 ], 'Arabic-only policy');
 
 await expectText('/js/admin-orders-customers.js', [
-  'font-family:"Modern Pro Bold","Modern Pro","DIN Next Arabic","Geeza Pro",Tahoma,Arial,sans-serif',
-  'font-size:12pt;font-weight:900;line-height:1.25',
-  'font-size:9.5pt;color:#000;font-weight:900',
-  'border-bottom:1.5pt dotted #000',
-  '.row.grand{font-size:16pt'
-], 'reference-style compact laser invoice typography');
+  '@page{size:${pageSize};margin:${cfg.page_margin_mm}mm}',
+  'window.PashaInvoiceSettings?.normalize',
+  'font-family:${invoiceFont}',
+  'min-height:${cfg.row_min_height_mm}mm',
+  'border-bottom:${cfg.leader_width_pt}pt ${cfg.leader_style}'
+], 'saved configurable laser invoice renderer');
+
+await expectText('/js/admin-invoice-settings.js', [
+  'إعدادات الفاتورة',
+  'المعاينة المباشرة',
+  'قالب مضغوط لأصناف كثيرة',
+  "from('invoice-assets').upload",
+  'mergeIntoUiDesignSettings'
+], 'complete invoice settings editor');
 
 await expectText('/js/pasha-admin-product-editor-cleanup.js', [
   'p_is_hot',
@@ -217,11 +226,11 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v31',
+  'restbr-pasha-baby-v32',
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
-  'js/pasha-arabic-only.js?v=1.2',
+  'js/pasha-arabic-only.js?v=1.3',
   'js/pasha-number-normalizer.js?v=1.2',
   'js/pasha-baby-fixed-discounts.js?v=1.0',
   'js/live-prices.js?v=3.0',
