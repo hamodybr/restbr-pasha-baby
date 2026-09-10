@@ -502,11 +502,14 @@
     add.textContent = t('إضافة للسلة', 'زیادکردن بۆ سەبەتە', 'Add to cart');
   }
 
-  function openChooser(product) {
+  function openChooser(product, preferredColorId = '') {
     ensureChooser();
     currentProduct = product;
     selectedOptionIndex = (product.options || []).length === 1 ? 0 : null;
-    selectedColorId = '';
+    const preferredColor = (product.colors || []).find(color =>
+      String(color?.id || '') === String(preferredColorId || '') && color?.isAvailable !== false
+    );
+    selectedColorId = preferredColor ? String(preferredColor.id || '') : '';
     document.getElementById('pbCommerceTitle').textContent = txt(product.name);
     renderChooserBody();
     document.getElementById('pbCommerceBackdrop').classList.add('open');
@@ -589,10 +592,12 @@
     const DB = window.RESTBR_DB;
     const product = DB?.products?.find(item => String(item.id) === String(button.dataset.productId || ''));
     if (!commerceReady || !product || !Array.isArray(product.colors) || !product.colors.length) return;
+    const preferredColorId = String(button.dataset.pbPreferredColorId || '');
+    delete button.dataset.pbPreferredColorId;
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
-    openChooser(product);
+    openChooser(product, preferredColorId);
   }, true);
 
   document.addEventListener('keydown', event => {
