@@ -159,7 +159,7 @@ await expectText('/js/pasha-arabic-only.js', [
   "localStorage.setItem('RESTBR_LANG_V1', 'ar')",
   'js/admin-retail-discounts.js?v=4.0',
   'js/admin-product-colors.js?v=3.0',
-  'js/admin-orders-customers.js?v=1.5',
+  'js/admin-orders-customers.js?v=1.6',
   'js/pasha-admin-product-editor-cleanup.js?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
   'js/pasha-number-normalizer.js?v=1.2',
@@ -167,12 +167,12 @@ await expectText('/js/pasha-arabic-only.js', [
 ], 'Arabic-only policy');
 
 await expectText('/js/admin-orders-customers.js', [
-  'font-family:"Segoe UI Variable Text","Segoe UI",Tahoma,Arial,sans-serif',
-  'font-size:14pt;font-weight:800;line-height:1.5',
-  'font-size:12.5pt;color:#000;font-weight:900',
-  'border-bottom:2pt solid #000;font-size:14pt',
-  '.row.grand{font-size:20pt'
-], 'larger laser invoice typography');
+  'font-family:"Modern Pro Bold","Modern Pro","DIN Next Arabic","Geeza Pro",Tahoma,Arial,sans-serif',
+  'font-size:12pt;font-weight:900;line-height:1.25',
+  'font-size:9.5pt;color:#000;font-weight:900',
+  'border-bottom:1.5pt dotted #000',
+  '.row.grand{font-size:16pt'
+], 'reference-style compact laser invoice typography');
 
 await expectText('/js/pasha-admin-product-editor-cleanup.js', [
   'p_is_hot',
