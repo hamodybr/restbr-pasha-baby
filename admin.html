@@ -4508,6 +4508,9 @@
 
     renderCustomManagers();
     renderUiDesignSettings();
+    window.PashaInvoiceSettings?.render(
+      uiDesignObject(s.ui_design_settings).invoice || {}
+    );
     setRestaurantSettingsMsg('');
   }
 
@@ -4589,6 +4592,7 @@
 
     try{
       const logoUrl=await uploadRestaurantLogo();
+      await window.PashaInvoiceSettings?.uploadPendingAssets?.();
 
       const whatsappNumber=
         normalizeWhatsappNumber(
@@ -4661,7 +4665,9 @@
         custom_top_actions:customTopActionsDraft.map(x=>({id:String(x.id||newDynamicId('top')),icon:String(x.icon||''),label_ar:String(x.label_ar||''),label_ku:String(x.label_ku||''),label_en:String(x.label_en||''),url:String(x.url||''),enabled:x.enabled!==false})),
         custom_footer_actions:customFooterActionsDraft.map(x=>({id:String(x.id||newDynamicId('footer')),icon:String(x.icon||''),label_ar:String(x.label_ar||''),label_ku:String(x.label_ku||''),label_en:String(x.label_en||''),url:String(x.url||''),enabled:x.enabled!==false})),
 
-        ui_design_settings:collectUiDesignSettings(),
+        ui_design_settings:window.PashaInvoiceSettings
+          ? window.PashaInvoiceSettings.mergeIntoUiDesignSettings(collectUiDesignSettings())
+          : collectUiDesignSettings(),
 
         logo_url:logoUrl || '',
         background_video:rsValue('rs_background_video'),

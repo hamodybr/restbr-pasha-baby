@@ -50,7 +50,7 @@ requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row b
 
 // Repeat public visits should come from local cache immediately while a fresh
 // copy is revalidated in the background. Admin remains network-first/no-store.
-requireText('sw.js', 'restbr-pasha-baby-v31', 'product gallery cache generation');
+requireText('sw.js', 'restbr-pasha-baby-v32', 'invoice editor cache generation');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');

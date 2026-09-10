@@ -1,5 +1,5 @@
-const CACHE_NAME = "restbr-pasha-baby-v31";
-// Product-details image gallery release 2026-09-10.
+const CACHE_NAME = "restbr-pasha-baby-v32";
+// Invoice settings editor release 2026-09-10.
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
 const CORE = [
@@ -33,7 +33,7 @@ const CORE = [
   "./js/restbr-hardening.js?v=1.0",
   "./js/url-safety.js?v=1.3",
   "./js/supabase-config.js?v=2.7",
-  "./js/pasha-arabic-only.js?v=1.2",
+  "./js/pasha-arabic-only.js?v=1.3",
   "./js/pasha-number-normalizer.js?v=1.2",
   "./js/live-prices.js?v=3.0",
   "./js/restaurant-hours.js?v=1.3",
