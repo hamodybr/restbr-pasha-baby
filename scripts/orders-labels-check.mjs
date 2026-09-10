@@ -95,12 +95,12 @@ requireText('js/pasha-order-submit.js', 'event.stopImmediatePropagation()', 'per
 requireText('js/pasha-order-submit.js', 'capturedLocationUrl', 'captured delivery location');
 requireText('js/pasha-order-submit.js', 'https://maps.google.com/?q=', 'Google Maps location payload');
 requireText('js/pasha-order-submit.js', 'if (checkout.locationUrl)', 'WhatsApp location preservation');
-requireText('js/admin-orders-customers.js', '@page{size:auto;margin:8mm}', 'laser-printer page sizing');
-requireText('js/admin-orders-customers.js', 'font-family:"Segoe UI Variable Text","Segoe UI",Tahoma,Arial,sans-serif', 'modern Arabic invoice font stack');
-requireText('js/admin-orders-customers.js', 'font-size:14pt;font-weight:800;line-height:1.5', 'bold laser-safe invoice item font');
-requireText('js/admin-orders-customers.js', 'font-size:12.5pt;color:#000;font-weight:900', 'bold invoice option font');
-requireText('js/admin-orders-customers.js', 'border-bottom:2pt solid #000;font-size:14pt', 'bold invoice item dividers');
-requireText('js/admin-orders-customers.js', '.row.grand{font-size:20pt', 'larger invoice grand total font');
+requireText('js/admin-orders-customers.js', '@page{size:A4 portrait;margin:6mm}', 'full A4 laser-printer page sizing');
+requireText('js/admin-orders-customers.js', 'font-family:"Modern Pro Bold","Modern Pro","DIN Next Arabic","Geeza Pro",Tahoma,Arial,sans-serif', 'Modern Pro bold Arabic invoice font stack');
+requireText('js/admin-orders-customers.js', 'font-size:12pt;font-weight:900;line-height:1.25', 'compact bold laser-safe invoice item font');
+requireText('js/admin-orders-customers.js', 'font-size:9.5pt;color:#000;font-weight:900', 'compact bold invoice option font');
+requireText('js/admin-orders-customers.js', 'border-bottom:1.5pt dotted #000', 'compact dotted invoice item leaders');
+requireText('js/admin-orders-customers.js', '.row.grand{font-size:16pt', 'reference-size invoice grand total font');
 requireText('js/admin-orders-customers.js', 'border:2pt solid #000', 'high-contrast laser total border');
 requireText('js/admin-orders-customers.js', 'class="print-logo-mark"', 'monochrome printer-safe Pasha logo');
 requireText('js/admin-orders-customers.js', 'طباعة بالحجم الكامل / حفظ PDF', 'full-size laser print action');
@@ -110,7 +110,7 @@ requireText('js/admin-orders-customers.js', "from('customer_order_summary')", 'c
 requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard');
 requireText('js/admin-orders-customers.js', 'PDF / طباعة ليزر واضحة', 'laser invoice action');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.1", 'public order loader');
-requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.5", 'modern bold admin orders loader');
+requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.6", 'reference invoice admin orders loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.1", 'color persistence loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=2.0", 'color gallery v2 loader');
 requireText('js/pasha-arabic-only.js', 'js/pasha-number-normalizer.js?v=1.2', 'number normalizer loader');
