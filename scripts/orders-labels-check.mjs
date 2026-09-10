@@ -96,7 +96,9 @@ requireText('js/pasha-order-submit.js', 'capturedLocationUrl', 'captured deliver
 requireText('js/pasha-order-submit.js', 'https://maps.google.com/?q=', 'Google Maps location payload');
 requireText('js/pasha-order-submit.js', 'if (checkout.locationUrl)', 'WhatsApp location preservation');
 requireText('js/admin-orders-customers.js', '@page{size:auto;margin:8mm}', 'laser-printer page sizing');
-requireText('js/admin-orders-customers.js', 'font-size:11.5pt', 'laser-safe invoice item font');
+requireText('js/admin-orders-customers.js', 'font-size:14pt;font-weight:700;line-height:1.5', 'larger laser-safe invoice item font');
+requireText('js/admin-orders-customers.js', 'font-size:12.5pt;color:#000', 'larger invoice option font');
+requireText('js/admin-orders-customers.js', '.row.grand{font-size:20pt', 'larger invoice grand total font');
 requireText('js/admin-orders-customers.js', 'border:2pt solid #000', 'high-contrast laser total border');
 requireText('js/admin-orders-customers.js', 'class="print-logo-mark"', 'monochrome printer-safe Pasha logo');
 requireText('js/admin-orders-customers.js', 'طباعة بالحجم الكامل / حفظ PDF', 'full-size laser print action');
@@ -106,7 +108,7 @@ requireText('js/admin-orders-customers.js', "from('customer_order_summary')", 'c
 requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard');
 requireText('js/admin-orders-customers.js', 'PDF / طباعة ليزر واضحة', 'laser invoice action');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.1", 'public order loader');
-requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.3", 'admin orders loader');
+requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.4", 'larger-font admin orders loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.1", 'color persistence loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=2.0", 'color gallery v2 loader');
 requireText('js/pasha-arabic-only.js', 'js/pasha-number-normalizer.js?v=1.2', 'number normalizer loader');
