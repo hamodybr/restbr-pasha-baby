@@ -1,4 +1,4 @@
-# Pasha Baby Orders + Customers + 100x150 Labels
+# Pasha Baby Orders + Customers + Laser Invoices
 
 Production remains on `main` until the two Supabase steps below are complete and tested.
 
@@ -40,7 +40,7 @@ Only after migration + function deployment succeed:
 3. Test one delivery checkout and one pickup checkout on the production domain.
 4. Confirm each order appears under Admin > الطلبات.
 5. Confirm each customer appears under Admin > الزبائن using normalized phone number.
-6. Print the order with `PDF / طباعة 100×150` and verify page size.
+6. Print the order with `PDF / طباعة ليزر واضحة`; verify that it fills the selected A5/A4 paper width, uses solid black text and borders, and is not reduced to a 100×150 mm block.
 7. Confirm WhatsApp contains the same order number and totals.
 
 If any production check or checkout test fails, restore `main` to the pre-feature snapshot and leave the additive database objects in place until the issue is diagnosed; they are private and unused by the old storefront.
