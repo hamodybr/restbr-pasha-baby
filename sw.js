@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v35";
+const CACHE_NAME = "restbr-pasha-baby-v36";
 
 const CORE = [
   "./",
