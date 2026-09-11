@@ -51,7 +51,7 @@ requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row b
 
 // Repeat public visits should come from local cache immediately while a fresh
 // copy is revalidated in the background. Admin remains network-first/no-store.
-requireText('sw.js', 'restbr-pasha-baby-v34', 'storefront bundle cache generation');
+requireText('sw.js', 'restbr-pasha-baby-v35', 'card-style rollback cache generation');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
@@ -72,7 +72,8 @@ requireText('js/admin-image-optimizer.js', "canvasToBlob(canvas, 'image/webp'", 
 requireText('js/admin-image-optimizer.js', "cacheControl: '31536000'", 'one-year product image cache');
 requireText('js/app.js', 'loading="lazy"', 'lazy product images');
 requireText('js/app.js', 'decoding="async"', 'async product image decode');
-requireText('index.html', 'css/pasha-baby-storefront-bundle.css?v=1.0', 'storefront CSS bundle');
+requireText('index.html', 'css/style.css?v=4.1', 'original storefront base CSS order');
+requireText('index.html', 'css/pasha-baby-final-tweaks.css?v=1.0', 'original storefront override CSS order');
 requireText('index.html', 'js/pasha-baby-storefront-bundle.js?v=1.0', 'storefront JavaScript bundle');
 requireText('index.html', 'rel="preload" as="image" href="assets/pasha-baby-logo-256.webp"', 'optimized logo preload');
 requireText('js/app.js', 'data-original-image=', 'original product-image fallback');
