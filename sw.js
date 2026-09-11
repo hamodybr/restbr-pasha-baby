@@ -1,10 +1,23 @@
-const CACHE_NAME = "restbr-pasha-baby-v34";
+const CACHE_NAME = "restbr-pasha-baby-v35";
 
 const CORE = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./css/pasha-baby-storefront-bundle.css?v=1.0",
+  "./css/style.css?v=4.1",
+  "./css/cart.css?v=3.6",
+  "./css/pasha-baby-commerce.css?v=1.0",
+  "./css/desktop-phone-parity.css?v=1.0",
+  "./css/mobile-card-image-fix.css?v=1.1",
+  "./css/live-card-badges.css?v=1.5",
+  "./css/pasha-baby-theme.css?v=1.1",
+  "./css/pasha-baby-storefront-v2.css?v=2.0",
+  "./css/pasha-baby-retail-fixes.css?v=1.0",
+  "./css/pasha-baby-retail-polish-v3.css?v=3.1",
+  "./css/pasha-baby-retail-v4.css?v=5.0",
+  "./css/pasha-baby-brand-background.css?v=1.0",
+  "./css/pasha-baby-footer-v2.css?v=2.0",
+  "./css/pasha-baby-final-tweaks.css?v=1.0",
   "./js/pasha-baby-storefront-bundle.js?v=1.0",
   "./js/vendor/supabase-2.114.0.min.js",
   "./js/runtime-config.js?v=2.2",
