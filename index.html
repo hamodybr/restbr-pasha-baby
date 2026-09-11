@@ -29,6 +29,12 @@
 
   <script>
     window.__smIntroBornAt=Date.now();
+    window.__smIntroEarlyDismissTimer=setTimeout(function(){
+      const intro=document.getElementById("smIntro");
+      if(!intro)return;
+      intro.classList.add("hide");
+      setTimeout(function(){intro.style.display="none";},360);
+    },620);
     window.RESTBR_HOURS_READY=false;
     document.documentElement.classList.add("sm-hours-pending");
 
@@ -212,8 +218,8 @@
   <div class="sm-bg-overlay"></div>
 
   <div id="smIntro" class="sm-intro">
-    <div class="sm-intro-logo-wrap">
-      <img src="" alt="" class="sm-intro-logo" style="visibility:hidden">
+    <div id="pbIntroMark" class="pb-intro-mark has-store-logo">
+      <img src="assets/pasha-baby-logo-256.webp" alt="" class="pb-intro-logo-dynamic" width="256" height="256" decoding="async" fetchpriority="high" style="display:block;width:100%;height:100%;object-fit:contain">
     </div>
     <div class="sm-intro-brand">پاشا بيبي</div>
     <div class="sm-intro-sub">مستلزمات الأطفال</div>
@@ -221,13 +227,28 @@
 
   <main id="smApp" class="sm-app">
     <header class="sm-header">
+      <div id="pbBrand" class="pb-brand" aria-label="پاشا بيبي">
+        <div class="pb-brand-mark has-store-logo" aria-hidden="true">
+          <img class="pb-brand-logo" src="assets/pasha-baby-logo-256.webp" data-original-image="https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/settings/logo/1788645406355-3ib1w5.png" alt="" width="256" height="256" decoding="async" fetchpriority="high" style="display:block;width:100%;height:100%;object-fit:contain">
+          <small></small>
+        </div>
+        <div class="pb-brand-name">پاشا بيبي</div>
+        <div class="pb-brand-tagline">مستلزمات الأطفال بشكل واضح وسهل</div>
+      </div>
       <div class="sm-logo-wrap">
-        <img src="" alt="" class="sm-logo" style="visibility:hidden">
+        <img src="assets/pasha-baby-logo-256.webp" data-original-image="https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/settings/logo/1788645406355-3ib1w5.png" alt="" class="sm-logo" style="visibility:hidden">
       </div>
       <h1>باشا بيبي</h1>
       <p id="smSubtitle">مستلزمات الأطفال والبيبي في دهوك</p>
       <div id="smActions" class="sm-actions"></div>
     </header>
+
+    <section id="pbStoreHeroV2" class="pb-store-hero">
+      <span class="pb-store-eyebrow">كل احتياجات طفلك بمكان واحد</span>
+      <h2>اختار القسم اللي تحتاجه</h2>
+      <p>أقسام واضحة، أسعار مباشرة، وطلب سهل.</p>
+      <div id="pbSearchHostV3" class="pb-search-host" role="search" aria-label="البحث في المنتجات"></div>
+    </section>
 
     <div class="sm-cats-wrap">
       <div id="smCats" class="sm-cats"></div>
