@@ -15,6 +15,41 @@
   --pb4-lilac:#eee9f7;
 }
 
+/* Reserve the exact final header geometry before live store data arrives. */
+.sm-header{padding-top:18px!important}
+#pbBrand.pb-brand{
+  width:100%!important;max-width:none!important;margin:0 auto 12px!important;
+  padding:4px 14px 8px!important;display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;gap:0!important;
+  text-align:center!important;border:0!important;border-radius:0!important;
+  background:transparent!important;background-image:none!important;box-shadow:none!important;
+}
+#pbBrand .pb-brand-mark{
+  grid-row:auto!important;grid-column:auto!important;width:118px!important;height:118px!important;
+  margin:0 auto 8px!important;padding:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;background-image:none!important;box-shadow:none!important;
+  overflow:visible!important;
+}
+#pbBrand .pb-brand-logo{
+  width:100%!important;height:100%!important;max-width:118px!important;max-height:118px!important;
+  padding:0!important;margin:0 auto!important;object-fit:contain!important;object-position:center!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+}
+#pbBrand .pb-brand-name{
+  width:100%!important;margin:0!important;padding:0!important;color:#243137!important;
+  font-size:28px!important;line-height:1.15!important;font-weight:950!important;
+  letter-spacing:-.45px!important;text-align:center!important;
+}
+#pbBrand .pb-brand-tagline{
+  width:100%!important;max-width:330px!important;margin:6px auto 0!important;padding:0!important;
+  color:#6d7b80!important;font-size:12.5px!important;line-height:1.55!important;
+  font-weight:720!important;text-align:center!important;
+}
+#smActions.sm-actions,#smActions.sm-quick-actions{
+  width:min(100%,430px)!important;min-height:48px!important;margin:8px auto 10px!important;
+  padding:0 14px!important;box-sizing:border-box!important;
+}
+
 #pbCategoryPanelV2{display:none!important}
 
 #smSearchWrap,
