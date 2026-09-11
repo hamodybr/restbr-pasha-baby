@@ -103,9 +103,9 @@
   function boot() {
     installStyles();
     tagQuickActions();
-    // Use the same script id expected by the lazy print loader so it waits for
-    // this renderer instead of loading the older SVG/foreignObject renderer.
-    loadAddon('pashaInvoicePdfScript', 'js/admin-invoice-pdf-v3.js?v=3.0');
+    // Preload the iPhone-safe renderer under the same id used by the lazy
+    // loader. This v4 path has no html2canvas, CDN, SVG or foreignObject step.
+    loadAddon('pashaInvoicePdfScript', 'js/admin-invoice-pdf-v4.js?v=4.0');
     loadAddon('pbOrdersEnhancementsScript', 'js/admin-orders-enhancements.js?v=1.0');
     loadAddon('pbColorImageUploadScript', 'js/admin-color-image-upload.js?v=1.0');
 
