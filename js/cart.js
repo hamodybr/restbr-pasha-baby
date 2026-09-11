@@ -45,10 +45,11 @@
   function syncOrderState(){
     ensureUI();
     const allowed=ordersAllowed();
+    const hoursPending=window.RESTBR_HOURS_READY!==true;
     const banner=document.getElementById("smOrderStateBanner");
     if(banner){
-      banner.hidden=allowed;
-      banner.textContent=allowed?"":("⏸ "+closedMessage());
+      banner.hidden=hoursPending||allowed;
+      banner.textContent=hoursPending||allowed?"":("⏸ "+closedMessage());
     }
     document.querySelectorAll(".sm-add-cart,.sm-direct-add,.sm-choose-options").forEach(btn=>{
       btn.disabled=!allowed;
