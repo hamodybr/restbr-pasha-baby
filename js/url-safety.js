@@ -112,6 +112,11 @@
   const PUBLIC_OBJECT_PREFIX = '/storage/v1/object/public/menu-images/';
   const PUBLIC_RENDER_PREFIX = '/storage/v1/render/image/public/menu-images/';
   const CURRENT_STORE_LOGO = '/storage/v1/object/public/menu-images/settings/logo/1788645406355-3ib1w5.png';
+  const B2_STORAGE_HOST = 'f003.backblazeb2.com';
+  const LOCAL_PRODUCT_THUMBNAILS = Object.freeze({
+    '/file/pasha-baby-products/products/9c4f903c-a78b-4620-9279-3c696235e55c/main':
+      'assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp'
+  });
 
   function optimizedMediaUrl(value, preset = 'product-card') {
     const safe = safeMediaUrl(value);
@@ -128,6 +133,14 @@
         parsed.pathname === CURRENT_STORE_LOGO
       ) {
         return 'assets/pasha-baby-logo-256.webp';
+      }
+
+      if (
+        preset === 'product-card' &&
+        parsed.hostname === B2_STORAGE_HOST &&
+        LOCAL_PRODUCT_THUMBNAILS[parsed.pathname]
+      ) {
+        return LOCAL_PRODUCT_THUMBNAILS[parsed.pathname];
       }
 
       if (

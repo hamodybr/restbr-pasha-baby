@@ -99,12 +99,9 @@ function pngDimensions(buffer) {
 const indexHtml = await expectText('/', [
   'پاشا بيبي',
   'js/runtime-config.js',
-  'js/supabase-config.js?v=2.7',
-  'js/pasha-baby-storefront-v2.js',
-  'js/live-prices.js?v=3.0',
-  'js/pasha-baby-fixed-discounts.js?v=1.0',
-  'css/pasha-baby-final-tweaks.css?v=1.0',
-  'css/pasha-baby-footer-v2.css'
+  'js/vendor/supabase-2.114.0.min.js',
+  'js/pasha-baby-storefront-bundle.js?v=1.0',
+  'css/pasha-baby-storefront-bundle.css?v=1.0'
 ], 'storefront');
 
 if (indexHtml.includes('id="smLangs"')) fail('Arabic-only storefront', 'language picker still present');
@@ -226,17 +223,16 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v33',
+  'restbr-pasha-baby-v34',
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
   'js/pasha-arabic-only.js?v=1.3',
   'js/pasha-number-normalizer.js?v=1.2',
-  'js/pasha-baby-fixed-discounts.js?v=1.0',
-  'js/live-prices.js?v=3.0',
-  'css/pasha-baby-final-tweaks.css?v=1.0',
+  'js/pasha-baby-storefront-bundle.js?v=1.0',
+  'css/pasha-baby-storefront-bundle.css?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
-  'js/pasha-baby-storefront-v2.js'
+  'assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp'
 ], 'service worker');
 
 await expectText('/js/pasha-number-normalizer.js', [

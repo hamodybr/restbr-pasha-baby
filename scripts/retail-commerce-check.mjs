@@ -43,25 +43,22 @@ for (const file of files) {
   }
 }
 
-requireText('index.html', 'css/pasha-baby-commerce.css?v=1.0', 'retail commerce stylesheet');
+requireText('index.html', 'css/pasha-baby-storefront-bundle.css?v=1.0', 'retail storefront CSS bundle');
 requireText('index.html', 'js/runtime-config.js?v=2.2', 'product gallery runtime config');
-requireText('index.html', 'js/pasha-baby-commerce.js?v=2.2', 'retail commerce preferred-color runtime');
-requireText('index.html', 'js/pasha-baby-retail-v4.js?v=5.1', 'placeholder detail opener runtime');
-requireText('index.html', 'js/live-prices.js?v=3.0', 'fixed-discount-aware live prices v3 runtime');
-requireText('index.html', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'fixed discount storefront runtime');
-requireText('index.html', 'css/pasha-baby-final-tweaks.css?v=1.0', 'final Pasha UI tweaks');
+requireText('index.html', 'js/pasha-baby-storefront-bundle.js?v=1.0', 'retail storefront JavaScript bundle');
+requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-commerce.js */', 'bundled preferred-color commerce runtime');
+requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-retail-v4.js */', 'bundled placeholder detail opener runtime');
+requireText('js/pasha-baby-storefront-bundle.js', '/* js/live-prices.js */', 'bundled fixed-discount-aware live prices');
+requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-fixed-discounts.js */', 'bundled fixed discount storefront runtime');
+requireText('css/pasha-baby-storefront-bundle.css', '/* css/pasha-baby-final-tweaks.css */', 'bundled final Pasha UI tweaks');
 forbidText('index.html', 'css/english-card-ltr.css', 'English-only card stylesheet');
 forbidText('index.html', 'js/english-news-ticker.js', 'English ticker layer');
 forbidText('index.html', 'id="smLangs"', 'storefront language picker');
 
 requireMatch('sw.js', /restbr-pasha-baby-v\d+/, 'retail cache generation');
-requireText('sw.js', 'css/pasha-baby-commerce.css?v=1.0', 'cached commerce stylesheet');
-requireText('sw.js', 'css/pasha-baby-final-tweaks.css?v=1.0', 'cached final Pasha UI tweaks');
-requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.2', 'cached preferred-color commerce runtime');
+requireText('sw.js', 'css/pasha-baby-storefront-bundle.css?v=1.0', 'cached retail storefront stylesheet bundle');
+requireText('sw.js', 'js/pasha-baby-storefront-bundle.js?v=1.0', 'cached retail storefront JavaScript bundle');
 requireText('sw.js', 'js/runtime-config.js?v=2.2', 'cached product gallery runtime config');
-requireText('sw.js', 'js/pasha-baby-retail-v4.js?v=5.1', 'cached placeholder detail opener runtime');
-requireText('sw.js', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'cached fixed discount runtime');
-requireText('sw.js', 'js/live-prices.js?v=3.0', 'cached live prices v3 runtime');
 requireText('sw.js', 'js/pasha-arabic-only.js?v=1.3', 'cached Arabic-only policy');
 requireText('sw.js', 'js/pasha-number-normalizer.js?v=1.2', 'cached English-digit normalizer');
 
