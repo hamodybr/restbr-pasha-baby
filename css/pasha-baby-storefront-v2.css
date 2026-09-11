@@ -198,6 +198,14 @@ body::before{
   font-weight:700;
 }
 
+.pb-search-host{
+  position:relative;
+  z-index:3;
+  width:100%;
+  min-height:50px;
+  margin-top:14px;
+}
+
 .pb-search-launch{
   width:100%;
   min-height:50px;
