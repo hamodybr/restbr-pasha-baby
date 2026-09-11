@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v39";
+const CACHE_NAME = "restbr-pasha-baby-v40";
 
 const CORE = [
   "./",
@@ -23,7 +23,9 @@ const CORE = [
   "./js/runtime-config.js?v=2.2",
   "./js/restbr-hardening.js?v=1.0",
   "./js/url-safety.js?v=1.5",
-  "./js/pasha-arabic-only.js?v=1.5",
+  "./js/pasha-arabic-only.js?v=1.6",
+  "./js/vendor/jspdf-2.5.2.umd.min.js",
+  "./js/admin-invoice-pdf.js?v=1.0",
   "./js/pasha-number-normalizer.js?v=1.2",
   "./js/restaurant-hours.js?v=1.3",
   "./js/whatsapp-order-bullets.js?v=1.0",

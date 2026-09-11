@@ -118,10 +118,14 @@ requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard'
 requireText('js/admin-orders-customers.js', 'PDF / طباعة ليزر واضحة', 'laser invoice action');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.1", 'public order loader');
 requireText('js/pasha-arabic-only.js', "js/admin-invoice-settings.js?v=1.0", 'invoice editor loader');
-requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.9", 'configurable invoice admin orders loader');
+requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=2.0", 'configurable invoice admin orders loader');
 requireText('js/admin-orders-customers.js', 'popup.document.fonts', 'print-window font readiness gate');
 requireText('js/admin-orders-customers.js', 'fontBytesAsDataUrl', 'custom font byte embedding');
 requireText('js/admin-orders-customers.js', 'new popup.FontFace', 'embedded print FontFace');
+requireText('js/admin-orders-customers.js', 'createEmbeddedInvoicePdf', 'direct embedded-font PDF action');
+requireText('js/admin-orders-customers.js', 'js/vendor/jspdf-2.5.2.umd.min.js', 'local direct PDF engine');
+requireText('js/admin-invoice-pdf.js', "doc.addFont('PashaInvoiceCustom.ttf', 'PashaInvoiceCustom', 'normal')", 'custom font registration inside PDF');
+requireText('js/admin-invoice-pdf.js', "doc.output('blob')", 'direct PDF blob output');
 requireText('js/admin-orders-customers.js', 'popup.document.fonts.check', 'embedded custom font verification');
 requireText('js/admin-orders-customers.js', 'pashaInvoicePrintButton', 'disabled-until-ready print action');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.1", 'color persistence loader');

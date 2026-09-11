@@ -20,6 +20,7 @@
   let customerSearch = '';
   let customerFilterPhone = '';
   let refreshTimer = null;
+  let invoicePdfEnginePromise = null;
 
   const sb = () => (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
   const esc = value => String(value ?? '')
@@ -43,6 +44,41 @@
         hour: '2-digit', minute: '2-digit',
       }));
     } catch (_) { return englishDigits(String(value || '')); }
+  };
+
+  const loadInvoicePdfEngine = () => {
+    if (window.jspdf?.jsPDF && window.PashaInvoicePdf?.create) return Promise.resolve();
+    if (invoicePdfEnginePromise) return invoicePdfEnginePromise;
+
+    const loadScript = (id, src, ready) => new Promise((resolve, reject) => {
+      if (ready()) return resolve();
+      const existing = document.getElementById(id);
+      const script = existing || document.createElement('script');
+      const done = () => ready() ? resolve() : reject(new Error('تعذر تشغيل محرك PDF.'));
+      script.addEventListener('load', done, { once:true });
+      script.addEventListener('error', () => reject(new Error('تعذر تنزيل محرك PDF.')), { once:true });
+      if (!existing) {
+        script.id = id;
+        script.src = src;
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    });
+
+    invoicePdfEnginePromise = loadScript(
+      'pashaJsPdfScript',
+      'js/vendor/jspdf-2.5.2.umd.min.js',
+      () => Boolean(window.jspdf?.jsPDF)
+    ).then(() => loadScript(
+      'pashaInvoicePdfScript',
+      'js/admin-invoice-pdf.js?v=1.0',
+      () => Boolean(window.PashaInvoicePdf?.create)
+    )).catch(error => {
+      invoicePdfEnginePromise = null;
+      throw error;
+    });
+
+    return invoicePdfEnginePromise;
   };
 
   const itemKey = value => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -588,16 +624,16 @@
       });
     };
 
-    const fontBytesAsDataUrl = async url => {
+    const assetBytesAsDataUrl = async (url, label) => {
       const response = await fetch(url, {
         mode:'cors',
         credentials:'omit',
         cache:'force-cache'
       });
-      if (!response.ok) throw new Error(`تعذر تنزيل الخط المخصص (${response.status}).`);
+      if (!response.ok) throw new Error(`تعذر تنزيل ${label} (${response.status}).`);
 
       const bytes = new Uint8Array(await response.arrayBuffer());
-      if (!bytes.length) throw new Error('ملف الخط المخصص فارغ.');
+      if (!bytes.length) throw new Error(`ملف ${label} فارغ.`);
 
       let binary = '';
       const chunkSize = 0x8000;
@@ -605,8 +641,15 @@
         binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
       }
 
-      const mime = response.headers.get('content-type') || 'font/otf';
+      const mime = response.headers.get('content-type') || 'application/octet-stream';
       return `data:${mime};base64,${btoa(binary)}`;
+    };
+
+    const fontBytesAsDataUrl = url => assetBytesAsDataUrl(url, 'الخط المخصص');
+    let customFontDataPromise = null;
+    const customFontDataUrl = () => {
+      if (!customFontDataPromise) customFontDataPromise = fontBytesAsDataUrl(fontUrl);
+      return customFontDataPromise;
     };
 
     const embedCustomFont = async () => {
@@ -615,7 +658,7 @@
         throw new Error('هذا المتصفح لا يدعم تضمين الخط داخل PDF.');
       }
 
-      const dataUrl = await fontBytesAsDataUrl(fontUrl);
+      const dataUrl = await customFontDataUrl();
       const face = new popup.FontFace(
         'Pasha Invoice Custom',
         `url(${JSON.stringify(dataUrl)})`,
@@ -636,6 +679,32 @@
       void popup.document.body.offsetHeight;
     };
 
+    const createEmbeddedInvoicePdf = async () => {
+      await loadInvoicePdfEngine();
+      const dataUrl = await customFontDataUrl();
+      const fontBase64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+      let logoDataUrl = '';
+      if (cfg.logo_mode === 'image' && logoUrl) {
+        try { logoDataUrl = await assetBytesAsDataUrl(logoUrl, 'شعار الفاتورة'); }
+        catch (_) { logoDataUrl = ''; }
+      }
+
+      return window.PashaInvoicePdf.create({
+        jsPDF: window.jspdf.jsPDF,
+        cfg,
+        order,
+        items,
+        notes,
+        fee,
+        fontBase64,
+        logoDataUrl,
+        money,
+        when,
+        itemOptionText,
+        englishDigits,
+      });
+    };
+
     const preparePrintAssets = () => {
       if (printAssetsReady) return Promise.resolve();
       if (printPreparation) return printPreparation;
@@ -643,7 +712,13 @@
       printPreparation = (async () => {
         const customFontRequested = cfg.font_family === 'custom';
         const readiness = [];
-        if (customFontRequested) readiness.push(embedCustomFont());
+        if (customFontRequested) {
+          readiness.push(loadInvoicePdfEngine());
+          readiness.push(customFontDataUrl());
+          // This only improves the on-screen print page. The generated PDF below
+          // does not depend on Safari preserving this FontFace.
+          readiness.push(embedCustomFont().catch(() => undefined));
+        }
         else if (popup.document.fonts?.ready) readiness.push(popup.document.fonts.ready);
         readiness.push(...Array.from(popup.document.images).map(waitForImage));
 
@@ -654,8 +729,8 @@
 
         printAssetsReady = true;
         printButton.disabled = false;
-        printButton.textContent = 'طباعة بالحجم الكامل / حفظ PDF';
-        printStatus.textContent = customFontRequested ? 'الخط المخصص جاهز للطباعة' : 'الفاتورة جاهزة للطباعة';
+        printButton.textContent = customFontRequested ? 'فتح PDF بالخط المرفوع' : 'طباعة بالحجم الكامل / حفظ PDF';
+        printStatus.textContent = customFontRequested ? 'سيُنشأ PDF حقيقي والخط مضمن داخله' : 'الفاتورة جاهزة للطباعة';
       })().catch(error => {
         printPreparation = null;
         printButton.disabled = false;
@@ -672,14 +747,23 @@
       printButton.textContent = printAssetsReady ? 'جاري فتح الطباعة…' : 'جاري تجهيز الخط والطباعة…';
       try {
         await preparePrintAssets();
+        if (cfg.font_family === 'custom') {
+          printButton.textContent = 'جاري إنشاء PDF بالخط المرفوع…';
+          printStatus.textContent = 'لا تغلق هذه النافذة';
+          const result = await createEmbeddedInvoicePdf();
+          const pdfUrl = URL.createObjectURL(result.blob);
+          popup.location.replace(pdfUrl);
+          setTimeout(() => URL.revokeObjectURL(pdfUrl), 300000);
+          return;
+        }
         popup.focus();
         popup.print();
-      } catch (_) {
-        // The status beside the button explains how to retry or save the font.
+      } catch (error) {
+        printStatus.textContent = error?.message || 'تعذر إنشاء PDF بالخط المرفوع.';
       } finally {
         if (printAssetsReady) {
           printButton.disabled = false;
-          printButton.textContent = 'طباعة بالحجم الكامل / حفظ PDF';
+          printButton.textContent = cfg.font_family === 'custom' ? 'فتح PDF بالخط المرفوع' : 'طباعة بالحجم الكامل / حفظ PDF';
         }
       }
     });
