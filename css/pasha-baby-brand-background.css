@@ -78,6 +78,19 @@ body::before{
   backdrop-filter:blur(18px) saturate(1.08) !important;
 }
 
+/* Reserve the category rail's final geometry before live categories arrive.
+   Filled layout = 66px category + 2px/5px rail padding = 73px.
+   This changes only the empty loading state and prevents the menu below from jumping. */
+#smCats.sm-cats{
+  min-height:73px !important;
+}
+
+@media (max-width:390px){
+  #smCats.sm-cats{
+    min-height:69px !important;
+  }
+}
+
 /* Announcement: clearer urgent label + stronger readable copy. */
 #smAnnouncement.sm-news-ticker,
 .sm-news-ticker{
