@@ -538,9 +538,6 @@
     };
     const fontUrl = safeAssetUrl(cfg.custom_font_url);
     const logoUrl = safeAssetUrl(cfg.logo_url);
-    const customFontFace = cfg.font_family === 'custom' && fontUrl
-      ? `@font-face{font-family:"Pasha Invoice Custom";src:url(${JSON.stringify(fontUrl)});font-display:block}`
-      : '';
     const invoiceFont = fontStacks[cfg.font_family] || fontStacks.modern_pro;
     const pageSize = ['A4','A5','Letter'].includes(cfg.page_size) ? `${cfg.page_size} ${cfg.page_orientation}` : 'auto';
     const pageWidth = cfg.page_size === 'A5' ? 136 : cfg.page_size === 'Letter' ? 203 : 198;
@@ -552,7 +549,6 @@
 
     popup.document.open();
     popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(order.order_number)} — Pasha Baby</title><style>
-      ${customFontFace}
       @page{size:${pageSize};margin:${cfg.page_margin_mm}mm}
       *{box-sizing:border-box}
       html,body{margin:0;padding:0;min-width:0;background:#fff;color:#000;font-family:${invoiceFont};font-size:${cfg.base_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};font-variant-numeric:tabular-nums;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -592,25 +588,63 @@
       });
     };
 
+    const fontBytesAsDataUrl = async url => {
+      const response = await fetch(url, {
+        mode:'cors',
+        credentials:'omit',
+        cache:'force-cache'
+      });
+      if (!response.ok) throw new Error(`تعذر تنزيل الخط المخصص (${response.status}).`);
+
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      if (!bytes.length) throw new Error('ملف الخط المخصص فارغ.');
+
+      let binary = '';
+      const chunkSize = 0x8000;
+      for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+      }
+
+      const mime = response.headers.get('content-type') || 'font/otf';
+      return `data:${mime};base64,${btoa(binary)}`;
+    };
+
+    const embedCustomFont = async () => {
+      if (!fontUrl) throw new Error('الخط المخصص غير محفوظ. ارفعه واحفظ الإعدادات أولاً.');
+      if (typeof popup.FontFace !== 'function' || !popup.document.fonts) {
+        throw new Error('هذا المتصفح لا يدعم تضمين الخط داخل PDF.');
+      }
+
+      const dataUrl = await fontBytesAsDataUrl(fontUrl);
+      const face = new popup.FontFace(
+        'Pasha Invoice Custom',
+        `url(${JSON.stringify(dataUrl)})`,
+        { style:'normal', weight:String(cfg.font_weight), display:'block' }
+      );
+      const loadedFace = await face.load();
+      popup.document.fonts.add(loadedFace);
+
+      const query = `${cfg.font_weight} ${cfg.base_size_pt}pt "Pasha Invoice Custom"`;
+      await popup.document.fonts.load(query, 'باشا بيبي تفاصيل الطلب');
+      await popup.document.fonts.ready;
+      if (!popup.document.fonts.check(query, 'باشا بيبي تفاصيل الطلب')) {
+        throw new Error('تم تنزيل الخط لكن تعذر تضمينه داخل صفحة الـPDF.');
+      }
+
+      // Let the print document complete two layouts with the embedded font.
+      await new Promise(resolve => popup.requestAnimationFrame(() => popup.requestAnimationFrame(resolve)));
+      void popup.document.body.offsetHeight;
+    };
+
     const preparePrintAssets = () => {
       if (printAssetsReady) return Promise.resolve();
       if (printPreparation) return printPreparation;
 
       printPreparation = (async () => {
         const customFontRequested = cfg.font_family === 'custom';
-        if (customFontRequested && !fontUrl) throw new Error('الخط المخصص غير محفوظ. ارفعه واحفظ الإعدادات أولاً.');
-
         const readiness = [];
-        if (popup.document.fonts?.ready) readiness.push(popup.document.fonts.ready);
-        if (customFontRequested) {
-          readiness.push(
-            popup.document.fonts
-              .load(`${cfg.font_weight} ${cfg.base_size_pt}pt "Pasha Invoice Custom"`, 'باشا بيبي')
-              .then(faces => {
-                if (!faces.length) throw new Error('تعذر تحميل الخط المخصص داخل صفحة الطباعة.');
-              })
-          );
-        }
+        if (customFontRequested) readiness.push(embedCustomFont());
+        else if (popup.document.fonts?.ready) readiness.push(popup.document.fonts.ready);
         readiness.push(...Array.from(popup.document.images).map(waitForImage));
 
         await Promise.race([
