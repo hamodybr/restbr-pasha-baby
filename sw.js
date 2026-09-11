@@ -1,57 +1,31 @@
-const CACHE_NAME = "restbr-pasha-baby-v33";
-// Invoice settings editor release 2026-09-10.
-const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
+const CACHE_NAME = "restbr-pasha-baby-v34";
 
 const CORE = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./css/style.css?v=4.1",
-  "./css/cart.css?v=3.6",
-  "./css/desktop-phone-parity.css?v=1.0",
-  "./css/mobile-card-image-fix.css?v=1.1",
-  "./css/live-card-badges.css?v=1.5",
-  "./css/pasha-baby-theme.css?v=1.1",
-  "./css/pasha-baby-storefront-v2.css?v=2.0",
-  "./css/pasha-baby-retail-fixes.css?v=1.0",
-  "./css/pasha-baby-retail-polish-v3.css?v=3.1",
-  "./css/pasha-baby-retail-v4.css?v=5.0",
-  "./css/pasha-baby-brand-background.css?v=1.0",
-  "./css/pasha-baby-footer-v2.css?v=2.0",
-  "./css/pasha-baby-commerce.css?v=1.0",
-  "./css/pasha-baby-final-tweaks.css?v=1.0",
-  "./js/offline-status.js?v=1.1",
-  "./js/unavailable-card-state.js?v=1.1",
-  "./js/app.js?v=18.2",
-  "./js/pasha-baby-commerce.js?v=2.2",
-  "./js/pasha-baby-fixed-discounts.js?v=1.0",
-  "./js/product-image-fallback.js?v=1.4",
-  "./js/price-safety.js?v=1.0",
-  "./js/cart.js?v=4.6",
-  "./js/cart-stale-item-guard.js?v=1.1",
+  "./css/pasha-baby-storefront-bundle.css?v=1.0",
+  "./js/pasha-baby-storefront-bundle.js?v=1.0",
+  "./js/vendor/supabase-2.114.0.min.js",
   "./js/runtime-config.js?v=2.2",
   "./js/restbr-hardening.js?v=1.0",
-  "./js/url-safety.js?v=1.4",
-  "./js/supabase-config.js?v=2.7",
+  "./js/url-safety.js?v=1.5",
   "./js/pasha-arabic-only.js?v=1.3",
   "./js/pasha-number-normalizer.js?v=1.2",
-  "./js/live-prices.js?v=3.0",
   "./js/restaurant-hours.js?v=1.3",
   "./js/whatsapp-order-bullets.js?v=1.0",
   "./js/arabic-news-ticker.js?v=1.1",
-  "./js/card-life-effects.js?v=1.0",
-  "./js/live-card-badges.js?v=1.0",
-  "./js/pasha-baby-ui.js?v=1.3",
-  "./js/pasha-baby-storefront-v2.js?v=2.2",
-  "./js/pasha-baby-retail-interactions-v3.js?v=3.0",
-  "./js/pasha-baby-retail-v4.js?v=5.1",
+  "./js/pasha-baby-product-description-v2.js?v=3.0",
+  "./js/pasha-baby-details-button-v3.js?v=3.1",
+  "./css/pasha-baby-card-density-v2.css?v=3.0",
+  "./css/pasha-baby-details-button-v3.css?v=3.1",
   "./data/menu.json?v=32",
   "./assets/restaurant-placeholder.svg",
   "./assets/pasha-baby-product-placeholder.svg",
   "./assets/pasha-baby-logo-256.webp",
+  "./assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp",
   "./assets/favicon.png",
-  "./assets/apple-touch-icon.png",
-  SUPABASE_BROWSER_URL
+  "./assets/apple-touch-icon.png"
 ];
 
 async function cacheOne(cache, path) {
@@ -147,11 +121,6 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
-
-  if (url.href === SUPABASE_BROWSER_URL) {
-    event.respondWith(cacheFirst(request));
-    return;
-  }
 
   if (url.origin !== self.location.origin) return;
 

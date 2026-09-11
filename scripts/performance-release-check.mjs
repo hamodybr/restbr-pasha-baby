@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 const failures = [];
 const read = file => fs.readFileSync(file, 'utf8');
@@ -50,16 +51,15 @@ requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row b
 
 // Repeat public visits should come from local cache immediately while a fresh
 // copy is revalidated in the background. Admin remains network-first/no-store.
-requireText('sw.js', 'restbr-pasha-baby-v33', 'optimized-image cache generation');
+requireText('sw.js', 'restbr-pasha-baby-v34', 'storefront bundle cache generation');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
 
 // First visit: avoid a second 2MB+ logo request for favicon/apple icon, warm the
-// two cross-origin connections that are needed for Supabase + its browser SDK,
-// and never rescan the entire document for logo mutations.
-requireText('index.html', 'rel="preconnect" href="https://cdn.jsdelivr.net"', 'jsDelivr preconnect');
+// the Supabase API connection, and never rescan the entire document for logo mutations.
 requireText('index.html', 'rel="preconnect" href="https://wlollfpmjzenhkjwxrqo.supabase.co"', 'Supabase preconnect');
+requireText('index.html', 'src="js/vendor/supabase-2.114.0.min.js"', 'self-hosted pinned Supabase browser SDK');
 requireText('index.html', 'href="assets/favicon.png"', 'local lightweight favicon');
 requireText('index.html', 'href="assets/apple-touch-icon.png"', 'local lightweight Apple icon');
 requireText('index.html', 'window.addEventListener("restbr:ready",scanBrandLogo,{once:true})', 'one-shot live brand icon refresh');
@@ -72,10 +72,19 @@ requireText('js/admin-image-optimizer.js', "canvasToBlob(canvas, 'image/webp'", 
 requireText('js/admin-image-optimizer.js', "cacheControl: '31536000'", 'one-year product image cache');
 requireText('js/app.js', 'loading="lazy"', 'lazy product images');
 requireText('js/app.js', 'decoding="async"', 'async product image decode');
-requireText('index.html', 'js/app.js?v=18.2', 'storefront core loader');
+requireText('index.html', 'css/pasha-baby-storefront-bundle.css?v=1.0', 'storefront CSS bundle');
+requireText('index.html', 'js/pasha-baby-storefront-bundle.js?v=1.0', 'storefront JavaScript bundle');
 requireText('index.html', 'rel="preload" as="image" href="assets/pasha-baby-logo-256.webp"', 'optimized logo preload');
 requireText('js/app.js', 'data-original-image=', 'original product-image fallback');
 requireText('js/app.js', 'RESTBR_OPTIMIZED_MEDIA_URL', 'optimized product card images');
+requireText('js/url-safety.js', 'assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp', 'B2 card thumbnail mapping');
+
+const sdkDigest = createHash('sha384')
+  .update(fs.readFileSync('js/vendor/supabase-2.114.0.min.js'))
+  .digest('base64');
+if (sdkDigest !== '0UK+HVlz5Y7F//atDpPysyocv/PjGXQoBX+XSaL/eEotARW8rPFh+lL5sO0Ljzfi') {
+  failures.push('js/vendor/supabase-2.114.0.min.js: pinned SDK integrity mismatch');
+}
 
 // Keep key client files under generous regression ceilings. These are not bundle
 // targets; they only catch accidental megabyte-scale artifacts before delivery.
@@ -85,6 +94,8 @@ for (const [file, maxBytes] of [
   ['js/pasha-baby-commerce.js', 100 * 1024],
   ['js/pasha-baby-product-description-v2.js', 60 * 1024],
   ['js/live-prices.js', 40 * 1024],
+  ['js/pasha-baby-storefront-bundle.js', 400 * 1024],
+  ['css/pasha-baby-storefront-bundle.css', 250 * 1024],
   ['sw.js', 30 * 1024]
 ]) {
   const size = fs.statSync(file).size;

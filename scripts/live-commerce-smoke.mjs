@@ -34,12 +34,9 @@ async function expectText(url, markers, label) {
 }
 
 await expectText('/', [
-  'css/pasha-baby-commerce.css?v=1.0',
-  'css/pasha-baby-final-tweaks.css?v=1.0',
-  'js/pasha-baby-commerce.js?v=2.2',
-  'js/pasha-baby-fixed-discounts.js?v=1.0',
-  'js/live-prices.js?v=3.0',
-  'js/supabase-config.js?v=2.7'
+  'css/pasha-baby-storefront-bundle.css?v=1.0',
+  'js/pasha-baby-storefront-bundle.js?v=1.0',
+  'js/vendor/supabase-2.114.0.min.js'
 ], 'storefront Arabic-only fixed-discount commerce assets');
 
 await expectText('/js/supabase-config.js', [
