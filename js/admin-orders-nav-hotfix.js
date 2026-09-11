@@ -103,6 +103,9 @@
   function boot() {
     installStyles();
     tagQuickActions();
+    // Use the same script id expected by the lazy print loader so it waits for
+    // this renderer instead of loading the older SVG/foreignObject renderer.
+    loadAddon('pashaInvoicePdfScript', 'js/admin-invoice-pdf-v3.js?v=3.0');
     loadAddon('pbOrdersEnhancementsScript', 'js/admin-orders-enhancements.js?v=1.0');
     loadAddon('pbColorImageUploadScript', 'js/admin-color-image-upload.js?v=1.0');
 

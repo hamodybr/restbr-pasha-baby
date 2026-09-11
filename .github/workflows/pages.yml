@@ -30,6 +30,9 @@ jobs:
       - name: Raster invoice PDF audit
         run: node scripts/invoice-pdf-embedding-check.mjs
 
+      - name: Browser-canvas invoice PDF audit
+        run: node scripts/invoice-pdf-v3-check.mjs
+
       - name: Numeric input behavior audit
         run: node scripts/numeric-input-check.mjs
 
@@ -49,6 +52,8 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
