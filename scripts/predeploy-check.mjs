@@ -116,7 +116,17 @@ for (const fragment of requiredRuntimeFragments) {
 if (read('CNAME').trim() !== 'pashababyiq.com') fail('CNAME: expected pashababyiq.com');
 if (read('index.html').includes('js/dining-mode.js')) fail('index.html: restaurant dining-mode script must not load in retail mode');
 
-// 7) Detect secret keys accidentally committed to browser-delivered files.
+// 7) Search engines must be able to discover and understand the storefront.
+requireText('robots.txt', 'Sitemap: https://pashababyiq.com/sitemap.xml', 'production sitemap declaration');
+requireText('robots.txt', 'Disallow: /admin.html', 'admin crawl exclusion');
+requireText('sitemap.xml', '<loc>https://pashababyiq.com/</loc>', 'canonical storefront URL');
+requireText('index.html', 'type="application/ld+json"', 'structured data');
+requireText('index.html', 'https://pashababyiq.com/#store', 'stable store entity ID');
+requireText('index.html', 'https://maps.app.goo.gl/UyXFBL4ULxe8PJjCA', 'Google Maps business link');
+requireText('index.html', 'https://www.instagram.com/pasha__baby', 'official Instagram profile');
+requireText('index.html', 'باشا بيبي (Pasha Baby) | مستلزمات الأطفال في دهوك', 'search title');
+
+// 8) Detect secret keys accidentally committed to browser-delivered files.
 const browserTextFiles = [
   'index.html',
   'admin.html',
