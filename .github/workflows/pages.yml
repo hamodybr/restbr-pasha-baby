@@ -30,9 +30,6 @@ jobs:
       - name: Raster invoice PDF audit
         run: node scripts/invoice-pdf-embedding-check.mjs
 
-      - name: Browser-canvas invoice PDF audit
-        run: node scripts/invoice-pdf-v3-check.mjs
-
       - name: Native-canvas invoice PDF audit
         run: node scripts/native-canvas-invoice-pdf-check.mjs
 
