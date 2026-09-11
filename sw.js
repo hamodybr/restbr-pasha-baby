@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v32";
+const CACHE_NAME = "restbr-pasha-baby-v33";
 // Invoice settings editor release 2026-09-10.
 const SUPABASE_BROWSER_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0";
 
@@ -22,16 +22,16 @@ const CORE = [
   "./css/pasha-baby-final-tweaks.css?v=1.0",
   "./js/offline-status.js?v=1.1",
   "./js/unavailable-card-state.js?v=1.1",
-  "./js/app.js?v=18.1",
-  "./js/pasha-baby-commerce.js?v=2.1",
+  "./js/app.js?v=18.2",
+  "./js/pasha-baby-commerce.js?v=2.2",
   "./js/pasha-baby-fixed-discounts.js?v=1.0",
-  "./js/product-image-fallback.js?v=1.3",
+  "./js/product-image-fallback.js?v=1.4",
   "./js/price-safety.js?v=1.0",
   "./js/cart.js?v=4.6",
   "./js/cart-stale-item-guard.js?v=1.1",
   "./js/runtime-config.js?v=2.2",
   "./js/restbr-hardening.js?v=1.0",
-  "./js/url-safety.js?v=1.3",
+  "./js/url-safety.js?v=1.4",
   "./js/supabase-config.js?v=2.7",
   "./js/pasha-arabic-only.js?v=1.3",
   "./js/pasha-number-normalizer.js?v=1.2",
@@ -41,13 +41,14 @@ const CORE = [
   "./js/arabic-news-ticker.js?v=1.1",
   "./js/card-life-effects.js?v=1.0",
   "./js/live-card-badges.js?v=1.0",
-  "./js/pasha-baby-ui.js?v=1.2",
+  "./js/pasha-baby-ui.js?v=1.3",
   "./js/pasha-baby-storefront-v2.js?v=2.2",
   "./js/pasha-baby-retail-interactions-v3.js?v=3.0",
   "./js/pasha-baby-retail-v4.js?v=5.1",
   "./data/menu.json?v=32",
   "./assets/restaurant-placeholder.svg",
   "./assets/pasha-baby-product-placeholder.svg",
+  "./assets/pasha-baby-logo-256.webp",
   "./assets/favicon.png",
   "./assets/apple-touch-icon.png",
   SUPABASE_BROWSER_URL

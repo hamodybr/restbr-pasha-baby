@@ -108,6 +108,50 @@
 
   window.RESTBR_SAFE_MEDIA_URL = safeMediaUrl;
 
+  const SUPABASE_STORAGE_HOST = 'wlollfpmjzenhkjwxrqo.supabase.co';
+  const PUBLIC_OBJECT_PREFIX = '/storage/v1/object/public/menu-images/';
+  const PUBLIC_RENDER_PREFIX = '/storage/v1/render/image/public/menu-images/';
+  const CURRENT_STORE_LOGO = '/storage/v1/object/public/menu-images/settings/logo/1788645406355-3ib1w5.png';
+
+  function optimizedMediaUrl(value, preset = 'product-card') {
+    const safe = safeMediaUrl(value);
+    if (!safe) return '';
+
+    try {
+      const parsed = new URL(safe, window.location.href);
+
+      // This exact store logo is bundled locally so the header never downloads
+      // the 2.2 MB source image or incurs a transformation request.
+      if (
+        preset === 'logo' &&
+        parsed.hostname === SUPABASE_STORAGE_HOST &&
+        parsed.pathname === CURRENT_STORE_LOGO
+      ) {
+        return 'assets/pasha-baby-logo-256.webp';
+      }
+
+      if (
+        parsed.protocol !== 'https:' ||
+        parsed.hostname !== SUPABASE_STORAGE_HOST ||
+        !parsed.pathname.startsWith(PUBLIC_OBJECT_PREFIX)
+      ) {
+        return safe;
+      }
+
+      parsed.pathname = parsed.pathname.replace(PUBLIC_OBJECT_PREFIX, PUBLIC_RENDER_PREFIX);
+      parsed.search = '';
+      parsed.searchParams.set('width', preset === 'logo' ? '256' : '480');
+      parsed.searchParams.set('height', preset === 'logo' ? '256' : '480');
+      parsed.searchParams.set('resize', preset === 'logo' ? 'contain' : 'cover');
+      parsed.searchParams.set('quality', preset === 'logo' ? '75' : '72');
+      return parsed.href;
+    } catch (_) {
+      return safe;
+    }
+  }
+
+  window.RESTBR_OPTIMIZED_MEDIA_URL = optimizedMediaUrl;
+
   function isConfiguredLink(anchor) {
     if (!(anchor instanceof HTMLAnchorElement)) return false;
 
