@@ -223,7 +223,7 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v36',
+  'restbr-pasha-baby-v37',
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
