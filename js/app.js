@@ -2063,9 +2063,16 @@ function productCard(product) {
   const hasVariants = productOptions.length > 1;
   const productId = escapeUi(product.id);
   const productName = escapeUi(txt(product.name));
-  const productImage = escapeUi(
-    safeMediaUrl(product.image, "assets/restaurant-placeholder.svg")
+  const productImageOriginal = safeMediaUrl(
+    product.image,
+    "assets/restaurant-placeholder.svg"
   );
+  const productImage = escapeUi(
+    typeof window.RESTBR_OPTIMIZED_MEDIA_URL === "function"
+      ? window.RESTBR_OPTIMIZED_MEDIA_URL(productImageOriginal, "product-card") || productImageOriginal
+      : productImageOriginal
+  );
+  const productFullImage = escapeUi(productImageOriginal);
 
   const optionRows = productOptions
     .map((option, optionIndex) => {
@@ -2130,7 +2137,8 @@ function productCard(product) {
 
         <img
           class="sm-product-image"
-          data-full-image="${productImage}"
+          data-full-image="${productFullImage}"
+          data-original-image="${productFullImage}"
           data-product-name="${productName}"
           loading="lazy"
           decoding="async"
@@ -2948,12 +2956,17 @@ function applyRestaurantBranding() {
 
   document.title =
     currentName
-      ? currentName + " — Menu"
-      : "Menu";
+      ? currentName + " | مستلزمات الأطفال في دهوك"
+      : "باشا بيبي | مستلزمات الأطفال في دهوك";
 
+
+  const originalLogo =
+    safeMediaUrl(restaurant.logo);
 
   const logo =
-    safeMediaUrl(restaurant.logo);
+    typeof window.RESTBR_OPTIMIZED_MEDIA_URL === "function"
+      ? window.RESTBR_OPTIMIZED_MEDIA_URL(originalLogo, "logo") || originalLogo
+      : originalLogo;
 
 
   [
@@ -2979,6 +2992,12 @@ function applyRestaurantBranding() {
         : "hidden";
 
     if (show) {
+      img.dataset.originalImage = originalLogo;
+      img.onerror = () => {
+        if (originalLogo && img.getAttribute("src") !== originalLogo) {
+          img.src = originalLogo;
+        }
+      };
       img.src = logo;
       img.alt = currentName || "Restaurant";
     }
@@ -3614,6 +3633,12 @@ async function loadMenuFromSupabase() {
       options: optionsData?.length || 0
     }
   );
+
+  window.RESTBR_INITIAL_CATALOG_COUNTS = {
+    categories: categoriesData?.length || 0,
+    products: productsData?.length || 0,
+    options: optionsData?.length || 0
+  };
 
 
   /* =========================

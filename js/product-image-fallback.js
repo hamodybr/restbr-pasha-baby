@@ -65,6 +65,19 @@
     img.closest('.sm-img')?.classList.add('sm-image-fallback-empty');
   }
 
+  function tryOriginal(img){
+    if (!(img instanceof HTMLImageElement)) return false;
+    if (img.dataset.smOriginalAttempted === '1') return false;
+
+    const original = safeMedia(img.dataset.originalImage || img.dataset.fullImage || '');
+    const current = safeMedia(img.getAttribute('src'));
+    if (!original || original === current) return false;
+
+    img.dataset.smOriginalAttempted = '1';
+    img.src = original;
+    return true;
+  }
+
   function inspect(img){
     if (!(img instanceof HTMLImageElement)) return;
     if (!img.classList.contains('sm-product-image')) return;
@@ -89,6 +102,8 @@
   document.addEventListener('error', event => {
     const img = event.target;
     if (!(img instanceof HTMLImageElement) || !img.classList.contains('sm-product-image')) return;
+
+    if (tryOriginal(img)) return;
 
     if (img.dataset.smFallbackApplied === '1') {
       img.closest('.sm-img')?.classList.add('sm-image-fallback-empty');

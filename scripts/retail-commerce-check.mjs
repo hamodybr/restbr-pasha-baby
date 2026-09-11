@@ -45,7 +45,7 @@ for (const file of files) {
 
 requireText('index.html', 'css/pasha-baby-commerce.css?v=1.0', 'retail commerce stylesheet');
 requireText('index.html', 'js/runtime-config.js?v=2.2', 'product gallery runtime config');
-requireText('index.html', 'js/pasha-baby-commerce.js?v=2.1', 'retail commerce preferred-color runtime');
+requireText('index.html', 'js/pasha-baby-commerce.js?v=2.2', 'retail commerce preferred-color runtime');
 requireText('index.html', 'js/pasha-baby-retail-v4.js?v=5.1', 'placeholder detail opener runtime');
 requireText('index.html', 'js/live-prices.js?v=3.0', 'fixed-discount-aware live prices v3 runtime');
 requireText('index.html', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'fixed discount storefront runtime');
@@ -57,7 +57,7 @@ forbidText('index.html', 'id="smLangs"', 'storefront language picker');
 requireMatch('sw.js', /restbr-pasha-baby-v\d+/, 'retail cache generation');
 requireText('sw.js', 'css/pasha-baby-commerce.css?v=1.0', 'cached commerce stylesheet');
 requireText('sw.js', 'css/pasha-baby-final-tweaks.css?v=1.0', 'cached final Pasha UI tweaks');
-requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.1', 'cached preferred-color commerce runtime');
+requireText('sw.js', 'js/pasha-baby-commerce.js?v=2.2', 'cached preferred-color commerce runtime');
 requireText('sw.js', 'js/runtime-config.js?v=2.2', 'cached product gallery runtime config');
 requireText('sw.js', 'js/pasha-baby-retail-v4.js?v=5.1', 'cached placeholder detail opener runtime');
 requireText('sw.js', 'js/pasha-baby-fixed-discounts.js?v=1.0', 'cached fixed discount runtime');

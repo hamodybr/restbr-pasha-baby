@@ -1,6 +1,6 @@
 (() => {
-  if (window.__PASHA_BABY_UI_V12__) return;
-  window.__PASHA_BABY_UI_V12__ = true;
+  if (window.__PASHA_BABY_UI_V13__) return;
+  window.__PASHA_BABY_UI_V13__ = true;
 
   const COPY = {
     ar: {
@@ -65,6 +65,8 @@
 
   function configuredLogo() {
     const sourceCandidates = [
+      document.querySelector('.sm-logo')?.dataset?.originalImage,
+      document.querySelector('.sm-intro-logo')?.dataset?.originalImage,
       document.querySelector('.sm-logo')?.getAttribute('src'),
       document.querySelector('.sm-intro-logo')?.getAttribute('src')
     ];
@@ -119,7 +121,21 @@
 
   function syncBrandLogo() {
     installLogoStyles();
-    const logo = configuredLogo();
+    const originalLogo = configuredLogo();
+    const logo = typeof window.RESTBR_OPTIMIZED_MEDIA_URL === 'function'
+      ? window.RESTBR_OPTIMIZED_MEDIA_URL(originalLogo, 'logo') || originalLogo
+      : originalLogo;
+
+    const applyLogo = img => {
+      if (!img || !logo) return;
+      img.dataset.originalImage = originalLogo;
+      img.width = 256;
+      img.height = 256;
+      img.onerror = () => {
+        if (originalLogo && img.getAttribute('src') !== originalLogo) img.src = originalLogo;
+      };
+      if (img.getAttribute('src') !== logo) img.src = logo;
+    };
 
     const mark = document.querySelector('#pbBrand .pb-brand-mark');
     if (mark) {
@@ -129,11 +145,12 @@
         img.className = 'pb-brand-logo';
         img.alt = '';
         img.decoding = 'async';
+        img.fetchPriority = 'high';
         mark.prepend(img);
       }
 
       if (logo) {
-        if (img.getAttribute('src') !== logo) img.src = logo;
+        applyLogo(img);
         img.style.display = 'block';
         mark.classList.add('has-store-logo');
       } else {
@@ -155,7 +172,7 @@
       }
 
       if (logo) {
-        if (img.getAttribute('src') !== logo) img.src = logo;
+        applyLogo(img);
         img.style.display = 'block';
         introMark.classList.add('has-store-logo');
       } else {

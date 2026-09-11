@@ -205,6 +205,21 @@
     const DB = window.RESTBR_DB;
     if (!DB) return false;
 
+    const initialCounts = window.RESTBR_INITIAL_CATALOG_COUNTS;
+    if (
+      initialCounts &&
+      ['categories', 'products', 'options'].every(key =>
+        Number.isFinite(Number(initialCounts[key])) && Number(initialCounts[key]) < PAGE_SIZE
+      )
+    ) {
+      window.RESTBR_CATALOG_COUNTS = {
+        ...initialCounts,
+        visibleProducts: Array.isArray(DB.products) ? DB.products.length : 0
+      };
+      window.RESTBR_LARGE_CATALOG_READY = true;
+      return true;
+    }
+
     try {
       const [categoriesData, productsData, optionsData] = await Promise.all([
         fetchAll('categories', { order: 'sort_order', ascending: true }),
