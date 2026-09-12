@@ -42,7 +42,7 @@ need(polish, 'frame.contentWindow.print()', 'PDF-frame native print');
 need(polish, 'بدون ترويسة أو رابط الموقع', 'header/footer-free print status');
 forbid(polish, /<img[^>]+onload=.*window\.print/i, 'HTML image direct print that triggers Safari headers');
 
-need(direct, "data.pbDirectEditor='1'", 'direct editor modal activation');
+need(direct, "modal.dataset.pbDirectEditor='1'", 'direct editor modal activation');
 need(direct, 'اضغط على أي جزء من الفاتورة لتعديله', 'direct-edit onboarding hint');
 need(direct, "multi.textContent='تحديد متعدد'", 'multi-select mode');
 need(direct, 'selected = new Set()', 'selection state');
