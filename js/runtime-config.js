@@ -173,8 +173,8 @@ window.RESTBR_CONFIG = Object.freeze({
 
 // Admin hotfix 2026-09-12: keep invoice default logic inside the original invoice settings flow; no global DOM observer.
 
-// Deterministic invoice printing V2.
-// iPhone must receive a real one-page PDF, not an HTML page that Safari can repaginate.
+// Invoice printing V8: render in the foreground, match the dashboard preview,
+// then navigate to a deterministic one-page PDF only after generation finishes.
 (() => {
   const path = String(window.location.pathname || '').toLowerCase();
   if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
@@ -182,7 +182,7 @@ window.RESTBR_CONFIG = Object.freeze({
 
   const script = document.createElement('script');
   script.id = 'pbInvoicePrintV2Script';
-  script.src = 'js/admin-invoice-print-v2.js?v=2.1';
+  script.src = 'js/admin-invoice-print-v2.js?v=2.2';
   script.defer = true;
   document.head.appendChild(script);
 })();
