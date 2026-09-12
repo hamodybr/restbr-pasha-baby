@@ -13,10 +13,11 @@ const forbid = (file, marker, label = marker) => {
 };
 
 const engine = 'js/admin-invoice-pdf-onepage-v8.js';
-const router = 'js/admin-invoice-print-v2.js';
+const router = 'js/admin-invoice-print-ready-v9.js';
 const packer = 'js/admin-invoice-fast-pdf-ios-v1.js';
+const brand = 'js/pasha-admin-brand-v1.js';
 
-for (const file of [engine, router, packer]) {
+for (const file of [engine, router, packer, brand]) {
   if (!exists(file)) {
     failures.push(`${file}: missing`);
     continue;
@@ -28,20 +29,30 @@ for (const file of [engine, router, packer]) {
   }
 }
 
-need('js/runtime-config.js', 'js/admin-invoice-print-v2.js?v=2.2', 'V8 cache-busted invoice loader');
-need(router, "js/admin-invoice-pdf-onepage-v8.js?v=8.0", 'V8 invoice engine route');
+need('js/runtime-config.js', 'js/admin-invoice-print-ready-v9.js?v=9.0', 'V9 print-ready invoice loader');
+need('js/runtime-config.js', 'js/pasha-admin-brand-v1.js?v=1.0', 'Pasha admin brand loader');
+forbid('js/runtime-config.js', 'js/admin-invoice-print-v2.js?v=2.2', 'old V8 router loader alongside V9');
+
+need(router, "js/admin-invoice-pdf-onepage-v8.js?v=8.0", 'proven V8 invoice engine reuse');
 need(router, "preview-matched-one-page-v8", 'V8 render-mode assertion');
 need(router, "document.addEventListener('click', capture, true)", 'capture-phase print override');
 need(router, 'event.stopImmediatePropagation()', 'legacy HTML print suppression');
-need(router, "window.location.assign(blobUrl)", 'same-tab PDF navigation after generation');
 need(router, 'pbInvoiceForegroundOverlay', 'foreground generation overlay');
+need(router, 'pbInvoicePrintReady', 'print-ready invoice screen');
+need(router, 'data-pb-print-now', 'direct print button');
+need(router, 'printButton?.addEventListener(\'click\', () => window.print())', 'synchronous user-gesture print call');
+need(router, 'extractEmbeddedJpeg', 'exact V8 raster reuse for print preview');
+need(router, "new Blob([bytes.slice(start, end)], { type: 'image/jpeg' })", 'embedded invoice JPEG extraction');
+need(router, 'window.location.assign(pdfUrl)', 'optional PDF button');
+need(router, '@media print', 'print-only invoice styling');
+need(router, '@page{size:', 'configured print paper size');
 need(router, 'result.pageCount !== 1', 'one-page output assertion');
 need(router, 'result.customFontBaked !== true', 'custom-font raster assertion');
 need(router, 'PdfClass: window.PashaFastSinglePagePdf', 'direct one-page packer for all devices');
 need(router, 'fetchBuffer(fontUrl)', 'uploaded font byte fetch');
 need(router, "cache: 'force-cache'", 'repeat asset cache');
+need(router, "renderMode: 'print-ready-preview-matched-v9'", 'V9 route identity');
 forbid(router, 'window.open(', 'pre-generation popup/background-tab path');
-forbid(router, 'window.print(', 'browser HTML print path');
 forbid(router, 'jspdf', 'jsPDF dependency in active print route');
 
 need(engine, "const RENDER_MODE = 'preview-matched-one-page-v8'", 'preview-matched render mode');
@@ -61,7 +72,7 @@ need(engine, 'customFontBaked:', 'font-baked metadata');
 need(engine, "ctx.fillText('◆'", 'preview footer diamond');
 need(engine, "ctx.fillText('المجموع الكلي'", 'preview total layout');
 forbid(engine, 'doc.addPage(', 'multi-page PDF creation');
-forbid(engine, 'window.print(', 'HTML print fallback');
+forbid(engine, 'window.print(', 'renderer must stay independent from browser print');
 forbid(engine, '96 / 25.4', 'old physical mm-to-px mismatch');
 forbid(engine, '96 / 72', 'old physical pt-to-px mismatch');
 forbid(engine, 'document.fonts.ready', 'global font-set wait that can stall Safari');
@@ -69,10 +80,18 @@ forbid(engine, 'document.fonts.ready', 'global font-set wait that can stall Safa
 need(packer, '/Count 1', 'hard one-page PDF page tree');
 need(packer, '/DCTDecode', 'direct JPEG embedding');
 
+need(brand, "const FALLBACK_LOGO = 'assets/pasha-baby-logo-256.webp'", 'real Pasha Baby fallback logo');
+need(brand, "document.querySelector('.admin-logo')", 'dashboard header logo repair');
+need(brand, "document.querySelector('.login-brand img')", 'login logo repair');
+need(brand, "document.getElementById('rs_logo_preview')", 'settings logo fallback repair');
+need(brand, "loginTitle.textContent = 'Pasha Baby Admin'", 'login brand title');
+need(brand, 'MutationObserver', 'fallback persistence after settings refresh');
+if (!exists('assets/pasha-baby-logo-256.webp')) failures.push('assets/pasha-baby-logo-256.webp: missing');
+
 if (failures.length) {
-  console.error('\nInvoice foreground preview-matched V8 audit failed:');
+  console.error('\nInvoice print-ready V9 / Pasha admin brand audit failed:');
   failures.forEach(item => console.error(`  ✗ ${item}`));
   process.exit(1);
 }
 
-console.log('✓ foreground preview-matched one-page invoice V8 audit passed');
+console.log('✓ print-ready invoice V9 + Pasha Baby admin brand audit passed');
