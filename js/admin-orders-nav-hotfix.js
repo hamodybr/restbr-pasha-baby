@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V2__) return;
-  window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V2__ = true;
+  if (window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V3__) return;
+  window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V3__ = true;
 
   const STYLE_ID = 'pbOrdersNavHotfixStyles';
 
@@ -106,8 +106,9 @@
     loadAddon('pashaInvoicePdfScript', 'js/admin-invoice-pdf-v4.js?v=4.0');
     loadAddon('pashaInvoicePdfSchedulerPatch', 'js/admin-invoice-iphone-scheduler-fix.js?v=1.0');
     loadAddon('pashaInvoiceLiveEditorScript', 'js/admin-invoice-live-editor.js?v=1.0');
-    loadAddon('pashaInvoiceLiveEditorMobileFix', 'js/admin-invoice-live-editor-mobile-fix.js?v=1.0');
-    loadAddon('pashaInvoiceLiveEditorMobileRuntimeFixV2', 'js/admin-invoice-live-editor-mobile-runtime-fix.js?v=2.0');
+    // The print editor now reuses the same visual language as the Invoice Settings panel.
+    // Do not load the previous mobile layout guards; they forced the preview below the controls.
+    loadAddon('pashaInvoiceLiveSettingsUiV1', 'js/admin-invoice-live-settings-ui.js?v=1.0');
     loadAddon('pbOrdersEnhancementsScript', 'js/admin-orders-enhancements.js?v=1.0');
     loadAddon('pbColorImageUploadScript', 'js/admin-color-image-upload.js?v=1.0');
 
