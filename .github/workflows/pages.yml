@@ -36,6 +36,9 @@ jobs:
       - name: Invoice live editor audit
         run: node scripts/invoice-live-editor-check.mjs
 
+      - name: Invoice Studio trial audit
+        run: node scripts/invoice-studio-check.mjs
+
       - name: Invoice print polish audit
         run: node scripts/invoice-print-polish-check.mjs
 

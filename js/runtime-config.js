@@ -170,3 +170,35 @@ window.RESTBR_CONFIG = Object.freeze({
   script.defer = true;
   document.head.appendChild(script);
 })();
+
+// Invoice Studio V1 trial. Admin-only and intentionally layered over the
+// already validated invoice renderer/PDF engine so no commerce or DB flow changes.
+(() => {
+  const path = String(window.location.pathname || '').toLowerCase();
+  if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
+  if (document.getElementById('pbInvoiceStudioV1Script')) return;
+
+  window.__PASHA_INVOICE_STUDIO_ENABLED__ = true;
+
+  // Safe trial mode: append ?invoiceStudioTrial=1 while testing a branch copy.
+  // It blocks any attempt to persist invoice settings to the real database.
+  const trialMode = new URLSearchParams(window.location.search).get('invoiceStudioTrial') === '1';
+  if (trialMode && !window.__PASHA_INVOICE_STUDIO_TRIAL_SAFE__) {
+    window.__PASHA_INVOICE_STUDIO_TRIAL_SAFE__ = true;
+    window.addEventListener('click', event => {
+      const target = event.target instanceof Element
+        ? event.target.closest('[data-studio-save],[data-pb-live-save]')
+        : null;
+      if (!target) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      alert('وضع التجربة الآمن: لم يتم حفظ أي إعدادات في قاعدة البيانات. التعديلات الحالية للمعاينة والطباعة فقط.');
+    }, true);
+  }
+
+  const script = document.createElement('script');
+  script.id = 'pbInvoiceStudioV1Script';
+  script.src = 'js/admin-invoice-studio-v1.js?v=1.0';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
