@@ -7,6 +7,9 @@ replacements = {
     'scripts/predeploy-check.mjs': [
         ('js/pasha-arabic-only.js?v=1.4', 'js/pasha-arabic-only.js?v=1.5'),
     ],
+    'scripts/retail-commerce-check.mjs': [
+        ('js/pasha-arabic-only.js?v=1.4', 'js/pasha-arabic-only.js?v=1.5'),
+    ],
 }
 
 for name, reps in replacements.items():
