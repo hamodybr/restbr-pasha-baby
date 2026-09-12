@@ -36,6 +36,9 @@ jobs:
       - name: Invoice live editor audit
         run: node scripts/invoice-live-editor-check.mjs
 
+      - name: Invoice print polish audit
+        run: node scripts/invoice-print-polish-check.mjs
+
       - name: Numeric input behavior audit
         run: node scripts/numeric-input-check.mjs
 
