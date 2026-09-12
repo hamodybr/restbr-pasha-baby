@@ -1,0 +1,51 @@
+name: One-off adaptive cache sync
+
+on:
+  push:
+    branches:
+      - feat/adaptive-invoice-frame
+    paths:
+      - scripts/run-adaptive-cache-sync.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/adaptive-invoice-frame
+          fetch-depth: 0
+      - name: Sync cache and audit versions
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          sw=Path('sw.js')
+          text=sw.read_text(encoding='utf-8')
+          text=text.replace('restbr-pasha-baby-v37','restbr-pasha-baby-v38')
+          text=text.replace('./js/pasha-arabic-only.js?v=1.3','./js/pasha-arabic-only.js?v=1.4')
+          sw.write_text(text,encoding='utf-8')
+
+          audit=Path('scripts/predeploy-check.mjs')
+          text=audit.read_text(encoding='utf-8')
+          text=text.replace("js/pasha-arabic-only.js?v=1.3", "js/pasha-arabic-only.js?v=1.4")
+          audit.write_text(text,encoding='utf-8')
+          PY
+      - name: Verify
+        run: |
+          grep -Fq 'restbr-pasha-baby-v38' sw.js
+          grep -Fq './js/pasha-arabic-only.js?v=1.4' sw.js
+          grep -Fq "script.src = 'js/pasha-arabic-only.js?v=1.4'" scripts/predeploy-check.mjs
+          node --check sw.js
+          node scripts/predeploy-check.mjs
+      - name: Commit
+        run: |
+          git config user.name 'HaMoDyBr'
+          git config user.email '78080184+hamodybr@users.noreply.github.com'
+          git add sw.js scripts/predeploy-check.mjs
+          git commit -m 'Sync adaptive invoice cache versions'
+          git push origin HEAD:feat/adaptive-invoice-frame
