@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Pasha Baby — Invoice Studio Sandbox</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;background:#f6f1ea;color:#29231d}
+    body{min-height:100dvh;display:grid;place-items:center;padding:24px}
+    .sandbox{width:min(720px,100%);background:#fff;border:1px solid #e4d9cb;border-radius:24px;padding:24px;box-shadow:0 24px 70px rgba(77,55,34,.12)}
+    .badge{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:#e9f5ef;color:#24654f;font-size:12px;font-weight:900}
+    h1{margin:13px 0 7px;font-size:26px}p{margin:0;color:#71675d;line-height:1.8;font-size:14px}.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}.fact{padding:12px;border-radius:14px;background:#f8f4ee;border:1px solid #eee5da;text-align:center}.fact b{display:block;font-size:16px}.fact span{font-size:11px;color:#85796d}
+    .launch{width:100%;min-height:54px;border:0;border-radius:15px;background:#29231d;color:#fff;font:900 16px/1 inherit;cursor:pointer}.launch:active{transform:scale(.99)}.hint{margin-top:12px;text-align:center;font-size:11px;color:#95887b}
+    @media(max-width:560px){body{padding:12px}.sandbox{padding:18px;border-radius:20px}.facts{grid-template-columns:1fr}.fact{text-align:right;display:flex;justify-content:space-between;align-items:center}.fact b{font-size:14px}}
+  </style>
+</head>
+<body>
+  <main class="sandbox">
+    <span class="badge">✓ Sandbox آمن — لا اتصال بقاعدة البيانات</span>
+    <h1>تجربة Invoice Studio V1</h1>
+    <p>هذه الصفحة تستخدم طلباً وهمياً ومحرك الفاتورة الحقيقي الموجود في الفرع التجريبي. أي تعديل أو حفظ هنا يبقى داخل هذه الصفحة فقط ولا يصل إلى Pasha Baby أو Supabase.</p>
+    <div class="facts">
+      <div class="fact"><b>PB-10428</b><span>طلب تجريبي</span></div>
+      <div class="fact"><b>4 أصناف</b><span>ألوان وخيارات</span></div>
+      <div class="fact"><b>35,000 د.ع</b><span>مع التوصيل</span></div>
+    </div>
+    <button class="launch" type="button" data-print-order="sandbox-order">فتح Invoice Studio</button>
+    <div class="hint">جرّب الشعار، بيانات الزبون، الأصناف، الخيارات، الأسعار، المجموع، الملاءمة الذكية، PDF والطباعة.</div>
+  </main>
+
+  <script>
+    const MOCK_ORDER = {
+      id:'sandbox-order',
+      order_number:'PB-10428',
+      customer_name:'سارة أحمد',
+      customer_phone:'+964 750 123 4567',
+      order_type:'delivery',
+      address:'دهوك — شارع كاوه، قرب الحديقة العامة، بناية 12، الطابق الثاني',
+      notes:'يرجى الاتصال قبل الوصول بعشر دقائق.',
+      subtotal:30000,
+      delivery_fee:5000,
+      total:35000,
+      created_at:'2026-09-12T11:45:00.000Z',
+      order_items:[
+        {id:'1',product_name:'طقم أطفال قطني ناعم',option_name:'قياس 6–9 أشهر',selected_color:'بيج',quantity:1,line_total:12000},
+        {id:'2',product_name:'رضّاعة مضادة للمغص',option_name:'250 ml',selected_color:'وردي',quantity:1,line_total:8000},
+        {id:'3',product_name:'منشفة أطفال بغطاء رأس',option_name:'حجم كبير',selected_color:'أزرق سماوي',quantity:1,line_total:6500},
+        {id:'4',product_name:'جوارب أطفال',option_name:'3 أزواج',selected_color:'أبيض',quantity:1,line_total:3500}
+      ]
+    };
+
+    var adminRestaurantSettings = {
+      id:'sandbox-settings',
+      ui_design_settings:{
+        invoice:{
+          page_size:'A4',page_orientation:'portrait',page_margin_mm:6,outer_padding_mm:8,
+          frame_width_pt:3,font_family:'tahoma',font_weight:900,custom_font_url:'',base_size_pt:12,line_height:1.25,
+          logo_mode:'stamp',logo_url:'',logo_size_mm:27,title_size_pt:25,subtitle_size_pt:8,header_spacing_mm:2.5,meta_size_pt:8,
+          customer_size_pt:10.5,address_size_pt:9.5,details_size_pt:17,item_size_pt:12,option_size_pt:9.5,price_size_pt:12,
+          row_min_height_mm:7,row_padding_mm:1,leader_width_pt:1.5,leader_style:'dotted',notes_size_pt:9.5,total_size_pt:16,
+          total_border_pt:2,footer_size_pt:15,footer_spacing_mm:2.5,brand_title:'PASHA BABY',brand_subtitle:'PREMIUM BABY BOUTIQUE',
+          details_title:'تفاصيل الطلب',footer_text:'شكراً لاختياركم',show_logo:true,show_brand_title:true,show_brand_subtitle:true,
+          show_order_number:true,show_date_time:true,show_customer_phone:true,show_customer_address:true,show_order_type:true,
+          show_details_title:true,show_quantity:true,show_options:true,show_notes:true,show_subtotal:true,show_footer:true
+        }
+      }
+    };
+
+    window.PashaInvoiceSettings = {
+      defaults:{...adminRestaurantSettings.ui_design_settings.invoice},
+      normalize(value={}){ return {...this.defaults,...value}; },
+      render(){},
+      fontStacks:{
+        modern_pro:'Tahoma,Arial,sans-serif',din:'Tahoma,Arial,sans-serif',segoe:'"Segoe UI",Tahoma,Arial,sans-serif',
+        tahoma:'Tahoma,Arial,sans-serif',arial:'Arial,Tahoma,sans-serif',kufi:'Tahoma,Arial,sans-serif',custom:'Tahoma,Arial,sans-serif'
+      }
+    };
+
+    function mockTable(name){
+      const chain={
+        payload:null,
+        select(){return chain;},
+        eq(){return chain;},
+        update(payload){chain.payload=payload;return chain;},
+        single(){
+          if(name==='orders') return Promise.resolve({data:structuredClone(MOCK_ORDER),error:null});
+          if(name==='restaurant_settings'){
+            if(chain.payload?.ui_design_settings) adminRestaurantSettings.ui_design_settings=structuredClone(chain.payload.ui_design_settings);
+            return Promise.resolve({data:{ui_design_settings:structuredClone(adminRestaurantSettings.ui_design_settings)},error:null});
+          }
+          return Promise.resolve({data:null,error:new Error('Sandbox table is not available.')});
+        }
+      };
+      return chain;
+    }
+    var supabaseClient = { from: mockTable };
+  </script>
+  <script src="js/admin-invoice-live-editor.js?v=1.0"></script>
+  <script src="js/admin-invoice-direct-editor-v1.js?v=1.0"></script>
+  <script src="js/admin-invoice-studio-v1.js?v=1.0"></script>
+</body>
+</html>

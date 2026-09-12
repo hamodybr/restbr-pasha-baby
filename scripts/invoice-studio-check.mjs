@@ -5,6 +5,7 @@ const read = path => fs.readFileSync(path, 'utf8');
 
 const runtime = read('js/runtime-config.js');
 const studio = read('js/admin-invoice-studio-v1.js');
+const sandbox = read('invoice-studio-sandbox.html');
 const workflow = read('.github/workflows/pages.yml');
 
 if (!runtime.includes('pbInvoiceStudioV1Script')) fail('Invoice Studio loader id is missing from runtime config.');
@@ -40,6 +41,13 @@ if (/supabaseClient\s*\.\s*from\s*\(/.test(studio)) {
 if (/fetchOrder\s*\(/.test(studio)) {
   fail('Invoice Studio must not duplicate order fetching.');
 }
+
+for (const token of ['Sandbox آمن','data-print-order="sandbox-order"','mockTable','js/admin-invoice-live-editor.js','js/admin-invoice-studio-v1.js']) {
+  if (!sandbox.includes(token)) fail(`Invoice Studio sandbox is missing: ${token}`);
+}
+if (/https?:\/\/[^\s"']*supabase\.co/i.test(sandbox)) fail('Sandbox must not point at a real Supabase project.');
+if (/createClient\s*\(/.test(sandbox)) fail('Sandbox must not create a real Supabase client.');
+
 if (!workflow.includes('node scripts/invoice-studio-check.mjs')) fail('Invoice Studio audit is not wired into GitHub Actions.');
 
-console.log('Invoice Studio trial audit passed.');
+console.log('Invoice Studio trial and sandbox audit passed.');
