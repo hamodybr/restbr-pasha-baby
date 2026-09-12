@@ -182,7 +182,7 @@ window.RESTBR_CONFIG = Object.freeze({
 
   const script = document.createElement('script');
   script.id = 'pbInvoicePrintV2Script';
-  script.src = 'js/admin-invoice-print-v2.js?v=2.0';
+  script.src = 'js/admin-invoice-print-v2.js?v=2.1';
   script.defer = true;
   document.head.appendChild(script);
 })();
