@@ -171,18 +171,29 @@ window.RESTBR_CONFIG = Object.freeze({
   document.head.appendChild(script);
 })();
 
-// Admin hotfix 2026-09-12: keep invoice default logic inside the original invoice settings flow; no global DOM observer.
-
-// Invoice printing V8: render in the foreground, match the dashboard preview,
-// then navigate to a deterministic one-page PDF only after generation finishes.
+// Pasha Baby admin identity fallback: never show the inherited restaurant/coffee placeholder.
 (() => {
   const path = String(window.location.pathname || '').toLowerCase();
   if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
-  if (document.getElementById('pbInvoicePrintV2Script')) return;
+  if (document.getElementById('pashaAdminBrandV1Script')) return;
 
   const script = document.createElement('script');
-  script.id = 'pbInvoicePrintV2Script';
-  script.src = 'js/admin-invoice-print-v2.js?v=2.2';
+  script.id = 'pashaAdminBrandV1Script';
+  script.src = 'js/pasha-admin-brand-v1.js?v=1.0';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
+
+// Invoice printing V9: keep the proven V8 renderer, then show a print-ready
+// screen with a direct user-gesture print button plus an optional PDF button.
+(() => {
+  const path = String(window.location.pathname || '').toLowerCase();
+  if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
+  if (document.getElementById('pbInvoicePrintReadyV9Script')) return;
+
+  const script = document.createElement('script');
+  script.id = 'pbInvoicePrintReadyV9Script';
+  script.src = 'js/admin-invoice-print-ready-v9.js?v=9.0';
   script.defer = true;
   document.head.appendChild(script);
 })();
