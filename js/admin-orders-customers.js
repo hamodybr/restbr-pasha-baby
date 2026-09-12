@@ -503,7 +503,7 @@
     }));
   }
 
-  function printOrder(orderId) {
+  async function printOrder(orderId) {
     const order = orders.find(row => String(row.id) === String(orderId));
     if (!order) return;
     const items = orderItemsWithColors(order);
@@ -538,9 +538,6 @@
     };
     const fontUrl = safeAssetUrl(cfg.custom_font_url);
     const logoUrl = safeAssetUrl(cfg.logo_url);
-    const customFontFace = cfg.font_family === 'custom' && fontUrl
-      ? `@font-face{font-family:"Pasha Invoice Custom";src:url(${JSON.stringify(fontUrl)});font-display:block}`
-      : '';
     const invoiceFont = fontStacks[cfg.font_family] || fontStacks.modern_pro;
     const pageSize = ['A4','A5','Letter'].includes(cfg.page_size) ? `${cfg.page_size} ${cfg.page_orientation}` : 'auto';
     const physicalPage = ({
@@ -563,19 +560,45 @@
     }
 
     popup.document.open();
+    popup.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>جاري تجهيز الفاتورة…</title></head><body style="font-family:Tahoma,Arial,sans-serif;padding:24px;text-align:center">جاري تجهيز الفاتورة والخط للطباعة…</body></html>');
+    popup.document.close();
+
+    const blobToDataUrl = blob => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(reader.error || new Error('font data URL failed'));
+      reader.readAsDataURL(blob);
+    });
+    let printFontUrl = fontUrl;
+    if (cfg.font_family === 'custom' && fontUrl) {
+      try {
+        const response = await fetch(fontUrl, { cache:'no-store', mode:'cors' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        printFontUrl = await blobToDataUrl(await response.blob()) || fontUrl;
+      } catch (error) {
+        console.warn('Pasha invoice custom font embedding fallback:', error);
+        printFontUrl = fontUrl;
+      }
+    }
+    const customFontFace = cfg.font_family === 'custom' && printFontUrl
+      ? `@font-face{font-family:"Pasha Invoice Custom";src:url(${JSON.stringify(printFontUrl)});font-style:normal;font-weight:100 900;font-display:block}`
+      : '';
+
+    popup.document.open();
     popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(order.order_number)} — Pasha Baby</title><style>
       ${customFontFace}
       @page{size:${pageSize};margin:${cfg.page_margin_mm}mm}
       *{box-sizing:border-box}
       html,body{margin:0;padding:0;min-width:0;background:#fff;color:#000;font-family:${invoiceFont};font-size:${cfg.base_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};font-variant-numeric:tabular-nums;-webkit-print-color-adjust:exact;print-color-adjust:exact}
       body{padding:8mm 8mm 25mm}
-      .label{position:relative;width:100%;max-width:${pageWidth}mm;min-height:${pageHeight}mm;margin:0 auto;padding:${cfg.outer_padding_mm}mm;background:#fff;color:#000;border:${cfg.frame_width_pt}pt double #000;border-radius:${cfg.frame_radius_mm}mm;display:flex;flex-direction:column}
+      .print-sheet{position:relative;width:100%;max-width:${pageWidth}mm;height:${Math.max(79,pageHeight-.8)}mm;margin:0 auto;overflow:hidden;background:#fff}
+      .label{position:absolute;top:0;left:50%;width:100%;max-width:${pageWidth}mm;height:100%;min-height:0;margin:0;padding:${cfg.outer_padding_mm}mm;background:#fff;color:#000;border:${cfg.frame_width_pt}pt double #000;border-radius:${cfg.frame_radius_mm}mm;display:flex;flex-direction:column;transform:translateX(-50%);transform-origin:top center}
       .brand{text-align:center;break-inside:avoid}.print-logo-mark{position:relative;width:${cfg.logo_size_mm}mm;height:${cfg.logo_size_mm}mm;margin:0 auto 2mm;border:${cfg.frame_width_pt}pt double #000;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Georgia,"Times New Roman",serif;font-weight:900;line-height:.95}.print-logo-mark::before{content:"♛";display:block;font-size:${Math.max(8,cfg.logo_size_mm*.52)}pt;line-height:1}.print-logo-name{font-size:${Math.max(6,cfg.logo_size_mm*.37)}pt;letter-spacing:.2pt;white-space:nowrap}.print-logo-pb{font-size:${Math.max(9,cfg.logo_size_mm*.56)}pt;font-style:italic}.brand-logo-image{display:block;width:${cfg.logo_size_mm}mm;height:${cfg.logo_size_mm}mm;object-fit:contain;margin:0 auto 2mm;filter:grayscale(1) contrast(1.3)}.brand-copy h1{margin:0;color:#000;font:900 ${cfg.title_size_pt}pt/.95 Georgia,"Times New Roman",serif;letter-spacing:1.2pt}.brand-ar{margin-top:1mm;font:900 ${cfg.subtitle_size_pt}pt/1.1 Georgia,"Times New Roman",serif;letter-spacing:2pt}.ornament{display:flex;align-items:center;gap:3mm;margin:${cfg.header_spacing_mm}mm 0 2mm}.ornament::before,.ornament::after{content:"";height:1pt;background:#000;flex:1}.ornament span{font-size:10pt;line-height:1}
       .orderline{display:flex;justify-content:space-between;align-items:center;gap:4mm;margin-bottom:1.4mm;font-size:${cfg.meta_size_pt}pt;font-weight:${cfg.font_weight};break-inside:avoid}.orderline strong{font:900 ${cfg.meta_size_pt}pt/1.15 ui-monospace,SFMono-Regular,Consolas,monospace;direction:ltr;text-align:left}.orderline span{font-size:${cfg.meta_size_pt}pt;font-weight:${cfg.font_weight}}.customer{border-top:1pt solid #000;border-bottom:1pt solid #000;padding:1.5mm 0;margin-bottom:2mm;font-size:${cfg.customer_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};break-inside:avoid}.customer-main{display:flex;justify-content:space-between;gap:4mm}.customer b{font-size:${cfg.customer_size_pt}pt;font-weight:${cfg.font_weight}}.phone{direction:ltr;display:inline-block;font-weight:${cfg.font_weight}}.address{margin-top:.7mm;font-size:${cfg.address_size_pt}pt;font-weight:${cfg.font_weight}}
       .details-title{text-align:center;margin:0 0 1mm;font-size:${cfg.details_size_pt}pt;font-weight:${cfg.font_weight}}.items{padding:0 1mm;flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;min-height:0}.item{display:flex;align-items:baseline;gap:2mm;min-height:${cfg.row_min_height_mm}mm;padding:${cfg.row_padding_mm}mm 0;font-size:${cfg.item_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};break-inside:avoid}.item-copy{display:flex;align-items:baseline;gap:1.2mm;min-width:0}.item-copy::before{content:"◆";font-size:7pt;flex:none}.item b{font-weight:${cfg.font_weight}}.item-leader{min-width:12mm;flex:1;border-bottom:${cfg.leader_width_pt}pt ${cfg.leader_style} #000;transform:translateY(-1.2mm)}.item strong{min-width:27mm;white-space:nowrap;font-size:${cfg.price_size_pt}pt;font-weight:${cfg.font_weight};direction:ltr;text-align:left}.option{display:inline;font-size:${cfg.option_size_pt}pt;color:#000;font-weight:${cfg.font_weight}}.option::before{content:" — "}.delivery-item,.delivery-item .option{color:#000}
       .notes{margin-top:1.5mm;padding:1.5mm 0;border-top:1pt solid #000;font-size:${cfg.notes_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};break-inside:avoid}.totals{margin-top:2mm;border:${cfg.total_border_pt}pt solid #000;border-radius:2mm;padding:2mm 4mm;display:grid;gap:1mm;break-inside:avoid}.row{display:flex;justify-content:space-between;gap:5mm;font-size:${Math.max(8,cfg.total_size_pt-4)}pt;font-weight:${cfg.font_weight}}.row b{white-space:nowrap;direction:ltr}.row.grand{font-size:${cfg.total_size_pt}pt;font-weight:${cfg.font_weight}}.footer{text-align:center;margin-top:${cfg.footer_spacing_mm}mm;font-size:${cfg.footer_size_pt}pt;font-weight:${cfg.font_weight};break-inside:avoid}.footer::before{content:"◆";display:block;font-size:9pt;margin-bottom:1mm}.screen-actions{display:flex;gap:8px;padding:12px;position:fixed;left:0;right:0;bottom:0;background:#eee;z-index:5}.screen-actions button{flex:1;padding:12px;border:0;border-radius:8px;background:#000;color:#fff;font-size:16px;font-weight:900}
-      @media print{html,body{width:auto!important;min-width:0!important;background:#fff!important;color:#000!important}body{padding:0!important}.label{width:100%!important;max-width:none!important;min-height:${pageHeight}mm!important;margin:0!important;overflow:visible!important;display:flex!important;flex-direction:column!important}.items{flex:1 1 auto!important;display:flex!important;flex-direction:column!important;justify-content:space-evenly!important}.screen-actions{display:none!important}}
-    </style></head><body><div class="label">
+      @media print{html,body{width:auto!important;min-width:0!important;height:auto!important;background:#fff!important;color:#000!important;overflow:hidden!important}body{padding:0!important}.print-sheet{width:100%!important;max-width:none!important;height:${Math.max(79,pageHeight-.8)}mm!important;margin:0!important;overflow:hidden!important}.label{max-width:none!important;min-height:0!important;margin:0!important;overflow:visible!important;display:flex!important;flex-direction:column!important}.items{flex:1 1 auto!important;display:flex!important;flex-direction:column!important;justify-content:space-evenly!important}.screen-actions{display:none!important}}
+    </style></head><body><div class="print-sheet"><div class="label">
       <div class="brand" aria-label="Pasha Baby">${cfg.show_logo ? (cfg.logo_mode === 'image' && logoUrl ? `<img class="brand-logo-image" src="${esc(logoUrl)}" alt="شعار PASHA BABY">` : '<div class="print-logo-mark" aria-hidden="true"><span class="print-logo-name">PASHA BABY</span><span class="print-logo-pb">PB</span></div>') : ''}<div class="brand-copy">${cfg.show_brand_title ? `<h1>${invoiceEsc(cfg.brand_title)}</h1>` : ''}${cfg.show_brand_subtitle ? `<div class="brand-ar">${invoiceEsc(cfg.brand_subtitle)}</div>` : ''}</div></div>
       <div class="ornament" aria-hidden="true"><span>◆</span></div>
       ${(cfg.show_order_number || cfg.show_date_time) ? `<div class="orderline">${cfg.show_order_number ? `<strong>${invoiceEsc(order.order_number)}</strong>` : '<span></span>'}${cfg.show_date_time ? `<span>${invoiceEsc(when(order.created_at))}</span>` : ''}</div>` : ''}
@@ -585,7 +608,61 @@
       ${cfg.show_notes && notes ? `<div class="notes"><b>ملاحظة:</b> ${invoiceEsc(notes)}</div>` : ''}
       <div class="totals">${cfg.show_subtotal && fee > 0 ? `<div class="row"><span>مجموع الأصناف</span><b>${money(order.subtotal)}</b></div>` : ''}<div class="row grand"><span>المجموع الكلي</span><b>${money(order.total)}</b></div></div>
       ${cfg.show_footer ? `<div class="footer">${invoiceEsc(cfg.footer_text)}</div>` : ''}
-    </div><div class="screen-actions"><button onclick="window.print()">طباعة بالحجم الكامل / حفظ PDF</button></div></body></html>`);
+    </div></div><div class="screen-actions"><button id="pbInvoicePrintButton" onclick="window.pbPrintInvoice()">طباعة صفحة واحدة / حفظ PDF</button></div>
+    <script>
+      (() => {
+        const sheet = document.querySelector('.print-sheet');
+        const label = document.querySelector('.label');
+        const printButton = document.getElementById('pbInvoicePrintButton');
+        const waitImages = () => Promise.all(Array.from(document.images).map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
+          img.addEventListener('load', resolve, { once:true });
+          img.addEventListener('error', resolve, { once:true });
+        })));
+        const fitOnePage = () => {
+          if (!sheet || !label) return 1;
+          label.style.width = '100%';
+          label.style.height = '100%';
+          label.style.transform = 'translateX(-50%)';
+          void label.offsetHeight;
+          const targetHeight = Math.max(1, sheet.clientHeight);
+          const targetWidth = Math.max(1, sheet.clientWidth);
+          const contentHeight = Math.max(targetHeight, label.scrollHeight + 1);
+          const contentWidth = Math.max(targetWidth, label.scrollWidth + 1);
+          const rawScale = Math.min(1, targetHeight / contentHeight, targetWidth / contentWidth);
+          const scale = Number.isFinite(rawScale) && rawScale > 0 ? rawScale : 1;
+          if (scale < .999) {
+            const expanded = (100 / scale).toFixed(4) + '%';
+            label.style.width = expanded;
+            label.style.height = expanded;
+            label.style.transform = 'translateX(-50%) scale(' + scale.toFixed(4) + ')';
+          }
+          label.dataset.printScale = scale.toFixed(4);
+          return scale;
+        };
+        window.pbPrepareInvoicePrint = async () => {
+          try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (_) {}
+          await waitImages();
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          fitOnePage();
+        };
+        window.pbPrintInvoice = async () => {
+          if (printButton) {
+            printButton.disabled = true;
+            printButton.textContent = 'جاري تجهيز صفحة واحدة…';
+          }
+          await window.pbPrepareInvoicePrint();
+          setTimeout(() => {
+            if (printButton) {
+              printButton.disabled = false;
+              printButton.textContent = 'طباعة صفحة واحدة / حفظ PDF';
+            }
+            window.print();
+          }, 80);
+        };
+        window.addEventListener('load', () => { void window.pbPrepareInvoicePrint(); }, { once:true });
+        window.addEventListener('beforeprint', fitOnePage);
+      })();
+    <\/script></body></html>`);
     popup.document.close();
     popup.focus();
   }
