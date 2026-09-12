@@ -10,6 +10,9 @@ replacements = {
     'scripts/retail-commerce-check.mjs': [
         ('js/pasha-arabic-only.js?v=1.4', 'js/pasha-arabic-only.js?v=1.5'),
     ],
+    'scripts/performance-release-check.mjs': [
+        ('restbr-pasha-baby-v38', 'restbr-pasha-baby-v39'),
+    ],
 }
 
 for name, reps in replacements.items():
