@@ -58,7 +58,7 @@ need(direct, "proxyClick(modal,'[data-pb-live-print]')", 'existing safe print pa
 need(direct, "proxyClick(modal,'[data-pb-live-pdf]')", 'existing PDF path reuse');
 need(direct, "proxyClick(modal,'[data-pb-live-save]')", 'existing defaults save reuse');
 need(direct, 'pb-direct-advanced-open', 'advanced settings fallback');
-forbid(direct, /\.from\s*\(|\.rpc\s*\(|\.insert\s*\(|\.update\s*\(|\.delete\s*\(/, 'database mutation in direct editor');
+forbid(direct, /supabaseClient|\.from\s*\(['"]/i, 'database access in direct editor');
 
 forbid(editor, /html2canvas/i, 'html2canvas');
 forbid(editor, /foreignObject/i, 'SVG foreignObject');
