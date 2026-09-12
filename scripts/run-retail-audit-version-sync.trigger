@@ -1,1 +1,1 @@
-run retail audit version sync 2026-09-12
+run full invoice and retail audit version sync 2026-09-12
