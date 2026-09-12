@@ -41,6 +41,13 @@ jobs:
           text=text.replace(old_settings,'admin-invoice-settings.js?v=1.1')
           text=text.replace(old_orders,'admin-orders-customers.js?v=1.8')
           orders.write_text(text,encoding='utf-8')
+
+          perf=Path('scripts/performance-release-check.mjs')
+          text=perf.read_text(encoding='utf-8')
+          old_cache='restbr-pasha-baby-v37'
+          if text.count(old_cache) != 1:
+              raise SystemExit(f'expected 1 old performance cache marker, found {text.count(old_cache)}')
+          perf.write_text(text.replace(old_cache,'restbr-pasha-baby-v38'),encoding='utf-8')
           PY
       - name: Verify all core audits
         run: |
@@ -54,6 +61,6 @@ jobs:
         run: |
           git config user.name 'HaMoDyBr'
           git config user.email '78080184+hamodybr@users.noreply.github.com'
-          git add scripts/retail-commerce-check.mjs scripts/orders-labels-check.mjs
-          git commit -m 'Sync invoice and retail audit cache versions'
+          git add scripts/retail-commerce-check.mjs scripts/orders-labels-check.mjs scripts/performance-release-check.mjs
+          git commit -m 'Sync invoice cache audit versions'
           git push origin HEAD:feat/adaptive-invoice-frame
