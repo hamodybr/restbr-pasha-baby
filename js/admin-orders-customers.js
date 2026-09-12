@@ -20,7 +20,6 @@
   let customerSearch = '';
   let customerFilterPhone = '';
   let refreshTimer = null;
-  let invoicePdfEnginePromise = null;
 
   const sb = () => (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
   const esc = value => String(value ?? '')
@@ -44,41 +43,6 @@
         hour: '2-digit', minute: '2-digit',
       }));
     } catch (_) { return englishDigits(String(value || '')); }
-  };
-
-  const loadInvoicePdfEngine = () => {
-    if (window.jspdf?.jsPDF && window.PashaInvoicePdf?.create) return Promise.resolve();
-    if (invoicePdfEnginePromise) return invoicePdfEnginePromise;
-
-    const loadScript = (id, src, ready) => new Promise((resolve, reject) => {
-      if (ready()) return resolve();
-      const existing = document.getElementById(id);
-      const script = existing || document.createElement('script');
-      const done = () => ready() ? resolve() : reject(new Error('تعذر تشغيل محرك PDF.'));
-      script.addEventListener('load', done, { once:true });
-      script.addEventListener('error', () => reject(new Error('تعذر تنزيل محرك PDF.')), { once:true });
-      if (!existing) {
-        script.id = id;
-        script.src = src;
-        script.async = true;
-        document.head.appendChild(script);
-      }
-    });
-
-    invoicePdfEnginePromise = loadScript(
-      'pashaJsPdfScript',
-      'js/vendor/jspdf-2.5.2.umd.min.js',
-      () => Boolean(window.jspdf?.jsPDF)
-    ).then(() => loadScript(
-      'pashaInvoicePdfScript',
-      'js/admin-invoice-pdf.js?v=1.0',
-      () => Boolean(window.PashaInvoicePdf?.create)
-    )).catch(error => {
-      invoicePdfEnginePromise = null;
-      throw error;
-    });
-
-    return invoicePdfEnginePromise;
   };
 
   const itemKey = value => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -574,6 +538,9 @@
     };
     const fontUrl = safeAssetUrl(cfg.custom_font_url);
     const logoUrl = safeAssetUrl(cfg.logo_url);
+    const customFontFace = cfg.font_family === 'custom' && fontUrl
+      ? `@font-face{font-family:"Pasha Invoice Custom";src:url(${JSON.stringify(fontUrl)});font-display:block}`
+      : '';
     const invoiceFont = fontStacks[cfg.font_family] || fontStacks.modern_pro;
     const pageSize = ['A4','A5','Letter'].includes(cfg.page_size) ? `${cfg.page_size} ${cfg.page_orientation}` : 'auto';
     const pageWidth = cfg.page_size === 'A5' ? 136 : cfg.page_size === 'Letter' ? 203 : 198;
@@ -585,6 +552,7 @@
 
     popup.document.open();
     popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(order.order_number)} — Pasha Baby</title><style>
+      ${customFontFace}
       @page{size:${pageSize};margin:${cfg.page_margin_mm}mm}
       *{box-sizing:border-box}
       html,body{margin:0;padding:0;min-width:0;background:#fff;color:#000;font-family:${invoiceFont};font-size:${cfg.base_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};font-variant-numeric:tabular-nums;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -593,7 +561,7 @@
       .brand{text-align:center;break-inside:avoid}.print-logo-mark{position:relative;width:${cfg.logo_size_mm}mm;height:${cfg.logo_size_mm}mm;margin:0 auto 2mm;border:${cfg.frame_width_pt}pt double #000;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Georgia,"Times New Roman",serif;font-weight:900;line-height:.95}.print-logo-mark::before{content:"♛";display:block;font-size:${Math.max(8,cfg.logo_size_mm*.52)}pt;line-height:1}.print-logo-name{font-size:${Math.max(6,cfg.logo_size_mm*.37)}pt;letter-spacing:.2pt;white-space:nowrap}.print-logo-pb{font-size:${Math.max(9,cfg.logo_size_mm*.56)}pt;font-style:italic}.brand-logo-image{display:block;width:${cfg.logo_size_mm}mm;height:${cfg.logo_size_mm}mm;object-fit:contain;margin:0 auto 2mm;filter:grayscale(1) contrast(1.3)}.brand-copy h1{margin:0;color:#000;font:900 ${cfg.title_size_pt}pt/.95 Georgia,"Times New Roman",serif;letter-spacing:1.2pt}.brand-ar{margin-top:1mm;font:900 ${cfg.subtitle_size_pt}pt/1.1 Georgia,"Times New Roman",serif;letter-spacing:2pt}.ornament{display:flex;align-items:center;gap:3mm;margin:${cfg.header_spacing_mm}mm 0 2mm}.ornament::before,.ornament::after{content:"";height:1pt;background:#000;flex:1}.ornament span{font-size:10pt;line-height:1}
       .orderline{display:flex;justify-content:space-between;align-items:center;gap:4mm;margin-bottom:1.4mm;font-size:${cfg.meta_size_pt}pt;font-weight:${cfg.font_weight};break-inside:avoid}.orderline strong{font:900 ${cfg.meta_size_pt}pt/1.15 ui-monospace,SFMono-Regular,Consolas,monospace;direction:ltr;text-align:left}.orderline span{font-size:${cfg.meta_size_pt}pt;font-weight:${cfg.font_weight}}.customer{border-top:1pt solid #000;border-bottom:1pt solid #000;padding:1.5mm 0;margin-bottom:2mm;font-size:${cfg.customer_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};break-inside:avoid}.customer-main{display:flex;justify-content:space-between;gap:4mm}.customer b{font-size:${cfg.customer_size_pt}pt;font-weight:${cfg.font_weight}}.phone{direction:ltr;display:inline-block;font-weight:${cfg.font_weight}}.address{margin-top:.7mm;font-size:${cfg.address_size_pt}pt;font-weight:${cfg.font_weight}}
       .details-title{text-align:center;margin:0 0 1mm;font-size:${cfg.details_size_pt}pt;font-weight:${cfg.font_weight}}.items{padding:0 1mm}.item{display:flex;align-items:baseline;gap:2mm;min-height:${cfg.row_min_height_mm}mm;padding:${cfg.row_padding_mm}mm 0;font-size:${cfg.item_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};break-inside:avoid}.item-copy{display:flex;align-items:baseline;gap:1.2mm;min-width:0}.item-copy::before{content:"◆";font-size:7pt;flex:none}.item b{font-weight:${cfg.font_weight}}.item-leader{min-width:12mm;flex:1;border-bottom:${cfg.leader_width_pt}pt ${cfg.leader_style} #000;transform:translateY(-1.2mm)}.item strong{min-width:27mm;white-space:nowrap;font-size:${cfg.price_size_pt}pt;font-weight:${cfg.font_weight};direction:ltr;text-align:left}.option{display:inline;font-size:${cfg.option_size_pt}pt;color:#000;font-weight:${cfg.font_weight}}.option::before{content:" — "}.delivery-item,.delivery-item .option{color:#000}
-      .notes{margin-top:1.5mm;padding:1.5mm 0;border-top:1pt solid #000;font-size:${cfg.notes_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};break-inside:avoid}.totals{margin-top:2mm;border:${cfg.total_border_pt}pt solid #000;border-radius:2mm;padding:2mm 4mm;display:grid;gap:1mm;break-inside:avoid}.row{display:flex;justify-content:space-between;gap:5mm;font-size:${Math.max(8,cfg.total_size_pt-4)}pt;font-weight:${cfg.font_weight}}.row b{white-space:nowrap;direction:ltr}.row.grand{font-size:${cfg.total_size_pt}pt;font-weight:${cfg.font_weight}}.footer{text-align:center;margin-top:${cfg.footer_spacing_mm}mm;font-size:${cfg.footer_size_pt}pt;font-weight:${cfg.font_weight};break-inside:avoid}.footer::before{content:"◆";display:block;font-size:9pt;margin-bottom:1mm}.screen-actions{display:flex;align-items:center;gap:8px;padding:12px;position:fixed;left:0;right:0;bottom:0;background:#eee;z-index:5}.screen-actions button{flex:1;padding:12px;border:0;border-radius:8px;background:#000;color:#fff;font-size:16px;font-weight:900}.screen-actions button:disabled{cursor:wait;opacity:.56}.print-readiness{max-width:42%;color:#333;font-size:12px;font-weight:800;line-height:1.35;text-align:center}
+      .notes{margin-top:1.5mm;padding:1.5mm 0;border-top:1pt solid #000;font-size:${cfg.notes_size_pt}pt;font-weight:${cfg.font_weight};line-height:${cfg.line_height};break-inside:avoid}.totals{margin-top:2mm;border:${cfg.total_border_pt}pt solid #000;border-radius:2mm;padding:2mm 4mm;display:grid;gap:1mm;break-inside:avoid}.row{display:flex;justify-content:space-between;gap:5mm;font-size:${Math.max(8,cfg.total_size_pt-4)}pt;font-weight:${cfg.font_weight}}.row b{white-space:nowrap;direction:ltr}.row.grand{font-size:${cfg.total_size_pt}pt;font-weight:${cfg.font_weight}}.footer{text-align:center;margin-top:${cfg.footer_spacing_mm}mm;font-size:${cfg.footer_size_pt}pt;font-weight:${cfg.font_weight};break-inside:avoid}.footer::before{content:"◆";display:block;font-size:9pt;margin-bottom:1mm}.screen-actions{display:flex;gap:8px;padding:12px;position:fixed;left:0;right:0;bottom:0;background:#eee;z-index:5}.screen-actions button{flex:1;padding:12px;border:0;border-radius:8px;background:#000;color:#fff;font-size:16px;font-weight:900}
       @media print{html,body{width:auto!important;min-width:0!important;background:#fff!important;color:#000!important}body{padding:0!important}.label{width:100%!important;max-width:none!important;min-height:${cfg.paper_min_height_mm}mm!important;margin:0!important;overflow:visible!important}.screen-actions{display:none!important}}
     </style></head><body><div class="label">
       <div class="brand" aria-label="Pasha Baby">${cfg.show_logo ? (cfg.logo_mode === 'image' && logoUrl ? `<img class="brand-logo-image" src="${esc(logoUrl)}" alt="شعار PASHA BABY">` : '<div class="print-logo-mark" aria-hidden="true"><span class="print-logo-name">PASHA BABY</span><span class="print-logo-pb">PB</span></div>') : ''}<div class="brand-copy">${cfg.show_brand_title ? `<h1>${invoiceEsc(cfg.brand_title)}</h1>` : ''}${cfg.show_brand_subtitle ? `<div class="brand-ar">${invoiceEsc(cfg.brand_subtitle)}</div>` : ''}</div></div>
@@ -605,170 +573,9 @@
       ${cfg.show_notes && notes ? `<div class="notes"><b>ملاحظة:</b> ${invoiceEsc(notes)}</div>` : ''}
       <div class="totals">${cfg.show_subtotal && fee > 0 ? `<div class="row"><span>مجموع الأصناف</span><b>${money(order.subtotal)}</b></div>` : ''}<div class="row grand"><span>المجموع الكلي</span><b>${money(order.total)}</b></div></div>
       ${cfg.show_footer ? `<div class="footer">${invoiceEsc(cfg.footer_text)}</div>` : ''}
-    </div><div class="screen-actions"><button id="pashaInvoicePrintButton" type="button" disabled>جاري تجهيز الخط والطباعة…</button><span id="pashaInvoicePrintStatus" class="print-readiness" role="status">يرجى الانتظار لحظة</span></div></body></html>`);
+    </div><div class="screen-actions"><button onclick="window.print()">طباعة بالحجم الكامل / حفظ PDF</button></div></body></html>`);
     popup.document.close();
     popup.focus();
-
-    const printButton = popup.document.getElementById('pashaInvoicePrintButton');
-    const printStatus = popup.document.getElementById('pashaInvoicePrintStatus');
-    let printAssetsReady = false;
-    let printPreparation = null;
-
-    const waitForImage = image => {
-      if (image.complete) return image.naturalWidth > 0
-        ? Promise.resolve()
-        : Promise.reject(new Error('تعذر تحميل شعار الفاتورة.'));
-      return new Promise((resolve, reject) => {
-        image.addEventListener('load', resolve, { once:true });
-        image.addEventListener('error', () => reject(new Error('تعذر تحميل شعار الفاتورة.')), { once:true });
-      });
-    };
-
-    const assetBytesAsDataUrl = async (url, label) => {
-      const response = await fetch(url, {
-        mode:'cors',
-        credentials:'omit',
-        cache:'force-cache'
-      });
-      if (!response.ok) throw new Error(`تعذر تنزيل ${label} (${response.status}).`);
-
-      const bytes = new Uint8Array(await response.arrayBuffer());
-      if (!bytes.length) throw new Error(`ملف ${label} فارغ.`);
-
-      let binary = '';
-      const chunkSize = 0x8000;
-      for (let offset = 0; offset < bytes.length; offset += chunkSize) {
-        binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
-      }
-
-      const mime = response.headers.get('content-type') || 'application/octet-stream';
-      return `data:${mime};base64,${btoa(binary)}`;
-    };
-
-    const fontBytesAsDataUrl = url => assetBytesAsDataUrl(url, 'الخط المخصص');
-    let customFontDataPromise = null;
-    const customFontDataUrl = () => {
-      if (!customFontDataPromise) customFontDataPromise = fontBytesAsDataUrl(fontUrl);
-      return customFontDataPromise;
-    };
-
-    const embedCustomFont = async () => {
-      if (!fontUrl) throw new Error('الخط المخصص غير محفوظ. ارفعه واحفظ الإعدادات أولاً.');
-      if (typeof popup.FontFace !== 'function' || !popup.document.fonts) {
-        throw new Error('هذا المتصفح لا يدعم تضمين الخط داخل PDF.');
-      }
-
-      const dataUrl = await customFontDataUrl();
-      const face = new popup.FontFace(
-        'Pasha Invoice Custom',
-        `url(${JSON.stringify(dataUrl)})`,
-        { style:'normal', weight:String(cfg.font_weight), display:'block' }
-      );
-      const loadedFace = await face.load();
-      popup.document.fonts.add(loadedFace);
-
-      const query = `${cfg.font_weight} ${cfg.base_size_pt}pt "Pasha Invoice Custom"`;
-      await popup.document.fonts.load(query, 'باشا بيبي تفاصيل الطلب');
-      await popup.document.fonts.ready;
-      if (!popup.document.fonts.check(query, 'باشا بيبي تفاصيل الطلب')) {
-        throw new Error('تم تنزيل الخط لكن تعذر تضمينه داخل صفحة الـPDF.');
-      }
-
-      // Let the print document complete two layouts with the embedded font.
-      await new Promise(resolve => popup.requestAnimationFrame(() => popup.requestAnimationFrame(resolve)));
-      void popup.document.body.offsetHeight;
-    };
-
-    const createEmbeddedInvoicePdf = async () => {
-      await loadInvoicePdfEngine();
-      const dataUrl = await customFontDataUrl();
-      const fontBase64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
-      let logoDataUrl = '';
-      if (cfg.logo_mode === 'image' && logoUrl) {
-        try { logoDataUrl = await assetBytesAsDataUrl(logoUrl, 'شعار الفاتورة'); }
-        catch (_) { logoDataUrl = ''; }
-      }
-
-      return window.PashaInvoicePdf.create({
-        jsPDF: window.jspdf.jsPDF,
-        cfg,
-        order,
-        items,
-        notes,
-        fee,
-        fontBase64,
-        logoDataUrl,
-        money,
-        when,
-        itemOptionText,
-        englishDigits,
-      });
-    };
-
-    const preparePrintAssets = () => {
-      if (printAssetsReady) return Promise.resolve();
-      if (printPreparation) return printPreparation;
-
-      printPreparation = (async () => {
-        const customFontRequested = cfg.font_family === 'custom';
-        const readiness = [];
-        if (customFontRequested) {
-          readiness.push(loadInvoicePdfEngine());
-          readiness.push(customFontDataUrl());
-          // This only improves the on-screen print page. The generated PDF below
-          // does not depend on Safari preserving this FontFace.
-          readiness.push(embedCustomFont().catch(() => undefined));
-        }
-        else if (popup.document.fonts?.ready) readiness.push(popup.document.fonts.ready);
-        readiness.push(...Array.from(popup.document.images).map(waitForImage));
-
-        await Promise.race([
-          Promise.all(readiness),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('انتهت مهلة تحميل الخط أو الشعار. حاول مرة أخرى.')), 15000))
-        ]);
-
-        printAssetsReady = true;
-        printButton.disabled = false;
-        printButton.textContent = customFontRequested ? 'فتح PDF بالخط المرفوع' : 'طباعة بالحجم الكامل / حفظ PDF';
-        printStatus.textContent = customFontRequested ? 'سيُنشأ PDF حقيقي والخط مضمن داخله' : 'الفاتورة جاهزة للطباعة';
-      })().catch(error => {
-        printPreparation = null;
-        printButton.disabled = false;
-        printButton.textContent = 'إعادة تجهيز الخط';
-        printStatus.textContent = error?.message || 'تعذر تجهيز الخط للطباعة.';
-        throw error;
-      });
-
-      return printPreparation;
-    };
-
-    printButton.addEventListener('click', async () => {
-      printButton.disabled = true;
-      printButton.textContent = printAssetsReady ? 'جاري فتح الطباعة…' : 'جاري تجهيز الخط والطباعة…';
-      try {
-        await preparePrintAssets();
-        if (cfg.font_family === 'custom') {
-          printButton.textContent = 'جاري إنشاء PDF بالخط المرفوع…';
-          printStatus.textContent = 'لا تغلق هذه النافذة';
-          const result = await createEmbeddedInvoicePdf();
-          const pdfUrl = URL.createObjectURL(result.blob);
-          popup.location.replace(pdfUrl);
-          setTimeout(() => URL.revokeObjectURL(pdfUrl), 300000);
-          return;
-        }
-        popup.focus();
-        popup.print();
-      } catch (error) {
-        printStatus.textContent = error?.message || 'تعذر إنشاء PDF بالخط المرفوع.';
-      } finally {
-        if (printAssetsReady) {
-          printButton.disabled = false;
-          printButton.textContent = cfg.font_family === 'custom' ? 'فتح PDF بالخط المرفوع' : 'طباعة بالحجم الكامل / حفظ PDF';
-        }
-      }
-    });
-
-    void preparePrintAssets().catch(() => {});
   }
 
   function startAutoRefresh() {
