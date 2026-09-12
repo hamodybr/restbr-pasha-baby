@@ -44,7 +44,7 @@
   const watchImage = (image, forceVisible = false) => {
     if (!image) return;
     const observer = new MutationObserver(() => applyImageFallback(image, forceVisible));
-    observer.observe(image, { attributes: true, attributeFilter: ['src', 'style'] });
+    observer.observe(image, { attributes: true, attributeFilter: ['src'] });
   };
 
   const init = () => {
