@@ -33,6 +33,9 @@ jobs:
       - name: Native-canvas invoice PDF audit
         run: node scripts/native-canvas-invoice-pdf-check.mjs
 
+      - name: Invoice live editor audit
+        run: node scripts/invoice-live-editor-check.mjs
+
       - name: Numeric input behavior audit
         run: node scripts/numeric-input-check.mjs
 
