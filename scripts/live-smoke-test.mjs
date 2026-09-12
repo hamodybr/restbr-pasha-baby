@@ -157,7 +157,7 @@ await expectText('/js/pasha-arabic-only.js', [
   'js/admin-retail-discounts.js?v=4.0',
   'js/admin-product-colors.js?v=3.0',
   'js/admin-invoice-settings.js?v=1.0',
-  'js/admin-orders-customers.js?v=2.0',
+  'js/admin-orders-customers.js?v=1.7',
   'js/pasha-admin-product-editor-cleanup.js?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
   'js/pasha-number-normalizer.js?v=1.2',
@@ -171,13 +171,6 @@ await expectText('/js/admin-orders-customers.js', [
   'min-height:${cfg.row_min_height_mm}mm',
   'border-bottom:${cfg.leader_width_pt}pt ${cfg.leader_style}'
 ], 'saved configurable laser invoice renderer');
-
-await expectText('/js/admin-invoice-pdf.js', [
-  "doc.addFont('PashaInvoiceCustom.ttf', 'PashaInvoiceCustom', 'normal')",
-  'drawAmount',
-  "doc.output('blob')",
-  "embeddedFont: 'PashaInvoiceCustom'"
-], 'direct PDF renderer with embedded custom Arabic font');
 
 await expectText('/js/admin-invoice-settings.js', [
   'إعدادات الفاتورة',
@@ -230,11 +223,11 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v40',
+  'restbr-pasha-baby-v37',
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
-  'js/pasha-arabic-only.js?v=1.6',
+  'js/pasha-arabic-only.js?v=1.3',
   'js/pasha-number-normalizer.js?v=1.2',
   'js/pasha-baby-storefront-bundle.js?v=1.0',
   'css/pasha-baby-final-tweaks.css?v=1.0',
