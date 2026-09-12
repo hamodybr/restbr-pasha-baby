@@ -1,3 +1,14 @@
+// Emergency kill-switch for the short-lived PR #59 invoice helper.
+// Some iOS/Safari clients may still have the old runtime-config.js cached.
+// Mark the helper as already handled and remove its pending script tag before
+// the admin boot continues, so a stale cache cannot freeze dashboard taps.
+(() => {
+  const isAdmin = /(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname);
+  if (!isAdmin) return;
+  window.__PASHA_INVOICE_DEFAULT_CAIRO_V1__ = true;
+  document.getElementById('pbInvoiceDefaultCairoScript')?.remove();
+})();
+
 // ==========================================
 // RESTBR single-store menu — Supabase configuration
 // ==========================================
