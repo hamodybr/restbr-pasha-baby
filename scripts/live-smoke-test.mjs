@@ -157,7 +157,7 @@ await expectText('/js/pasha-arabic-only.js', [
   'js/admin-retail-discounts.js?v=4.0',
   'js/admin-product-colors.js?v=3.0',
   'js/admin-invoice-settings.js?v=1.1',
-  'js/admin-orders-customers.js?v=1.8',
+  'js/admin-orders-customers.js?v=1.9',
   'js/pasha-admin-product-editor-cleanup.js?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
   'js/pasha-number-normalizer.js?v=1.2',
@@ -223,11 +223,11 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v38',
+  'restbr-pasha-baby-v39',
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
-  'js/pasha-arabic-only.js?v=1.4',
+  'js/pasha-arabic-only.js?v=1.5',
   'js/pasha-number-normalizer.js?v=1.2',
   'js/pasha-baby-storefront-bundle.js?v=1.0',
   'css/pasha-baby-final-tweaks.css?v=1.0',

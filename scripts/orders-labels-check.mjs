@@ -103,7 +103,10 @@ requireText('js/admin-orders-customers.js', 'border-bottom:${cfg.leader_width_pt
 requireText('js/admin-orders-customers.js', 'font-size:${cfg.total_size_pt}pt', 'configurable invoice grand total font');
 requireText('js/admin-orders-customers.js', 'border:${cfg.total_border_pt}pt solid #000', 'configurable high-contrast laser total border');
 requireText('js/admin-orders-customers.js', 'class="print-logo-mark"', 'monochrome printer-safe Pasha logo');
-requireText('js/admin-orders-customers.js', 'طباعة بالحجم الكامل / حفظ PDF', 'full-size laser print action');
+requireText('js/admin-orders-customers.js', 'طباعة صفحة واحدة / حفظ PDF', 'single-page laser print action');
+requireText('js/admin-orders-customers.js', 'window.pbPrepareInvoicePrint', 'single-page pre-print fitting');
+requireText('js/admin-orders-customers.js', 'blobToDataUrl', 'embedded uploaded font for print');
+requireText('js/admin-orders-customers.js', 'document.fonts.ready', 'wait for uploaded font before print');
 requireText('js/admin-invoice-settings.js', 'قالب مضغوط لأصناف كثيرة', 'invoice compact preset');
 requireText('js/admin-invoice-settings.js', 'المعاينة المباشرة', 'live invoice preview');
 requireText('js/admin-invoice-settings.js', "from('invoice-assets').upload", 'custom invoice font and logo upload');
@@ -118,7 +121,7 @@ requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard'
 requireText('js/admin-orders-customers.js', 'PDF / طباعة ليزر واضحة', 'laser invoice action');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.1", 'public order loader');
 requireText('js/pasha-arabic-only.js', "js/admin-invoice-settings.js?v=1.1", 'invoice editor loader');
-requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.8", 'configurable invoice admin orders loader');
+requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.9", 'configurable invoice admin orders loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.1", 'color persistence loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=2.0", 'color gallery v2 loader');
 requireText('js/pasha-arabic-only.js', 'js/pasha-number-normalizer.js?v=1.2', 'number normalizer loader');
