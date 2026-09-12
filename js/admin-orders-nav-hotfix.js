@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V1__) return;
-  window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V1__ = true;
+  if (window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V2__) return;
+  window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V2__ = true;
 
   const STYLE_ID = 'pbOrdersNavHotfixStyles';
 
@@ -103,14 +103,11 @@
   function boot() {
     installStyles();
     tagQuickActions();
-    // Preload the native Canvas renderer under the same id used by the lazy
-    // loader, then install the iPhone guard that replaces the renderer's two
-    // layout RAF checkpoints while PDF generation is running. Safari can stop
-    // RAF in the admin/opener window as soon as the invoice popup takes focus.
     loadAddon('pashaInvoicePdfScript', 'js/admin-invoice-pdf-v4.js?v=4.0');
     loadAddon('pashaInvoicePdfSchedulerPatch', 'js/admin-invoice-iphone-scheduler-fix.js?v=1.0');
     loadAddon('pashaInvoiceLiveEditorScript', 'js/admin-invoice-live-editor.js?v=1.0');
     loadAddon('pashaInvoiceLiveEditorMobileFix', 'js/admin-invoice-live-editor-mobile-fix.js?v=1.0');
+    loadAddon('pashaInvoiceLiveEditorMobileRuntimeFixV2', 'js/admin-invoice-live-editor-mobile-runtime-fix.js?v=2.0');
     loadAddon('pbOrdersEnhancementsScript', 'js/admin-orders-enhancements.js?v=1.0');
     loadAddon('pbColorImageUploadScript', 'js/admin-color-image-upload.js?v=1.0');
 
