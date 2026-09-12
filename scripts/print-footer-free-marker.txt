@@ -1,0 +1,1 @@
+Pasha Baby direct invoice printing uses a generated PDF source so Safari does not append the webpage URL/date/page footer that appears when printing temporary HTML.
