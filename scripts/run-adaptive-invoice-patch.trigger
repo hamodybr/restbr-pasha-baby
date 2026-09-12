@@ -1,1 +1,1 @@
-run 2026-09-12 adaptive invoice frame
+run 2026-09-12 adaptive invoice frame retry 2
