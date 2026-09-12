@@ -170,3 +170,17 @@ window.RESTBR_CONFIG = Object.freeze({
   script.defer = true;
   document.head.appendChild(script);
 })();
+
+// Pasha Baby invoice font policy: Cairo Bold is the stable default.
+// Admin-only; the storefront does not need the invoice editor helper.
+(() => {
+  const path = String(window.location.pathname || '').toLowerCase();
+  if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
+  if (document.getElementById('pbInvoiceDefaultCairoScript')) return;
+
+  const script = document.createElement('script');
+  script.id = 'pbInvoiceDefaultCairoScript';
+  script.src = 'js/pasha-invoice-default-cairo.js?v=1.0';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
