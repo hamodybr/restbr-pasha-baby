@@ -110,6 +110,7 @@
     loadAddon('pashaInvoicePdfScript', 'js/admin-invoice-pdf-v4.js?v=4.0');
     loadAddon('pashaInvoicePdfSchedulerPatch', 'js/admin-invoice-iphone-scheduler-fix.js?v=1.0');
     loadAddon('pashaInvoiceLiveEditorScript', 'js/admin-invoice-live-editor.js?v=1.0');
+    loadAddon('pashaInvoiceLiveEditorMobileFix', 'js/admin-invoice-live-editor-mobile-fix.js?v=1.0');
     loadAddon('pbOrdersEnhancementsScript', 'js/admin-orders-enhancements.js?v=1.0');
     loadAddon('pbColorImageUploadScript', 'js/admin-color-image-upload.js?v=1.0');
 
