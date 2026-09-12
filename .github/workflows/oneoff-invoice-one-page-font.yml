@@ -18,12 +18,15 @@ jobs:
           fetch-depth: 0
 
       - name: Apply invoice patch
-        run: python scripts/oneoff_invoice_patch.py
+        run: |
+          python scripts/oneoff_invoice_patch.py
+          python scripts/oneoff_invoice_patch_versions.py
 
       - name: Validate patched project
         run: |
           node --check js/admin-orders-customers.js
           node --check js/pasha-arabic-only.js
+          node --check js/supabase-config.js
           node scripts/orders-labels-check.mjs
           node scripts/predeploy-check.mjs
           node scripts/retail-commerce-check.mjs
@@ -35,7 +38,7 @@ jobs:
         run: |
           git config user.name "HaMoDyBr"
           git config user.email "78080184+hamodybr@users.noreply.github.com"
-          git rm .github/workflows/oneoff-invoice-one-page-font.yml scripts/oneoff_invoice_patch.py
-          git add js/admin-orders-customers.js js/pasha-arabic-only.js sw.js scripts/orders-labels-check.mjs scripts/live-smoke-test.mjs
+          git rm .github/workflows/oneoff-invoice-one-page-font.yml scripts/oneoff_invoice_patch.py scripts/oneoff_invoice_patch_versions.py
+          git add js/admin-orders-customers.js js/pasha-arabic-only.js js/supabase-config.js sw.js scripts/orders-labels-check.mjs scripts/live-smoke-test.mjs scripts/predeploy-check.mjs
           git commit -m "Fix invoice single-page print and uploaded font embedding"
           git push origin HEAD:${{ github.ref_name }}
