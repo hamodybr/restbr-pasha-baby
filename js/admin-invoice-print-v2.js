@@ -3,6 +3,7 @@
   window.__PASHA_INVOICE_PRINT_V2__ = true;
 
   const JS_PDF_SRC = 'js/vendor/jspdf-2.5.2.umd.min.js?v=2.5.2';
+  const FAST_PDF_SRC = 'js/admin-invoice-fast-pdf-ios-v1.js?v=1.0';
   const PDF_ENGINE_SRC = 'js/admin-invoice-pdf-onepage-v6.js?v=6.0';
   const SELECT = 'id,order_number,customer_id,customer_name,customer_phone,order_type,address,location_url,notes,status,subtotal,delivery_fee,total,created_at,updated_at,order_items(id,product_id,option_id,product_name,option_name,selected_color,quantity,unit_price,line_total)';
 
@@ -17,6 +18,9 @@
     show_order_number:true,show_date_time:true,show_customer_phone:true,show_customer_address:true,show_order_type:true,
     show_details_title:true,show_quantity:true,show_options:true,show_notes:true,show_subtotal:true,show_footer:true
   };
+
+  const isIOS = () => /iPad|iPhone|iPod/i.test(navigator.userAgent || '') ||
+    ((navigator.platform || '') === 'MacIntel' && Number(navigator.maxTouchPoints || 0) > 1);
 
   const englishDigits = value => String(value ?? '')
     .replace(/[٠-٩]/g, digit => String(digit.charCodeAt(0) - 1632))
@@ -126,7 +130,11 @@
   }
 
   async function ensureEngines() {
-    await loadScript('pbInvoiceJsPdfV252', JS_PDF_SRC, () => typeof window.jspdf?.jsPDF === 'function');
+    if (isIOS()) {
+      await loadScript('pbInvoiceFastPdfIosV1', FAST_PDF_SRC, () => typeof window.PashaFastSinglePagePdf === 'function');
+    } else {
+      await loadScript('pbInvoiceJsPdfV252', JS_PDF_SRC, () => typeof window.jspdf?.jsPDF === 'function');
+    }
     await loadScript('pbInvoiceOnePagePdfV6', PDF_ENGINE_SRC, () => typeof window.PashaInvoiceOnePagePdf?.create === 'function' && window.PashaInvoiceOnePagePdf?.renderMode === 'native-canvas-one-page-v6');
     if (window.PashaInvoiceOnePagePdf?.renderMode !== 'native-canvas-one-page-v6') {
       throw new Error('تم تحميل محرك PDF غير متوقع. حدّث الصفحة وحاول مرة أخرى.');
@@ -191,8 +199,9 @@
       button.disabled = true;
       button.textContent = '⏳ جاري تجهيز صفحة واحدة…';
     }
-    writeStatus(popup, 'جاري تجهيز PDF من صفحة واحدة', 'المحرك V6 يثبت الخط داخل الصورة ويقلل حجم الرسم قبل إنشاء PDF حتى يعمل بثبات على iPhone.');
+    writeStatus(popup, 'جاري تجهيز PDF من صفحة واحدة', 'على iPhone يتم إنشاء PDF مباشرة من صورة الفاتورة بدون jsPDF لتجنب تعليق Safari.');
 
+    let stageHandler = null;
     try {
       await ensureEngines();
       const order = await fetchOrder(orderId);
@@ -225,10 +234,20 @@
       if (logoResult.status === 'fulfilled') logoDataUrl = logoResult.value || '';
       else console.warn('Pasha invoice logo raster fallback:', logoResult.reason);
 
-      writeStatus(popup, 'جاري رسم الفاتورة', 'يتم الآن ضغط الرسم حسب المساحة الفعلية للـ A4 ثم إنشاء PDF من صفحة واحدة.');
+      stageHandler = stage => {
+        if (stage === 'pack') {
+          writeStatus(popup, 'تم رسم الفاتورة ✓', 'الخط والتصميم صاروا داخل الصورة. الآن يتم تغليفها مباشرة داخل PDF من صفحة واحدة.');
+        } else if (stage === 'pdf') {
+          writeStatus(popup, 'جاري إنهاء PDF', 'بقيت كتابة ملف PDF فقط؛ لا يوجد تقسيم صفحات أو إعادة معالجة للخط.');
+        }
+      };
+      window.__PASHA_INVOICE_PDF_STAGE__ = stageHandler;
+
+      writeStatus(popup, 'جاري رسم الفاتورة', 'يتم ضغط الرسم حسب مساحة A4. بعدها iPhone يستخدم مولّد PDF مباشر وخفيف.');
       const startedAt = performance.now();
+      const PdfClass = isIOS() ? window.PashaFastSinglePagePdf : window.jspdf.jsPDF;
       const result = await window.PashaInvoiceOnePagePdf.create({
-        jsPDF: window.jspdf.jsPDF,
+        jsPDF: PdfClass,
         cfg,
         order,
         items,
@@ -245,7 +264,8 @@
         elapsedMs: Math.round(performance.now() - startedAt),
         renderScale: result?.renderScale,
         rasterFormat: result?.rasterFormat,
-        fittedScale: result?.fittedScale
+        fittedScale: result?.fittedScale,
+        pdfPacker: isIOS() ? 'direct-jpeg' : 'jspdf'
       });
 
       if (!(result?.blob instanceof Blob) || result.pageCount !== 1) {
@@ -262,6 +282,9 @@
       console.error('Pasha deterministic invoice PDF failed:', error);
       writeError(popup, error);
     } finally {
+      if (stageHandler && window.__PASHA_INVOICE_PDF_STAGE__ === stageHandler) {
+        try { delete window.__PASHA_INVOICE_PDF_STAGE__; } catch (_) { window.__PASHA_INVOICE_PDF_STAGE__ = null; }
+      }
       if (button) {
         button.disabled = false;
         button.textContent = oldText || '🖨 PDF / طباعة ليزر واضحة';
@@ -279,5 +302,5 @@
   }
 
   document.addEventListener('click', capture, true);
-  window.PashaInvoicePrintV2 = Object.freeze({ generate, renderMode: 'pdf-first-one-page-v6' });
+  window.PashaInvoicePrintV2 = Object.freeze({ generate, renderMode: 'pdf-first-one-page-v6-direct-ios' });
 })();
