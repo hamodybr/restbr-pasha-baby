@@ -1,10 +1,9 @@
 (() => {
-  if (window.__PASHA_INVOICE_PRINT_V2__) return;
-  window.__PASHA_INVOICE_PRINT_V2__ = true;
+  if (window.__PASHA_INVOICE_PRINT_V8__) return;
+  window.__PASHA_INVOICE_PRINT_V8__ = true;
 
-  const JS_PDF_SRC = 'js/vendor/jspdf-2.5.2.umd.min.js?v=2.5.2';
-  const FAST_PDF_SRC = 'js/admin-invoice-fast-pdf-ios-v1.js?v=1.0';
-  const PDF_ENGINE_SRC = 'js/admin-invoice-pdf-onepage-v6.js?v=6.0';
+  const FAST_PDF_SRC = 'js/admin-invoice-fast-pdf-ios-v1.js?v=1.1';
+  const PDF_ENGINE_SRC = 'js/admin-invoice-pdf-onepage-v8.js?v=8.0';
   const SELECT = 'id,order_number,customer_id,customer_name,customer_phone,order_type,address,location_url,notes,status,subtotal,delivery_fee,total,created_at,updated_at,order_items(id,product_id,option_id,product_name,option_name,selected_color,quantity,unit_price,line_total)';
 
   const DEFAULTS = {
@@ -19,9 +18,6 @@
     show_details_title:true,show_quantity:true,show_options:true,show_notes:true,show_subtotal:true,show_footer:true
   };
 
-  const isIOS = () => /iPad|iPhone|iPod/i.test(navigator.userAgent || '') ||
-    ((navigator.platform || '') === 'MacIntel' && Number(navigator.maxTouchPoints || 0) > 1);
-
   const englishDigits = value => String(value ?? '')
     .replace(/[٠-٩]/g, digit => String(digit.charCodeAt(0) - 1632))
     .replace(/[۰-۹]/g, digit => String(digit.charCodeAt(0) - 1776))
@@ -30,8 +26,7 @@
   const when = value => {
     try {
       return englishDigits(new Date(value).toLocaleString('ar-IQ', {
-        timeZone: 'Asia/Baghdad',
-        year: 'numeric', month: '2-digit', day: '2-digit',
+        timeZone: 'Asia/Baghdad', year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit'
       }));
     } catch (_) { return englishDigits(String(value || '')); }
@@ -80,17 +75,13 @@
   }
 
   function client() {
-    try {
-      if (typeof supabaseClient !== 'undefined') return supabaseClient;
-    } catch (_) {}
+    try { if (typeof supabaseClient !== 'undefined') return supabaseClient; } catch (_) {}
     return window.supabaseClient || null;
   }
 
   function invoiceSettings() {
     let raw = {};
-    try {
-      raw = (typeof adminRestaurantSettings !== 'undefined' && adminRestaurantSettings?.ui_design_settings?.invoice) || {};
-    } catch (_) {}
+    try { raw = (typeof adminRestaurantSettings !== 'undefined' && adminRestaurantSettings?.ui_design_settings?.invoice) || {}; } catch (_) {}
     if (window.PashaInvoiceSettings?.normalize) return window.PashaInvoiceSettings.normalize(raw);
     return { ...DEFAULTS, ...(raw && typeof raw === 'object' ? raw : {}) };
   }
@@ -109,13 +100,8 @@
       if (existing) {
         const started = Date.now();
         const timer = setInterval(() => {
-          if (ready()) {
-            clearInterval(timer);
-            resolve();
-          } else if (Date.now() - started > 12000) {
-            clearInterval(timer);
-            reject(new Error(`انتهت مهلة تحميل ${src}`));
-          }
+          if (ready()) { clearInterval(timer); resolve(); }
+          else if (Date.now() - started > 12000) { clearInterval(timer); reject(new Error(`انتهت مهلة تحميل ${src}`)); }
         }, 60);
         return;
       }
@@ -130,14 +116,13 @@
   }
 
   async function ensureEngines() {
-    if (isIOS()) {
-      await loadScript('pbInvoiceFastPdfIosV1', FAST_PDF_SRC, () => typeof window.PashaFastSinglePagePdf === 'function');
-    } else {
-      await loadScript('pbInvoiceJsPdfV252', JS_PDF_SRC, () => typeof window.jspdf?.jsPDF === 'function');
-    }
-    await loadScript('pbInvoiceOnePagePdfV6', PDF_ENGINE_SRC, () => typeof window.PashaInvoiceOnePagePdf?.create === 'function' && window.PashaInvoiceOnePagePdf?.renderMode === 'native-canvas-one-page-v6');
-    if (window.PashaInvoiceOnePagePdf?.renderMode !== 'native-canvas-one-page-v6') {
-      throw new Error('تم تحميل محرك PDF غير متوقع. حدّث الصفحة وحاول مرة أخرى.');
+    await loadScript('pbInvoiceFastPdfV11', FAST_PDF_SRC, () => typeof window.PashaFastSinglePagePdf === 'function');
+    await loadScript('pbInvoiceOnePagePdfV8', PDF_ENGINE_SRC, () =>
+      typeof window.PashaInvoiceOnePagePdf?.create === 'function' &&
+      window.PashaInvoiceOnePagePdf?.renderMode === 'preview-matched-one-page-v8'
+    );
+    if (window.PashaInvoiceOnePagePdf?.renderMode !== 'preview-matched-one-page-v8') {
+      throw new Error('تم تحميل محرك فاتورة قديم. حدّث الصفحة وحاول مرة أخرى.');
     }
   }
 
@@ -170,38 +155,53 @@
     });
   }
 
-  function writeStatus(popup, title, detail = '') {
-    try {
-      popup.document.open();
-      popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>html,body{margin:0;min-height:100%;background:#111;color:#fff;font-family:Tahoma,Arial,sans-serif}body{display:grid;place-items:center;padding:28px;box-sizing:border-box}.box{width:min(92vw,520px);padding:26px;border:1px solid #333;border-radius:18px;background:#191919;text-align:center;box-shadow:0 18px 60px #0008}.spin{width:34px;height:34px;margin:0 auto 16px;border:4px solid #444;border-top-color:#fff;border-radius:50%;animation:s .8s linear infinite}@keyframes s{to{transform:rotate(360deg)}}h1{margin:0 0 10px;font-size:20px}p{margin:0;color:#bbb;line-height:1.7;font-size:14px}</style></head><body><div class="box"><div class="spin"></div><h1>${title}</h1><p>${detail}</p></div></body></html>`);
-      popup.document.close();
-    } catch (_) {}
+  function overlay() {
+    let root = document.getElementById('pbInvoiceForegroundOverlay');
+    if (root) return root;
+    root = document.createElement('div');
+    root.id = 'pbInvoiceForegroundOverlay';
+    root.innerHTML = '<div class="pb-ifo-card"><div class="pb-ifo-spin"></div><h2 data-pb-ifo-title>جاري تجهيز الفاتورة</h2><p data-pb-ifo-detail>يتم العمل داخل الداشبورد حتى لا يوقف iPhone عملية الإنشاء.</p><button type="button" data-pb-ifo-close hidden>إغلاق</button></div>';
+    const style = document.createElement('style');
+    style.id = 'pbInvoiceForegroundOverlayStyle';
+    style.textContent = '#pbInvoiceForegroundOverlay{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:24px;background:rgba(10,10,10,.94);color:#fff;font-family:Tahoma,Arial,sans-serif;direction:rtl}.pb-ifo-card{width:min(92vw,520px);padding:28px 22px;border:1px solid #3a3a3a;border-radius:22px;background:#181818;text-align:center;box-shadow:0 22px 80px #000a}.pb-ifo-spin{width:42px;height:42px;margin:0 auto 18px;border:5px solid #444;border-top-color:#fff;border-radius:50%;animation:pbifo .8s linear infinite}@keyframes pbifo{to{transform:rotate(360deg)}}.pb-ifo-card h2{margin:0 0 10px;font-size:22px}.pb-ifo-card p{margin:0;color:#bbb;line-height:1.8;font-size:14px}.pb-ifo-card button{margin-top:18px;border:0;border-radius:12px;padding:11px 22px;font:800 14px inherit;cursor:pointer}';
+    document.head.appendChild(style);
+    document.body.appendChild(root);
+    root.querySelector('[data-pb-ifo-close]')?.addEventListener('click', () => root.remove());
+    return root;
   }
 
-  function writeError(popup, error) {
-    const message = String(error?.message || error || 'خطأ غير معروف').replace(/[&<>]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[char]));
-    try {
-      popup.document.open();
-      popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>تعذر تجهيز الفاتورة</title><style>html,body{margin:0;min-height:100%;background:#111;color:#fff;font-family:Tahoma,Arial,sans-serif}body{display:grid;place-items:center;padding:26px}.box{max-width:520px;padding:24px;border:1px solid #5a2929;border-radius:18px;background:#211414;text-align:center}h1{font-size:20px}p{color:#efc2c2;line-height:1.8}button{border:0;border-radius:12px;padding:12px 20px;font:800 15px inherit;cursor:pointer}</style></head><body><div class="box"><h1>تعذر تجهيز PDF</h1><p>${message}</p><button onclick="window.close()">إغلاق</button></div></body></html>`);
-      popup.document.close();
-    } catch (_) {}
+  function setStatus(title, detail = '', error = false) {
+    const root = overlay();
+    const titleEl = root.querySelector('[data-pb-ifo-title]');
+    const detailEl = root.querySelector('[data-pb-ifo-detail]');
+    const spinner = root.querySelector('.pb-ifo-spin');
+    const close = root.querySelector('[data-pb-ifo-close]');
+    if (titleEl) titleEl.textContent = title;
+    if (detailEl) detailEl.textContent = detail;
+    if (spinner) spinner.style.display = error ? 'none' : 'block';
+    if (close) close.hidden = !error;
+  }
+
+  function clearOverlay() {
+    document.getElementById('pbInvoiceForegroundOverlay')?.remove();
   }
 
   async function generate(orderId, button) {
-    const popup = window.open('', '_blank', 'width=900,height=1000');
-    if (!popup) {
-      alert('اسمح بالنوافذ المنبثقة حتى تفتح فاتورة PDF.');
-      return;
-    }
-
     const oldText = button?.textContent || '';
-    if (button) {
-      button.disabled = true;
-      button.textContent = '⏳ جاري تجهيز صفحة واحدة…';
-    }
-    writeStatus(popup, 'جاري تجهيز PDF من صفحة واحدة', 'على iPhone يتم إنشاء PDF مباشرة من صورة الفاتورة بدون jsPDF لتجنب تعليق Safari.');
+    if (button) { button.disabled = true; button.textContent = '⏳ جاري تجهيز صفحة واحدة…'; }
+    setStatus('جاري تجهيز الفاتورة', 'V8 يعمل داخل نفس الداشبورد حتى تبقى JavaScript فعالة على iPhone.');
 
-    let stageHandler = null;
+    const stageHandler = (name, detail) => {
+      const map = {
+        font: 'جاري تثبيت الخط والشعار',
+        render: 'جاري رسم الفاتورة',
+        encode: 'جاري ضغط صفحة الفاتورة',
+        pack: 'جاري إنشاء PDF من صفحة واحدة'
+      };
+      setStatus(map[name] || 'جاري تجهيز الفاتورة', detail || '');
+    };
+    window.__PASHA_INVOICE_PDF_STAGE__ = stageHandler;
+
     try {
       await ensureEngines();
       const order = await fetchOrder(orderId);
@@ -209,86 +209,48 @@
       const items = orderItemsWithColors(order);
       const notes = cleanOrderNotes(order.notes);
       const fee = Number(order.delivery_fee || 0);
-
       const fontUrl = String(cfg.font_family || '') === 'custom' ? safeHttpsUrl(cfg.custom_font_url) : '';
       if (String(cfg.font_family || '') === 'custom' && !fontUrl) {
         throw new Error('أنت مختار «الخط المرفوع»، لكن رابط الخط غير محفوظ. أعد رفع الخط واحفظ إعدادات الفاتورة.');
       }
       const logoUrl = cfg.show_logo && cfg.logo_mode === 'image' ? safeHttpsUrl(cfg.logo_url) : '';
 
-      if (String(cfg.font_family || '') === 'custom') {
-        writeStatus(popup, 'جاري تثبيت الخط المرفوع', cfg.custom_font_name ? `الخط: ${cfg.custom_font_name}` : 'لن يتم استخدام خط بديل إذا فشل الخط المرفوع.');
-      }
-
-      let fontBuffer = null;
-      let logoDataUrl = '';
       const [fontResult, logoResult] = await Promise.allSettled([
         fontUrl ? fetchBuffer(fontUrl) : Promise.resolve(null),
         logoUrl ? urlToDataUrl(logoUrl) : Promise.resolve('')
       ]);
-
       if (fontResult.status === 'rejected') {
         throw new Error(`تعذر تنزيل ملف الخط المرفوع نفسه: ${fontResult.reason?.message || fontResult.reason}`);
       }
-      fontBuffer = fontResult.value;
-      if (logoResult.status === 'fulfilled') logoDataUrl = logoResult.value || '';
-      else console.warn('Pasha invoice logo raster fallback:', logoResult.reason);
+      const fontBuffer = fontResult.value;
+      const logoDataUrl = logoResult.status === 'fulfilled' ? (logoResult.value || '') : '';
 
-      stageHandler = stage => {
-        if (stage === 'pack') {
-          writeStatus(popup, 'تم رسم الفاتورة ✓', 'الخط والتصميم صاروا داخل الصورة. الآن يتم تغليفها مباشرة داخل PDF من صفحة واحدة.');
-        } else if (stage === 'pdf') {
-          writeStatus(popup, 'جاري إنهاء PDF', 'بقيت كتابة ملف PDF فقط؛ لا يوجد تقسيم صفحات أو إعادة معالجة للخط.');
-        }
-      };
-      window.__PASHA_INVOICE_PDF_STAGE__ = stageHandler;
-
-      writeStatus(popup, 'جاري رسم الفاتورة', 'يتم ضغط الرسم حسب مساحة A4. بعدها iPhone يستخدم مولّد PDF مباشر وخفيف.');
-      const startedAt = performance.now();
-      const PdfClass = isIOS() ? window.PashaFastSinglePagePdf : window.jspdf.jsPDF;
       const result = await window.PashaInvoiceOnePagePdf.create({
-        jsPDF: PdfClass,
-        cfg,
-        order,
-        items,
-        notes,
-        fee,
-        fontBuffer,
-        logoDataUrl,
-        money,
-        when,
-        itemOptionText,
-        englishDigits
+        PdfClass: window.PashaFastSinglePagePdf,
+        cfg, order, items, notes, fee, fontBuffer, logoDataUrl,
+        money, when, itemOptionText, englishDigits
       });
-      console.info('Pasha invoice V6 PDF ready', {
-        elapsedMs: Math.round(performance.now() - startedAt),
-        renderScale: result?.renderScale,
-        rasterFormat: result?.rasterFormat,
-        fittedScale: result?.fittedScale,
-        pdfPacker: isIOS() ? 'direct-jpeg' : 'jspdf'
-      });
-
       if (!(result?.blob instanceof Blob) || result.pageCount !== 1) {
-        throw new Error('فشل ضمان الصفحة الواحدة؛ تم إيقاف الفاتورة بدلاً من إرسال ملف متعدد الصفحات.');
+        throw new Error('فشل ضمان الصفحة الواحدة؛ تم إيقاف الفاتورة بدلاً من إنشاء ملف متعدد الصفحات.');
       }
       if (String(cfg.font_family || '') === 'custom' && result.customFontBaked !== true) {
-        throw new Error('لم يتم تثبيت الخط المرفوع داخل صورة PDF؛ تم إيقاف الطباعة بدلاً من استخدام خط بديل.');
+        throw new Error('لم يتم تثبيت الخط المرفوع داخل الصورة النهائية.');
       }
 
+      setStatus('تم تجهيز الفاتورة ✓', 'جاري فتح ملف PDF من صفحة واحدة…');
       const blobUrl = URL.createObjectURL(result.blob);
-      popup.location.replace(blobUrl);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 5 * 60 * 1000);
+      // Navigate only AFTER all expensive work is complete. This is critical on
+      // iPhone: opening a second tab before rendering backgrounds the dashboard
+      // and Safari may pause its JavaScript.
+      window.location.assign(blobUrl);
     } catch (error) {
-      console.error('Pasha deterministic invoice PDF failed:', error);
-      writeError(popup, error);
+      console.error('Pasha V8 invoice generation failed:', error);
+      setStatus('تعذر تجهيز الفاتورة', String(error?.message || error || 'خطأ غير معروف'), true);
     } finally {
-      if (stageHandler && window.__PASHA_INVOICE_PDF_STAGE__ === stageHandler) {
+      if (window.__PASHA_INVOICE_PDF_STAGE__ === stageHandler) {
         try { delete window.__PASHA_INVOICE_PDF_STAGE__; } catch (_) { window.__PASHA_INVOICE_PDF_STAGE__ = null; }
       }
-      if (button) {
-        button.disabled = false;
-        button.textContent = oldText || '🖨 PDF / طباعة ليزر واضحة';
-      }
+      if (button) { button.disabled = false; button.textContent = oldText || '🖨 PDF / طباعة ليزر واضحة'; }
     }
   }
 
@@ -302,5 +264,6 @@
   }
 
   document.addEventListener('click', capture, true);
-  window.PashaInvoicePrintV2 = Object.freeze({ generate, renderMode: 'pdf-first-one-page-v6-direct-ios' });
+  window.addEventListener('pageshow', clearOverlay);
+  window.PashaInvoicePrintV2 = Object.freeze({ generate, renderMode: 'foreground-preview-matched-v8' });
 })();
