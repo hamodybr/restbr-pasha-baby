@@ -10,6 +10,9 @@ const workflow = read('.github/workflows/pages.yml');
 if (!runtime.includes('pbInvoiceStudioV1Script')) fail('Invoice Studio loader id is missing from runtime config.');
 if (!runtime.includes('js/admin-invoice-studio-v1.js?v=1.0')) fail('Invoice Studio loader path is missing from runtime config.');
 if (!runtime.includes("/(^|\\/)admin(?:\\.html)?\\/?$/.test(path)")) fail('Invoice Studio loader must remain admin-only.');
+if (!runtime.includes("get('invoiceStudioTrial') === '1'")) fail('Safe trial query mode is missing.');
+if (!runtime.includes("closest('[data-studio-save],[data-pb-live-save]')")) fail('Safe trial mode must block invoice-setting persistence.');
+if (!runtime.includes('__PASHA_INVOICE_STUDIO_TRIAL_SAFE__')) fail('Safe trial guard flag is missing.');
 
 for (const token of [
   '__PASHA_INVOICE_STUDIO_V1__',
