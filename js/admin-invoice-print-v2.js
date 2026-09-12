@@ -3,7 +3,7 @@
   window.__PASHA_INVOICE_PRINT_V2__ = true;
 
   const JS_PDF_SRC = 'js/vendor/jspdf-2.5.2.umd.min.js?v=2.5.2';
-  const PDF_ENGINE_SRC = 'js/admin-invoice-pdf-onepage-v5.js?v=5.0';
+  const PDF_ENGINE_SRC = 'js/admin-invoice-pdf-onepage-v6.js?v=6.0';
   const SELECT = 'id,order_number,customer_id,customer_name,customer_phone,order_type,address,location_url,notes,status,subtotal,delivery_fee,total,created_at,updated_at,order_items(id,product_id,option_id,product_name,option_name,selected_color,quantity,unit_price,line_total)';
 
   const DEFAULTS = {
@@ -127,9 +127,9 @@
 
   async function ensureEngines() {
     await loadScript('pbInvoiceJsPdfV252', JS_PDF_SRC, () => typeof window.jspdf?.jsPDF === 'function');
-    await loadScript('pbInvoiceOnePagePdfV5', PDF_ENGINE_SRC, () => typeof window.PashaInvoiceOnePagePdf?.create === 'function');
-    if (window.PashaInvoiceOnePagePdf?.renderMode !== 'native-canvas-one-page-v5') {
-      throw new Error('تم تحميل محرك PDF غير متوقع.');
+    await loadScript('pbInvoiceOnePagePdfV6', PDF_ENGINE_SRC, () => typeof window.PashaInvoiceOnePagePdf?.create === 'function' && window.PashaInvoiceOnePagePdf?.renderMode === 'native-canvas-one-page-v6');
+    if (window.PashaInvoiceOnePagePdf?.renderMode !== 'native-canvas-one-page-v6') {
+      throw new Error('تم تحميل محرك PDF غير متوقع. حدّث الصفحة وحاول مرة أخرى.');
     }
   }
 
@@ -143,7 +143,7 @@
   }
 
   async function fetchBuffer(url) {
-    const response = await fetch(url, { cache: 'no-store', mode: 'cors', credentials: 'omit' });
+    const response = await fetch(url, { cache: 'force-cache', mode: 'cors', credentials: 'omit' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const buffer = await response.arrayBuffer();
     if (buffer.byteLength < 100) throw new Error('الملف فارغ أو غير صالح.');
@@ -151,7 +151,7 @@
   }
 
   async function urlToDataUrl(url) {
-    const response = await fetch(url, { cache: 'no-store', mode: 'cors', credentials: 'omit' });
+    const response = await fetch(url, { cache: 'force-cache', mode: 'cors', credentials: 'omit' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const blob = await response.blob();
     return new Promise((resolve, reject) => {
@@ -191,38 +191,42 @@
       button.disabled = true;
       button.textContent = '⏳ جاري تجهيز صفحة واحدة…';
     }
-    writeStatus(popup, 'جاري تجهيز PDF من صفحة واحدة', 'يتم تثبيت الخط داخل صورة الفاتورة أولاً، ثم إنشاء PDF حقيقي من صفحة واحدة.');
+    writeStatus(popup, 'جاري تجهيز PDF من صفحة واحدة', 'المحرك V6 يثبت الخط داخل الصورة ويقلل حجم الرسم قبل إنشاء PDF حتى يعمل بثبات على iPhone.');
 
     try {
       await ensureEngines();
-      const [order] = await Promise.all([fetchOrder(orderId)]);
+      const order = await fetchOrder(orderId);
       const cfg = invoiceSettings();
       const items = orderItemsWithColors(order);
       const notes = cleanOrderNotes(order.notes);
       const fee = Number(order.delivery_fee || 0);
 
-      let fontBuffer = null;
+      const fontUrl = String(cfg.font_family || '') === 'custom' ? safeHttpsUrl(cfg.custom_font_url) : '';
+      if (String(cfg.font_family || '') === 'custom' && !fontUrl) {
+        throw new Error('أنت مختار «الخط المرفوع»، لكن رابط الخط غير محفوظ. أعد رفع الخط واحفظ إعدادات الفاتورة.');
+      }
+      const logoUrl = cfg.show_logo && cfg.logo_mode === 'image' ? safeHttpsUrl(cfg.logo_url) : '';
+
       if (String(cfg.font_family || '') === 'custom') {
-        const fontUrl = safeHttpsUrl(cfg.custom_font_url);
-        if (!fontUrl) throw new Error('أنت مختار «الخط المرفوع»، لكن رابط الخط غير محفوظ. أعد رفع الخط واحفظ إعدادات الفاتورة.');
-        writeStatus(popup, 'جاري تثبيت الخط المرفوع', cfg.custom_font_name ? `الخط: ${cfg.custom_font_name}` : 'لن يتم استخدام أي خط بديل إذا فشل الخط المرفوع.');
-        try {
-          fontBuffer = await fetchBuffer(fontUrl);
-        } catch (error) {
-          throw new Error(`تعذر تنزيل ملف الخط المرفوع نفسه: ${error?.message || error}`);
-        }
+        writeStatus(popup, 'جاري تثبيت الخط المرفوع', cfg.custom_font_name ? `الخط: ${cfg.custom_font_name}` : 'لن يتم استخدام خط بديل إذا فشل الخط المرفوع.');
       }
 
+      let fontBuffer = null;
       let logoDataUrl = '';
-      if (cfg.show_logo && cfg.logo_mode === 'image') {
-        const logoUrl = safeHttpsUrl(cfg.logo_url);
-        if (logoUrl) {
-          try { logoDataUrl = await urlToDataUrl(logoUrl); }
-          catch (error) { console.warn('Pasha invoice logo raster fallback:', error); }
-        }
-      }
+      const [fontResult, logoResult] = await Promise.allSettled([
+        fontUrl ? fetchBuffer(fontUrl) : Promise.resolve(null),
+        logoUrl ? urlToDataUrl(logoUrl) : Promise.resolve('')
+      ]);
 
-      writeStatus(popup, 'جاري رسم الفاتورة', 'هذه المرة لا نرسل HTML إلى طابعة iPhone؛ الخط والتصميم يتحولان إلى صورة عالية الدقة داخل PDF.');
+      if (fontResult.status === 'rejected') {
+        throw new Error(`تعذر تنزيل ملف الخط المرفوع نفسه: ${fontResult.reason?.message || fontResult.reason}`);
+      }
+      fontBuffer = fontResult.value;
+      if (logoResult.status === 'fulfilled') logoDataUrl = logoResult.value || '';
+      else console.warn('Pasha invoice logo raster fallback:', logoResult.reason);
+
+      writeStatus(popup, 'جاري رسم الفاتورة', 'يتم الآن ضغط الرسم حسب المساحة الفعلية للـ A4 ثم إنشاء PDF من صفحة واحدة.');
+      const startedAt = performance.now();
       const result = await window.PashaInvoiceOnePagePdf.create({
         jsPDF: window.jspdf.jsPDF,
         cfg,
@@ -236,6 +240,12 @@
         when,
         itemOptionText,
         englishDigits
+      });
+      console.info('Pasha invoice V6 PDF ready', {
+        elapsedMs: Math.round(performance.now() - startedAt),
+        renderScale: result?.renderScale,
+        rasterFormat: result?.rasterFormat,
+        fittedScale: result?.fittedScale
       });
 
       if (!(result?.blob instanceof Blob) || result.pageCount !== 1) {
@@ -269,5 +279,5 @@
   }
 
   document.addEventListener('click', capture, true);
-  window.PashaInvoicePrintV2 = Object.freeze({ generate, renderMode: 'pdf-first-one-page' });
+  window.PashaInvoicePrintV2 = Object.freeze({ generate, renderMode: 'pdf-first-one-page-v6' });
 })();
