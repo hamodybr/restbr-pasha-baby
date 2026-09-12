@@ -170,3 +170,5 @@ window.RESTBR_CONFIG = Object.freeze({
   script.defer = true;
   document.head.appendChild(script);
 })();
+
+// Admin hotfix 2026-09-12: keep invoice default logic inside the original invoice settings flow; no global DOM observer.
