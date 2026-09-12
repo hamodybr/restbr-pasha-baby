@@ -1,0 +1,161 @@
+name: One-off adaptive invoice patch
+
+on:
+  push:
+    branches:
+      - feat/adaptive-invoice-frame
+    paths:
+      - scripts/run-adaptive-invoice-patch.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/adaptive-invoice-frame
+          fetch-depth: 0
+
+      - name: Apply adaptive invoice layout patch
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new, label):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 match, found {count}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+              print('patched', label)
+
+          # 1) Actual invoice print/PDF popup: use the real printable page dimensions,
+          # make the frame a full-page flex column, and let the items area consume
+          # spare vertical space instead of leaving a dead block below the footer.
+          orders = Path('js/admin-orders-customers.js')
+          text = orders.read_text(encoding='utf-8')
+
+          old = """    const pageSize = ['A4','A5','Letter'].includes(cfg.page_size) ? `${cfg.page_size} ${cfg.page_orientation}` : 'auto';
+    const pageWidth = cfg.page_size === 'A5' ? 136 : cfg.page_size === 'Letter' ? 203 : 198;
+"""
+          new = """    const pageSize = ['A4','A5','Letter'].includes(cfg.page_size) ? `${cfg.page_size} ${cfg.page_orientation}` : 'auto';
+    const physicalPage = ({
+      A4: { width: 210, height: 297 },
+      A5: { width: 148, height: 210 },
+      Letter: { width: 215.9, height: 279.4 }
+    })[cfg.page_size] || {
+      width: 210,
+      height: Math.max(120, Number(cfg.paper_min_height_mm) || 297)
+    };
+    const orientedPage = cfg.page_orientation === 'landscape'
+      ? { width: physicalPage.height, height: physicalPage.width }
+      : physicalPage;
+    const pageWidth = Math.max(60, orientedPage.width - (Number(cfg.page_margin_mm) || 0) * 2);
+    const pageHeight = Math.max(80, orientedPage.height - (Number(cfg.page_margin_mm) || 0) * 2);
+"""
+          if text.count(old) != 1:
+              raise SystemExit(f'orders page geometry: expected 1 match, found {text.count(old)}')
+          text = text.replace(old, new, 1)
+
+          old = ".label{position:relative;width:100%;max-width:${pageWidth}mm;min-height:${Math.min(Number(cfg.paper_min_height_mm)||285,273)}mm;margin:0 auto;padding:${cfg.outer_padding_mm}mm;background:#fff;color:#000;border:${cfg.frame_width_pt}pt double #000;border-radius:${cfg.frame_radius_mm}mm}"
+          new = ".label{position:relative;width:100%;max-width:${pageWidth}mm;min-height:${pageHeight}mm;margin:0 auto;padding:${cfg.outer_padding_mm}mm;background:#fff;color:#000;border:${cfg.frame_width_pt}pt double #000;border-radius:${cfg.frame_radius_mm}mm;display:flex;flex-direction:column}"
+          if text.count(old) != 1:
+              raise SystemExit(f'orders label css: expected 1 match, found {text.count(old)}')
+          text = text.replace(old, new, 1)
+
+          old = ".details-title{text-align:center;margin:0 0 1mm;font-size:${cfg.details_size_pt}pt;font-weight:${cfg.font_weight}}.items{padding:0 1mm}"
+          new = ".details-title{text-align:center;margin:0 0 1mm;font-size:${cfg.details_size_pt}pt;font-weight:${cfg.font_weight}}.items{padding:0 1mm;flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;min-height:0}"
+          if text.count(old) != 1:
+              raise SystemExit(f'orders items css: expected 1 match, found {text.count(old)}')
+          text = text.replace(old, new, 1)
+
+          old = ".label{width:100%!important;max-width:none!important;min-height:${cfg.paper_min_height_mm}mm!important;margin:0!important;overflow:visible!important}"
+          new = ".label{width:100%!important;max-width:none!important;min-height:${pageHeight}mm!important;margin:0!important;overflow:visible!important;display:flex!important;flex-direction:column!important}.items{flex:1 1 auto!important;display:flex!important;flex-direction:column!important;justify-content:space-evenly!important}"
+          if text.count(old) != 1:
+              raise SystemExit(f'orders print css: expected 1 match, found {text.count(old)}')
+          text = text.replace(old, new, 1)
+
+          orders.write_text(text, encoding='utf-8')
+
+          # 2) Dashboard live preview: mirror the same adaptive full-page behavior.
+          settings = Path('js/admin-invoice-settings.js')
+          text = settings.read_text(encoding='utf-8')
+
+          old = ".pb-invoice-paper{width:100%;min-height:590px;padding:18px;background:#fff;color:#000;border-style:double;transform-origin:top center;box-shadow:0 8px 28px rgba(0,0,0,.25);font-family:Tahoma,Arial,sans-serif}"
+          new = ".pb-invoice-paper{width:100%;min-height:590px;padding:18px;background:#fff;color:#000;border-style:double;transform-origin:top center;box-shadow:0 8px 28px rgba(0,0,0,.25);font-family:Tahoma,Arial,sans-serif;display:flex;flex-direction:column}"
+          if text.count(old) != 1:
+              raise SystemExit(f'preview paper css: expected 1 match, found {text.count(old)}')
+          text = text.replace(old, new, 1)
+
+          old = ".pb-prev-details{text-align:center;font-weight:900}.pb-prev-item{display:flex;gap:5px;align-items:baseline}"
+          new = ".pb-prev-details{text-align:center;font-weight:900}.pb-prev-items{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;min-height:0}.pb-prev-item{display:flex;gap:5px;align-items:baseline}"
+          if text.count(old) != 1:
+              raise SystemExit(f'preview items css: expected 1 match, found {text.count(old)}')
+          text = text.replace(old, new, 1)
+
+          old = "      ${[['1× بدلة أطفال','اللون: بيج','35,000'],['2× رضاعة سوانكس','الحجم: صغير','18,000'],['1× حقيبة حليب','','5,000'],['1× أجور التوصيل','','5,000']].map(([name,opt,price])=>`<div class=\"pb-prev-item\" style=\"min-height:${s.row_min_height_mm*2}px;padding:${s.row_padding_mm*1.5}px 0;font-size:${s.item_size_pt}px\"><span>${s.show_quantity?name:name.replace(/^\\d+×\\s*/,'')}${s.show_options&&opt?` <small style=\"font-size:${s.option_size_pt}px\">— ${opt}</small>`:''}</span><i class=\"pb-prev-leader\" style=\"border-bottom-width:${s.leader_width_pt}px;border-bottom-style:${s.leader_style}\"></i><strong style=\"font-size:${s.price_size_pt}px\">${price}</strong></div>`).join('')}"
+          new = "      <div class=\"pb-prev-items\">${[['1× بدلة أطفال','اللون: بيج','35,000'],['2× رضاعة سوانكس','الحجم: صغير','18,000'],['1× حقيبة حليب','','5,000'],['1× أجور التوصيل','','5,000']].map(([name,opt,price])=>`<div class=\"pb-prev-item\" style=\"min-height:${s.row_min_height_mm*2}px;padding:${s.row_padding_mm*1.5}px 0;font-size:${s.item_size_pt}px\"><span>${s.show_quantity?name:name.replace(/^\\d+×\\s*/,'')}${s.show_options&&opt?` <small style=\"font-size:${s.option_size_pt}px\">— ${opt}</small>`:''}</span><i class=\"pb-prev-leader\" style=\"border-bottom-width:${s.leader_width_pt}px;border-bottom-style:${s.leader_style}\"></i><strong style=\"font-size:${s.price_size_pt}px\">${price}</strong></div>`).join('')}</div>"
+          if text.count(old) != 1:
+              raise SystemExit(f'preview items markup: expected 1 match, found {text.count(old)}')
+          text = text.replace(old, new, 1)
+          settings.write_text(text, encoding='utf-8')
+
+          # 3) Cache-bust both invoice files and the loader chain for iOS Safari.
+          replace_once(
+              'js/pasha-arabic-only.js',
+              "loadScript('pashaInvoiceSettingsScript', 'js/admin-invoice-settings.js?v=1.0', true);",
+              "loadScript('pashaInvoiceSettingsScript', 'js/admin-invoice-settings.js?v=1.1', true);",
+              'invoice settings cache version'
+          )
+          replace_once(
+              'js/pasha-arabic-only.js',
+              "loadScript('pashaOrdersCustomersScript', 'js/admin-orders-customers.js?v=1.7', true);",
+              "loadScript('pashaOrdersCustomersScript', 'js/admin-orders-customers.js?v=1.8', true);",
+              'orders cache version'
+          )
+          replace_once(
+              'js/supabase-config.js',
+              "script.src = 'js/pasha-arabic-only.js?v=1.3';",
+              "script.src = 'js/pasha-arabic-only.js?v=1.4';",
+              'arabic loader cache version'
+          )
+          replace_once(
+              'admin.html',
+              '<script src="js/supabase-config.js?v=2.2"></script>',
+              '<script src="js/supabase-config.js?v=2.3"></script>',
+              'admin config cache version'
+          )
+          PY
+
+      - name: Static assertions
+        shell: bash
+        run: |
+          grep -Fq 'const pageHeight = Math.max(80' js/admin-orders-customers.js
+          grep -Fq 'justify-content:space-evenly' js/admin-orders-customers.js
+          grep -Fq '.pb-prev-items{flex:1 1 auto' js/admin-invoice-settings.js
+          grep -Fq 'admin-invoice-settings.js?v=1.1' js/pasha-arabic-only.js
+          grep -Fq 'admin-orders-customers.js?v=1.8' js/pasha-arabic-only.js
+          grep -Fq 'pasha-arabic-only.js?v=1.4' js/supabase-config.js
+          grep -Fq 'supabase-config.js?v=2.3' admin.html
+          node --check js/admin-orders-customers.js
+          node --check js/admin-invoice-settings.js
+          node --check js/pasha-arabic-only.js
+          node --check js/supabase-config.js
+
+      - name: Commit patch to feature branch
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git config user.name 'HaMoDyBr'
+          git config user.email '78080184+hamodybr@users.noreply.github.com'
+          git add admin.html js/admin-orders-customers.js js/admin-invoice-settings.js js/pasha-arabic-only.js js/supabase-config.js
+          git commit -m 'Make invoice frame adaptively fill the printable page'
+          git push origin HEAD:feat/adaptive-invoice-frame
