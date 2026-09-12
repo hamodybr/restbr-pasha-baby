@@ -103,9 +103,12 @@
   function boot() {
     installStyles();
     tagQuickActions();
-    // Preload the iPhone-safe renderer under the same id used by the lazy
-    // loader. This v4 path has no html2canvas, CDN, SVG or foreignObject step.
+    // Preload the native Canvas renderer under the same id used by the lazy
+    // loader, then install the iPhone guard that replaces the renderer's two
+    // layout RAF checkpoints while PDF generation is running. Safari can stop
+    // RAF in the admin/opener window as soon as the invoice popup takes focus.
     loadAddon('pashaInvoicePdfScript', 'js/admin-invoice-pdf-v4.js?v=4.0');
+    loadAddon('pashaInvoicePdfSchedulerPatch', 'js/admin-invoice-iphone-scheduler-fix.js?v=1.0');
     loadAddon('pbOrdersEnhancementsScript', 'js/admin-orders-enhancements.js?v=1.0');
     loadAddon('pbColorImageUploadScript', 'js/admin-color-image-upload.js?v=1.0');
 

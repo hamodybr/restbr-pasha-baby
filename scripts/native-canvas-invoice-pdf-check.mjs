@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const renderer = fs.readFileSync('js/admin-invoice-pdf-v4.js', 'utf8');
 const loader = fs.readFileSync('js/admin-orders-nav-hotfix.js', 'utf8');
+const schedulerFix = fs.readFileSync('js/admin-invoice-iphone-scheduler-fix.js', 'utf8');
 const failures = [];
 
 const need = (text, marker, label) => {
@@ -20,6 +21,11 @@ need(renderer, "doc.addImage(png, 'PNG'", 'PDF image packaging');
 need(renderer, '18000', 'hard PDF completion timeout');
 need(renderer, 'document.fonts.check', 'font application verification');
 need(loader, "js/admin-invoice-pdf-v4.js?v=4.0", 'v4 preload');
+need(loader, "js/admin-invoice-iphone-scheduler-fix.js?v=1.0", 'iPhone scheduler guard preload');
+need(schedulerFix, 'window.requestAnimationFrame = microtaskRaf', 'RAF replacement while PDF is generated');
+need(schedulerFix, 'queueMicrotask', 'foreground-independent scheduler checkpoint');
+need(schedulerFix, 'window.requestAnimationFrame = nativeRaf', 'RAF restoration after PDF creation');
+need(schedulerFix, '__iphoneSchedulerFixed', 'single-install guard');
 
 forbid(renderer, /html2canvas/i, 'html2canvas dependency');
 forbid(renderer, /foreignObject/i, 'SVG foreignObject rendering');
@@ -32,4 +38,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('✓ Native canvas invoice PDF audit passed');
+console.log('✓ Native canvas invoice PDF audit passed, including iPhone background-window scheduler guard');
