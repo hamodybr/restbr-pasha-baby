@@ -170,3 +170,18 @@ window.RESTBR_CONFIG = Object.freeze({
   script.defer = true;
   document.head.appendChild(script);
 })();
+
+// Invoice Studio V1 trial. Admin-only and intentionally layered over the
+// already validated invoice renderer/PDF engine so no commerce or DB flow changes.
+(() => {
+  const path = String(window.location.pathname || '').toLowerCase();
+  if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
+  if (document.getElementById('pbInvoiceStudioV1Script')) return;
+
+  window.__PASHA_INVOICE_STUDIO_ENABLED__ = true;
+  const script = document.createElement('script');
+  script.id = 'pbInvoiceStudioV1Script';
+  script.src = 'js/admin-invoice-studio-v1.js?v=1.0';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
