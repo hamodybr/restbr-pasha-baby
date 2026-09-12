@@ -1,7 +1,7 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V4__) return;
-  window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V4__ = true;
+  if (window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V5__) return;
+  window.__PASHA_ADMIN_ORDERS_NAV_HOTFIX_V5__ = true;
 
   const STYLE_ID = 'pbOrdersNavHotfixStyles';
 
@@ -108,6 +108,7 @@
     loadAddon('pashaInvoiceLiveEditorScript', 'js/admin-invoice-live-editor.js?v=1.0');
     loadAddon('pashaInvoiceLiveSettingsUiV1', 'js/admin-invoice-live-settings-ui.js?v=1.0');
     loadAddon('pashaInvoicePrintPolishV1', 'js/admin-invoice-print-polish.js?v=1.0');
+    loadAddon('pashaInvoiceDirectEditorV1', 'js/admin-invoice-direct-editor-v1.js?v=1.0');
     loadAddon('pbOrdersEnhancementsScript', 'js/admin-orders-enhancements.js?v=1.0');
     loadAddon('pbColorImageUploadScript', 'js/admin-color-image-upload.js?v=1.0');
 
