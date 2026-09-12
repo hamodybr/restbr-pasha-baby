@@ -1,0 +1,174 @@
+from pathlib import Path
+
+p = Path('js/admin-orders-customers.js')
+s = p.read_text(encoding='utf-8')
+
+old = '  function printOrder(orderId) {'
+new = '  async function printOrder(orderId) {'
+assert old in s, 'printOrder signature anchor missing'
+s = s.replace(old, new, 1)
+
+old = '''    const fontUrl = safeAssetUrl(cfg.custom_font_url);
+    const logoUrl = safeAssetUrl(cfg.logo_url);
+    const customFontFace = cfg.font_family === 'custom' && fontUrl
+      ? `@font-face{font-family:"Pasha Invoice Custom";src:url(${JSON.stringify(fontUrl)});font-display:block}`
+      : '';
+    const invoiceFont = fontStacks[cfg.font_family] || fontStacks.modern_pro;'''
+new = '''    const fontUrl = safeAssetUrl(cfg.custom_font_url);
+    const logoUrl = safeAssetUrl(cfg.logo_url);
+    const invoiceFont = fontStacks[cfg.font_family] || fontStacks.modern_pro;'''
+assert old in s, 'custom font face anchor missing'
+s = s.replace(old, new, 1)
+
+old = '''    const popup = window.open('', '_blank', 'width=900,height=1000');
+    if (!popup) {
+      alert('اسمح بالنوافذ المنبثقة حتى تفتح معاينة الطباعة.');
+      return;
+    }
+
+    popup.document.open();
+    popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head>'''
+new = '''    const popup = window.open('', '_blank', 'width=900,height=1000');
+    if (!popup) {
+      alert('اسمح بالنوافذ المنبثقة حتى تفتح معاينة الطباعة.');
+      return;
+    }
+
+    popup.document.open();
+    popup.document.write('<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>جاري تجهيز الفاتورة…</title></head><body style="font-family:Tahoma,Arial,sans-serif;padding:24px;text-align:center">جاري تجهيز الفاتورة والخط للطباعة…</body></html>');
+    popup.document.close();
+
+    const blobToDataUrl = blob => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(reader.error || new Error('font data URL failed'));
+      reader.readAsDataURL(blob);
+    });
+    let printFontUrl = fontUrl;
+    if (cfg.font_family === 'custom' && fontUrl) {
+      try {
+        const response = await fetch(fontUrl, { cache:'no-store', mode:'cors' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        printFontUrl = await blobToDataUrl(await response.blob()) || fontUrl;
+      } catch (error) {
+        console.warn('Pasha invoice custom font embedding fallback:', error);
+        printFontUrl = fontUrl;
+      }
+    }
+    const customFontFace = cfg.font_family === 'custom' && printFontUrl
+      ? `@font-face{font-family:"Pasha Invoice Custom";src:url(${JSON.stringify(printFontUrl)});font-style:normal;font-weight:100 900;font-display:block}`
+      : '';
+
+    popup.document.open();
+    popup.document.write(`<!doctype html><html lang="ar" dir="rtl"><head>'''
+assert old in s, 'popup open anchor missing'
+s = s.replace(old, new, 1)
+
+old = '''      body{padding:8mm 8mm 25mm}
+      .label{position:relative;width:100%;max-width:${pageWidth}mm;min-height:${pageHeight}mm;margin:0 auto;padding:${cfg.outer_padding_mm}mm;background:#fff;color:#000;border:${cfg.frame_width_pt}pt double #000;border-radius:${cfg.frame_radius_mm}mm;display:flex;flex-direction:column}'''
+new = '''      body{padding:8mm 8mm 25mm}
+      .print-sheet{position:relative;width:100%;max-width:${pageWidth}mm;height:${Math.max(79,pageHeight-.8)}mm;margin:0 auto;overflow:hidden;background:#fff}
+      .label{position:absolute;top:0;left:50%;width:100%;max-width:${pageWidth}mm;height:100%;min-height:0;margin:0;padding:${cfg.outer_padding_mm}mm;background:#fff;color:#000;border:${cfg.frame_width_pt}pt double #000;border-radius:${cfg.frame_radius_mm}mm;display:flex;flex-direction:column;transform:translateX(-50%);transform-origin:top center}'''
+assert old in s, 'label CSS anchor missing'
+s = s.replace(old, new, 1)
+
+old = '''      @media print{html,body{width:auto!important;min-width:0!important;background:#fff!important;color:#000!important}body{padding:0!important}.label{width:100%!important;max-width:none!important;min-height:${pageHeight}mm!important;margin:0!important;overflow:visible!important;display:flex!important;flex-direction:column!important}.items{flex:1 1 auto!important;display:flex!important;flex-direction:column!important;justify-content:space-evenly!important}.screen-actions{display:none!important}}
+    </style></head><body><div class="label">'''
+new = '''      @media print{html,body{width:auto!important;min-width:0!important;height:auto!important;background:#fff!important;color:#000!important;overflow:hidden!important}body{padding:0!important}.print-sheet{width:100%!important;max-width:none!important;height:${Math.max(79,pageHeight-.8)}mm!important;margin:0!important;overflow:hidden!important}.label{max-width:none!important;min-height:0!important;margin:0!important;overflow:visible!important;display:flex!important;flex-direction:column!important}.items{flex:1 1 auto!important;display:flex!important;flex-direction:column!important;justify-content:space-evenly!important}.screen-actions{display:none!important}}
+    </style></head><body><div class="print-sheet"><div class="label">'''
+assert old in s, 'print CSS/body anchor missing'
+s = s.replace(old, new, 1)
+
+old = '''      ${cfg.show_footer ? `<div class="footer">${invoiceEsc(cfg.footer_text)}</div>` : ''}
+    </div><div class="screen-actions"><button onclick="window.print()">طباعة بالحجم الكامل / حفظ PDF</button></div></body></html>`);'''
+new = '''      ${cfg.show_footer ? `<div class="footer">${invoiceEsc(cfg.footer_text)}</div>` : ''}
+    </div></div><div class="screen-actions"><button id="pbInvoicePrintButton" onclick="window.pbPrintInvoice()">طباعة صفحة واحدة / حفظ PDF</button></div>
+    <script>
+      (() => {
+        const sheet = document.querySelector('.print-sheet');
+        const label = document.querySelector('.label');
+        const printButton = document.getElementById('pbInvoicePrintButton');
+        const waitImages = () => Promise.all(Array.from(document.images).map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
+          img.addEventListener('load', resolve, { once:true });
+          img.addEventListener('error', resolve, { once:true });
+        })));
+        const fitOnePage = () => {
+          if (!sheet || !label) return 1;
+          label.style.width = '100%';
+          label.style.height = '100%';
+          label.style.transform = 'translateX(-50%)';
+          void label.offsetHeight;
+          const targetHeight = Math.max(1, sheet.clientHeight);
+          const targetWidth = Math.max(1, sheet.clientWidth);
+          const contentHeight = Math.max(targetHeight, label.scrollHeight + 1);
+          const contentWidth = Math.max(targetWidth, label.scrollWidth + 1);
+          const scale = Math.max(.35, Math.min(1, targetHeight / contentHeight, targetWidth / contentWidth));
+          if (scale < .999) {
+            const expanded = (100 / scale).toFixed(4) + '%';
+            label.style.width = expanded;
+            label.style.height = expanded;
+            label.style.transform = 'translateX(-50%) scale(' + scale.toFixed(4) + ')';
+          }
+          label.dataset.printScale = scale.toFixed(4);
+          return scale;
+        };
+        window.pbPrepareInvoicePrint = async () => {
+          try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (_) {}
+          await waitImages();
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          fitOnePage();
+        };
+        window.pbPrintInvoice = async () => {
+          if (printButton) {
+            printButton.disabled = true;
+            printButton.textContent = 'جاري تجهيز صفحة واحدة…';
+          }
+          await window.pbPrepareInvoicePrint();
+          setTimeout(() => {
+            if (printButton) {
+              printButton.disabled = false;
+              printButton.textContent = 'طباعة صفحة واحدة / حفظ PDF';
+            }
+            window.print();
+          }, 80);
+        };
+        window.addEventListener('load', () => { void window.pbPrepareInvoicePrint(); }, { once:true });
+        window.addEventListener('beforeprint', fitOnePage);
+      })();
+    <\/script></body></html>`);'''
+assert old in s, 'invoice closing/button anchor missing'
+s = s.replace(old, new, 1)
+
+p.write_text(s, encoding='utf-8')
+
+replacements = {
+    'js/pasha-arabic-only.js': [
+        ('js/admin-orders-customers.js?v=1.8', 'js/admin-orders-customers.js?v=1.9'),
+    ],
+    'sw.js': [
+        ('restbr-pasha-baby-v38', 'restbr-pasha-baby-v39'),
+        ('js/pasha-arabic-only.js?v=1.4', 'js/pasha-arabic-only.js?v=1.5'),
+    ],
+    'scripts/orders-labels-check.mjs': [
+        ('js/admin-orders-customers.js?v=1.8', 'js/admin-orders-customers.js?v=1.9'),
+    ],
+    'scripts/live-smoke-test.mjs': [
+        ('js/admin-orders-customers.js?v=1.8', 'js/admin-orders-customers.js?v=1.9'),
+        ('restbr-pasha-baby-v38', 'restbr-pasha-baby-v39'),
+        ('js/pasha-arabic-only.js?v=1.4', 'js/pasha-arabic-only.js?v=1.5'),
+    ],
+}
+for name, reps in replacements.items():
+    path = Path(name)
+    text = path.read_text(encoding='utf-8')
+    for a, b in reps:
+        assert a in text, f'{name}: missing {a}'
+        text = text.replace(a, b)
+    path.write_text(text, encoding='utf-8')
+
+audit = Path('scripts/orders-labels-check.mjs')
+text = audit.read_text(encoding='utf-8')
+anchor = "requireText('js/admin-orders-customers.js', 'طباعة بالحجم الكامل / حفظ PDF', 'full-size laser print action');"
+assert anchor in text, 'orders audit print action anchor missing'
+text = text.replace(anchor, "requireText('js/admin-orders-customers.js', 'طباعة صفحة واحدة / حفظ PDF', 'single-page laser print action');\nrequireText('js/admin-orders-customers.js', 'window.pbPrepareInvoicePrint', 'single-page pre-print fitting');\nrequireText('js/admin-orders-customers.js', 'blobToDataUrl', 'embedded uploaded font for print');\nrequireText('js/admin-orders-customers.js', 'document.fonts.ready', 'wait for uploaded font before print');")
+audit.write_text(text, encoding='utf-8')
