@@ -57,12 +57,13 @@ let runtime = read(runtimeFile);
 runtime = replaceExact(runtime, "js/admin-invoice-print-ready-v9.js?v=9.0", "js/admin-invoice-print-ready-v9.js?v=9.1", 'V9 router cache bust');
 write(runtimeFile, runtime);
 
+// Cache-bust the settings loader whether it was referenced with or without an old query.
 const candidates = ['admin.html', ...fs.readdirSync('js').filter(name => name.endsWith('.js')).map(name => path.join('js', name))];
 let settingsLoaderChanges = 0;
 for (const file of candidates) {
   let text = read(file);
-  if (!text.includes('admin-invoice-settings.js?v=')) continue;
-  const next = text.replace(/admin-invoice-settings\.js\?v=[0-9.]+/g, 'admin-invoice-settings.js?v=1.1');
+  if (!text.includes('admin-invoice-settings.js')) continue;
+  const next = text.replace(/admin-invoice-settings\.js(?:\?v=[0-9.]+)?/g, 'admin-invoice-settings.js?v=1.1');
   if (next !== text) { write(file, next); settingsLoaderChanges += 1; }
 }
 if (settingsLoaderChanges < 1) throw new Error('Could not locate admin-invoice-settings.js loader for cache bust');
