@@ -30,13 +30,13 @@ for (const file of [engine, router, nativeShare, packer, brand]) {
   }
 }
 
-need('js/runtime-config.js', 'js/admin-invoice-print-ready-v9.js?v=9.0', 'V9 print-ready invoice loader');
+need('js/runtime-config.js', 'js/admin-invoice-print-ready-v9.js?v=9.1', 'V9 print-ready invoice loader');
 need('js/runtime-config.js', 'js/admin-invoice-pdf-native-share-v11.js?v=11.1', 'V11.1 native PDF share loader');
 need('js/runtime-config.js', 'js/pasha-admin-brand-v1.js?v=1.0', 'Pasha admin brand loader');
 forbid('js/runtime-config.js', 'js/admin-invoice-pdf-direct-print-v10.js?v=10.0', 'V10 iframe print loader');
 forbid('js/runtime-config.js', 'js/admin-invoice-print-v2.js?v=2.2', 'old V8 router loader alongside V9');
 
-need(router, "js/admin-invoice-pdf-onepage-v8.js?v=8.0", 'proven V8 invoice engine reuse');
+need(router, "js/admin-invoice-pdf-onepage-v8.js?v=8.1", 'proven V8 invoice engine reuse');
 need(router, "preview-matched-one-page-v8", 'V8 render-mode assertion');
 need(router, "document.addEventListener('click', capture, true)", 'capture-phase invoice generation override');
 need(router, 'event.stopImmediatePropagation()', 'legacy invoice route suppression');
@@ -90,6 +90,12 @@ need(engine, 'pageCount: 1', 'exact one-page metadata');
 need(engine, 'customFontBaked:', 'font-baked metadata');
 need(engine, "ctx.fillText('◆'", 'preview footer diamond');
 need(engine, "ctx.fillText('المجموع الكلي'", 'preview total layout');
+need(engine, 'cfg.show_subtotal', 'subtotal setting reaches final PDF');
+need(engine, "product: 'مجموع الأصناف'", 'subtotal row exists in final PDF');
+need(engine, 'Math.max(5, num(cfg.address_size_pt, 9.5) * .45)', 'safe customer/address divider clearance');
+need('js/admin-invoice-settings.js', "['الخط العام', ['line_height']]", 'only effective global line-height control is exposed');
+need('js/pasha-arabic-only.js', 'js/admin-invoice-settings.js?v=1.2', 'invoice settings cache-busted loader');
+forbid('js/admin-invoice-settings.js', '<option value="auto">تلقائي</option>', 'ambiguous auto page-size control');
 forbid(engine, 'doc.addPage(', 'multi-page PDF creation');
 forbid(engine, 'window.print(', 'renderer must stay independent from browser print');
 forbid(engine, '96 / 25.4', 'old physical mm-to-px mismatch');

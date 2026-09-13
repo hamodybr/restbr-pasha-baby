@@ -3,7 +3,7 @@
   window.__PASHA_INVOICE_PRINT_V9__ = true;
 
   const FAST_PDF_SRC = 'js/admin-invoice-fast-pdf-ios-v1.js?v=1.1';
-  const PDF_ENGINE_SRC = 'js/admin-invoice-pdf-onepage-v8.js?v=8.0';
+  const PDF_ENGINE_SRC = 'js/admin-invoice-pdf-onepage-v8.js?v=8.1';
   const SELECT = 'id,order_number,customer_id,customer_name,customer_phone,order_type,address,location_url,notes,status,subtotal,delivery_fee,total,created_at,updated_at,order_items(id,product_id,option_id,product_name,option_name,selected_color,quantity,unit_price,line_total)';
 
   const DEFAULTS = {

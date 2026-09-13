@@ -212,6 +212,7 @@
       const product = `${cfg.show_quantity ? `${Number(item.quantity || 0)}× ` : ''}${digits(options, item.product_name)}`;
       rows.push(measureRow(ctx, cfg, font, product, cfg.show_options ? optionText(options, item) : '', productMax));
     }
+    if (cfg.show_subtotal) rows.push(measureRow(ctx, cfg, font, 'مجموع الأصناف', '', productMax));
     if (Number(fee || 0) > 0) rows.push(measureRow(ctx, cfg, font, `${cfg.show_quantity ? '1× ' : ''}أجور التوصيل`, '', productMax));
     h += rows.reduce((sum, row) => sum + row.height, 0);
     if (cfg.show_notes && clean(notes)) h += num(cfg.notes_size_pt, 9.5) * 1.6 + 8;
@@ -318,7 +319,8 @@
     }
 
     ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
-    y += 7;
+    // Move customer content up slightly; lower divider stays stable below.
+    y += 4;
 
     setFont(ctx, num(cfg.customer_size_pt, 10.5), font);
     const customerY = y + num(cfg.customer_size_pt, 10.5);
@@ -338,7 +340,10 @@
       const text = `العنوان: ${digits(options, order.address)}`;
       const lines = wrapText(ctx, text, inner);
       for (const line of lines) { y += num(cfg.address_size_pt, 9.5) * 1.25; ctx.fillText(line, right, y); }
-      y += 2;
+      // Bold Arabic glyphs need more clearance from the divider.
+      y += Math.max(5, num(cfg.address_size_pt, 9.5) * .45);
+    } else {
+      y += 3;
     }
     ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
     y += 7;
@@ -355,6 +360,9 @@
       option: cfg.show_options ? digits(options, optionText(options, item)) : '',
       price: digits(options, money(options, item.line_total))
     }));
+    if (cfg.show_subtotal) renderRows.push({
+      product: 'مجموع الأصناف', option: '', price: digits(options, money(options, order.subtotal))
+    });
     if (Number(fee || 0) > 0) renderRows.push({
       product: `${cfg.show_quantity ? '1× ' : ''}أجور التوصيل`, option: '', price: digits(options, money(options, fee))
     });

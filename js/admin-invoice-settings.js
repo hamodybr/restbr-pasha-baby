@@ -70,7 +70,7 @@
 
   const GROUPS = [
     ['الصفحة والإطار', ['page_margin_mm','paper_min_height_mm','outer_padding_mm','frame_width_pt','frame_radius_mm']],
-    ['الخط العام', ['base_size_pt','line_height']],
+    ['الخط العام', ['line_height']],
     ['الرأس والشعار', ['logo_size_mm','title_size_pt','subtitle_size_pt','header_spacing_mm']],
     ['الطلب والزبون', ['meta_size_pt','customer_size_pt','address_size_pt','details_size_pt']],
     ['الأصناف والفواصل', ['item_size_pt','option_size_pt','price_size_pt','row_min_height_mm','row_padding_mm','leader_width_pt']],
@@ -112,7 +112,7 @@
     });
     Object.keys(TEXT_FIELDS).forEach(key => { result[key] = String(source[key] ?? DEFAULTS[key]).slice(0, 120); });
     Object.keys(TOGGLES).forEach(key => { result[key] = source[key] === undefined ? DEFAULTS[key] : source[key] === true; });
-    result.page_size = ['A4','A5','Letter','auto'].includes(source.page_size) ? source.page_size : DEFAULTS.page_size;
+    result.page_size = ['A4','A5','Letter'].includes(source.page_size) ? source.page_size : DEFAULTS.page_size;
     result.page_orientation = ['portrait','landscape'].includes(source.page_orientation) ? source.page_orientation : DEFAULTS.page_orientation;
     result.font_family = Object.hasOwn(FONT_STACKS, source.font_family) ? source.font_family : DEFAULTS.font_family;
     result.font_weight = [600,700,800,900].includes(Number(source.font_weight)) ? Number(source.font_weight) : DEFAULTS.font_weight;
@@ -138,7 +138,7 @@
           <div class="pb-invoice-controls">
             <details class="pb-invoice-group" open><summary>الورقة والخط</summary><div class="pb-invoice-group-body">
               <div class="pb-invoice-select-grid">
-                <label><span>حجم الورقة</span><select data-invoice-field="page_size"><option>A4</option><option>A5</option><option>Letter</option><option value="auto">تلقائي</option></select></label>
+                <label><span>حجم الورقة</span><select data-invoice-field="page_size"><option>A4</option><option>A5</option><option>Letter</option></select></label>
                 <label><span>اتجاه الورقة</span><select data-invoice-field="page_orientation"><option value="portrait">طولي</option><option value="landscape">عرضي</option></select></label>
                 <label><span>نوع الخط</span><select data-invoice-field="font_family"><option value="modern_pro">Modern Pro Bold عربي</option><option value="din">DIN Next Arabic</option><option value="segoe">Segoe UI Arabic</option><option value="tahoma">Tahoma</option><option value="arial">Arial</option><option value="kufi">Noto Kufi Arabic</option><option value="custom">الخط المرفوع</option></select></label>
                 <label><span>سماكة الخط</span><select data-invoice-field="font_weight"><option value="600">Semi Bold 600</option><option value="700">Bold 700</option><option value="800">Extra Bold 800</option><option value="900">Black 900</option></select></label>
@@ -223,7 +223,7 @@
       ${(s.show_order_number||s.show_date_time)?`<div class="pb-prev-meta" style="font-size:${s.meta_size_pt}px">${s.show_order_number?'<b>PB-260910-001</b>':'<span></span>'}${s.show_date_time?'<span>10/09/2026، 03:30 م</span>':''}</div>`:''}
       <div class="pb-prev-customer" style="font-size:${s.customer_size_pt}px"><div class="pb-prev-customer-line"><b>محمد مصطفى محمود</b><span>${s.show_customer_phone?'0750 000 0000':''}${s.show_order_type?' · توصيل':''}</span></div>${s.show_customer_address?`<div style="font-size:${s.address_size_pt}px">العنوان: دهوك، شارع بارزان</div>`:''}</div>
       ${s.show_details_title?`<div class="pb-prev-details" style="font-size:${s.details_size_pt}px">${esc(s.details_title)}</div>`:''}
-      ${[['1× بدلة أطفال','اللون: بيج','35,000'],['2× رضاعة سوانكس','الحجم: صغير','18,000'],['1× حقيبة حليب','','5,000'],['1× أجور التوصيل','','5,000']].map(([name,opt,price])=>`<div class="pb-prev-item" style="min-height:${s.row_min_height_mm*2}px;padding:${s.row_padding_mm*1.5}px 0;font-size:${s.item_size_pt}px"><span>${s.show_quantity?name:name.replace(/^\d+×\s*/,'')}${s.show_options&&opt?` <small style="font-size:${s.option_size_pt}px">— ${opt}</small>`:''}</span><i class="pb-prev-leader" style="border-bottom-width:${s.leader_width_pt}px;border-bottom-style:${s.leader_style}"></i><strong style="font-size:${s.price_size_pt}px">${price}</strong></div>`).join('')}
+      ${[['1× بدلة أطفال','اللون: بيج','35,000'],['2× رضاعة سوانكس','الحجم: صغير','18,000'],['1× حقيبة حليب','','5,000'],...(s.show_subtotal?[['مجموع الأصناف','','58,000']]:[]),['1× أجور التوصيل','','5,000']].map(([name,opt,price])=>`<div class="pb-prev-item" style="min-height:${s.row_min_height_mm*2}px;padding:${s.row_padding_mm*1.5}px 0;font-size:${s.item_size_pt}px"><span>${s.show_quantity?name:name.replace(/^\d+×\s*/,'')}${s.show_options&&opt?` <small style="font-size:${s.option_size_pt}px">— ${opt}</small>`:''}</span><i class="pb-prev-leader" style="border-bottom-width:${s.leader_width_pt}px;border-bottom-style:${s.leader_style}"></i><strong style="font-size:${s.price_size_pt}px">${price}</strong></div>`).join('')}
       ${s.show_notes?`<div style="font-size:${s.notes_size_pt}px;border-top:1px solid;padding-top:4px">ملاحظة: الاتصال قبل التوصيل</div>`:''}
       <div class="pb-prev-total" style="font-size:${s.total_size_pt}px;border-width:${s.total_border_pt}px"><span>المجموع الكلي</span><b>63,000 د.ع</b></div>
       ${s.show_footer?`<div class="pb-prev-footer" style="font-size:${s.footer_size_pt}px;margin-top:${s.footer_spacing_mm*1.3}px">${esc(s.footer_text)}</div>`:''}`;
