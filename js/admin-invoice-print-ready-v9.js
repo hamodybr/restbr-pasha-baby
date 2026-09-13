@@ -220,8 +220,19 @@
     const sizeRaw = String(cfg.page_size || 'A4').toUpperCase();
     const size = sizeRaw === 'A5' ? 'A5' : sizeRaw === 'LETTER' ? 'Letter' : 'A4';
     const orientation = String(cfg.page_orientation || 'portrait').toLowerCase() === 'landscape' ? 'landscape' : 'portrait';
-    const margin = Math.max(0, Math.min(20, Number(cfg.page_margin_mm || 6)));
+    const rawMargin = Number(cfg.page_margin_mm);
+    const margin = Math.max(0, Math.min(20, Number.isFinite(rawMargin) ? rawMargin : 6));
     return `@page{size:${size} ${orientation};margin:${margin}mm}`;
+  }
+
+  function previewPageMarginPercent(cfg) {
+    const sizeRaw = String(cfg.page_size || 'A4').toUpperCase();
+    let pageWidth = sizeRaw === 'A5' ? 148 : sizeRaw === 'LETTER' ? 215.9 : 210;
+    let pageHeight = sizeRaw === 'A5' ? 210 : sizeRaw === 'LETTER' ? 279.4 : 297;
+    if (String(cfg.page_orientation || 'portrait').toLowerCase() === 'landscape') [pageWidth, pageHeight] = [pageHeight, pageWidth];
+    const rawMargin = Number(cfg.page_margin_mm);
+    const margin = Math.max(0, Math.min(20, Number.isFinite(rawMargin) ? rawMargin : 6));
+    return Math.max(0, Math.min(20, margin / pageWidth * 100));
   }
 
   async function showPrintReady(pdfBlob, cfg, order) {
@@ -241,7 +252,8 @@
       .pb-ipr-toolbar button:disabled{opacity:.5;cursor:wait}
       .pb-ipr-info{width:100%;text-align:center;color:#aaa;font-size:11px;line-height:1.5}
       .pb-ipr-stage{min-height:calc(100dvh - 92px);display:flex;justify-content:center;align-items:flex-start;padding:14px 8px calc(28px + env(safe-area-inset-bottom));box-sizing:border-box}
-      .pb-ipr-paper{display:block;width:min(100%,820px);height:auto;background:#fff;box-shadow:0 12px 45px #000;border:0}
+      .pb-ipr-page{display:block;width:min(100%,820px);box-sizing:border-box;padding:var(--pb-page-margin);background:#fff;box-shadow:0 12px 45px #000}
+      .pb-ipr-paper{display:block;width:100%;height:auto;background:#fff;border:0}
       @media(max-width:520px){.pb-ipr-toolbar button{flex:1;min-width:0;padding-inline:10px}.pb-ipr-toolbar [data-pb-print-now]{flex:1.35}.pb-ipr-stage{padding-inline:4px}}
       @media print{
         html,body{margin:0!important;padding:0!important;background:#fff!important;width:auto!important;height:auto!important;overflow:visible!important}
@@ -249,6 +261,7 @@
         #pbInvoicePrintReady{position:static!important;inset:auto!important;display:block!important;background:#fff!important;color:#000!important;overflow:visible!important;width:100%!important;height:auto!important}
         #pbInvoicePrintReady .pb-ipr-toolbar{display:none!important}
         #pbInvoicePrintReady .pb-ipr-stage{display:block!important;min-height:0!important;padding:0!important;margin:0!important}
+        #pbInvoicePrintReady .pb-ipr-page{display:block!important;width:100%!important;max-width:none!important;padding:0!important;margin:0!important;box-shadow:none!important}
         #pbInvoicePrintReady .pb-ipr-paper{display:block!important;width:100%!important;max-width:none!important;height:auto!important;margin:0!important;padding:0!important;box-shadow:none!important;break-inside:avoid!important;page-break-inside:avoid!important}
       }
     `;
@@ -263,6 +276,7 @@
     root.id = 'pbInvoicePrintReady';
     root.setAttribute('aria-label', 'فاتورة جاهزة للطباعة');
     const orderNumber = englishDigits(order?.order_number || '');
+    const previewMarginPct = previewPageMarginPercent(cfg);
     root.innerHTML = `
       <div class="pb-ipr-toolbar" data-print-ui>
         <button type="button" data-pb-print-back>رجوع</button>
@@ -270,7 +284,7 @@
         <button type="button" data-pb-print-now disabled>🖨 طباعة الآن</button>
         <div class="pb-ipr-info">${orderNumber ? `الطلب ${orderNumber} · ` : ''}الفاتورة نفسها التي تم توليدها بـ V8</div>
       </div>
-      <main class="pb-ipr-stage"><img class="pb-ipr-paper" data-pb-print-image alt="فاتورة Pasha Baby"></main>
+      <main class="pb-ipr-stage"><div class="pb-ipr-page" style="--pb-page-margin:${previewMarginPct.toFixed(4)}%"><img class="pb-ipr-paper" data-pb-print-image alt="فاتورة Pasha Baby"></div></main>
     `;
     document.body.appendChild(root);
     document.documentElement.classList.add('pb-invoice-print-ready-open');

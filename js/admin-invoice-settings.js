@@ -112,7 +112,7 @@
     });
     Object.keys(TEXT_FIELDS).forEach(key => { result[key] = String(source[key] ?? DEFAULTS[key]).slice(0, 120); });
     Object.keys(TOGGLES).forEach(key => { result[key] = source[key] === undefined ? DEFAULTS[key] : source[key] === true; });
-    result.page_size = ['A4','A5','Letter'].includes(source.page_size) ? source.page_size : DEFAULTS.page_size;
+    result.page_size = ['auto','A4','A5','Letter'].includes(source.page_size) ? source.page_size : DEFAULTS.page_size;
     result.page_orientation = ['portrait','landscape'].includes(source.page_orientation) ? source.page_orientation : DEFAULTS.page_orientation;
     result.font_family = Object.hasOwn(FONT_STACKS, source.font_family) ? source.font_family : DEFAULTS.font_family;
     result.font_weight = [600,700,800,900].includes(Number(source.font_weight)) ? Number(source.font_weight) : DEFAULTS.font_weight;
@@ -138,7 +138,7 @@
           <div class="pb-invoice-controls">
             <details class="pb-invoice-group" open><summary>الورقة والخط</summary><div class="pb-invoice-group-body">
               <div class="pb-invoice-select-grid">
-                <label><span>حجم الورقة</span><select data-invoice-field="page_size"><option>A4</option><option>A5</option><option>Letter</option></select></label>
+                <label><span>حجم الورقة</span><select data-invoice-field="page_size"><option value="auto">تلقائي</option><option>A4</option><option>A5</option><option>Letter</option></select></label>
                 <label><span>اتجاه الورقة</span><select data-invoice-field="page_orientation"><option value="portrait">طولي</option><option value="landscape">عرضي</option></select></label>
                 <label><span>نوع الخط</span><select data-invoice-field="font_family"><option value="modern_pro">Modern Pro Bold عربي</option><option value="din">DIN Next Arabic</option><option value="segoe">Segoe UI Arabic</option><option value="tahoma">Tahoma</option><option value="arial">Arial</option><option value="kufi">Noto Kufi Arabic</option><option value="custom">الخط المرفوع</option></select></label>
                 <label><span>سماكة الخط</span><select data-invoice-field="font_weight"><option value="600">Semi Bold 600</option><option value="700">Bold 700</option><option value="800">Extra Bold 800</option><option value="900">Black 900</option></select></label>
@@ -217,7 +217,8 @@
     if (!face) { face = document.createElement('style'); face.id = 'pbInvoicePreviewFont'; document.head.appendChild(face); }
     face.textContent = customFace;
     const font = s.font_family === 'custom' && fontUrl ? 'PashaInvoicePreview,Tahoma,Arial,sans-serif' : FONT_STACKS[s.font_family];
-    holder.style.cssText = `min-height:${Math.max(420,s.paper_min_height_mm*2)}px;padding:${s.outer_padding_mm*2}px;border-width:${s.frame_width_pt}px;border-radius:${s.frame_radius_mm*1.5}px;font-family:${font};font-size:${s.base_size_pt}px;font-weight:${s.font_weight};line-height:${s.line_height}`;
+    const previewMarginPx = Math.max(0, Number(s.page_margin_mm || 0) * 2);
+    holder.style.cssText = `min-height:${Math.max(420,s.paper_min_height_mm*2)}px;padding:${s.outer_padding_mm*2}px;border-width:${s.frame_width_pt}px;border-radius:${s.frame_radius_mm*1.5}px;font-family:${font};font-size:${s.base_size_pt}px;font-weight:${s.font_weight};line-height:${s.line_height};outline:1px solid rgba(127,127,127,.55);outline-offset:${previewMarginPx}px;margin:${Math.max(10,previewMarginPx+10)}px auto`;
     holder.innerHTML = `<div class="pb-prev-brand">${previewLogo(s)}${s.show_brand_title?`<h3 style="font-size:${s.title_size_pt}px">${esc(s.brand_title)}</h3>`:''}${s.show_brand_subtitle?`<small style="font-size:${s.subtitle_size_pt}px">${esc(s.brand_subtitle)}</small>`:''}</div>
       <div class="pb-prev-rule" style="margin:${s.header_spacing_mm*1.2}px 0"><span>◆</span></div>
       ${(s.show_order_number||s.show_date_time)?`<div class="pb-prev-meta" style="font-size:${s.meta_size_pt}px">${s.show_order_number?'<b>PB-260910-001</b>':'<span></span>'}${s.show_date_time?'<span>10/09/2026، 03:30 م</span>':''}</div>`:''}
