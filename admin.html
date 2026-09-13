@@ -5689,7 +5689,7 @@
       ${fieldHtml('الاسم الكوردي','p_name_ku',firstExisting(product,['name_ku']))}
       ${fieldHtml('الاسم الإنجليزي','p_name_en',firstExisting(product,['name_en']))}
       <div class="field"><label>القسم</label><select id="p_category_id">${catOptions}</select></div>
-      <div class="image-upload-box"><div>صورة الصنف — من الجهاز أو رابط مباشر</div><div class="image-upload-row"><img id="p_image_preview" class="image-preview" src="${escapeAdminHtml(firstExisting(product,['image_url','image'],'assets/pasha-baby-logo-256.webp'))}"><label class="image-upload-btn">📷 اختيار صورة<input id="p_image_file" type="file" accept="image/*" onchange="previewAdminImage(this)"></label><span id="p_image_file_name" class="image-file-name">لم يتم اختيار صورة جديدة</span></div><div id="p_upload_progress" class="upload-progress"></div></div>${fieldHtml('رابط الصورة (اختياري)','p_image_url',firstExisting(product,['image_url','image']),'url',true)}
+      <div class="image-upload-box"><div>صورة الصنف — من الجهاز أو رابط مباشر</div><div class="image-upload-row"><img id="p_image_preview" class="image-preview" src="${escapeAdminHtml(firstExisting(product,['image_url','image'],'assets/restaurant-placeholder.svg'))}"><label class="image-upload-btn">📷 اختيار صورة<input id="p_image_file" type="file" accept="image/*" onchange="previewAdminImage(this)"></label><span id="p_image_file_name" class="image-file-name">لم يتم اختيار صورة جديدة</span></div><div id="p_upload_progress" class="upload-progress"></div></div>${fieldHtml('رابط الصورة (اختياري)','p_image_url',firstExisting(product,['image_url','image']),'url',true)}
       ${priceKey?fieldHtml('السعر الأساسي','p_base_price',product[priceKey]??0,'number'):''}
       ${hasField(product,'sort_order')?fieldHtml('الترتيب','p_sort_order',product.sort_order??0,'number'):''}
       ${hasField(product,'description_ar')?textAreaHtml('الوصف العربي','p_description_ar',product.description_ar||''):''}
@@ -5965,7 +5965,7 @@
       <div class="image-upload-box">
         <div>صورة الصنف — من الجهاز أو رابط مباشر</div>
         <div class="image-upload-row">
-          <img id="np_image_preview" class="image-preview" src="assets/pasha-baby-logo-256.webp" alt="">
+          <img id="np_image_preview" class="image-preview" src="assets/restaurant-placeholder.svg" alt="">
           <label class="image-upload-btn">📷 اختيار صورة
             <input id="np_image_file" type="file" accept="image/*" onchange="previewNewProductImage(this)">
           </label>
@@ -6673,7 +6673,7 @@
         const image =
           product.image_url ||
           product.image ||
-          'assets/pasha-baby-logo-256.webp';
+          'assets/restaurant-placeholder.svg';
 
 
         return `
@@ -6686,7 +6686,7 @@
               loading="lazy"
               onerror="
                 this.onerror=null;
-                this.src='assets/pasha-baby-logo-256.webp';
+                this.src='assets/restaurant-placeholder.svg';
               "
             >
 
