@@ -14,10 +14,11 @@ const forbid = (file, marker, label = marker) => {
 
 const engine = 'js/admin-invoice-pdf-onepage-v8.js';
 const router = 'js/admin-invoice-print-ready-v9.js';
+const directPrint = 'js/admin-invoice-pdf-direct-print-v10.js';
 const packer = 'js/admin-invoice-fast-pdf-ios-v1.js';
 const brand = 'js/pasha-admin-brand-v1.js';
 
-for (const file of [engine, router, packer, brand]) {
+for (const file of [engine, router, directPrint, packer, brand]) {
   if (!exists(file)) {
     failures.push(`${file}: missing`);
     continue;
@@ -30,22 +31,21 @@ for (const file of [engine, router, packer, brand]) {
 }
 
 need('js/runtime-config.js', 'js/admin-invoice-print-ready-v9.js?v=9.0', 'V9 print-ready invoice loader');
+need('js/runtime-config.js', 'js/admin-invoice-pdf-direct-print-v10.js?v=10.0', 'V10 direct PDF print loader');
 need('js/runtime-config.js', 'js/pasha-admin-brand-v1.js?v=1.0', 'Pasha admin brand loader');
 forbid('js/runtime-config.js', 'js/admin-invoice-print-v2.js?v=2.2', 'old V8 router loader alongside V9');
 
 need(router, "js/admin-invoice-pdf-onepage-v8.js?v=8.0", 'proven V8 invoice engine reuse');
 need(router, "preview-matched-one-page-v8", 'V8 render-mode assertion');
-need(router, "document.addEventListener('click', capture, true)", 'capture-phase print override');
-need(router, 'event.stopImmediatePropagation()', 'legacy HTML print suppression');
+need(router, "document.addEventListener('click', capture, true)", 'capture-phase invoice generation override');
+need(router, 'event.stopImmediatePropagation()', 'legacy invoice route suppression');
 need(router, 'pbInvoiceForegroundOverlay', 'foreground generation overlay');
 need(router, 'pbInvoicePrintReady', 'print-ready invoice screen');
-need(router, 'data-pb-print-now', 'direct print button');
-need(router, 'printButton?.addEventListener(\'click\', () => window.print())', 'synchronous user-gesture print call');
+need(router, 'data-pb-print-now', 'print button');
+need(router, "printButton?.addEventListener('click', () => window.print())", 'legacy V9 HTML print handler retained for V10 interception');
 need(router, 'extractEmbeddedJpeg', 'exact V8 raster reuse for print preview');
 need(router, "new Blob([bytes.slice(start, end)], { type: 'image/jpeg' })", 'embedded invoice JPEG extraction');
 need(router, 'window.location.assign(pdfUrl)', 'optional PDF button');
-need(router, '@media print', 'print-only invoice styling');
-need(router, '@page{size:', 'configured print paper size');
 need(router, 'result.pageCount !== 1', 'one-page output assertion');
 need(router, 'result.customFontBaked !== true', 'custom-font raster assertion');
 need(router, 'PdfClass: window.PashaFastSinglePagePdf', 'direct one-page packer for all devices');
@@ -54,6 +54,21 @@ need(router, "cache: 'force-cache'", 'repeat asset cache');
 need(router, "renderMode: 'print-ready-preview-matched-v9'", 'V9 route identity');
 forbid(router, 'window.open(', 'pre-generation popup/background-tab path');
 forbid(router, 'jspdf', 'jsPDF dependency in active print route');
+
+need(directPrint, "const FRAME_ID = 'pbInvoicePdfPrintFrameV10'", 'dedicated PDF print iframe');
+need(directPrint, "value instanceof Blob && /^application\\/pdf", 'PDF-only Blob capture');
+need(directPrint, 'URL.createObjectURL = function pashaCreateObjectURLV10', 'non-destructive PDF object URL bridge');
+need(directPrint, "document.addEventListener('click', printPreparedPdf, true)", 'capture-phase print-button interception');
+need(directPrint, "event.target?.closest?.('[data-pb-print-now]')", 'V9 print button targeting');
+need(directPrint, 'event.stopImmediatePropagation()', 'old HTML print handler suppression');
+need(directPrint, 'frame.contentWindow.focus()', 'PDF frame focus before printing');
+need(directPrint, 'frame.contentWindow.print()', 'direct PDF-window print call');
+need(directPrint, 'window.location.assign(latestPdfUrl)', 'safe proven-PDF fallback');
+need(directPrint, "'left:-10000px'", 'offscreen preloaded PDF frame');
+need(directPrint, '1200', 'iOS PDF iframe readiness fallback');
+need(directPrint, "version: '10.0'", 'V10 bridge identity');
+forbid(directPrint, 'window.open(', 'popup print path');
+forbid(directPrint, 'jspdf', 'jsPDF dependency in direct print bridge');
 
 need(engine, "const RENDER_MODE = 'preview-matched-one-page-v8'", 'preview-matched render mode');
 need(engine, 'const LAYOUT_MM = 2', 'dashboard preview mm visual contract');
@@ -89,9 +104,9 @@ need(brand, 'MutationObserver', 'fallback persistence after settings refresh');
 if (!exists('assets/pasha-baby-logo-256.webp')) failures.push('assets/pasha-baby-logo-256.webp: missing');
 
 if (failures.length) {
-  console.error('\nInvoice print-ready V9 / Pasha admin brand audit failed:');
+  console.error('\nInvoice direct-PDF print V10 / Pasha admin brand audit failed:');
   failures.forEach(item => console.error(`  ✗ ${item}`));
   process.exit(1);
 }
 
-console.log('✓ print-ready invoice V9 + Pasha Baby admin brand audit passed');
+console.log('✓ direct-PDF invoice print V10 + Pasha Baby admin brand audit passed');
