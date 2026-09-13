@@ -8,7 +8,7 @@
   let latestPdfBlob = null;
   let latestPdfUrl = '';
   let latestPdfFile = null;
-  let buttonObserver = null;
+  let boundReadyRoot = null;
 
   const isPdfBlob = value =>
     value instanceof Blob && /^application\/pdf(?:;|$)/i.test(String(value.type || '').trim());
@@ -17,12 +17,12 @@
     return document.getElementById(READY_ROOT_ID);
   }
 
-  function currentButton() {
-    return currentRoot()?.querySelector?.('[data-pb-print-now]') || null;
+  function currentButton(root = currentRoot()) {
+    return root?.querySelector?.('[data-pb-print-now]') || null;
   }
 
-  function currentPreviewImage() {
-    return currentRoot()?.querySelector?.('[data-pb-print-image]') || null;
+  function currentPreviewImage(root = currentRoot()) {
+    return root?.querySelector?.('[data-pb-print-image]') || null;
   }
 
   function pdfFile() {
@@ -47,35 +47,30 @@
     try { return navigator.canShare({ files: [file] }); } catch (_) { return false; }
   }
 
-  function syncPrintButton() {
-    const button = currentButton();
+  function syncPrintButton(root = currentRoot()) {
+    const button = currentButton(root);
     if (!button) return;
-    const image = currentPreviewImage();
+    const image = currentPreviewImage(root);
     const imageReady = Boolean(image?.complete && image?.naturalWidth > 0);
     const ready = Boolean(latestPdfBlob && latestPdfUrl && imageReady);
 
-    button.disabled = !ready;
-    if (!ready) {
-      button.textContent = '⏳ تجهيز طباعة PDF…';
-      return;
-    }
-
-    button.textContent = canNativeSharePdf()
-      ? '🖨 طباعة PDF'
-      : '📄 فتح PDF للطباعة';
+    if (button.disabled !== !ready) button.disabled = !ready;
+    const label = !ready
+      ? '⏳ تجهيز طباعة PDF…'
+      : canNativeSharePdf()
+        ? '🖨 طباعة PDF'
+        : '📄 فتح PDF للطباعة';
+    if (button.textContent !== label) button.textContent = label;
   }
 
-  function watchReadyButton() {
-    const button = currentButton();
-    const image = currentPreviewImage();
-    if (!button) return;
+  function bindReadyRoot(root) {
+    if (!root || root === boundReadyRoot) return;
+    boundReadyRoot = root;
 
-    buttonObserver?.disconnect();
-    buttonObserver = new MutationObserver(syncPrintButton);
-    buttonObserver.observe(button, { attributes: true, attributeFilter: ['disabled'] });
-    image?.addEventListener('load', syncPrintButton, { once: true });
-    image?.addEventListener('error', syncPrintButton, { once: true });
-    syncPrintButton();
+    const image = currentPreviewImage(root);
+    image?.addEventListener('load', () => syncPrintButton(root), { once: true });
+    image?.addEventListener('error', () => syncPrintButton(root), { once: true });
+    syncPrintButton(root);
   }
 
   // Capture the exact final PDF Blob produced by the proven V8/V9 renderer.
@@ -85,7 +80,7 @@
       latestPdfBlob = value;
       latestPdfUrl = url;
       latestPdfFile = null;
-      queueMicrotask(syncPrintButton);
+      queueMicrotask(() => syncPrintButton());
     }
     return url;
   };
@@ -107,9 +102,6 @@
         return;
       }
 
-      // On iPhone/iPad this opens the native share sheet with the actual PDF
-      // file. Choosing Print there prints the PDF itself, so Safari cannot add
-      // webpage URL/date headers or footers.
       await navigator.share({
         files: [file],
         title: 'Pasha Baby Invoice'
@@ -125,7 +117,6 @@
     const button = event.target?.closest?.('[data-pb-print-now]');
     if (!button) return;
 
-    // Stop the old V9 webpage print handler and any older iframe print bridge.
     event.preventDefault();
     event.stopImmediatePropagation();
     event.stopPropagation();
@@ -135,21 +126,25 @@
       return;
     }
 
-    if (canNativeSharePdf()) {
-      void sharePdfForPrint();
-    } else {
-      openPdfFallback();
-    }
+    if (canNativeSharePdf()) void sharePdfForPrint();
+    else openPdfFallback();
   }
 
   document.addEventListener('click', handlePrintTap, true);
 
+  // Watch only for the print-ready root appearing/disappearing. Do not observe
+  // the print button's disabled attribute: mutating that attribute from inside
+  // its own MutationObserver can starve Safari's microtask queue and freeze the
+  // transition on "invoice ready".
   const rootObserver = new MutationObserver(() => {
-    if (currentRoot()) {
-      watchReadyButton();
-    } else {
-      buttonObserver?.disconnect();
-      buttonObserver = null;
+    const root = currentRoot();
+    if (root) {
+      bindReadyRoot(root);
+      return;
+    }
+
+    if (boundReadyRoot) {
+      boundReadyRoot = null;
       latestPdfBlob = null;
       latestPdfFile = null;
       latestPdfUrl = '';
@@ -158,7 +153,8 @@
 
   const start = () => {
     rootObserver.observe(document.body, { childList: true, subtree: true });
-    if (currentRoot()) watchReadyButton();
+    const root = currentRoot();
+    if (root) bindReadyRoot(root);
   };
 
   if (document.readyState === 'loading') {
@@ -168,7 +164,7 @@
   }
 
   window.PashaInvoicePdfNativeShareV11 = Object.freeze({
-    version: '11.0',
+    version: '11.1',
     sync: syncPrintButton,
     openPdf: openPdfFallback
   });
