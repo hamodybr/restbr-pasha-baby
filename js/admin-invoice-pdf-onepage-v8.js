@@ -318,10 +318,14 @@
     }
 
     ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
-    y += 7;
+    // Keep customer block visually high and reserve an explicit safe gap before
+    // the lower divider. This avoids Arabic descenders touching the rule.
+    const customerSize = num(cfg.customer_size_pt, 10.5);
+    const addressSize = num(cfg.address_size_pt, 9.5);
+    y += 2;
 
-    setFont(ctx, num(cfg.customer_size_pt, 10.5), font);
-    const customerY = y + num(cfg.customer_size_pt, 10.5);
+    setFont(ctx, customerSize, font);
+    const customerY = y + customerSize * .92;
     ctx.textAlign = 'right'; ctx.direction = 'rtl';
     ctx.fillText(digits(options, order.customer_name || 'زبون'), right, customerY);
     const leftParts = [];
@@ -331,14 +335,20 @@
       ctx.textAlign = 'left'; ctx.direction = 'rtl';
       ctx.fillText(leftParts.join(' · '), left, customerY);
     }
-    y = customerY + 5;
+    y = customerY + 2;
     if (cfg.show_customer_address && order.address) {
-      setFont(ctx, num(cfg.address_size_pt, 9.5), font);
+      setFont(ctx, addressSize, font);
       ctx.textAlign = 'right'; ctx.direction = 'rtl';
       const text = `العنوان: ${digits(options, order.address)}`;
       const lines = wrapText(ctx, text, inner);
-      for (const line of lines) { y += num(cfg.address_size_pt, 9.5) * 1.25; ctx.fillText(line, right, y); }
-      y += 2;
+      for (const line of lines) {
+        y += addressSize * 1.18;
+        ctx.fillText(line, right, y);
+      }
+      // Guaranteed visible breathing room below the last address baseline.
+      y += Math.max(9, addressSize * .9);
+    } else {
+      y += 6;
     }
     ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
     y += 7;
@@ -446,6 +456,25 @@
     return { canvas, cssWidth, cssHeight, contentScale };
   }
 
+  function composeFullPageCanvas(contentCanvas, cfg) {
+    const metrics = pageMetrics(cfg);
+    const pxPerMm = LAYOUT_MM * 2;
+    const pageWidthPx = Math.max(1, Math.round(metrics.width * pxPerMm));
+    const pageHeightPx = Math.max(1, Math.round(metrics.height * pxPerMm));
+    const marginPx = Math.max(0, Math.round(metrics.margin * pxPerMm));
+    const innerWidth = Math.max(1, pageWidthPx - marginPx * 2);
+    const innerHeight = Math.max(1, pageHeightPx - marginPx * 2);
+    const pageCanvas = document.createElement('canvas');
+    pageCanvas.width = pageWidthPx;
+    pageCanvas.height = pageHeightPx;
+    const pageCtx = pageCanvas.getContext('2d', { alpha: false });
+    if (!pageCtx) throw new Error('تعذر تجهيز صفحة الفاتورة مع هامش الطباعة.');
+    pageCtx.fillStyle = '#fff';
+    pageCtx.fillRect(0, 0, pageWidthPx, pageHeightPx);
+    pageCtx.drawImage(contentCanvas, marginPx, marginPx, innerWidth, innerHeight);
+    return pageCanvas;
+  }
+
   async function encodeJpeg(canvas) {
     stage('encode', 'تم رسم التصميم بنفس نسب المعاينة. جاري ضغط صورة الصفحة.');
     const blob = await timeout(new Promise((resolve, reject) => {
@@ -466,11 +495,12 @@
     stage('render', 'جاري رسم نفس تخطيط المعاينة داخل صفحة واحدة.');
     await new Promise(resolve => requestAnimationFrame(resolve));
     const rendered = renderCanvas(options, font, logo);
-    const jpeg = await encodeJpeg(rendered.canvas);
+    const fullPageCanvas = composeFullPageCanvas(rendered.canvas, cfg);
+    const jpeg = await encodeJpeg(fullPageCanvas);
     stage('pack', 'جاري تغليف الصورة داخل PDF من صفحة واحدة.');
     const metrics = pageMetrics(cfg);
     const doc = new PdfClass({ orientation: metrics.orientation, unit: 'mm', format: metrics.format });
-    doc.addImage(jpeg, 'JPEG', metrics.margin, metrics.margin, metrics.contentWidth, metrics.contentHeight);
+    doc.addImage(jpeg, 'JPEG', 0, 0, metrics.width, metrics.height);
     const blob = doc.output('blob');
     return {
       blob,
