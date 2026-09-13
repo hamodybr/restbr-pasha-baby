@@ -86,7 +86,7 @@ audit = audit.replace("need(engine, \"product: 'مجموع الأصناف'\", 's
 audit = audit.replace("forbid('js/admin-invoice-settings.js', '<option value=\"auto\">تلقائي</option>', 'ambiguous auto page-size control');\n", '');
 const anchor = "need(engine, 'Math.max(5, num(cfg.address_size_pt, 9.5) * .45)', 'safe customer/address divider clearance');";
 if (!audit.includes(anchor)) throw new Error('Missing audit anchor');
-audit = audit.replace(anchor, `${anchor}\nneed(engine, \"doc.addImage(jpeg, 'JPEG', metrics.margin, metrics.margin, metrics.contentWidth, metrics.contentHeight)\", 'final PDF uses saved page margin');\nneed(router, 'previewPageMarginPercent(cfg)', 'print-ready preview shows real page margin');\nneed(router, 'Number.isFinite(rawMargin) ? rawMargin : 6', 'zero-safe page margin');\nneed('js/admin-invoice-settings.js', 'outline-offset:${previewMarginPx}px', 'settings preview shows page margin');\nneed('js/admin-invoice-settings.js', '<option value=\"auto\">تلقائي</option>', 'Auto page-size remains available');`);
+audit = audit.replace(anchor, `${anchor}\nneed(engine, \"doc.addImage(jpeg, 'JPEG', metrics.margin, metrics.margin, metrics.contentWidth, metrics.contentHeight)\", 'final PDF uses saved page margin');\nneed(router, 'previewPageMarginPercent(cfg)', 'print-ready preview shows real page margin');\nneed(router, 'Number.isFinite(rawMargin) ? rawMargin : 6', 'zero-safe page margin');\nneed('js/admin-invoice-settings.js', 'outline-offset:\${previewMarginPx}px', 'settings preview shows page margin');\nneed('js/admin-invoice-settings.js', '<option value=\"auto\">تلقائي</option>', 'Auto page-size remains available');`);
 write(auditFile, audit);
 
 console.log('Focused invoice margin refinement applied.');
