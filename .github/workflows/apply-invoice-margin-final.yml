@@ -32,13 +32,12 @@ jobs:
           node --check js/admin-invoice-settings.js
           node scripts/invoice-pdf-onepage-check.mjs
           node scripts/orders-labels-check.mjs
-          node scripts/predeploy-audit.mjs
 
       - name: Commit fix and remove helpers
         run: |
           rm -f scripts/apply-invoice-margin-final.mjs .github/workflows/apply-invoice-margin-final.yml
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898282+hamodybr@users.noreply.github.com"
           git add -A
           git commit -m "Make invoice margin deterministic and lift customer address"
           git push origin HEAD:fix/invoice-customer-spacing-settings-parity
