@@ -103,7 +103,6 @@ window.RESTBR_CONFIG = Object.freeze({
     }
   };
 
-  // Remove a brand cache copied from another deployment before the intro uses it.
   window.RESTBR_READ_BRAND_CACHE();
 
   const applyInitialBrand = () => {
@@ -122,7 +121,6 @@ window.RESTBR_CONFIG = Object.freeze({
   }
 })();
 
-// Backward-compatible loader for page shells that do not load the URL guard first.
 (() => {
   if (document.getElementById('restbrUrlSafetyScript')) return;
   const script = document.createElement('script');
@@ -132,8 +130,6 @@ window.RESTBR_CONFIG = Object.freeze({
   document.head.appendChild(script);
 })();
 
-// Shared security/reliability layer. It is intentionally loaded from the
-// per-client runtime config so both storefront and admin receive the guard.
 (() => {
   if (document.getElementById('restbrHardeningScript')) return;
   const script = document.createElement('script');
@@ -143,8 +139,6 @@ window.RESTBR_CONFIG = Object.freeze({
   document.head.appendChild(script);
 })();
 
-// Pasha Baby storefront retail-card V2 helper.
-// Keep it storefront-only: the admin already owns the description editor fields.
 (() => {
   const path = String(window.location.pathname || '').toLowerCase();
   if (/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
@@ -157,8 +151,6 @@ window.RESTBR_CONFIG = Object.freeze({
   document.head.appendChild(script);
 })();
 
-// Pasha Baby storefront details-button V3.
-// Keeps the description to one line and places Details in the same bottom action row.
 (() => {
   const path = String(window.location.pathname || '').toLowerCase();
   if (/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
@@ -171,7 +163,6 @@ window.RESTBR_CONFIG = Object.freeze({
   document.head.appendChild(script);
 })();
 
-// Pasha Baby admin identity fallback: never show the inherited restaurant/coffee placeholder.
 (() => {
   const path = String(window.location.pathname || '').toLowerCase();
   if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
@@ -184,8 +175,7 @@ window.RESTBR_CONFIG = Object.freeze({
   document.head.appendChild(script);
 })();
 
-// Invoice printing V9: keep the proven V8 renderer, then show a print-ready
-// screen with a direct user-gesture print button plus an optional PDF button.
+// Invoice printing V9: keep the proven V8 renderer and print-ready preview.
 (() => {
   const path = String(window.location.pathname || '').toLowerCase();
   if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
@@ -198,16 +188,18 @@ window.RESTBR_CONFIG = Object.freeze({
   document.head.appendChild(script);
 })();
 
-// Invoice print bridge V10: preload the exact V9 PDF and print that PDF window
-// directly from the user's tap. This bypasses Safari's HTML-page print path.
+// Invoice print bridge V11: on iPhone/iPad hand the exact final PDF file to the
+// native iOS share sheet. Choosing Print there prints the PDF itself, avoiding
+// Safari webpage URL/date headers and footers. Unsupported browsers fall back
+// to opening the already-proven PDF file.
 (() => {
   const path = String(window.location.pathname || '').toLowerCase();
   if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
-  if (document.getElementById('pbInvoicePdfDirectPrintV10Script')) return;
+  if (document.getElementById('pbInvoicePdfNativeShareV11Script')) return;
 
   const script = document.createElement('script');
-  script.id = 'pbInvoicePdfDirectPrintV10Script';
-  script.src = 'js/admin-invoice-pdf-direct-print-v10.js?v=10.0';
+  script.id = 'pbInvoicePdfNativeShareV11Script';
+  script.src = 'js/admin-invoice-pdf-native-share-v11.js?v=11.0';
   script.defer = true;
   document.head.appendChild(script);
 })();
