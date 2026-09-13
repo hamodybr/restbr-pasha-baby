@@ -57,16 +57,24 @@ let runtime = read(runtimeFile);
 runtime = replaceExact(runtime, "js/admin-invoice-print-ready-v9.js?v=9.0", "js/admin-invoice-print-ready-v9.js?v=9.1", 'V9 router cache bust');
 write(runtimeFile, runtime);
 
-// Cache-bust the settings loader whether it was referenced with or without an old query.
+// Settings loader already exists in Pasha Arabic-only bootstrap. Bump it to 1.2.
 const candidates = ['admin.html', ...fs.readdirSync('js').filter(name => name.endsWith('.js')).map(name => path.join('js', name))];
+let settingsLoaderFound = 0;
 let settingsLoaderChanges = 0;
 for (const file of candidates) {
   let text = read(file);
   if (!text.includes('admin-invoice-settings.js')) continue;
-  const next = text.replace(/admin-invoice-settings\.js(?:\?v=[0-9.]+)?/g, 'admin-invoice-settings.js?v=1.1');
+  settingsLoaderFound += 1;
+  const next = text.replace(/admin-invoice-settings\.js(?:\?v=[0-9.]+)?/g, 'admin-invoice-settings.js?v=1.2');
   if (next !== text) { write(file, next); settingsLoaderChanges += 1; }
 }
-if (settingsLoaderChanges < 1) throw new Error('Could not locate admin-invoice-settings.js loader for cache bust');
+if (settingsLoaderFound < 1) throw new Error('Could not locate admin-invoice-settings.js loader');
+
+for (const testFile of ['scripts/live-smoke-test.mjs','scripts/orders-labels-check.mjs']) {
+  let text = read(testFile);
+  text = text.replaceAll('js/admin-invoice-settings.js?v=1.1', 'js/admin-invoice-settings.js?v=1.2');
+  write(testFile, text);
+}
 
 const auditFile = 'scripts/invoice-pdf-onepage-check.mjs';
 let audit = read(auditFile);
@@ -75,9 +83,9 @@ audit = audit.replaceAll("js/admin-invoice-pdf-onepage-v8.js?v=8.0", "js/admin-i
 audit = replaceExact(
   audit,
   "need(engine, \"ctx.fillText('المجموع الكلي'\", 'preview total layout');",
-  "need(engine, \"ctx.fillText('المجموع الكلي'\", 'preview total layout');\nneed(engine, 'cfg.show_subtotal', 'subtotal setting reaches final PDF');\nneed(engine, \"product: 'مجموع الأصناف'\", 'subtotal row exists in final PDF');\nneed(engine, 'Math.max(5, num(cfg.address_size_pt, 9.5) * .45)', 'safe customer/address divider clearance');\nneed('js/admin-invoice-settings.js', \"['الخط العام', ['line_height']]\", 'only effective global line-height control is exposed');\nforbid('js/admin-invoice-settings.js', '<option value=\"auto\">تلقائي</option>', 'ambiguous auto page-size control');",
+  "need(engine, \"ctx.fillText('المجموع الكلي'\", 'preview total layout');\nneed(engine, 'cfg.show_subtotal', 'subtotal setting reaches final PDF');\nneed(engine, \"product: 'مجموع الأصناف'\", 'subtotal row exists in final PDF');\nneed(engine, 'Math.max(5, num(cfg.address_size_pt, 9.5) * .45)', 'safe customer/address divider clearance');\nneed('js/admin-invoice-settings.js', \"['الخط العام', ['line_height']]\", 'only effective global line-height control is exposed');\nneed('js/pasha-arabic-only.js', 'js/admin-invoice-settings.js?v=1.2', 'invoice settings cache-busted loader');\nforbid('js/admin-invoice-settings.js', '<option value=\"auto\">تلقائي</option>', 'ambiguous auto page-size control');",
   'invoice parity audit markers'
 );
 write(auditFile, audit);
 
-console.log(`Invoice customer spacing + settings parity patch applied. Settings loader changes: ${settingsLoaderChanges}`);
+console.log(`Invoice customer spacing + settings parity patch applied. Settings loaders found: ${settingsLoaderFound}; changed: ${settingsLoaderChanges}`);
