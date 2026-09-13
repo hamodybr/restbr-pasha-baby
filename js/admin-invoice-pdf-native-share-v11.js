@@ -115,8 +115,6 @@
         title: 'Pasha Baby Invoice'
       });
     } catch (error) {
-      // AbortError means the user simply closed the share sheet; do not force
-      // navigation in that case. Any real platform failure falls back to PDF.
       if (String(error?.name || '') === 'AbortError') return;
       console.warn('Native PDF share failed; opening the proven PDF instead.', error);
       openPdfFallback();
@@ -127,7 +125,7 @@
     const button = event.target?.closest?.('[data-pb-print-now]');
     if (!button) return;
 
-    // Stop V9 window.print() and any older V10 HTML/iframe print bridge.
+    // Stop the old V9 webpage print handler and any older iframe print bridge.
     event.preventDefault();
     event.stopImmediatePropagation();
     event.stopPropagation();
