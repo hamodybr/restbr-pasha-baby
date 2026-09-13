@@ -19,6 +19,11 @@ jobs:
           ref: fix/invoice-customer-spacing-settings-parity
           fetch-depth: 0
 
+      - name: Locate invoice settings loader
+        shell: bash
+        run: |
+          grep -RniE 'admin-invoice-settings|invoice-settings' . --exclude='patch-invoice-customer-parity.mjs' --exclude-dir=.git || true
+
       - name: Apply safe invoice patch
         run: node scripts/patch-invoice-customer-parity.mjs
 
@@ -44,7 +49,6 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add js/admin-invoice-pdf-onepage-v8.js js/admin-invoice-settings.js js/admin-invoice-print-ready-v9.js js/runtime-config.js scripts/invoice-pdf-onepage-check.mjs
-          # Include any loader file automatically cache-busted by the patch helper.
           git add admin.html js/*.js
           if git diff --cached --quiet; then
             echo 'No generated changes to commit'
