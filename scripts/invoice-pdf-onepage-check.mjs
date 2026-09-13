@@ -31,7 +31,7 @@ for (const file of [engine, router, nativeShare, packer, brand]) {
 }
 
 need('js/runtime-config.js', 'js/admin-invoice-print-ready-v9.js?v=9.0', 'V9 print-ready invoice loader');
-need('js/runtime-config.js', 'js/admin-invoice-pdf-native-share-v11.js?v=11.0', 'V11 native PDF share loader');
+need('js/runtime-config.js', 'js/admin-invoice-pdf-native-share-v11.js?v=11.1', 'V11.1 native PDF share loader');
 need('js/runtime-config.js', 'js/pasha-admin-brand-v1.js?v=1.0', 'Pasha admin brand loader');
 forbid('js/runtime-config.js', 'js/admin-invoice-pdf-direct-print-v10.js?v=10.0', 'V10 iframe print loader');
 forbid('js/runtime-config.js', 'js/admin-invoice-print-v2.js?v=2.2', 'old V8 router loader alongside V9');
@@ -64,7 +64,11 @@ need(nativeShare, 'navigator.canShare({ files: [file] })', 'native file-share ca
 need(nativeShare, 'navigator.share({', 'native iOS share sheet path');
 need(nativeShare, "files: [file]", 'share exact PDF file');
 need(nativeShare, 'window.location.assign(latestPdfUrl)', 'safe proven-PDF fallback');
-need(nativeShare, "version: '11.0'", 'V11 bridge identity');
+need(nativeShare, "let boundReadyRoot = null", 'single print-ready root binding');
+need(nativeShare, "if (button.disabled !== !ready) button.disabled = !ready", 'non-reentrant button state update');
+need(nativeShare, "version: '11.1'", 'V11.1 bridge identity');
+forbid(nativeShare, 'buttonObserver', 'self-observing disabled-attribute mutation loop');
+forbid(nativeShare, "attributeFilter: ['disabled']", 'disabled-attribute MutationObserver loop');
 forbid(nativeShare, 'contentWindow.print()', 'iframe/webpage print path');
 forbid(nativeShare, 'window.print()', 'HTML print path');
 forbid(nativeShare, 'window.open(', 'popup print path');
@@ -103,9 +107,9 @@ need(brand, "loginTitle.textContent = 'Pasha Baby Admin'", 'login brand title');
 if (!exists('assets/pasha-baby-logo-256.webp')) failures.push('assets/pasha-baby-logo-256.webp: missing');
 
 if (failures.length) {
-  console.error('\nInvoice native-PDF share V11 / Pasha admin brand audit failed:');
+  console.error('\nInvoice native-PDF share V11.1 / Pasha admin brand audit failed:');
   failures.forEach(item => console.error(`  ✗ ${item}`));
   process.exit(1);
 }
 
-console.log('✓ native-PDF invoice share/print V11 + Pasha Baby admin brand audit passed');
+console.log('✓ native-PDF invoice share/print V11.1 + Pasha Baby admin brand audit passed');
