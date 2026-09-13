@@ -197,3 +197,17 @@ window.RESTBR_CONFIG = Object.freeze({
   script.defer = true;
   document.head.appendChild(script);
 })();
+
+// Invoice print bridge V10: preload the exact V9 PDF and print that PDF window
+// directly from the user's tap. This bypasses Safari's HTML-page print path.
+(() => {
+  const path = String(window.location.pathname || '').toLowerCase();
+  if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
+  if (document.getElementById('pbInvoicePdfDirectPrintV10Script')) return;
+
+  const script = document.createElement('script');
+  script.id = 'pbInvoicePdfDirectPrintV10Script';
+  script.src = 'js/admin-invoice-pdf-direct-print-v10.js?v=10.0';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
