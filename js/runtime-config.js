@@ -199,7 +199,7 @@ window.RESTBR_CONFIG = Object.freeze({
 
   const script = document.createElement('script');
   script.id = 'pbInvoicePdfNativeShareV11Script';
-  script.src = 'js/admin-invoice-pdf-native-share-v11.js?v=11.0';
+  script.src = 'js/admin-invoice-pdf-native-share-v11.js?v=11.1';
   script.defer = true;
   document.head.appendChild(script);
 })();
