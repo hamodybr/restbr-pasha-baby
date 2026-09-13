@@ -156,7 +156,7 @@ await expectText('/js/pasha-arabic-only.js', [
   "localStorage.setItem('RESTBR_LANG_V1', 'ar')",
   'js/admin-retail-discounts.js?v=4.0',
   'js/admin-product-colors.js?v=3.0',
-  'js/admin-invoice-settings.js?v=1.2',
+  'js/admin-invoice-settings.js?v=1.1',
   'js/admin-orders-customers.js?v=1.9',
   'js/pasha-admin-product-editor-cleanup.js?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
