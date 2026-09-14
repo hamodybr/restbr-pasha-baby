@@ -1,20 +1,13 @@
-# Pasha Baby reviews trial
+# Pasha Baby checkout reviews
 
-Base: ff1a2728f05f3edf1e59a3411e720c6ccebb3586. Feature branch only; no production database migration or deployment performed.
+After a successful order save, an optional review dialog appears before WhatsApp. Sending a rating or skipping continues to WhatsApp. Disabled/unavailable reviews preserve the normal handoff. A failed review shows retry and skip; it never resubmits the order.
 
-## Try
-Serve this branch over HTTP and open reviews.html?demo=1. Demo data is explicitly marked and submission writes nothing. Do not open invitation links in the demo. Live integration requires applying the migration to a test database with the existing order/role schema and setting runtime-config to that test project.
+The server matches the saved order ID and its private client token, checks the order is less than 24 hours old and not cancelled, and permits one review per order. The first name comes from the saved order. Checkout reviews display “Verified order”; legacy completed-purchase reviews retain their original badge.
 
-## Operation
-Dashboard Home → تقييمات الزبائن. Enable reviews and optionally save a Google review link. Enter a completed order number to generate/copy its private 90-day invitation. Share only with that customer. This implementation does not send messages automatically. Invite issuance is repeatable until expiry; expiry rotates the token. Submission is one-time, idempotent, and checks completed status again. Avoid changing completed status until a status update is actually required.
+Star-only ratings at every score publish immediately. Comments keep the entire review pending, excluded from the public average until approved. Only insertion applies this rule; subsequent moderation remains an explicit admin decision with audit reason. No existing rejected reviews are automatically republished.
 
-Public reviews use approved rows only. Administrators can change moderation status with an audit reason, but cannot rewrite ratings/comments. Apply the same relevance/privacy/abuse criteria to every rating. Google link is shown independently of rating, before and after submission. No self-serving aggregateRating schema is added.
+Home quick actions and Customers each have a summary card with the approved average/count and pending comment count. Manual invitation controls were removed from the dashboard. Existing invitation links still work. Google review links are available independently of the star score.
 
-Invitation tokens are private bearer capabilities, not proof of the recipient's legal identity. They are removed from the address bar and are never saved to browser storage. If the page is reloaded, reopen the original invitation. The original number/phone/order/customer are never exposed by the public reviews RPC. A review's verified purchase badge survives deletion of the historical order.
+Validation: disposable PostgreSQL tests cover ownership, publication, moderation, duplicate submissions, cancellation, expiry and counts. Chromium mobile tests run the actual order handler through skip, stars, comments, failed review and disabled states, verifying exactly one WhatsApp handoff and one order save. Dashboard cards are tested in both hosts.
 
-## Validation / rollout
-The Reviews trial checks workflow starts a disposable PostgreSQL 16 database, checks permissions/lifecycle, and runs Chromium mobile form/security tests with mocked Supabase requests. The existing Pages workflow checks the rest of the site and deploys only main. No automatic merge.
-
-Before production release: review test results, apply the additive migration to the correct project, deploy the reviewed code, keep enabled=false until a real end-to-end test succeeds. No test reviews should be seeded into production. Google URL remains empty until the merchant supplies a verified review URL. An empty URL hides that button.
-
-Disable from dashboard to hide reviews and stop submissions; original checkout is independent. Do not drop review tables for rollback. Apply migrations once through normal migration tracking.
+Apply 20260914180000_checkout_reviews_v2.sql before deploying the UI. Keep the existing feature settings and Google URL. All checkout simulations use mocks or rolled-back transactions; do not publish test reviews. Disable the feature in the dashboard for immediate fallback to ordinary checkout.
