@@ -3,7 +3,7 @@
  'use strict';
  const sb=()=>typeof supabaseClient==='undefined'?null:supabaseClient;
  const n=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e;};
- let button,dialog;
+ let button,dialog,customerCard,allowedNow=false,mountObserver;
  async function rpc(name,args){const r=await sb().rpc(name,args);if(r.error)throw r.error;return r.data;}
  async function open(){
   dialog?.remove();dialog=n('dialog');dialog.className='pb-reviews';dialog.dir='rtl';
@@ -17,12 +17,7 @@
    const url=n('input');url.type='url';url.value=cfg.google_url;url.placeholder='https://g.page/r/.../review';url.dir='ltr';
    const ul=n('label','رابط تقييم Google (اختياري)');ul.append(url);
    const save=n('button','حفظ الإعدادات');save.onclick=()=>run(async()=>{await rpc('pasha_reviews_settings',{p_enabled:enabled.checked,p_google_url:url.value});msg.textContent='تم الحفظ';},save);
-   dialog.append(el,ul,save,n('h3','رابط تقييم لطلب مكتمل'));
-   const order=n('input');order.placeholder='رقم الطلب PB-…';order.dir='ltr';order.setAttribute('aria-label','رقم الطلب');
-   const invite=n('button','إنشاء رابط التقييم');const result=n('input');result.readOnly=true;result.hidden=true;result.dir='ltr';result.setAttribute('aria-label','رابط التقييم الخاص بالزبون');
-   const copy=n('button','نسخ الرابط');copy.hidden=true;copy.onclick=()=>run(async()=>{try{await navigator.clipboard.writeText(result.value);msg.textContent='تم نسخ الرابط';}catch(_){result.select();msg.textContent='حدد الرابط وانسخه يدويًا';}},copy);
-   invite.onclick=()=>run(async()=>{const token=await rpc('pasha_reviews_invite',{p_order_number:order.value});result.value=new URL('reviews.html',location.href).href+'#'+token;result.hidden=false;copy.hidden=false;msg.textContent='الرابط خاص بهذا الزبون، صالح لمدة 90 يومًا ويقبل تقييمًا واحدًا.';},invite);
-   dialog.append(order,invite,result,copy,n('p','اطلب التقييم من جميع الزبائن بشكل محايد. الرفض مخصص للإساءة أو كشف البيانات الشخصية أو المحتوى غير المرتبط بالتجربة؛ لا ترفض تقييمًا بسبب انخفاض عدد النجوم.'));
+   dialog.append(el,ul,save,n('p','النجوم بدون تعليق تُنشر تلقائيًا. التقييمات التي فيها تعليق تنتظر موافقتك. لا يلزم إنشاء روابط أو إرسالها للزبائن.'));
    const filter=n('select');filter.setAttribute('aria-label','حالة التقييمات');
    for(const [key,text] of [['pending','بانتظار المراجعة'],['approved','منشور'],['rejected','مرفوض']]){const o=n('option',text);o.value=key;filter.append(o);}
    const list=n('div');const more=n('button','عرض المزيد');let offset=0;
@@ -36,7 +31,7 @@
       const action=n('button',title);action.onclick=()=>run(async()=>{
        const reason=prompt('سبب القرار (لا يُسمح بالرفض بسبب عدد النجوم):',status==='approved'?'مراجعة المحتوى: صالح للنشر':'');
        if(!reason?.trim())return;
-       await rpc('pasha_reviews_moderate',{p_id:review.id,p_status:status,p_reason:reason});await load(true);msg.textContent='تم تحديث حالة التقييم';
+       await rpc('pasha_reviews_moderate',{p_id:review.id,p_status:status,p_reason:reason});await load(true);await refreshSummary();msg.textContent='تم تحديث حالة التقييم';
       },action);card.append(action);
      }list.append(card);
     }
@@ -46,16 +41,43 @@
    filter.onchange=()=>run(()=>load(true),more);more.onclick=()=>run(()=>load(false),more);dialog.append(n('h3','مراجعة التقييمات'),filter,list,more);await load(true);
   });
  }
+
+ function makeCard(){
+  const card=n('button');card.type='button';card.className='pb-review-dashboard-card';
+  card.append(n('strong','⭐ تقييمات الزبائن'),n('span','عرض التقييمات والتعليقات الجديدة'));
+  card.onclick=()=>void open();return card;
+ }
+ function mount(){
+  if(!allowedNow)return;
+  const home=document.querySelector('#viewHome .quick-grid');
+  if(home&&!button){button=makeCard();home.append(button);}
+  const customers=document.getElementById('viewPashaCustomers');
+  if(customers&&!customerCard){customerCard=makeCard();const title=customers.querySelector('.view-title-row');if(title)title.after(customerCard);else customers.prepend(customerCard);}
+ }
+ async function refreshSummary(){
+  if(!allowedNow)return;
+  try{const d=await rpc('pasha_reviews_dashboard_summary');if(!allowedNow)return;mount();
+   const text=(d.average===null?'لا توجد تقييمات منشورة':d.average+' / 5 · '+d.count+' تقييم')+' · '+d.pending+' تعليق بانتظار الموافقة';
+   for(const card of [button,customerCard])if(card)card.querySelector('span').textContent=text;
+  }catch(_){}
+ }
  async function sync(){
   if(!sb())return;
-  const session=await sb().auth.getSession();
-  let allowed=false;
+  const session=await sb().auth.getSession();let allowed=false;
   if(session.data.session){const r=await sb().from('admin_users').select('role,is_active').eq('user_id',session.data.session.user.id).maybeSingle();allowed=!r.error&&r.data?.is_active===true&&['super_admin','owner','manager'].includes(r.data.role);}
-  if(!allowed){button?.remove();button=null;dialog?.close();dialog?.remove();dialog=null;return;}
-  if(button)return;
-  const host=document.getElementById('viewHome');if(!host)return;
-  button=n('button','⭐ تقييمات الزبائن');button.type='button';button.className='btn';button.onclick=()=>void open();host.prepend(button);
+  allowedNow=allowed;
+  if(!allowed){button?.remove();customerCard?.remove();button=customerCard=null;dialog?.close();dialog?.remove();dialog=null;mountObserver?.disconnect();return;}
+  mount();
+  if(!mountObserver)mountObserver=new MutationObserver(mount);
+  mountObserver.observe(document.querySelector('.admin-main')||document.body,{childList:true,subtree:true});
+  await refreshSummary();
  }
- function init(){if(!sb())return;void sync();sb().auth.onAuthStateChange(()=>setTimeout(()=>void sync(),0));}
+ function init(){
+  if(!sb())return;
+  void sync();
+  sb().auth.onAuthStateChange(()=>setTimeout(()=>void sync(),0));
+  window.addEventListener('pageshow',()=>void refreshSummary());
+  document.addEventListener('click',e=>{if(e.target.closest('#pbCustomersNav,[data-admin-nav="home"],#refreshBtn'))void refreshSummary();});
+ }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
