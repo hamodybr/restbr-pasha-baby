@@ -7,7 +7,9 @@
     if (typeof value !== 'string') return value;
     if (!value.includes('🛒 *تفاصيل الطلب*')) return value;
 
-    return value.replace(/^\d+\.\s+(?=\*)/gm, '• ');
+    return value
+      .replace(/^🍽️\s*/u, '🛍️ ')
+      .replace(/^\d+\.\s+(?=\*)/gm, '• ');
   }
 
   function patchSendButton() {
