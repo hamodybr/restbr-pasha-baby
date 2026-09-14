@@ -203,3 +203,18 @@ window.RESTBR_CONFIG = Object.freeze({
   script.defer = true;
   document.head.appendChild(script);
 })();
+
+// Manual external invoice V1: enter customer/items manually but render through
+// the same one-page V8 engine and the same V11 PDF print bridge. No order row is
+// created in Supabase.
+(() => {
+  const path = String(window.location.pathname || '').toLowerCase();
+  if (!/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
+  if (document.getElementById('pbManualInvoiceV1Script')) return;
+
+  const script = document.createElement('script');
+  script.id = 'pbManualInvoiceV1Script';
+  script.src = 'js/admin-manual-invoice-v1.js?v=1.0';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
