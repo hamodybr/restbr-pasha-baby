@@ -17,8 +17,9 @@ const router = 'js/admin-invoice-print-ready-v9.js';
 const nativeShare = 'js/admin-invoice-pdf-native-share-v11.js';
 const packer = 'js/admin-invoice-fast-pdf-ios-v1.js';
 const brand = 'js/pasha-admin-brand-v1.js';
+const manual = 'js/admin-manual-invoice-v1.js';
 
-for (const file of [engine, router, nativeShare, packer, brand]) {
+for (const file of [engine, router, nativeShare, packer, brand, manual]) {
   if (!exists(file)) {
     failures.push(`${file}: missing`);
     continue;
@@ -32,6 +33,7 @@ for (const file of [engine, router, nativeShare, packer, brand]) {
 
 need('js/runtime-config.js', 'js/admin-invoice-print-ready-v9.js?v=9.2', 'V9.2 print-ready invoice loader');
 need('js/runtime-config.js', 'js/admin-invoice-pdf-native-share-v11.js?v=11.1', 'V11.1 native PDF share loader');
+need('js/runtime-config.js', 'js/admin-manual-invoice-v1.js?v=1.0', 'manual external invoice loader');
 need('js/runtime-config.js', 'js/pasha-admin-brand-v1.js?v=1.0', 'Pasha admin brand loader');
 forbid('js/runtime-config.js', 'js/admin-invoice-pdf-direct-print-v10.js?v=10.0', 'V10 iframe print loader');
 forbid('js/runtime-config.js', 'js/admin-invoice-print-v2.js?v=2.2', 'old V8 router loader alongside V9');
@@ -104,6 +106,19 @@ forbid(engine, 'document.fonts.ready', 'global font-set wait that can stall Safa
 need(packer, '/Count 1', 'hard one-page PDF page tree');
 need(packer, '/DCTDecode', 'direct JPEG embedding');
 
+need(manual, 'window.__PASHA_MANUAL_INVOICE_V1__', 'manual invoice singleton guard');
+need(manual, 'invoice_default_snapshot', 'saved invoice default snapshot bridge');
+need(manual, 'data-mi-generate', 'manual invoice generate action');
+need(manual, 'PashaInvoiceOnePagePdf.create', 'same proven V8 renderer');
+need(manual, 'PdfClass:window.PashaFastSinglePagePdf', 'same one-page PDF packer');
+need(manual, 'data-pb-print-now', 'same V11 print button contract');
+need(manual, "page_margin_mm:5", 'current 5mm margin default snapshot');
+need(manual, 'show_subtotal:false', 'current hidden subtotal default snapshot');
+need(manual, 'هذه الفاتورة لا تُنشئ طلبًا ولا زبونًا في قاعدة البيانات', 'manual invoice is explicitly non-persistent');
+forbid(manual, ".from('orders')", 'manual invoice must not write/read orders table');
+forbid(manual, '.insert(', 'manual invoice must not insert database rows');
+forbid(manual, '.update(', 'manual invoice must not update database rows');
+
 need(brand, "const FALLBACK_LOGO = 'assets/pasha-baby-logo-256.webp'", 'real Pasha Baby fallback logo');
 need(brand, "document.querySelector('.admin-logo')", 'dashboard header logo repair');
 need(brand, "document.querySelector('.login-brand img')", 'login logo repair');
@@ -117,4 +132,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('✓ native-PDF invoice share/print V11.1 + Pasha Baby admin brand audit passed');
+console.log('✓ native-PDF invoice share V11.1 + manual external invoice + Pasha Baby audit passed');
