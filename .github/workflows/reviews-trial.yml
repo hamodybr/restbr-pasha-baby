@@ -1,0 +1,40 @@
+name: Reviews trial checks
+on:
+  push:
+    branches: ['trial/pasha-reviews-20260914']
+  pull_request:
+    paths: ['**/*reviews*']
+permissions:
+  contents: read
+jobs:
+  reviews:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test_only
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: JavaScript syntax
+        run: |
+          node --check js/pasha-reviews.js
+          node --check js/admin-pasha-reviews.js
+      - name: PostgreSQL permissions and lifecycle
+        env:
+          DB_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          docker exec -i "$DB_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 < scripts/reviews-db-fixture.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 < supabase/migrations/20260914160000_pasha_reviews.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 < scripts/reviews-db-test.sql
+      - name: Browser tools
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.55.1
+          npx playwright install --with-deps chromium
+      - name: Mobile review form and safe rendering
+        run: node scripts/reviews-browser-test.mjs
