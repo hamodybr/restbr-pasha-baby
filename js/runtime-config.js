@@ -16,6 +16,66 @@ window.RESTBR_CONFIG = Object.freeze({
   legacySessionStorageKeys: {}
 });
 
+// Public storefront SEO identity. Keep the Arabic and English brand names together
+// even when later storefront scripts refresh the document title.
+(() => {
+  const path = String(window.location.pathname || '').toLowerCase();
+  if (/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
+
+  const BRAND_NAME = 'پاشا بيبي — Pasha Baby';
+  const PAGE_TITLE = `${BRAND_NAME} | تسوّق حسب القسم`;
+  const HOME_URL = 'https://pashababyiq.com/';
+
+  const setMeta = (selector, content) => {
+    const node = document.querySelector(selector);
+    if (node && node.getAttribute('content') !== content) {
+      node.setAttribute('content', content);
+    }
+  };
+
+  const applySeoIdentity = () => {
+    if (document.title !== PAGE_TITLE) document.title = PAGE_TITLE;
+
+    setMeta('meta[property="og:site_name"]', BRAND_NAME);
+    setMeta('meta[property="og:title"]', PAGE_TITLE);
+    setMeta('meta[name="twitter:title"]', PAGE_TITLE);
+    setMeta('meta[name="apple-mobile-web-app-title"]', BRAND_NAME);
+
+    let websiteSchema = document.getElementById('pashaWebsiteSchema');
+    if (!websiteSchema) {
+      websiteSchema = document.createElement('script');
+      websiteSchema.id = 'pashaWebsiteSchema';
+      websiteSchema.type = 'application/ld+json';
+      websiteSchema.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        '@id': `${HOME_URL}#website`,
+        url: HOME_URL,
+        name: BRAND_NAME,
+        alternateName: ['پاشا بيبي', 'Pasha Baby', 'باشا بيبي']
+      });
+      document.head.appendChild(websiteSchema);
+    }
+
+    const titleNode = document.querySelector('title');
+    if (titleNode && titleNode.dataset.pashaSeoGuard !== '1') {
+      titleNode.dataset.pashaSeoGuard = '1';
+      new MutationObserver(() => {
+        if (document.title !== PAGE_TITLE) document.title = PAGE_TITLE;
+      }).observe(titleNode, { childList: true, characterData: true, subtree: true });
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applySeoIdentity, { once: true });
+  } else {
+    applySeoIdentity();
+  }
+
+  window.addEventListener('restbr:ready', applySeoIdentity);
+  window.addEventListener('pageshow', applySeoIdentity, { passive: true });
+})();
+
 (() => {
   const config = window.RESTBR_CONFIG || {};
 
