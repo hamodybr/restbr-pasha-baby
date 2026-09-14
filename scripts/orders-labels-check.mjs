@@ -119,7 +119,7 @@ forbidText('js/admin-orders-customers.js', 'font-size:1.95mm', 'unreadable ultra
 requireText('js/admin-orders-customers.js', "from('customer_order_summary')", 'customer summary');
 requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard');
 requireText('js/admin-orders-customers.js', 'PDF / طباعة ليزر واضحة', 'laser invoice action');
-requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=1.1", 'public order loader');
+requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=2.0", 'public order loader');
 requireText('js/pasha-arabic-only.js', "js/admin-invoice-settings.js?v=1.1", 'invoice editor loader');
 requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.9", 'configurable invoice admin orders loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.1", 'color persistence loader');

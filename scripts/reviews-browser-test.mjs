@@ -40,7 +40,7 @@ try{
  const request=page.waitForRequest(r=>r.url().endsWith('/rpc/pasha_reviews_submit'));
  await page.getByRole('button',{name:'إرسال التقييم',exact:true}).click();
  assert.equal((await request).postDataJSON().p_rating,1);
- await page.getByText('شكرًا! تم استلام تقييمك للمراجعة.').waitFor();
+ await page.getByText('شكرًا! تم تسجيل تقييمك.').waitFor();
  assert.equal(await page.getByRole('link',{name:'شارك تقييمك على Google'}).count(),1);
  assert.deepEqual(errors,[]);
  console.log('Mobile demo, submission, token privacy, XSS rendering and neutral Google link passed');

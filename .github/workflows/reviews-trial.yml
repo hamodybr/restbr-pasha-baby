@@ -1,7 +1,7 @@
 name: Reviews trial checks
 on:
   push:
-    branches: ['trial/pasha-reviews-20260914']
+    branches: ['trial/pasha-reviews-20260914', 'feature/checkout-reviews-v2']
   pull_request:
     paths: ['**/*reviews*']
 permissions:
@@ -32,9 +32,19 @@ jobs:
           docker exec -i "$DB_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 < scripts/reviews-db-fixture.sql
           docker exec -i "$DB_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 < supabase/migrations/20260914160000_pasha_reviews.sql
           docker exec -i "$DB_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 < scripts/reviews-db-test.sql
+      - name: Checkout review database behavior
+        env:
+          DB_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          docker exec -i "$DB_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 < scripts/reviews-checkout-db-test.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 < supabase/migrations/20260914180000_checkout_reviews_v2.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 < scripts/reviews-checkout-db-assert.sql
       - name: Browser tools
         run: |
           npm install --no-save --package-lock=false @playwright/test@1.55.1
           npx playwright install --with-deps chromium
       - name: Mobile review form and safe rendering
         run: node scripts/reviews-browser-test.mjs
+
+      - name: Checkout and dashboard review behavior
+        run: node scripts/reviews-checkout-browser-test.mjs

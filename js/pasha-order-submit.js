@@ -295,7 +295,19 @@
       const order = await saveOrder(payload);
       button.textContent = '✓ تم تثبيت الطلب';
       toast('تم تثبيت الطلب', false, WHATSAPP_DELAY_MS, true);
-      setTimeout(() => openWhatsApp(order, checkout, cart), WHATSAPP_DELAY_MS);
+      setTimeout(() => {
+        const continueToWhatsApp = () => {
+          openWhatsApp(order, checkout, cart);
+          submitting = false;
+          button.disabled = false;
+          button.textContent = originalText;
+        };
+        // Review UI failures must never strand a saved order.
+        try {
+          if (window.PashaCheckoutReview?.open({ order, clientToken, continueToWhatsApp })) return;
+        } catch (reviewError) { console.warn('Review UI unavailable', reviewError); }
+        continueToWhatsApp();
+      }, WHATSAPP_DELAY_MS);
     } catch (error) {
       console.error('PASHA ORDER SUBMIT ERROR:', error);
       button.disabled = false;

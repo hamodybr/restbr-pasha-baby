@@ -24,7 +24,7 @@
   root.append(node('h2',t('تجارب زبائن پاشا بيبي','Pasha Baby customer reviews')));
   if(demo)root.append(node('p',t('معاينة تجريبية — بيانات وهمية، لا يتم حفظ أي تقييم.','Demo — sample data; no reviews are saved.'),'pb-review-demo'));
   const summary=node('p');root.append(summary);
-  root.append(node('p',t('نعرض التقييمات بعد مراجعتها لمنع الإساءة والبيانات الشخصية، بصرف النظر عن عدد النجوم.','Reviews are moderated for abuse and personal information, regardless of rating.')));
+  root.append(node('p',t('النجوم بدون تعليق تُنشر مباشرة. التقييمات التي تتضمن تعليقًا تُنشر بعد المراجعة.','Star-only ratings are published immediately. Reviews with comments are published after moderation.')));
   const google=safeGoogle(cfg.google_url);
   if(google){const a=node('a',t('شارك تقييمك على Google','Share your review on Google'),'pb-review-action');a.href=google;a.target='_blank';a.rel='noopener noreferrer';root.append(a);}
   if(page&&(token||demo)){
@@ -41,7 +41,7 @@
     const name=first.value.trim();if(!name||/\s/.test(name)){message.textContent=t('اكتب الاسم الأول فقط بدون مسافات.','Enter your first name without spaces.');return;}
     send.disabled=true;
     try{if(!demo)await rpc('pasha_reviews_submit',{p_token:token,p_first_name:name,p_rating:rating,p_comment:comment.value});
-     form.replaceChildren(node('p',demo?t('تمت تجربة الإرسال فقط، لم يُحفظ تقييم.','Demo submission only; nothing was saved.'):t('شكرًا! تم استلام تقييمك للمراجعة.','Thank you! Your review was received for moderation.')));
+     form.replaceChildren(node('p',demo?t('تمت تجربة الإرسال فقط، لم يُحفظ تقييم.','Demo submission only; nothing was saved.'):(comment.value.trim()?t('شكرًا! تم استلام تقييمك للمراجعة.','Thank you! Your review was received for moderation.'):t('شكرًا! تم تسجيل تقييمك.','Thank you! Your rating was saved.'))));
     }catch(_){message.textContent=t('تعذر إرسال التقييم. تأكد من صلاحية رابط الدعوة والاتصال ثم حاول مجددًا.','Could not submit. Check your invitation and connection, then try again.');send.disabled=false;}
    });
   }else if(page){root.append(node('p',t('لإضافة تقييم موثّق، استخدم رابط التقييم الخاص بطلبك بعد استلامه.','To leave a verified review, use your order invitation after delivery.')));}
@@ -52,7 +52,7 @@
    try{const data=demo?{count:2,average:4,reviews:offset?[]:samples}:await rpc('pasha_reviews_public',{p_offset:offset});
     count=data.count;summary.textContent=count?String(data.average)+' / 5 · '+count+' '+t('تقييم معتمد','approved reviews'):t('لا توجد تقييمات منشورة بعد.','No published reviews yet.');
     for(const r of data.reviews){const card=node('article');card.append(node('strong',r.first_name+' · '+r.rating+' / 5'));card.append(node('p',r.comment));
-     card.append(node('div',(r.verified_purchase?t('✓ مشتري موثّق','✓ Verified buyer'):'')+' · '+new Date(r.created_at).toLocaleDateString('en-GB',{timeZone:'Asia/Baghdad'}),'pb-review-meta'));list.append(card);}
+     card.append(node('div',(r.verified_purchase?(r.verification_kind==='order'?t('✓ طلب موثّق','✓ Verified order'):t('✓ مشتري موثّق','✓ Verified buyer')):'')+' · '+new Date(r.created_at).toLocaleDateString('en-GB',{timeZone:'Asia/Baghdad'}),'pb-review-meta'));list.append(card);}
     offset+=data.reviews.length;more.hidden=offset>=count||!data.reviews.length;
    }catch(_){error.textContent=t('تعذر تحميل التقييمات. اضغط للمحاولة مجددًا.','Could not load reviews. Please retry.');}
    finally{more.disabled=false;}
