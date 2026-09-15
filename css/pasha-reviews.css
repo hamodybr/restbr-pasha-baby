@@ -58,3 +58,24 @@ dialog.pb-checkout-review.pb-reviews-premium{max-width:390px;max-height:90dvh;ov
 .pb-reviews .pb-review-skip{background:transparent;border:0;color:#7d8c83;font-size:12px;min-height:40px;padding:8px}
 @media(max-width:380px){ .pb-review-heading{padding:16px;gap:10px}.pb-review-heading h2{font-size:18px}.pb-review-emblem{flex-basis:44px;width:44px;height:44px}.pb-rating-summary-host,.pb-review-list{padding-inline:16px}.pb-rating-score{font-size:48px;min-width:85px;padding-right:16px}.pb-rating-overview{gap:16px}.pb-reviews-premium>form{padding:14px 16px}.pb-reviews .pb-star-picker label{flex-basis:43px;width:43px;font-size:39px}}
 @media(prefers-reduced-motion:reduce){.pb-rating-track>span,.pb-star-picker label{transition:none!important}}
+
+/* Tighter spacing without reducing touch targets or changing review behavior. */
+.pb-reviews-premium{max-width:560px}
+.pb-reviews-premium .pb-review-heading{padding-block:12px;gap:8px}
+.pb-reviews-premium .pb-review-emblem{flex-basis:36px;width:36px;height:36px;font-size:25px}
+.pb-reviews-premium .pb-rating-overview{padding:12px 0 8px;gap:12px}
+.pb-reviews-premium .pb-rating-score{font-size:40px;min-width:76px;padding-right:12px;letter-spacing:-2px}
+.pb-reviews-premium .pb-rating-score small{margin-top:4px}
+.pb-reviews-premium .pb-rating-bars{gap:4px;padding-bottom:12px}
+.pb-reviews-premium .pb-rating-bar-row{font-size:13px;gap:8px}
+.pb-reviews-premium .pb-review-list article{padding:10px 0}
+.pb-reviews-premium .pb-review-list article>p{margin:6px 0;line-height:1.7}
+.pb-reviews-premium>form{padding-block:10px}
+.pb-reviews-premium>form>label{margin:8px 0}
+.pb-reviews-premium>form>p:empty{margin:0}
+.pb-reviews-premium>.pb-review-action{width:auto;margin-bottom:10px}
+dialog.pb-checkout-review.pb-reviews-premium{max-width:370px}
+.pb-checkout-review .pb-star-feedback{margin-top:4px}
+.pb-checkout-review .pb-review-policy{margin:6px 0}
+.pb-checkout-review form>button{margin-top:6px}
+.pb-checkout-review textarea{height:70px;min-height:70px;padding:8px 10px}
