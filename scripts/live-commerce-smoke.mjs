@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const BASE_URL = String(process.env.SMOKE_BASE_URL || 'https://pashababy.restbr.com').replace(/\/$/, '');
+const BASE_URL = String(process.env.SMOKE_BASE_URL || 'https://pashababyiq.com').replace(/\/$/, '');
 const runtimeConfig = fs.readFileSync(new URL('../js/runtime-config.js', import.meta.url), 'utf8');
 const SUPABASE_URL = runtimeConfig.match(/supabaseUrl:\s*'([^']+)'/)?.[1] || '';
 const SUPABASE_KEY = runtimeConfig.match(/supabasePublishableKey:\s*'([^']+)'/)?.[1] || '';

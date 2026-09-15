@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v40";
+const CACHE_NAME = "restbr-pasha-baby-v41";
 
 const CORE = [
   "./",
@@ -121,9 +121,8 @@ function staleWhileRevalidate(event, request) {
   event.waitUntil(networkUpdate.then(() => {}).catch(() => {}));
 
   return (async () => {
-    const cached =
-      await caches.match(request) ||
-      await caches.match(request, { ignoreSearch: true });
+    // A versioned code request must never receive another version's bytes.
+    const cached = await caches.match(request);
     if (cached) return cached;
     return (await networkUpdate) || Response.error();
   })();

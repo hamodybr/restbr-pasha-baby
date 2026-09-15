@@ -296,6 +296,34 @@ function publicErrorMessage(message: string) {
   return "تعذر تسجيل الطلب. حاول مرة ثانية.";
 }
 
+async function readOrderBody(req: Request): Promise<Record<string, unknown>> {
+  if (!req.body) throw new SyntaxError("Missing body");
+  const reader = req.body.getReader();
+  const decoder = new TextDecoder();
+  let bytes = 0;
+  let text = "";
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > MAX_BODY_BYTES) {
+        await reader.cancel();
+        throw new RangeError("Body too large");
+      }
+      text += decoder.decode(value, { stream: true });
+    }
+    text += decoder.decode();
+  } finally {
+    reader.releaseLock();
+  }
+  const parsed = JSON.parse(text);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new SyntaxError("Expected an object");
+  }
+  return parsed;
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin") || "";
   if (req.method === "OPTIONS") {
@@ -318,8 +346,9 @@ Deno.serve(async (req: Request) => {
 
     let body: Record<string, unknown>;
     try {
-      body = await req.json();
-    } catch {
+      body = await readOrderBody(req);
+    } catch (error) {
+      if (error instanceof RangeError) return json(req, { ok: false, error: "الطلب أكبر من الحد المسموح." }, 413);
       return json(req, { ok: false, error: "بيانات الطلب غير صالحة." }, 400);
     }
 
@@ -479,8 +508,13 @@ Deno.serve(async (req: Request) => {
 
       const productOptions = optionsByProduct.get(item.productId) || [];
       let option: CatalogOption | undefined;
-      if (item.optionId) option = productOptions.find((row) => String(row.id) === item.optionId);
-      if (!option) option = productOptions[item.optionIndex];
+      if (item.optionId) {
+        option = productOptions.find((row) => String(row.id) === item.optionId);
+        if (!option) throw new Error("Invalid option reference");
+      } else if (productOptions.length) {
+        option = productOptions[item.optionIndex];
+        if (!option) throw new Error("Invalid option reference");
+      }
 
       let basePrice = Number(product.base_price || 0);
       let optionId = "";
