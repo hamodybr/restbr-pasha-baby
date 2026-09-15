@@ -25,6 +25,7 @@ try{
   await page.goto('https://test.local/');
   await page.evaluate(()=>{window.RESTBR_CONFIG={supabaseUrl:'https://test.supabase.co',supabasePublishableKey:'test'};window.RESTBR_DB={restaurant:{whatsappNumber:'9647500200660'}};localStorage.setItem('RESTBR_CART_V1',JSON.stringify([{productId:'test',name:{ar:'Product'},qty:1,price:1000}]));});
   await page.addStyleTag({content:await readFile('css/pasha-reviews.css','utf8')});
+  await page.addScriptTag({content:await readFile('js/pasha-review-ui.js','utf8')});
   await page.addScriptTag({content:await readFile('js/pasha-checkout-review.js','utf8')});
   await page.addScriptTag({content:await readFile('js/pasha-order-submit.js','utf8')});
   await page.waitForTimeout(100);
@@ -37,6 +38,7 @@ try{
    if(mode==='skip')await page.getByRole('button',{name:'تخطي والمتابعة للواتساب',exact:true}).click();
    else{
     await page.locator('input[name=rating][value="1"]').check();
+    assert.equal(await page.locator('.pb-star-picker .is-filled').count(),1);
     if(mode==='comment')await page.locator('textarea').fill('تعليق يحتاج موافقة');
     await page.getByRole('button',{name:'إرسال التقييم والمتابعة للواتساب',exact:true}).click();
     if(mode==='failure'){await page.getByText('طلبك محفوظ. تعذر إرسال التقييم؛ حاول مجددًا أو تابع للواتساب.').waitFor();assert.equal(handoffs,0);await page.getByRole('button',{name:'تخطي والمتابعة للواتساب',exact:true}).click();}
