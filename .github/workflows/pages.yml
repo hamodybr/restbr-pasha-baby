@@ -39,6 +39,9 @@ jobs:
       - name: Final performance release audit
         run: node scripts/performance-release-check.mjs
 
+      - name: Order and cache behavior regression
+        run: node scripts/final-audit-regression.mjs
+
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: validate

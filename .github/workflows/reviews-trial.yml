@@ -3,7 +3,7 @@ on:
   push:
     branches: ['trial/pasha-reviews-20260914', 'feature/checkout-reviews-v2', 'feature/pasha-reviews-premium']
   pull_request:
-    paths: ['**/*reviews*']
+    paths: ['**/*reviews*', 'js/pasha-order-submit.js', 'js/cart.js', 'sw.js', 'supabase/functions/pasha-orders/**', '.github/workflows/reviews-trial.yml']
 permissions:
   contents: read
 jobs:
