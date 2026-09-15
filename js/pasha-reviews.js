@@ -27,7 +27,6 @@
   heading.append(emblem,headingCopy);root.append(heading);
   if(demo)root.append(node('p',t('معاينة تجريبية — بيانات وهمية، لا يتم حفظ أي تقييم.','Demo — sample data; no reviews are saved.'),'pb-review-demo'));
   const summary=node('div',undefined,'pb-rating-summary-host');root.append(summary);
-  const policy=node('p',t('النجوم تُنشر مباشرة، والتعليقات بعد المراجعة.','Stars publish immediately; comments follow moderation.'),'pb-review-policy');
   const google=safeGoogle(cfg.google_url);
   if(google){const a=node('a',t('شارك تقييمك على Google','Share your review on Google'),'pb-review-action');a.href=google;a.target='_blank';a.rel='noopener noreferrer';root.append(a);}
   if(page&&(token||demo)){
@@ -48,7 +47,7 @@
     }catch(_){message.textContent=t('تعذر إرسال التقييم. تأكد من صلاحية رابط الدعوة والاتصال ثم حاول مجددًا.','Could not submit. Check your invitation and connection, then try again.');send.disabled=false;}
    });
   }else if(page){root.append(node('p',t('لإضافة تقييم موثّق، استخدم رابط التقييم الخاص بطلبك بعد استلامه.','To leave a verified review, use your order invitation after delivery.')));}
-  const list=node('div');const more=node('button',t('عرض المزيد','Show more'));const error=node('p');error.setAttribute('role','status');list.className='pb-review-list';root.append(list,more,error,policy);
+  const list=node('div');const more=node('button',t('عرض المزيد','Show more'));const error=node('p');error.setAttribute('role','status');list.className='pb-review-list';root.append(list,more,error);
   const samples=[{first_name:'سارة',rating:5,comment:'مثال تجريبي: تعامل لطيف وتجهيز مرتب.',created_at:'2026-09-14T12:00:00Z',verified_purchase:true},{first_name:'آلان',rating:3,comment:'مثال تجريبي: المنتجات جيدة، والتوصيل احتاج وقتًا أكثر.',created_at:'2026-09-13T12:00:00Z',verified_purchase:true}];
   async function next(){
    more.disabled=true;error.textContent='';
