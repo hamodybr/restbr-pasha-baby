@@ -26,11 +26,17 @@ try{
  await page.route('https://*.supabase.co/**',async route=>{
   const path=new URL(route.request().url()).pathname;
   const data=path.endsWith('pasha_reviews_config')?{enabled:true,google_url:'https://g.page/r/test/review'}:
-   path.endsWith('pasha_reviews_public')?{count:1,average:1,reviews:[{first_name:'<img src=x>',rating:1,comment:'<script>alert(1)</script>',created_at:'2026-09-14T00:00:00Z',verified_purchase:true}]}:{ok:true};
+   path.endsWith('pasha_reviews_public')?{count:1,average:1,comment_count:1,distribution:{'1':1,'2':0,'3':0,'4':0,'5':0},reviews:[{first_name:'<img src=x>',rating:1,comment:'<script>alert(1)</script>',created_at:'2026-09-14T00:00:00Z',verified_purchase:true}]}:{ok:true};
   await route.fulfill({json:data});
  });
  await page.goto('http://127.0.0.1:8765/reviews.html#11111111-1111-4111-8111-111111111111');
  await page.locator('article').waitFor();
+ assert.equal(await page.locator('.pb-rating-bar-row').count(),5);
+ assert.equal(await page.locator('.pb-rating-score').innerText(),'1.0\nمن 5');
+ assert.equal(await page.locator('.pb-rating-bar-row').last().locator('.pb-rating-track span').evaluate(e=>e.style.width),'100%');
+ await page.getByRole('button',{name:'تفاصيل التقييمات'}).click();
+ assert.equal(await page.locator('.pb-rating-bars').isVisible(),false);
+ await page.getByRole('button',{name:'تفاصيل التقييمات'}).click();
  assert.equal(new URL(page.url()).hash,'');
  assert.equal(await page.locator('article img,article script').count(),0);
  assert.equal(await page.getByRole('link',{name:'شارك تقييمك على Google'}).count(),1);
