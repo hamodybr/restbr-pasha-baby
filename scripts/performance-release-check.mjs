@@ -46,12 +46,12 @@ requireText('js/admin-large-catalog.js', 'function catalogMayBeTruncated()', 'la
 requireText('js/admin-large-catalog.js', 'async function ensureCompleteCatalog()', 'conditional full-catalog hydration');
 requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row boundary detection');
 
-requireText('sw.js', 'restbr-pasha-baby-v46', 'version-safe code cache generation');
+requireText('sw.js', 'restbr-pasha-baby-v47', 'version-safe code cache generation');
 requireText('sw.js', '2026-09-17: v46 forces iOS Safari', 'install-time storefront cache refresh marker');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
-requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.2', 'carousel gallery precache');
+requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.3', 'carousel gallery precache');
 
 requireText('index.html', 'rel="preconnect" href="https://wlollfpmjzenhkjwxrqo.supabase.co"', 'Supabase preconnect');
 requireText('index.html', 'src="js/vendor/supabase-2.114.0.min.js"', 'self-hosted pinned Supabase browser SDK');
@@ -77,7 +77,8 @@ requireText('js/pasha-product-gallery-thermal-v1.js', "const SHEET_ID = 'pbProdu
 forbidText('js/pasha-product-gallery-thermal-v1.js', 'pbProductDetailsSheet', 'stale plural product sheet id');
 requireText('js/pasha-product-gallery-thermal-v1.js', '__PASHA_PRODUCT_GALLERY_THERMAL_V3__', 'continuous carousel runtime');
 requireText('js/pasha-product-gallery-thermal-v1.js', 'name.before(picker)', 'color strip above product title');
-requireText('js/pasha-product-gallery-thermal-v1.js', "querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())", 'duplicate color thumbnail removal');
+requireText('js/pasha-product-gallery-thermal-v1.js', 'button.dataset.pbCarouselSrc = src', 'persistent color slide source');
+forbidText('js/pasha-product-gallery-thermal-v1.js', "querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())", 'destructive base-gallery thumbnail removal');
 requireText('js/pasha-product-gallery-thermal-v1.js', "stage.addEventListener('pointermove'", 'finger-following gallery swipe');
 requireText('js/pasha-product-gallery-thermal-v1.js', 'pb-carousel-track', 'three-image carousel track');
 requireText('js/pasha-product-gallery-thermal-v1.js', "for (const position of ['prev', 'current', 'next'])", 'previous/current/next carousel peers');
@@ -93,8 +94,8 @@ requireText('js/pasha-product-gallery-thermal-v1.js', 'animation:none!important'
 requireText('js/app.js', 'loading="lazy"', 'lazy product images');
 requireText('js/app.js', 'decoding="async"', 'async product image decode');
 requireText('index.html', 'css/style.css?v=4.1', 'original storefront base CSS order');
-requireText('index.html', 'css/pasha-baby-final-tweaks.css?v=1.0', 'original storefront override CSS order');
-requireText('index.html', 'js/pasha-baby-storefront-bundle.js?v=1.2', 'storefront JavaScript bundle');
+requireText('index.html', 'css/pasha-baby-final-tweaks.css?v=1.1', 'original storefront override CSS order');
+requireText('index.html', 'js/pasha-baby-storefront-bundle.js?v=1.3', 'storefront JavaScript bundle');
 requireText('index.html', 'id="pbBrand" class="pb-brand"', 'server-rendered brand layout');
 requireText('index.html', 'id="pbStoreHeroV2" class="pb-store-hero"', 'server-rendered hero layout');
 requireText('index.html', '__smIntroEarlyDismissTimer', 'data-independent intro dismissal');

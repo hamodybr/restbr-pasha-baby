@@ -228,11 +228,12 @@
 
     colorButtons.forEach(button => {
       const thumb = button.querySelector('.pb-product-sheet-color-image');
-      const src = imageSrc(thumb);
+      const src = imageSrc(thumb) || String(button.dataset.pbCarouselSrc || '');
       if (!src) {
         delete button.dataset.pbCarouselIndex;
         return;
       }
+      button.dataset.pbCarouselSrc = src;
       button.dataset.pbCarouselIndex = String(nextGalleryIndex);
       nextGalleryIndex += 1;
       colorSources.push(src);
@@ -255,7 +256,12 @@
 
     const picker = pickers[pickers.length - 1];
     pickers.slice(0, -1).forEach(old => old.remove());
-    picker.querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove());
+    /* These hidden nodes belong to the base gallery. Keep them available so a
+       later observer pass cannot collapse the carousel to the main image. */
+    picker.querySelectorAll('.pb-product-sheet-color-image').forEach(img => {
+      img.loading = 'lazy';
+      img.decoding = 'async';
+    });
     picker.querySelectorAll('.pb-product-sheet-color.has-image').forEach(btn => btn.classList.remove('has-image'));
     if (picker.nextElementSibling !== name) name.before(picker);
     return true;
@@ -310,8 +316,9 @@
   function renderTrack(stage, forcedIndex = null) {
     const sheet = document.getElementById(SHEET_ID);
     const slides = stage?.__pbCarouselSlides;
+    if (!sheet || !Array.isArray(slides) || !slides.length) return false;
     const parts = ensureTrack(stage);
-    if (!sheet || !Array.isArray(slides) || !slides.length || !parts) return false;
+    if (!parts) return false;
 
     const index = normalizeIndex(forcedIndex === null ? currentGalleryIndex(sheet) : forcedIndex, slides.length);
     const previousIndex = normalizeIndex(index - 1, slides.length);

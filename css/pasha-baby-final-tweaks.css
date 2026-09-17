@@ -39,8 +39,34 @@ html body #smMenu .sm-grid > article.sm-card{
   overflow:hidden!important;
   border-radius:var(--pb-card-radius)!important;
   isolation:isolate!important;
-  content-visibility:auto;
-  contain-intrinsic-size:330px;
+  content-visibility:visible;
+  contain:none;
+  contain-intrinsic-size:none;
+}
+
+/* The core sticky code applies `fixed` to #smCats itself. */
+#smCats.sm-cats.fixed{
+  background:rgba(247,248,246,.98)!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  transition:none!important;
+}
+
+@media(max-width:899px){
+  html body #smMenu .sm-grid > article.sm-card,
+  html body #smMenu .sm-grid > article.sm-card:active,
+  html body #smMenu .sm-card .sm-product-image{
+    animation:none!important;
+    transition:none!important;
+    transform:none!important;
+    translate:0 0!important;
+    scale:1!important;
+    filter:none!important;
+    will-change:auto!important;
+  }
+  html body #smMenu .sm-card .sm-live-sheen{display:none!important}
 }
 
 /* Large image first. All old 160px side-by-side constraints are neutralized. */

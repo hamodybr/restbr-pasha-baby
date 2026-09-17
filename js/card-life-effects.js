@@ -1,6 +1,9 @@
 (() => {
   const STYLE_ID = 'smCardLifeEffectsStyle';
   const MENU_ID = 'smMenu';
+  const MOBILE_STATIC = window.matchMedia?.(
+    '(max-width: 899px), (hover: none), (pointer: coarse)'
+  )?.matches === true;
 
   function installStyles() {
     if (document.getElementById(STYLE_ID)) return;
@@ -200,6 +203,11 @@
       : [...root.querySelectorAll?.('.sm-card') || []];
 
     cards.forEach(card => {
+      if (MOBILE_STATIC) {
+        card.classList.remove('sm-life-ready');
+        card.querySelectorAll(':scope > .sm-live-sheen').forEach(node => node.remove());
+        return;
+      }
       if (!card.classList.contains('sm-life-ready')) {
         card.classList.add('sm-life-ready');
       }
@@ -214,7 +222,7 @@
   }
 
   function start() {
-    installStyles();
+    if (!MOBILE_STATIC) installStyles();
 
     const menu = document.getElementById(MENU_ID);
     if (!menu) return;

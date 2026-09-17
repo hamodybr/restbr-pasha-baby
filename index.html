@@ -33,8 +33,8 @@
       const intro=document.getElementById("smIntro");
       if(!intro)return;
       intro.classList.add("hide");
-      setTimeout(function(){intro.style.display="none";},360);
-    },620);
+      setTimeout(function(){intro.style.display="none";},220);
+    },180);
     window.RESTBR_HOURS_READY=false;
     document.documentElement.classList.add("sm-hours-pending");
 
@@ -200,6 +200,7 @@
   <link rel="stylesheet" href="css/pasha-baby-commerce.css?v=1.0">
 
   <style>
+    #smIntro{pointer-events:none!important;transition-duration:.18s!important}
     html.sm-hours-pending .sm-add-cart,
     html.sm-hours-pending .sm-direct-add,
     html.sm-hours-pending .sm-choose-options,
@@ -324,13 +325,13 @@
   <link rel="stylesheet" href="css/pasha-baby-retail-v4.css?v=5.0">
   <link rel="stylesheet" href="css/pasha-baby-brand-background.css?v=1.0">
   <link rel="stylesheet" href="css/pasha-baby-footer-v2.css?v=2.0">
-  <link rel="stylesheet" href="css/pasha-baby-final-tweaks.css?v=1.0">
+  <link rel="stylesheet" href="css/pasha-baby-final-tweaks.css?v=1.1">
 
   <script
     src="js/vendor/supabase-2.114.0.min.js"
     integrity="sha384-0UK+HVlz5Y7F//atDpPysyocv/PjGXQoBX+XSaL/eEotARW8rPFh+lL5sO0Ljzfi"
     crossorigin="anonymous" defer></script>
-  <script src="js/pasha-baby-storefront-bundle.js?v=1.2" defer></script>
+  <script src="js/pasha-baby-storefront-bundle.js?v=1.3" defer></script>
   <link rel="stylesheet" href="css/pasha-reviews.css?v=5">
   <script src="js/pasha-review-ui.js?v=3" defer></script>
   <script src="js/pasha-checkout-review.js?v=3" defer></script>
