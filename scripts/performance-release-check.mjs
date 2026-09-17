@@ -47,6 +47,7 @@ requireText('js/admin-large-catalog.js', 'async function ensureCompleteCatalog()
 requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row boundary detection');
 
 requireText('sw.js', 'restbr-pasha-baby-v45', 'version-safe code cache generation');
+requireText('sw.js', '2026-09-17: refresh the existing cache generation', 'install-time storefront cache refresh marker');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
@@ -74,14 +75,20 @@ forbidText('js/admin-image-optimizer.js', 'createImageBitmap(', 'duplicate legac
 requireText('js/pasha-baby-product-description-v2.js', "const SHEET_ID = 'pbProductDetailSheet'", 'real product details sheet id');
 requireText('js/pasha-product-gallery-thermal-v1.js', "const SHEET_ID = 'pbProductDetailSheet'", 'gallery helper real sheet target');
 forbidText('js/pasha-product-gallery-thermal-v1.js', 'pbProductDetailsSheet', 'stale plural product sheet id');
-requireText('js/pasha-product-gallery-thermal-v1.js', '__PASHA_PRODUCT_GALLERY_THERMAL_V2__', 'new carousel runtime');
+requireText('js/pasha-product-gallery-thermal-v1.js', '__PASHA_PRODUCT_GALLERY_THERMAL_V3__', 'continuous carousel runtime');
 requireText('js/pasha-product-gallery-thermal-v1.js', 'name.before(picker)', 'color strip above product title');
 requireText('js/pasha-product-gallery-thermal-v1.js', "querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())", 'duplicate color thumbnail removal');
 requireText('js/pasha-product-gallery-thermal-v1.js', "stage.addEventListener('pointermove'", 'finger-following gallery swipe');
-requireText('js/pasha-product-gallery-thermal-v1.js', 'pb-carousel-prev-image', 'previous carousel peer');
-requireText('js/pasha-product-gallery-thermal-v1.js', 'pb-carousel-next-image', 'next carousel peer');
-requireText('js/pasha-product-gallery-thermal-v1.js', 'new IntersectionObserver', 'low-cost sticky category state');
+requireText('js/pasha-product-gallery-thermal-v1.js', 'pb-carousel-track', 'three-image carousel track');
+requireText('js/pasha-product-gallery-thermal-v1.js', "for (const position of ['prev', 'current', 'next'])", 'previous/current/next carousel peers');
+requireText('js/pasha-product-gallery-thermal-v1.js', 'requestAnimationFrame(flushMove)', 'rAF-throttled finger tracking');
 requireText('js/pasha-product-gallery-thermal-v1.js', 'touch-action:pan-y', 'native vertical scrolling during gallery use');
+requireText('js/pasha-product-gallery-thermal-v1.js', 'background:rgba(247,248,246,.97)!important', 'natural category rail background');
+forbidText('js/pasha-product-gallery-thermal-v1.js', 'background:#101313!important', 'obsolete black category rail');
+forbidText('js/pasha-product-gallery-thermal-v1.js', 'new IntersectionObserver', 'obsolete sticky-category observer');
+requireText('js/pasha-product-gallery-thermal-v1.js', 'content-visibility:visible!important', 'Safari card virtualization override');
+requireText('js/pasha-product-gallery-thermal-v1.js', '.sm-live-sheen', 'legacy card sheen suppression');
+requireText('js/pasha-product-gallery-thermal-v1.js', 'animation:none!important', 'legacy mobile card animation suppression');
 
 requireText('js/app.js', 'loading="lazy"', 'lazy product images');
 requireText('js/app.js', 'decoding="async"', 'async product image decode');

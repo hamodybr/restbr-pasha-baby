@@ -1,14 +1,13 @@
 (() => {
   if (/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_PRODUCT_GALLERY_THERMAL_V2__) return;
-  window.__PASHA_PRODUCT_GALLERY_THERMAL_V2__ = true;
+  if (window.__PASHA_PRODUCT_GALLERY_THERMAL_V3__) return;
+  window.__PASHA_PRODUCT_GALLERY_THERMAL_V3__ = true;
 
   const SHEET_ID = 'pbProductDetailSheet';
-  const STYLE_ID = 'pbProductGalleryThermalV2Style';
-  const CATS_STUCK_CLASS = 'pb-cats-stuck';
-  const CAROUSEL_MS = 260;
+  const STYLE_ID = 'pbProductGalleryThermalV3Style';
+  const CAROUSEL_MS = 285;
   let sheetObserver = null;
-  let catsObserver = null;
+  let discoveryObserver = null;
   let queued = false;
 
   function installStyle() {
@@ -22,30 +21,30 @@
       }
       #${SHEET_ID} .pb-product-sheet-color-title{
         margin:0 0 6px!important;
-        font-size:10.5px!important;
+        font-size:11px!important;
         line-height:1.2!important;
-        opacity:.76!important;
+        opacity:.78!important;
       }
       #${SHEET_ID} .pb-product-sheet-color-list{
         display:flex!important;
-        gap:7px!important;
+        gap:8px!important;
         overflow-x:auto!important;
         overflow-y:hidden!important;
         overscroll-behavior-inline:contain!important;
         scrollbar-width:none!important;
-        padding:1px 1px 4px!important;
+        padding:1px 1px 5px!important;
         -webkit-overflow-scrolling:touch!important;
       }
       #${SHEET_ID} .pb-product-sheet-color-list::-webkit-scrollbar{display:none!important}
       #${SHEET_ID} .pb-product-sheet-color{
-        min-height:36px!important;
+        min-height:40px!important;
         min-width:max-content!important;
         max-width:none!important;
-        gap:6px!important;
-        padding:5px 10px!important;
-        border-radius:10px!important;
-        font-size:11px!important;
-        line-height:1.18!important;
+        gap:7px!important;
+        padding:6px 12px!important;
+        border-radius:11px!important;
+        font-size:11.5px!important;
+        line-height:1.2!important;
         flex:0 0 auto!important;
         white-space:nowrap!important;
       }
@@ -55,27 +54,44 @@
         text-overflow:clip!important;
       }
       #${SHEET_ID} .pb-product-sheet-color-swatch{
-        width:15px!important;
-        height:15px!important;
-        min-width:15px!important;
-        min-height:15px!important;
+        width:17px!important;
+        height:17px!important;
+        min-width:17px!important;
+        min-height:17px!important;
       }
       #${SHEET_ID} .pb-product-sheet-color-image{display:none!important}
       #${SHEET_ID} .pb-product-sheet-name{margin-top:5px!important}
 
       #${SHEET_ID} .pb-product-sheet-stage{
-        --pb-carousel-x:0px;
         touch-action:pan-y!important;
         overflow:hidden!important;
         position:relative!important;
       }
-      #${SHEET_ID} .pb-product-sheet-image,
-      #${SHEET_ID} .pb-carousel-peer{
+      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-enhanced > .pb-product-sheet-image{
+        visibility:hidden!important;
+        opacity:0!important;
+        pointer-events:none!important;
+      }
+      #${SHEET_ID} .pb-carousel-track{
         position:absolute!important;
-        inset:0!important;
-        display:block!important;
-        width:100%!important;
+        z-index:1!important;
+        inset:0 auto 0 0!important;
+        width:300%!important;
         height:100%!important;
+        display:flex!important;
+        flex-direction:row!important;
+        direction:ltr!important;
+        transform:translate3d(-33.333333%,0,0);
+        pointer-events:none!important;
+        will-change:auto!important;
+      }
+      #${SHEET_ID} .pb-carousel-track > img{
+        display:block!important;
+        flex:0 0 33.333333%!important;
+        width:33.333333%!important;
+        height:100%!important;
+        min-width:0!important;
+        max-width:none!important;
         margin:0!important;
         object-fit:contain!important;
         object-position:center!important;
@@ -83,57 +99,86 @@
         pointer-events:none!important;
         user-select:none!important;
         -webkit-user-select:none!important;
-        will-change:auto!important;
+        -webkit-user-drag:none!important;
       }
-      #${SHEET_ID} .pb-product-sheet-image{
-        transform:translate3d(var(--pb-carousel-x),0,0)!important;
-      }
-      #${SHEET_ID} .pb-carousel-prev-image{
-        transform:translate3d(calc(-100% + var(--pb-carousel-x)),0,0)!important;
-      }
-      #${SHEET_ID} .pb-carousel-next-image{
-        transform:translate3d(calc(100% + var(--pb-carousel-x)),0,0)!important;
-      }
-      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-dragging .pb-product-sheet-image,
-      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-dragging .pb-carousel-peer,
-      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-animating .pb-product-sheet-image,
-      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-animating .pb-carousel-peer{
+      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-dragging .pb-carousel-track,
+      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-animating .pb-carousel-track{
         will-change:transform!important;
       }
-      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-animating .pb-product-sheet-image,
-      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-animating .pb-carousel-peer{
-        transition:transform ${CAROUSEL_MS}ms cubic-bezier(.22,.72,.18,1)!important;
+      #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-animating .pb-carousel-track{
+        transition:transform ${CAROUSEL_MS}ms cubic-bezier(.22,.74,.18,1)!important;
       }
       #${SHEET_ID} .pb-product-gallery-arrow{
+        z-index:4!important;
         backdrop-filter:none!important;
         -webkit-backdrop-filter:none!important;
         background:rgba(255,255,255,.96)!important;
       }
+      #${SHEET_ID} .pb-product-gallery-dots,
+      #${SHEET_ID} .pb-product-gallery-counter,
+      #${SHEET_ID} .pb-product-gallery-caption,
+      #${SHEET_ID} .pb-product-gallery-hint{position:relative!important;z-index:3!important}
 
-      .sm-cats-wrap{
+      /* The Pasha category rail should never turn into a black slab. */
+      .sm-cats-wrap,
+      .sm-cats-wrap.fixed,
+      .sm-cats-wrap.pb-cats-stuck{
+        background:rgba(247,248,246,.97)!important;
+        background-image:none!important;
+        box-shadow:none!important;
         backdrop-filter:none!important;
         -webkit-backdrop-filter:none!important;
-        transition:background-color .16s ease,box-shadow .16s ease!important;
+        transition:none!important;
       }
-      .sm-cats-wrap.${CATS_STUCK_CLASS}{
-        background:#101313!important;
-        background-image:none!important;
-        box-shadow:0 8px 22px rgba(0,0,0,.20)!important;
-      }
-      .pb-cats-sticky-sentinel{
-        display:block!important;
-        width:1px!important;
-        height:1px!important;
-        margin:0 0 -1px!important;
-        padding:0!important;
-        border:0!important;
-        pointer-events:none!important;
-        visibility:hidden!important;
-      }
+      .pb-cats-sticky-sentinel{display:none!important}
 
+      /* iOS Safari: disable virtualized cards and legacy living-card animation.
+         Both were repainting/re-compositing cards while scrolling back and forth. */
       @media(max-width:899px){
         html body #smMenu .sm-grid > article.sm-card{
-          contain-intrinsic-size:auto 560px!important;
+          content-visibility:visible!important;
+          contain:none!important;
+          contain-intrinsic-size:none!important;
+          transition:none!important;
+          transform:none!important;
+          translate:0 0!important;
+          filter:none!important;
+          will-change:auto!important;
+        }
+        html body #smMenu .sm-grid > article.sm-card:active,
+        html body #smMenu .sm-card.sm-life-ready,
+        html body #smMenu .sm-card.sm-life-ready.sm-reveal,
+        html body #smMenu .sm-card.sm-life-ready.sm-reveal.sm-visible,
+        html body #smMenu .sm-card.sm-life-ready:active{
+          animation:none!important;
+          transition:none!important;
+          transform:none!important;
+          translate:0 0!important;
+          filter:none!important;
+          will-change:auto!important;
+        }
+        html body #smMenu .sm-card .sm-product-image,
+        html body #smMenu .sm-card.sm-life-ready .sm-product-image,
+        html body #smMenu .sm-card.sm-life-ready:active .sm-product-image{
+          animation:none!important;
+          transition:none!important;
+          transform:none!important;
+          translate:0 0!important;
+          scale:1!important;
+          filter:none!important;
+          will-change:auto!important;
+        }
+        html body #smMenu .sm-card .sm-live-sheen,
+        html body #smMenu .sm-card .sm-info::after,
+        html body #smMenu .sm-popular-card::before,
+        html body #smMenu .sm-hot-card::after,
+        html body #smMenu .sm-grill-card::before,
+        html body #smMenu .sm-cold-card::before,
+        html body #smMenu .sm-cold-card::after{
+          display:none!important;
+          content:none!important;
+          animation:none!important;
+          transition:none!important;
         }
         html body #smMenu .sm-card > .sm-share-product{
           backdrop-filter:none!important;
@@ -143,11 +188,9 @@
       }
 
       @media(prefers-reduced-motion:reduce){
-        #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-animating .pb-product-sheet-image,
-        #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-animating .pb-carousel-peer{
+        #${SHEET_ID} .pb-product-sheet-stage.pb-carousel-animating .pb-carousel-track{
           transition-duration:1ms!important;
         }
-        .sm-cats-wrap{transition:none!important}
       }
     `;
     document.head.appendChild(style);
@@ -157,18 +200,27 @@
     image?.currentSrc || image?.getAttribute?.('src') || image?.src || ''
   ).trim();
 
+  const normalizeIndex = (index, total) => total > 0
+    ? ((Number(index) % total) + total) % total
+    : 0;
+
   function currentGalleryIndex(sheet) {
     const selected = sheet?.querySelector('[data-pb-gallery-index][aria-current="true"], [data-pb-gallery-index].selected');
     const index = Number(selected?.dataset?.pbGalleryIndex);
     return Number.isFinite(index) ? index : 0;
   }
 
+  function cleanupOldCategoryState() {
+    document.querySelectorAll('.sm-cats-wrap.pb-cats-stuck').forEach(wrap => wrap.classList.remove('pb-cats-stuck'));
+    document.querySelectorAll('.pb-cats-sticky-sentinel').forEach(node => node.remove());
+  }
+
   function captureSlidesBeforeCompacting(sheet) {
     const stage = sheet?.querySelector('.pb-product-sheet-stage');
-    const center = stage?.querySelector('.pb-product-sheet-image');
+    const center = stage?.querySelector(':scope > .pb-product-sheet-image');
     const pickers = [...(sheet?.querySelectorAll('.pb-product-sheet-color-picker') || [])];
     const picker = pickers[pickers.length - 1];
-    if (!stage || !center || !picker) return;
+    if (!stage || !center || !picker) return false;
 
     const colorButtons = [...picker.querySelectorAll('[data-pb-detail-color-id]')];
     const colorSources = [];
@@ -186,102 +238,96 @@
       colorSources.push(src);
     });
 
+    const activeIndex = currentGalleryIndex(sheet);
     const current = imageSrc(center);
-    let main = String(stage.__pbCarouselMainSrc || '');
-    if (!main || !colorSources.includes(current)) main = current || main;
-    if (!main) return;
+    if (activeIndex === 0 && current) stage.__pbCarouselMainSrc = current;
+    if (!stage.__pbCarouselMainSrc && current) stage.__pbCarouselMainSrc = current;
+    if (!stage.__pbCarouselMainSrc) return false;
 
-    stage.__pbCarouselMainSrc = main;
-    stage.__pbCarouselSlides = [main, ...colorSources];
+    stage.__pbCarouselSlides = [String(stage.__pbCarouselMainSrc), ...colorSources];
+    return true;
   }
 
-  function compactAndMoveColorPicker() {
-    const sheet = document.getElementById(SHEET_ID);
-    if (!sheet) return false;
-    const name = sheet.querySelector('.pb-product-sheet-name');
-    const pickers = [...sheet.querySelectorAll('.pb-product-sheet-color-picker')];
+  function compactAndMoveColorPicker(sheet) {
+    const name = sheet?.querySelector('.pb-product-sheet-name');
+    const pickers = [...(sheet?.querySelectorAll('.pb-product-sheet-color-picker') || [])];
     if (!name || !pickers.length) return false;
 
     const picker = pickers[pickers.length - 1];
     pickers.slice(0, -1).forEach(old => old.remove());
-
     picker.querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove());
     picker.querySelectorAll('.pb-product-sheet-color.has-image').forEach(btn => btn.classList.remove('has-image'));
-
     if (picker.nextElementSibling !== name) name.before(picker);
     return true;
   }
 
-  function ensureCarouselPeers(stage) {
+  function ensureTrack(stage) {
     if (!(stage instanceof HTMLElement)) return null;
-    let previous = stage.querySelector('.pb-carousel-prev-image');
-    let next = stage.querySelector('.pb-carousel-next-image');
-
-    if (!previous) {
-      previous = document.createElement('img');
-      previous.className = 'pb-carousel-peer pb-carousel-prev-image';
-      previous.alt = '';
-      previous.decoding = 'async';
-      previous.draggable = false;
-      stage.prepend(previous);
+    let track = stage.querySelector(':scope > .pb-carousel-track');
+    if (!track) {
+      track = document.createElement('div');
+      track.className = 'pb-carousel-track';
+      track.setAttribute('aria-hidden', 'true');
+      for (const position of ['prev', 'current', 'next']) {
+        const image = document.createElement('img');
+        image.className = `pb-carousel-track-${position}`;
+        image.alt = '';
+        image.decoding = 'async';
+        image.draggable = false;
+        track.appendChild(image);
+      }
+      const center = stage.querySelector(':scope > .pb-product-sheet-image');
+      if (center) stage.insertBefore(track, center);
+      else stage.prepend(track);
     }
-    if (!next) {
-      next = document.createElement('img');
-      next.className = 'pb-carousel-peer pb-carousel-next-image';
-      next.alt = '';
-      next.decoding = 'async';
-      next.draggable = false;
-      const center = stage.querySelector('.pb-product-sheet-image');
-      if (center?.nextSibling) stage.insertBefore(next, center.nextSibling);
-      else stage.appendChild(next);
-    }
-    return { previous, next };
+    stage.classList.add('pb-carousel-enhanced');
+    return {
+      track,
+      previous: track.children[0],
+      current: track.children[1],
+      next: track.children[2]
+    };
   }
 
-  function setPeerSource(image, src) {
-    if (!image) return;
+  function setImageSource(image, src) {
+    if (!(image instanceof HTMLImageElement)) return;
     const nextSrc = String(src || '');
     if (!nextSrc) {
-      image.hidden = true;
       image.removeAttribute('src');
       return;
     }
-    image.hidden = false;
     if (imageSrc(image) !== nextSrc) image.src = nextSrc;
   }
 
-  function syncCarouselPeers(stage, forcedIndex = null) {
+  function setTrackOffset(stage, px, animate = false) {
+    const parts = ensureTrack(stage);
+    if (!parts) return;
+    stage.classList.toggle('pb-carousel-animating', animate);
+    if (!animate) stage.classList.remove('pb-carousel-animating');
+    parts.track.style.transform = `translate3d(calc(-33.333333% + ${Number(px) || 0}px),0,0)`;
+  }
+
+  function renderTrack(stage, forcedIndex = null) {
     const sheet = document.getElementById(SHEET_ID);
     const slides = stage?.__pbCarouselSlides;
-    const peers = ensureCarouselPeers(stage);
-    if (!sheet || !Array.isArray(slides) || !slides.length || !peers) return false;
+    const parts = ensureTrack(stage);
+    if (!sheet || !Array.isArray(slides) || !slides.length || !parts) return false;
 
-    const index = forcedIndex === null ? currentGalleryIndex(sheet) : Number(forcedIndex);
-    const safeIndex = ((index % slides.length) + slides.length) % slides.length;
-    stage.__pbCarouselIndex = safeIndex;
-    stage.style.setProperty('--pb-carousel-x', '0px');
-
-    if (slides.length < 2) {
-      peers.previous.hidden = true;
-      peers.next.hidden = true;
-      return true;
-    }
-
-    const previousIndex = (safeIndex - 1 + slides.length) % slides.length;
-    const nextIndex = (safeIndex + 1) % slides.length;
-    setPeerSource(peers.previous, slides[previousIndex]);
-    setPeerSource(peers.next, slides[nextIndex]);
+    const index = normalizeIndex(forcedIndex === null ? currentGalleryIndex(sheet) : forcedIndex, slides.length);
+    const previousIndex = normalizeIndex(index - 1, slides.length);
+    const nextIndex = normalizeIndex(index + 1, slides.length);
+    setImageSource(parts.previous, slides.length > 1 ? slides[previousIndex] : '');
+    setImageSource(parts.current, slides[index]);
+    setImageSource(parts.next, slides.length > 1 ? slides[nextIndex] : '');
+    stage.__pbCarouselIndex = index;
+    stage.classList.remove('pb-carousel-dragging', 'pb-carousel-animating');
+    parts.track.style.transition = '';
+    setTrackOffset(stage, 0, false);
     return true;
   }
 
-  function carouselDirection(from, to, total) {
-    const forward = (to - from + total) % total;
-    const backward = (from - to + total) % total;
-    return forward <= backward ? 1 : -1;
-  }
-
-  function activateDot(sheet, index, stage) {
-    const dot = sheet.querySelector(`[data-pb-gallery-index="${index}"]`);
+  function activateBaseDot(sheet, index, stage) {
+    const dot = sheet?.querySelector(`[data-pb-gallery-index="${index}"]`);
     if (!dot) return false;
     stage.__pbCarouselInternalClick = true;
     try { dot.click(); }
@@ -289,21 +335,43 @@
     return true;
   }
 
-  function animateCarouselTo(stage, targetIndex, direction = null) {
+  function directionBetween(from, to, total) {
+    const forward = normalizeIndex(to - from, total);
+    const backward = normalizeIndex(from - to, total);
+    return forward <= backward ? 1 : -1;
+  }
+
+  function transitionDone(track, callback) {
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      track.removeEventListener('transitionend', onEnd);
+      callback();
+    };
+    const onEnd = event => {
+      if (event.target === track && event.propertyName === 'transform') finish();
+    };
+    track.addEventListener('transitionend', onEnd);
+    window.setTimeout(finish, CAROUSEL_MS + 90);
+  }
+
+  function animateCarouselTo(stage, requestedIndex, requestedDirection = null) {
     const sheet = document.getElementById(SHEET_ID);
     const slides = stage?.__pbCarouselSlides;
-    if (!sheet || !Array.isArray(slides) || slides.length < 2 || stage.__pbCarouselBusy) return false;
+    const parts = ensureTrack(stage);
+    if (!sheet || !Array.isArray(slides) || slides.length < 2 || !parts || stage.__pbCarouselBusy) return false;
 
-    const from = currentGalleryIndex(sheet);
-    const target = ((Number(targetIndex) % slides.length) + slides.length) % slides.length;
-    if (target === from) return false;
+    const from = normalizeIndex(currentGalleryIndex(sheet), slides.length);
+    const target = normalizeIndex(requestedIndex, slides.length);
+    if (target === from) {
+      renderTrack(stage, target);
+      return false;
+    }
 
-    const move = direction || carouselDirection(from, target, slides.length);
-    const peers = ensureCarouselPeers(stage);
-    if (!peers) return false;
-
-    if (move > 0) setPeerSource(peers.next, slides[target]);
-    else setPeerSource(peers.previous, slides[target]);
+    const direction = requestedDirection || directionBetween(from, target, slides.length);
+    if (direction > 0) setImageSource(parts.next, slides[target]);
+    else setImageSource(parts.previous, slides[target]);
 
     const width = Math.max(1, stage.getBoundingClientRect().width || stage.clientWidth || 320);
     stage.__pbCarouselBusy = true;
@@ -311,40 +379,49 @@
     stage.classList.add('pb-carousel-animating');
 
     requestAnimationFrame(() => {
-      stage.style.setProperty('--pb-carousel-x', `${move > 0 ? -width : width}px`);
+      parts.track.style.transform = `translate3d(calc(-33.333333% + ${direction > 0 ? -width : width}px),0,0)`;
+      transitionDone(parts.track, () => {
+        activateBaseDot(sheet, target, stage);
+        renderTrack(stage, target);
+        stage.__pbCarouselBusy = false;
+      });
     });
-
-    window.setTimeout(() => {
-      activateDot(sheet, target, stage);
-      stage.classList.remove('pb-carousel-animating');
-      stage.style.setProperty('--pb-carousel-x', '0px');
-      syncCarouselPeers(stage, target);
-      stage.__pbCarouselBusy = false;
-    }, CAROUSEL_MS + 24);
-
     return true;
   }
 
   function settleCarousel(stage) {
-    if (!stage || stage.__pbCarouselBusy) return;
+    const parts = ensureTrack(stage);
+    if (!parts || stage.__pbCarouselBusy) return;
     stage.classList.remove('pb-carousel-dragging');
     stage.classList.add('pb-carousel-animating');
-    stage.style.setProperty('--pb-carousel-x', '0px');
-    window.setTimeout(() => {
-      stage.classList.remove('pb-carousel-animating');
-    }, CAROUSEL_MS + 20);
+    requestAnimationFrame(() => {
+      parts.track.style.transform = 'translate3d(-33.333333%,0,0)';
+      transitionDone(parts.track, () => {
+        stage.classList.remove('pb-carousel-animating');
+        renderTrack(stage);
+      });
+    });
   }
 
   function bindCarousel(stage) {
-    if (!(stage instanceof HTMLElement) || stage.dataset.pbWhatsappCarousel === '1') return;
-    stage.dataset.pbWhatsappCarousel = '1';
+    if (!(stage instanceof HTMLElement) || stage.dataset.pbWhatsappTrack === '1') return;
+    stage.dataset.pbWhatsappTrack = '1';
     let drag = null;
+    let moveFrame = 0;
+    let pendingDx = 0;
+
+    const flushMove = () => {
+      moveFrame = 0;
+      if (!drag?.horizontal || stage.__pbCarouselBusy) return;
+      setTrackOffset(stage, pendingDx, false);
+    };
 
     stage.addEventListener('pointerdown', event => {
       if (event.target.closest('button')) return;
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       if (!Array.isArray(stage.__pbCarouselSlides) || stage.__pbCarouselSlides.length < 2) return;
 
+      renderTrack(stage);
       drag = {
         id: event.pointerId,
         x: event.clientX,
@@ -354,6 +431,7 @@
         velocityX: 0,
         horizontal: false
       };
+      pendingDx = 0;
       event.stopImmediatePropagation();
     }, true);
 
@@ -363,8 +441,8 @@
       const dy = event.clientY - drag.y;
 
       if (!drag.horizontal) {
-        if (Math.abs(dx) < 7) return;
-        if (Math.abs(dx) <= Math.abs(dy) * 1.08) return;
+        if (Math.abs(dx) < 6) return;
+        if (Math.abs(dx) <= Math.abs(dy) * 1.05) return;
         drag.horizontal = true;
         stage.classList.add('pb-carousel-dragging');
         try { stage.setPointerCapture(event.pointerId); } catch (_) {}
@@ -372,8 +450,7 @@
       if (!drag.horizontal) return;
 
       event.preventDefault();
-      event.stopPropagation();
-
+      event.stopImmediatePropagation();
       const now = performance.now();
       const elapsed = Math.max(1, now - drag.lastAt);
       drag.velocityX = (event.clientX - drag.lastX) / elapsed;
@@ -381,14 +458,18 @@
       drag.lastAt = now;
 
       const width = Math.max(1, stage.clientWidth || 320);
-      const clamped = Math.max(-width, Math.min(width, dx));
-      stage.style.setProperty('--pb-carousel-x', `${clamped}px`);
+      pendingDx = Math.max(-width, Math.min(width, dx));
+      if (!moveFrame) moveFrame = requestAnimationFrame(flushMove);
     }, { capture: true, passive: false });
 
     stage.addEventListener('pointerup', event => {
       if (!drag || drag.id !== event.pointerId) return;
       const state = drag;
       drag = null;
+      if (moveFrame) {
+        cancelAnimationFrame(moveFrame);
+        moveFrame = 0;
+      }
       if (!state.horizontal) return;
 
       event.preventDefault();
@@ -397,25 +478,29 @@
 
       const dx = event.clientX - state.x;
       const width = Math.max(1, stage.clientWidth || 320);
-      const distanceThreshold = Math.min(58, Math.max(38, width * 0.16));
-      const fastEnough = Math.abs(state.velocityX) > 0.42 && Math.abs(dx) > 18;
-      const commit = Math.abs(dx) >= distanceThreshold || fastEnough;
+      pendingDx = Math.max(-width, Math.min(width, dx));
+      setTrackOffset(stage, pendingDx, false);
 
-      if (!commit) {
+      const distanceThreshold = Math.min(62, Math.max(34, width * 0.14));
+      const fastEnough = Math.abs(state.velocityX) > 0.36 && Math.abs(dx) > 14;
+      if (Math.abs(dx) < distanceThreshold && !fastEnough) {
         settleCarousel(stage);
         return;
       }
 
-      const current = currentGalleryIndex(document.getElementById(SHEET_ID));
-      const direction = dx < 0 ? 1 : -1;
       const total = stage.__pbCarouselSlides.length;
-      const target = (current + direction + total) % total;
-      animateCarouselTo(stage, target, direction);
+      const current = normalizeIndex(currentGalleryIndex(document.getElementById(SHEET_ID)), total);
+      const direction = dx < 0 ? 1 : -1;
+      animateCarouselTo(stage, current + direction, direction);
     }, true);
 
     stage.addEventListener('pointercancel', event => {
       if (!drag || drag.id !== event.pointerId) return;
       drag = null;
+      if (moveFrame) {
+        cancelAnimationFrame(moveFrame);
+        moveFrame = 0;
+      }
       settleCarousel(stage);
     }, true);
 
@@ -424,28 +509,28 @@
       if (!arrow || stage.__pbCarouselBusy) return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      const current = currentGalleryIndex(document.getElementById(SHEET_ID));
       const total = stage.__pbCarouselSlides?.length || 0;
       if (total < 2) return;
+      const current = currentGalleryIndex(document.getElementById(SHEET_ID));
       const direction = arrow.classList.contains('pb-product-gallery-next') ? 1 : -1;
-      const target = (current + direction + total) % total;
-      animateCarouselTo(stage, target, direction);
+      animateCarouselTo(stage, current + direction, direction);
     }, true);
   }
 
   function bindSheetNavigation(sheet) {
-    if (!(sheet instanceof HTMLElement) || sheet.dataset.pbCarouselNavigation === '1') return;
-    sheet.dataset.pbCarouselNavigation = '1';
+    if (!(sheet instanceof HTMLElement) || sheet.dataset.pbCarouselNavigationV3 === '1') return;
+    sheet.dataset.pbCarouselNavigationV3 = '1';
 
     sheet.addEventListener('click', event => {
       const stage = sheet.querySelector('.pb-product-sheet-stage');
       if (!stage || stage.__pbCarouselInternalClick || stage.__pbCarouselBusy) return;
+      const total = stage.__pbCarouselSlides?.length || 0;
+      if (total < 2) return;
 
       const dot = event.target.closest('[data-pb-gallery-index]');
       if (dot) {
         const target = Number(dot.dataset.pbGalleryIndex);
-        const total = stage.__pbCarouselSlides?.length || 0;
-        if (!Number.isFinite(target) || total < 2 || target === currentGalleryIndex(sheet)) return;
+        if (!Number.isFinite(target) || target === currentGalleryIndex(sheet)) return;
         event.preventDefault();
         event.stopImmediatePropagation();
         animateCarouselTo(stage, target);
@@ -455,56 +540,32 @@
       const color = event.target.closest('[data-pb-detail-color-id][data-pb-carousel-index]');
       if (!color) return;
       const target = Number(color.dataset.pbCarouselIndex);
-      const total = stage.__pbCarouselSlides?.length || 0;
-      if (!Number.isFinite(target) || total < 2 || target === currentGalleryIndex(sheet)) return;
+      if (!Number.isFinite(target) || target === currentGalleryIndex(sheet)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
       animateCarouselTo(stage, target);
     }, true);
   }
 
-  function installCategoryStickyState() {
-    const wrap = document.querySelector('.sm-cats-wrap');
-    if (!wrap) return false;
-    if (wrap.dataset.pbStickyState === '1') return true;
-
-    wrap.dataset.pbStickyState = '1';
-    let sentinel = wrap.previousElementSibling;
-    if (!sentinel?.classList?.contains('pb-cats-sticky-sentinel')) {
-      sentinel = document.createElement('i');
-      sentinel.className = 'pb-cats-sticky-sentinel';
-      sentinel.setAttribute('aria-hidden', 'true');
-      wrap.before(sentinel);
-    }
-
-    catsObserver?.disconnect();
-    catsObserver = new IntersectionObserver(entries => {
-      const entry = entries[0];
-      const isStuck = !entry?.isIntersecting && Number(entry?.boundingClientRect?.top) < 0;
-      wrap.classList.toggle(CATS_STUCK_CLASS, isStuck);
-    }, { threshold: [0, 1] });
-    catsObserver.observe(sentinel);
-    return true;
-  }
-
   function enhanceSheet() {
     queued = false;
     installStyle();
+    cleanupOldCategoryState();
     const sheet = document.getElementById(SHEET_ID);
     if (!sheet) return false;
 
     captureSlidesBeforeCompacting(sheet);
-    compactAndMoveColorPicker();
+    compactAndMoveColorPicker(sheet);
 
     const stage = sheet.querySelector('.pb-product-sheet-stage');
     bindCarousel(stage);
     bindSheetNavigation(sheet);
-    syncCarouselPeers(stage);
+    renderTrack(stage);
 
     if (!sheetObserver) {
       const root = sheet.querySelector('.pb-product-sheet-scroll') || sheet;
       sheetObserver = new MutationObserver(mutations => {
-        if (!mutations.some(m => m.addedNodes.length || m.removedNodes.length)) return;
+        if (!mutations.some(mutation => mutation.addedNodes.length || mutation.removedNodes.length)) return;
         if (queued) return;
         queued = true;
         requestAnimationFrame(enhanceSheet);
@@ -514,21 +575,43 @@
     return true;
   }
 
+  function discoverSheet() {
+    if (document.getElementById(SHEET_ID)) {
+      discoveryObserver?.disconnect();
+      discoveryObserver = null;
+      enhanceSheet();
+      return;
+    }
+    if (discoveryObserver || !document.body) return;
+    discoveryObserver = new MutationObserver(mutations => {
+      const found = mutations.some(mutation => [...mutation.addedNodes].some(node =>
+        node instanceof Element && (node.id === SHEET_ID || node.querySelector?.(`#${SHEET_ID}`))
+      ));
+      if (!found) return;
+      discoveryObserver.disconnect();
+      discoveryObserver = null;
+      requestAnimationFrame(enhanceSheet);
+    });
+    discoveryObserver.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function stabilizeExistingCards() {
+    document.querySelectorAll('#smMenu .sm-live-sheen').forEach(node => node.remove());
+  }
+
   function boot() {
     installStyle();
-    installCategoryStickyState();
-    enhanceSheet();
+    cleanupOldCategoryState();
+    stabilizeExistingCards();
+    discoverSheet();
 
-    let tries = 0;
-    const timer = setInterval(() => {
-      tries += 1;
-      const catsReady = installCategoryStickyState();
-      const sheetReady = enhanceSheet();
-      if ((catsReady && sheetReady) || tries >= 30) clearInterval(timer);
-    }, 120);
-
-    window.addEventListener('pageshow', installCategoryStickyState, { passive: true });
-    window.addEventListener('restbr:ready', installCategoryStickyState, { once: true });
+    const resync = () => {
+      cleanupOldCategoryState();
+      stabilizeExistingCards();
+      enhanceSheet();
+    };
+    window.addEventListener('restbr:ready', resync, { once: true });
+    window.addEventListener('pageshow', resync, { passive: true });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });

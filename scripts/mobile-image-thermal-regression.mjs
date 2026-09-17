@@ -59,21 +59,28 @@ const realSheetMarker = "const SHEET_ID = 'pbProductDetailSheet'";
 assert(files.details.includes(realSheetMarker), 'product details runtime must keep the expected live sheet id');
 assert(files.gallery.includes(realSheetMarker), 'gallery polish must target the exact live product details sheet id');
 assert(!files.gallery.includes('pbProductDetailsSheet'), 'gallery polish must not use the stale plural sheet id');
-assert(files.gallery.includes('__PASHA_PRODUCT_GALLERY_THERMAL_V2__'), 'WhatsApp-like carousel generation must be active');
+assert(files.gallery.includes('__PASHA_PRODUCT_GALLERY_THERMAL_V3__'), 'continuous iOS carousel generation must be active');
 assert(files.gallery.includes('name.before(picker)'), 'color strip must be moved above the product name');
-assert(files.gallery.includes("querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())"), 'tiny color chips must not decode duplicate full color photos');
-assert(files.gallery.includes('min-height:36px!important') && files.gallery.includes('max-width:none!important'), 'color chips must be larger and allow compound color names');
+assert(files.gallery.includes("querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())"), 'tiny color chips must not keep duplicate full color photos');
+assert(files.gallery.includes('min-height:40px!important') && files.gallery.includes('max-width:none!important'), 'color chips must fit compound color names comfortably');
 assert(files.gallery.includes("stage.addEventListener('pointermove'"), 'carousel must follow the finger during a swipe');
-assert(files.gallery.includes('animateCarouselTo(stage, target'), 'carousel must animate to the neighboring slide');
-assert(files.gallery.includes('pb-carousel-prev-image') && files.gallery.includes('pb-carousel-next-image'), 'carousel must keep real previous and next image peers');
-assert(files.gallery.includes('--pb-carousel-x'), 'carousel must move as one continuous track');
+assert(files.gallery.includes('pb-carousel-track'), 'carousel must render a real three-image track');
+assert(files.gallery.includes("for (const position of ['prev', 'current', 'next'])"), 'carousel track must contain previous/current/next slides');
+assert(files.gallery.includes('translate3d(calc(-33.333333% +'), 'current and neighboring images must translate together');
+assert(files.gallery.includes('requestAnimationFrame(flushMove)'), 'finger tracking must be rAF-throttled');
 assert(files.gallery.includes('performance.now()'), 'carousel must use swipe velocity as well as distance');
 assert(files.gallery.includes('touch-action:pan-y'), 'carousel swipe must keep vertical page scrolling native');
-assert(files.gallery.includes("const CATS_STUCK_CLASS = 'pb-cats-stuck'"), 'category rail must have an explicit sticky state');
-assert(files.gallery.includes('new IntersectionObserver'), 'sticky category state must avoid a continuous scroll listener');
-assert(files.gallery.includes('background:#101313!important'), 'stuck category rail must use the requested black background');
-assert(files.gallery.includes('contain-intrinsic-size:auto 560px!important'), 'mobile product card intrinsic height must reduce scroll reflow jitter');
+
+assert(!files.gallery.includes('background:#101313!important'), 'category rail must never be forced to black');
+assert(!files.gallery.includes('new IntersectionObserver'), 'category rail must not keep the obsolete sticky-state observer');
+assert(files.gallery.includes('background:rgba(247,248,246,.97)!important'), 'category rail must keep the natural Pasha background');
+assert(files.gallery.includes('content-visibility:visible!important'), 'mobile cards must disable Safari content-visibility virtualization');
+assert(files.gallery.includes('contain-intrinsic-size:none!important'), 'mobile cards must not use synthetic intrinsic heights while scrolling');
+assert(files.gallery.includes('.sm-live-sheen') && files.gallery.includes('display:none!important'), 'legacy card sheen must be disabled on mobile');
+assert(files.gallery.includes('animation:none!important'), 'legacy living-card animations must be disabled on mobile');
+assert(files.gallery.includes('.sm-card.sm-life-ready:active'), 'touch active-state card movement must be neutralized');
 assert(files.gallery.includes('backdrop-filter:none!important'), 'scroll polish must disable expensive blur repainting');
+assert(!files.gallery.includes('setInterval('), 'storefront gallery helper must not poll after boot');
 
 const pipelinePos = files.arabic.indexOf('admin-image-pipeline.js?v=1.0');
 const b2Pos = files.arabic.indexOf('admin-b2-storage.js?v=2.0');
@@ -86,4 +93,4 @@ assert(files.config.includes('pasha-arabic-only.js?v=2.2'), 'Arabic policy cache
 assert(files.config.includes('admin-option-order.js?v=3.0'), 'option-order cache version must be bumped');
 assert(files.config.includes('pasha-baby-admin-polish-v3.js?v=3.1'), 'admin polish cache version must be bumped');
 
-console.log('✅ Mobile image / carousel / thermal regression audit passed');
+console.log('✅ Mobile image / continuous carousel / iOS scroll regression audit passed');
