@@ -18,6 +18,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
+      - name: Build storefront bundles
+        run: node scripts/build-storefront-bundles.mjs
+
       - name: Pre-deploy audit
         run: node scripts/predeploy-check.mjs
 
@@ -64,6 +67,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Build storefront bundles
+        run: node scripts/build-storefront-bundles.mjs
 
       - name: Build WhatsApp social preview
         env:
