@@ -20,7 +20,6 @@ const files = {
 
 for (const [name, source] of Object.entries(files)) {
   try {
-    // Compile only. Browser globals are intentionally not executed here.
     new Function(source);
   } catch (error) {
     throw new Error(`${name} has invalid JavaScript: ${error.message}`);
@@ -58,23 +57,33 @@ assert(!files.polish.includes('observer.observe(document.body'), 'admin polish m
 
 const realSheetMarker = "const SHEET_ID = 'pbProductDetailSheet'";
 assert(files.details.includes(realSheetMarker), 'product details runtime must keep the expected live sheet id');
-assert(files.gallery.includes(realSheetMarker), 'thermal gallery must target the exact live product details sheet id');
-assert(!files.gallery.includes('pbProductDetailsSheet'), 'thermal gallery must not use the stale plural sheet id');
+assert(files.gallery.includes(realSheetMarker), 'gallery polish must target the exact live product details sheet id');
+assert(!files.gallery.includes('pbProductDetailsSheet'), 'gallery polish must not use the stale plural sheet id');
+assert(files.gallery.includes('__PASHA_PRODUCT_GALLERY_THERMAL_V2__'), 'WhatsApp-like carousel generation must be active');
 assert(files.gallery.includes('name.before(picker)'), 'color strip must be moved above the product name');
 assert(files.gallery.includes("querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())"), 'tiny color chips must not decode duplicate full color photos');
-assert(files.gallery.includes("stage.addEventListener('pointermove'"), 'gallery must follow the finger during a swipe');
-assert(files.gallery.includes('settleImage(stage, image'), 'gallery must settle with a short slide transition');
-assert(files.gallery.includes('touch-action:pan-y'), 'gallery swipe must keep vertical page scrolling native');
+assert(files.gallery.includes('min-height:36px!important') && files.gallery.includes('max-width:none!important'), 'color chips must be larger and allow compound color names');
+assert(files.gallery.includes("stage.addEventListener('pointermove'"), 'carousel must follow the finger during a swipe');
+assert(files.gallery.includes('animateCarouselTo(stage, target'), 'carousel must animate to the neighboring slide');
+assert(files.gallery.includes('pb-carousel-prev-image') && files.gallery.includes('pb-carousel-next-image'), 'carousel must keep real previous and next image peers');
+assert(files.gallery.includes('--pb-carousel-x'), 'carousel must move as one continuous track');
+assert(files.gallery.includes('performance.now()'), 'carousel must use swipe velocity as well as distance');
+assert(files.gallery.includes('touch-action:pan-y'), 'carousel swipe must keep vertical page scrolling native');
+assert(files.gallery.includes("const CATS_STUCK_CLASS = 'pb-cats-stuck'"), 'category rail must have an explicit sticky state');
+assert(files.gallery.includes('new IntersectionObserver'), 'sticky category state must avoid a continuous scroll listener');
+assert(files.gallery.includes('background:#101313!important'), 'stuck category rail must use the requested black background');
+assert(files.gallery.includes('contain-intrinsic-size:auto 560px!important'), 'mobile product card intrinsic height must reduce scroll reflow jitter');
+assert(files.gallery.includes('backdrop-filter:none!important'), 'scroll polish must disable expensive blur repainting');
 
 const pipelinePos = files.arabic.indexOf('admin-image-pipeline.js?v=1.0');
 const b2Pos = files.arabic.indexOf('admin-b2-storage.js?v=2.0');
 assert(pipelinePos >= 0 && b2Pos > pipelinePos, 'shared image pipeline must load before B2 uploader');
 assert(files.arabic.includes('admin-color-image-upload.js?v=2.0'), 'color uploader v2 must be loaded explicitly');
-assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.1'), 'storefront thermal gallery hotfix must be loaded');
+assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.1'), 'storefront gallery helper must be loaded');
 assert(!files.arabic.includes('admin-image-optimizer.js?v=1.0'), 'Arabic admin loader must not boot the retired legacy optimizer');
 
 assert(files.config.includes('pasha-arabic-only.js?v=2.2'), 'Arabic policy cache version must be bumped');
 assert(files.config.includes('admin-option-order.js?v=3.0'), 'option-order cache version must be bumped');
 assert(files.config.includes('pasha-baby-admin-polish-v3.js?v=3.1'), 'admin polish cache version must be bumped');
 
-console.log('✅ Mobile image / thermal regression audit passed');
+console.log('✅ Mobile image / carousel / thermal regression audit passed');
