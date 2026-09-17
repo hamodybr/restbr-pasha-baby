@@ -1,10 +1,12 @@
 (() => {
   if (!/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  if (window.__PASHA_ADMIN_COLOR_IMAGE_UPLOAD_V1__) return;
+  if (window.__PASHA_ADMIN_COLOR_IMAGE_UPLOAD_V2__) return;
+  window.__PASHA_ADMIN_COLOR_IMAGE_UPLOAD_V2__ = true;
+  // Stop a stale V1 script from installing a second seven-pass compressor.
   window.__PASHA_ADMIN_COLOR_IMAGE_UPLOAD_V1__ = true;
 
   const TARGET_BYTES = 620 * 1024;
-  const MAX_SOURCE_BYTES = 30 * 1024 * 1024;
+  const SERVER_MAX_BYTES = 700 * 1024;
   const q = (selector, root = document) => root.querySelector(selector);
 
   function client() {
@@ -12,6 +14,10 @@
       if (typeof supabaseClient !== 'undefined' && supabaseClient) return supabaseClient;
     } catch (_) {}
     return window.supabaseClient || null;
+  }
+
+  function imagePipeline() {
+    return window.PASHA_ADMIN_IMAGE_PIPELINE || null;
   }
 
   function installStyles() {
@@ -29,64 +35,32 @@
     document.head.appendChild(style);
   }
 
-  const fmt = bytes => bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`;
+  const fmt = bytes => {
+    const helper = imagePipeline()?.formatBytes;
+    if (typeof helper === 'function') return helper(bytes);
+    return bytes >= 1024 * 1024
+      ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
+      : `${Math.round(bytes / 1024)} KB`;
+  };
 
-  async function canvasBlob(canvas, quality) {
-    return await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('تعذر ضغط الصورة.')), 'image/webp', quality));
-  }
-
-  async function decode(file) {
-    if (typeof createImageBitmap === 'function') {
-      try { return { image: await createImageBitmap(file, { imageOrientation: 'from-image' }), close: img => img.close?.() }; } catch (_) {}
-    }
-    const url = URL.createObjectURL(file);
-    const image = new Image();
-    image.decoding = 'async';
-    image.src = url;
-    await image.decode();
-    return { image, close: () => URL.revokeObjectURL(url) };
-  }
-
-  async function compress(file, progress) {
-    if (!(file instanceof Blob) || !String(file.type || '').startsWith('image/')) throw new Error('اختر ملف صورة.');
-    if (file.size > MAX_SOURCE_BYTES) throw new Error('الصورة الأصلية أكبر من 30MB.');
-    if (/image\/(?:gif|svg\+xml)/i.test(file.type || '')) {
-      if (file.size > TARGET_BYTES) throw new Error('GIF/SVG لازم يكون أقل من 620KB.');
+  async function prepare(file, progress) {
+    const helper = imagePipeline();
+    if (!helper?.prepare) {
+      if (!(file instanceof Blob) || !String(file.type || '').startsWith('image/')) {
+        throw new Error('اختر ملف صورة.');
+      }
+      if (file.size > SERVER_MAX_BYTES) {
+        throw new Error('معالج الصور غير جاهز. اعمل Refresh للوحة وحاول مرة ثانية.');
+      }
       return file;
     }
-    if (String(file.type).toLowerCase() === 'image/webp' && file.size <= TARGET_BYTES) return file;
 
-    progress.textContent = `جاري ضغط الصورة... ${fmt(file.size)}`;
-    const decoded = await decode(file);
-    try {
-      const width0 = Number(decoded.image.width || decoded.image.naturalWidth || 0);
-      const height0 = Number(decoded.image.height || decoded.image.naturalHeight || 0);
-      if (!width0 || !height0) throw new Error('تعذر قراءة أبعاد الصورة.');
-      const attempts = [[1400,.78],[1200,.72],[1024,.66],[900,.60],[760,.54],[640,.48],[520,.42]];
-      let best = null;
-      for (const [edge, quality] of attempts) {
-        const scale = Math.min(1, edge / Math.max(width0, height0));
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.max(1, Math.round(width0 * scale));
-        canvas.height = Math.max(1, Math.round(height0 * scale));
-        const ctx = canvas.getContext('2d', { alpha: false });
-        if (!ctx) throw new Error('تعذر تشغيل معالج الصور.');
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(decoded.image, 0, 0, canvas.width, canvas.height);
-        const blob = await canvasBlob(canvas, quality);
-        const candidate = new File([blob], 'color.webp', { type: 'image/webp', lastModified: Date.now() });
-        if (!best || candidate.size < best.size) best = candidate;
-        progress.textContent = `جاري تحسين الصورة... ${fmt(candidate.size)}`;
-        if (candidate.size <= TARGET_BYTES) return candidate;
-      }
-      if (best?.size <= 700 * 1024) return best;
-      throw new Error('الصورة بقيت كبيرة بعد الضغط. جرّب صورة ثانية.');
-    } finally {
-      try { decoded.close?.(decoded.image); } catch (_) {}
-    }
+    return helper.prepare(file, {
+      profile: 'color',
+      targetBytes: TARGET_BYTES,
+      maxBytes: SERVER_MAX_BYTES,
+      onProgress: text => { progress.textContent = text; }
+    });
   }
 
   function existingAssetKey(url) {
@@ -109,22 +83,28 @@
     const button = q('.pb-color-upload-btn', box);
     progress.classList.remove('is-error');
     button.disabled = true;
+
     try {
-      const prepared = await compress(file, progress);
-      progress.textContent = `جاري الرفع إلى Backblaze... ${fmt(prepared.size)}`;
+      const prepared = await prepare(file, progress);
+      progress.textContent = prepared === file
+        ? `الصورة جاهزة. جاري الرفع... ${fmt(prepared.size)}`
+        : `تم تجهيز الصورة ${fmt(file.size)} → ${fmt(prepared.size)}. جاري الرفع...`;
+
       const assetKey = box.dataset.assetKey || existingAssetKey(urlInput.value) || randomKey();
       box.dataset.assetKey = assetKey;
       const form = new FormData();
       form.append('assetKey', assetKey);
-      form.append('file', prepared, prepared.name || 'color.webp');
+      form.append('file', prepared, prepared.name || file.name || 'color.webp');
+
       const sb = client();
       if (!sb?.functions?.invoke) throw new Error('خدمة رفع الصور غير جاهزة.');
       const { data, error } = await sb.functions.invoke('b2-color-images', {
         headers: { 'x-pb-action': 'upload' },
-        body: form,
+        body: form
       });
       if (error) throw error;
       if (!data?.publicUrl) throw new Error(data?.error || 'لم يرجع رابط الصورة.');
+
       urlInput.value = data.publicUrl;
       urlInput.dispatchEvent(new Event('input', { bubbles: true }));
       urlInput.dispatchEvent(new Event('change', { bubbles: true }));
@@ -144,13 +124,17 @@
     const img = q('img', preview);
     const url = String(urlInput.value || '').trim();
     preview.classList.toggle('show', !!url);
-    if (url) img.src = url;
-    else img.removeAttribute('src');
+    if (url) {
+      if (img.src !== url) img.src = url;
+    } else {
+      img.removeAttribute('src');
+    }
   }
 
   function enhance(input) {
     if (!(input instanceof HTMLInputElement) || input.dataset.pbColorUploadReady === '1') return;
     input.dataset.pbColorUploadReady = '1';
+
     const box = document.createElement('div');
     box.className = 'pb-color-upload-box';
     const currentKey = existingAssetKey(input.value);
@@ -161,8 +145,9 @@
         <input class="pb-color-upload-file" type="file" accept="image/*">
       </div>
       <div class="pb-color-upload-progress">تقدر ترفع الصورة مباشرة بدل لصق رابط.</div>
-      <div class="pb-color-upload-preview"><img alt="معاينة صورة اللون"><span>معاينة الصورة الخاصة بهذا اللون</span></div>`;
+      <div class="pb-color-upload-preview"><img alt="معاينة صورة اللون" decoding="async"><span>معاينة الصورة الخاصة بهذا اللون</span></div>`;
     input.insertAdjacentElement('afterend', box);
+
     const fileInput = q('.pb-color-upload-file', box);
     q('.pb-color-upload-btn', box)?.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => void uploadColor(fileInput, input, box));
@@ -174,15 +159,24 @@
     renderPreview(input, box);
   }
 
-  function scan() {
-    installStyles();
-    document.querySelectorAll('.pb-edit-color-image,.pb-npc-image').forEach(enhance);
+  function scan(root = document) {
+    if (root instanceof Element && root.matches('.pb-edit-color-image,.pb-npc-image')) enhance(root);
+    root.querySelectorAll?.('.pb-edit-color-image,.pb-npc-image').forEach(enhance);
   }
 
   function boot() {
     installStyles();
-    scan();
-    new MutationObserver(scan).observe(document.body, { childList: true, subtree: true });
+    scan(document);
+
+    // Color fields only live inside the editor modal. Observe that small subtree
+    // and only inspect newly-added nodes instead of rescanning the whole page.
+    const modal = document.getElementById('editorModal');
+    if (!modal) return;
+    new MutationObserver(mutations => {
+      mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
+        if (node.nodeType === 1) scan(node);
+      }));
+    }).observe(modal, { childList: true, subtree: true });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
