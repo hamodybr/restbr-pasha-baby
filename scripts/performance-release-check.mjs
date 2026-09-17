@@ -55,11 +55,11 @@ requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row b
 
 // Repeat public visits should come from local cache immediately while a fresh
 // copy is revalidated in the background. Admin remains network-first/no-store.
-requireText('sw.js', 'restbr-pasha-baby-v43', 'version-safe code cache generation');
+requireText('sw.js', 'restbr-pasha-baby-v44', 'version-safe code cache generation');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
-requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.0', 'thermal gallery precache');
+requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.1', 'thermal gallery v1.1 precache');
 
 // First visit: avoid a second 2MB+ logo request for favicon/apple icon, warm the
 // the Supabase API connection, and never rescan the entire document for logo mutations.
@@ -86,8 +86,11 @@ forbidText('js/admin-color-image-upload.js', 'observe(document.body', 'whole-das
 requireText('js/admin-image-optimizer.js', '__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V3__ = true', 'legacy optimizer kill-switch');
 forbidText('js/admin-image-optimizer.js', 'createImageBitmap(', 'duplicate legacy image decoding');
 
-// Storefront product-detail heat contract: no tiny duplicate photo thumbnails;
-// swipe follows the finger and settles once, while vertical page scrolling stays native.
+// Storefront product-detail heat contract: the helper must bind to the real
+// details sheet, remove duplicate thumbnails, and make swipe follow the finger.
+requireText('js/pasha-baby-product-description-v2.js', "const SHEET_ID = 'pbProductDetailSheet'", 'real product details sheet id');
+requireText('js/pasha-product-gallery-thermal-v1.js', "const SHEET_ID = 'pbProductDetailSheet'", 'thermal helper real sheet target');
+forbidText('js/pasha-product-gallery-thermal-v1.js', 'pbProductDetailsSheet', 'stale plural product sheet id');
 requireText('js/pasha-product-gallery-thermal-v1.js', 'name.before(picker)', 'color strip above product title');
 requireText('js/pasha-product-gallery-thermal-v1.js', "querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())", 'duplicate color thumbnail removal');
 requireText('js/pasha-product-gallery-thermal-v1.js', "stage.addEventListener('pointermove'", 'finger-following gallery swipe');
