@@ -63,7 +63,7 @@ requireText('sw.js', 'js/pasha-baby-storefront-bundle.js?v=1.2', 'cached retail 
 requireText('sw.js', 'js/runtime-config.js?v=2.3', 'cached product gallery runtime config');
 requireText('sw.js', 'js/pasha-arabic-only.js?v=2.2', 'cached Arabic-only policy');
 requireText('sw.js', 'js/pasha-number-normalizer.js?v=1.2', 'cached English-digit normalizer');
-requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.0', 'cached low-heat gallery helper');
+requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.1', 'cached low-heat gallery helper v1.1');
 
 requireText('js/supabase-config.js', 'js/pasha-arabic-only.js?v=2.2', 'Arabic-only policy loader');
 forbidText('js/supabase-config.js', 'language-settings.js', 'legacy multilingual loader');
@@ -72,7 +72,7 @@ requireText('js/pasha-arabic-only.js', 'data-pasha-multilang-hidden', 'admin mul
 requireText('js/pasha-arabic-only.js', 'js/admin-retail-discounts.js?v=4.0', 'fixed retail discount admin v4 loader');
 requireText('js/pasha-arabic-only.js', 'js/admin-product-colors.js?v=3.0', 'product colors admin v3 loader');
 requireText('js/pasha-arabic-only.js', 'js/admin-large-catalog.js?v=1.0', 'large catalog admin loader');
-requireText('js/pasha-arabic-only.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.0', 'low-heat product gallery loader');
+requireText('js/pasha-arabic-only.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.1', 'low-heat product gallery loader v1.1');
 
 requireText('js/pasha-baby-commerce.js', "scope_type === 'product'", 'product discount priority compatibility');
 requireText('js/pasha-baby-commerce.js', "scope_type === 'category'", 'category discount priority compatibility');
@@ -89,6 +89,7 @@ requireText('js/pasha-baby-commerce.js', "compose('ar', 'اللون')", 'Arabic 
 
 requireText('js/runtime-config.js', 'js/pasha-baby-product-description-v2.js?v=3.1', 'product details gallery v3 loader');
 requireText('js/pasha-baby-product-description-v2.js', '__PB_PRODUCT_DETAILS_GALLERY_V3__', 'product details gallery v3 guard');
+requireText('js/pasha-baby-product-description-v2.js', "const SHEET_ID = 'pbProductDetailSheet'", 'live product details sheet id');
 requireText('js/pasha-baby-product-description-v2.js', 'window.PASHA_OPEN_PRODUCT_DETAILS', 'public product details opener');
 requireText('js/pasha-baby-product-description-v2.js', 'data-pb-detail-color-id', 'interactive detail color picker');
 requireText('js/pasha-baby-product-description-v2.js', "stage.addEventListener('pointerdown'", 'touch swipe start');
@@ -96,6 +97,8 @@ requireText('js/pasha-baby-product-description-v2.js', "stage.addEventListener('
 requireText('js/pasha-baby-retail-v4.js', 'window.PASHA_OPEN_PRODUCT_DETAILS(card, image)', 'placeholder image details routing');
 requireText('css/pasha-baby-card-density-v2.css', '.pb-product-sheet-gallery', 'details image carousel styling');
 requireText('css/pasha-baby-card-density-v2.css', '.pb-product-sheet-color-list', 'details color selector styling');
+requireText('js/pasha-product-gallery-thermal-v1.js', "const SHEET_ID = 'pbProductDetailSheet'", 'thermal helper live sheet target');
+forbidText('js/pasha-product-gallery-thermal-v1.js', 'pbProductDetailsSheet', 'stale plural details sheet id');
 requireText('js/pasha-product-gallery-thermal-v1.js', 'name.before(picker)', 'compact color picker moved above name');
 requireText('js/pasha-product-gallery-thermal-v1.js', "stage.addEventListener('pointermove'", 'finger-following slide movement');
 
