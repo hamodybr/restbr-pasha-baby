@@ -161,8 +161,16 @@ await expectText('/js/pasha-arabic-only.js', [
   'js/pasha-admin-product-editor-cleanup.js?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
   'js/pasha-number-normalizer.js?v=1.2',
+  'js/pasha-product-gallery-thermal-v1.js?v=1.1',
   "window.addEventListener('restbr:ready', keepArabic, { once: true })"
 ], 'Arabic-only policy');
+
+await expectText('/js/pasha-product-gallery-thermal-v1.js', [
+  "const SHEET_ID = 'pbProductDetailSheet'",
+  'name.before(picker)',
+  "stage.addEventListener('pointermove'",
+  'touch-action:pan-y'
+], 'live product gallery thermal hotfix');
 
 await expectText('/js/admin-orders-customers.js', [
   '@page{size:${pageSize};margin:${cfg.page_margin_mm}mm}',
@@ -223,13 +231,14 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v43',
+  'restbr-pasha-baby-v44',
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
   'js/pasha-arabic-only.js?v=2.2',
   'js/pasha-number-normalizer.js?v=1.2',
   'js/pasha-baby-storefront-bundle.js?v=1.2',
+  'js/pasha-product-gallery-thermal-v1.js?v=1.1',
   'css/pasha-baby-final-tweaks.css?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
   'assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp'
