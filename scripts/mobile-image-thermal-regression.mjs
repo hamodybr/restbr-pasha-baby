@@ -55,6 +55,8 @@ assert(!files.polish.includes('setInterval('), 'admin polish must not keep the o
 assert(files.polish.includes("const modal = document.getElementById('editorModal')"), 'admin polish observer must be scoped to the editor modal');
 assert(!files.polish.includes('observer.observe(document.body'), 'admin polish must not observe the whole dashboard body');
 
+assert(files.gallery.includes("const SHEET_ID = 'pbProductDetailSheet'"), 'thermal gallery must target the real product details sheet id');
+assert(!files.gallery.includes("pbProductDetailsSheet"), 'thermal gallery must not use the stale plural sheet id');
 assert(files.gallery.includes('name.before(picker)'), 'color strip must be moved above the product name');
 assert(files.gallery.includes("querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())"), 'tiny color chips must not decode duplicate full color photos');
 assert(files.gallery.includes("stage.addEventListener('pointermove'"), 'gallery must follow the finger during a swipe');
@@ -65,7 +67,7 @@ const pipelinePos = files.arabic.indexOf('admin-image-pipeline.js?v=1.0');
 const b2Pos = files.arabic.indexOf('admin-b2-storage.js?v=2.0');
 assert(pipelinePos >= 0 && b2Pos > pipelinePos, 'shared image pipeline must load before B2 uploader');
 assert(files.arabic.includes('admin-color-image-upload.js?v=2.0'), 'color uploader v2 must be loaded explicitly');
-assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.0'), 'storefront thermal gallery follow-up must be loaded');
+assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.1'), 'storefront thermal gallery hotfix must be loaded');
 assert(!files.arabic.includes('admin-image-optimizer.js?v=1.0'), 'Arabic admin loader must not boot the retired legacy optimizer');
 
 assert(files.config.includes('pasha-arabic-only.js?v=2.2'), 'Arabic policy cache version must be bumped');
