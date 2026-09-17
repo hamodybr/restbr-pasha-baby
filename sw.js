@@ -1,6 +1,5 @@
-const CACHE_NAME = "restbr-pasha-baby-v45";
-// 2026-09-17: refresh the existing cache generation so iOS receives the rebuilt
-// carousel helper immediately; install-time cacheOne() overwrites the v1.1 entry.
+const CACHE_NAME = "restbr-pasha-baby-v46";
+// 2026-09-17: v46 forces iOS Safari to install a fresh code cache and fetch\n// the continuous carousel helper at its new v1.2 URL.
 
 const CORE = [
   "./",
@@ -31,7 +30,7 @@ const CORE = [
   "./js/whatsapp-order-bullets.js?v=1.0",
   "./js/arabic-news-ticker.js?v=1.1",
   "./js/pasha-baby-product-description-v2.js?v=3.1",
-  "./js/pasha-product-gallery-thermal-v1.js?v=1.1",
+  "./js/pasha-product-gallery-thermal-v1.js?v=1.2",
   "./js/pasha-baby-details-button-v3.js?v=3.2",
   "./css/pasha-baby-card-density-v2.css?v=3.0",
   "./css/pasha-baby-details-button-v3.css?v=3.1",
