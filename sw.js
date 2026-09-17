@@ -1,4 +1,6 @@
-const CACHE_NAME = "restbr-pasha-baby-v46";
+const CACHE_NAME = "restbr-pasha-baby-v45";
+// 2026-09-17: refresh the existing cache generation so iOS receives the rebuilt
+// carousel helper immediately; install-time cacheOne() overwrites the v1.1 entry.
 
 const CORE = [
   "./",
