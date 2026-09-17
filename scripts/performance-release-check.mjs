@@ -30,16 +30,11 @@ for (const file of [
   }
 }
 
-// Live prices: Realtime stays immediate, full-table reconciliation is only a
-// low-frequency safety net and never runs while the storefront tab is hidden.
 requireText('js/live-prices.js', 'const PRICE_SYNC_INTERVAL_MS = 5 * 60 * 1000', '5-minute price reconciliation');
 requireText('js/live-prices.js', 'document.visibilityState !== "visible"', 'hidden-tab price-sync guard');
 requireText('js/live-prices.js', 'status === "SUBSCRIBED"', 'Realtime subscription sync');
 forbidText('js/live-prices.js', 'setInterval(() => void syncAllPrices(), 30000)', 'legacy 30-second full price polling');
 
-// Arabic-only storefront must not watch every DOM mutation. It also throttles
-// the existing scroll work to one animation frame and removes the one-minute
-// schedule timer entirely when the loaded catalog has no scheduled items.
 forbidText('js/pasha-arabic-only.js', 'new MutationObserver(keepArabic)', 'storefront-wide Arabic MutationObserver');
 requireText('js/pasha-arabic-only.js', "window.addEventListener('restbr:ready', keepArabic, { once: true })", 'one-shot Arabic ready handler');
 requireText('js/pasha-arabic-only.js', "window.removeEventListener('scroll', baseScrollEffects)", 'raw scroll listener replacement');
@@ -47,22 +42,16 @@ requireText('js/pasha-arabic-only.js', 'requestAnimationFrame(() => {', 'scroll 
 requireText('js/pasha-arabic-only.js', 'clearInterval(window.__RESTBR_SCHEDULE_TIMER__)', 'unused schedule timer removal');
 requireText('js/pasha-arabic-only.js', 'availability_schedule_enabled === true', 'schedule-aware timer guard');
 
-// Admin large-catalog fallback should only paginate when a normal Supabase page
-// could actually be truncated at the 1000-row boundary.
 requireText('js/admin-large-catalog.js', 'function catalogMayBeTruncated()', 'large-catalog truncation guard');
 requireText('js/admin-large-catalog.js', 'async function ensureCompleteCatalog()', 'conditional full-catalog hydration');
 requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row boundary detection');
 
-// Repeat public visits should come from local cache immediately while a fresh
-// copy is revalidated in the background. Admin remains network-first/no-store.
-requireText('sw.js', 'restbr-pasha-baby-v44', 'version-safe code cache generation');
+requireText('sw.js', 'restbr-pasha-baby-v45', 'version-safe code cache generation');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
-requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.1', 'thermal gallery v1.1 precache');
+requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.1', 'carousel gallery precache');
 
-// First visit: avoid a second 2MB+ logo request for favicon/apple icon, warm the
-// the Supabase API connection, and never rescan the entire document for logo mutations.
 requireText('index.html', 'rel="preconnect" href="https://wlollfpmjzenhkjwxrqo.supabase.co"', 'Supabase preconnect');
 requireText('index.html', 'src="js/vendor/supabase-2.114.0.min.js"', 'self-hosted pinned Supabase browser SDK');
 requireText('index.html', 'href="assets/favicon.png"', 'local lightweight favicon');
@@ -70,10 +59,6 @@ requireText('index.html', 'href="assets/apple-touch-icon.png"', 'local lightweig
 requireText('index.html', 'window.addEventListener("restbr:ready",scanBrandLogo,{once:true})', 'one-shot live brand icon refresh');
 forbidText('index.html', 'new MutationObserver(scanBrandLogo)', 'global brand-logo MutationObserver');
 
-// Image-upload performance contract: one shared decoder/canvas pipeline handles
-// product and color images, does at most three encode passes, and releases the
-// backing canvas/bitmap immediately. The upload wrappers must not run long-lived
-// polling loops in the unlocked dashboard.
 requireText('js/admin-image-pipeline.js', "canvasToBlob(canvas, 'image/webp'", 'shared WebP image optimization');
 requireText('js/admin-image-pipeline.js', '[1280, 0.74]', 'bounded product compression profile');
 requireText('js/admin-image-pipeline.js', '[1080, 0.72]', 'bounded color compression profile');
@@ -86,14 +71,16 @@ forbidText('js/admin-color-image-upload.js', 'observe(document.body', 'whole-das
 requireText('js/admin-image-optimizer.js', '__PASHA_BABY_ADMIN_IMAGE_OPTIMIZER_V3__ = true', 'legacy optimizer kill-switch');
 forbidText('js/admin-image-optimizer.js', 'createImageBitmap(', 'duplicate legacy image decoding');
 
-// Storefront product-detail heat contract: the helper must bind to the real
-// details sheet, remove duplicate thumbnails, and make swipe follow the finger.
 requireText('js/pasha-baby-product-description-v2.js', "const SHEET_ID = 'pbProductDetailSheet'", 'real product details sheet id');
-requireText('js/pasha-product-gallery-thermal-v1.js', "const SHEET_ID = 'pbProductDetailSheet'", 'thermal helper real sheet target');
+requireText('js/pasha-product-gallery-thermal-v1.js', "const SHEET_ID = 'pbProductDetailSheet'", 'gallery helper real sheet target');
 forbidText('js/pasha-product-gallery-thermal-v1.js', 'pbProductDetailsSheet', 'stale plural product sheet id');
+requireText('js/pasha-product-gallery-thermal-v1.js', '__PASHA_PRODUCT_GALLERY_THERMAL_V2__', 'new carousel runtime');
 requireText('js/pasha-product-gallery-thermal-v1.js', 'name.before(picker)', 'color strip above product title');
 requireText('js/pasha-product-gallery-thermal-v1.js', "querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())", 'duplicate color thumbnail removal');
 requireText('js/pasha-product-gallery-thermal-v1.js', "stage.addEventListener('pointermove'", 'finger-following gallery swipe');
+requireText('js/pasha-product-gallery-thermal-v1.js', 'pb-carousel-prev-image', 'previous carousel peer');
+requireText('js/pasha-product-gallery-thermal-v1.js', 'pb-carousel-next-image', 'next carousel peer');
+requireText('js/pasha-product-gallery-thermal-v1.js', 'new IntersectionObserver', 'low-cost sticky category state');
 requireText('js/pasha-product-gallery-thermal-v1.js', 'touch-action:pan-y', 'native vertical scrolling during gallery use');
 
 requireText('js/app.js', 'loading="lazy"', 'lazy product images');
@@ -120,8 +107,6 @@ if (sdkDigest !== '0UK+HVlz5Y7F//atDpPysyocv/PjGXQoBX+XSaL/eEotARW8rPFh+lL5sO0Lj
   failures.push('js/vendor/supabase-2.114.0.min.js: pinned SDK integrity mismatch');
 }
 
-// Keep key client files under generous regression ceilings. These are not bundle
-// targets; they only catch accidental megabyte-scale artifacts before delivery.
 for (const [file, maxBytes] of [
   ['js/app.js', 250 * 1024],
   ['admin.html', 600 * 1024],
