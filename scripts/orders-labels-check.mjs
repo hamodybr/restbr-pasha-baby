@@ -123,7 +123,7 @@ requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=2.0", 'public
 requireText('js/pasha-arabic-only.js', "js/admin-invoice-settings.js?v=1.1", 'invoice editor loader');
 requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.9", 'configurable invoice admin orders loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.1", 'color persistence loader');
-requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=2.0", 'color gallery v2 loader');
+requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=2.1", 'color gallery v2 loader');
 requireText('js/pasha-arabic-only.js', 'js/pasha-number-normalizer.js?v=1.2', 'number normalizer loader');
 requireText('js/pasha-arabic-only.js', 'js/admin-interaction-polish.js?v=1.5', 'restored drag and first-tap loader');
 requireText('js/admin-role-ui.js', "'pasha-orders'", 'orders view role allowlist');

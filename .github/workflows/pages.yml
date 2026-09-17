@@ -21,6 +21,11 @@ jobs:
       - name: Pre-deploy audit
         run: node scripts/predeploy-check.mjs
 
+      - name: Mobile idle and color-switch regression
+        run: |
+          npm install --no-save --package-lock=false jsdom@26.1.0
+          node scripts/mobile-idle-regression.mjs
+
       - name: Retail commerce audit
         run: node scripts/retail-commerce-check.mjs
 

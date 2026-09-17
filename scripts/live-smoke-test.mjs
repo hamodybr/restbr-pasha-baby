@@ -100,7 +100,7 @@ const indexHtml = await expectText('/', [
   'پاشا بيبي',
   'js/runtime-config.js',
   'js/vendor/supabase-2.114.0.min.js',
-  'js/pasha-baby-storefront-bundle.js?v=1.1',
+  'js/pasha-baby-storefront-bundle.js?v=1.2',
   'css/pasha-baby-final-tweaks.css?v=1.0'
 ], 'storefront');
 
@@ -223,13 +223,13 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v41',
+  'restbr-pasha-baby-v42',
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
-  'js/pasha-arabic-only.js?v=2.0',
+  'js/pasha-arabic-only.js?v=2.1',
   'js/pasha-number-normalizer.js?v=1.2',
-  'js/pasha-baby-storefront-bundle.js?v=1.1',
+  'js/pasha-baby-storefront-bundle.js?v=1.2',
   'css/pasha-baby-final-tweaks.css?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
   'assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp'

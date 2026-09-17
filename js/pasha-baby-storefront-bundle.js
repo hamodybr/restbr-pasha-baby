@@ -111,6 +111,17 @@
 })();
 
 /* js/supabase-config.js */
+// Emergency kill-switch for the short-lived PR #59 invoice helper.
+// Some iOS/Safari clients may still have the old runtime-config.js cached.
+// Mark the helper as already handled and remove its pending script tag before
+// the admin boot continues, so a stale cache cannot freeze dashboard taps.
+(() => {
+  const isAdmin = /(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname);
+  if (!isAdmin) return;
+  window.__PASHA_INVOICE_DEFAULT_CAIRO_V1__ = true;
+  document.getElementById('pbInvoiceDefaultCairoScript')?.remove();
+})();
+
 // ==========================================
 // RESTBR single-store menu — Supabase configuration
 // ==========================================
@@ -207,7 +218,7 @@ if (RESTBR_CONFIGURED) {
     if (document.getElementById('pashaArabicOnlyScript')) return;
     const script = document.createElement('script');
     script.id = 'pashaArabicOnlyScript';
-    script.src = 'js/pasha-arabic-only.js?v=2.0';
+    script.src = 'js/pasha-arabic-only.js?v=2.1';
     script.async = false;
     document.head.appendChild(script);
   };
@@ -7349,7 +7360,7 @@ startRestbr();
           chip.className = 'pb-fixed-discount-chip';
           row.appendChild(chip);
         }
-        chip.textContent = 'خصم';
+        if (chip.textContent !== 'خصم') chip.textContent = 'خصم';
         chip.title = 'يوجد خصم على هذا الصنف';
         chip.setAttribute('aria-label', 'خصم');
       } else {
@@ -7364,11 +7375,12 @@ startRestbr();
         const original = Number(option.originalPrice ?? option.__retailOriginalPrice ?? option.price ?? 0);
         const current = Number(option.price ?? 0);
         if (amount > 0 && Number.isFinite(original) && original > current && current >= 0) {
-          buy.innerHTML = `
+          const priceHTML = `
             <span class="pb-price-stack">
               <span class="pb-old-price">${Math.max(0, original).toLocaleString('en-US')} د.ع</span>
               <b class="sm-price">${Math.max(0, current).toLocaleString('en-US')} د.ع</b>
             </span>`;
+          if (buy.innerHTML !== priceHTML) buy.innerHTML = priceHTML;
         }
       });
     });
@@ -8009,11 +8021,11 @@ startRestbr();
       if (logo) {
         applyLogo(img);
         img.style.display = 'block';
-        mark.classList.add('has-store-logo');
+        if (!mark.classList.contains('has-store-logo')) mark.classList.add('has-store-logo');
       } else {
-        img.removeAttribute('src');
+        if (img.hasAttribute('src')) img.removeAttribute('src');
         img.style.display = 'none';
-        mark.classList.remove('has-store-logo');
+        if (mark.classList.contains('has-store-logo')) mark.classList.remove('has-store-logo');
       }
     }
 
@@ -8031,11 +8043,11 @@ startRestbr();
       if (logo) {
         applyLogo(img);
         img.style.display = 'block';
-        introMark.classList.add('has-store-logo');
+        if (!introMark.classList.contains('has-store-logo')) introMark.classList.add('has-store-logo');
       } else {
-        img.removeAttribute('src');
+        if (img.hasAttribute('src')) img.removeAttribute('src');
         img.style.display = 'none';
-        introMark.classList.remove('has-store-logo');
+        if (introMark.classList.contains('has-store-logo')) introMark.classList.remove('has-store-logo');
       }
     }
   }

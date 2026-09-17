@@ -44,8 +44,8 @@ for (const file of files) {
 }
 
 requireText('index.html', 'css/pasha-baby-commerce.css?v=1.0', 'retail commerce stylesheet');
-requireText('index.html', 'js/runtime-config.js?v=2.2', 'product gallery runtime config');
-requireText('index.html', 'js/pasha-baby-storefront-bundle.js?v=1.1', 'retail storefront JavaScript bundle');
+requireText('index.html', 'js/runtime-config.js?v=2.3', 'product gallery runtime config');
+requireText('index.html', 'js/pasha-baby-storefront-bundle.js?v=1.2', 'retail storefront JavaScript bundle');
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-commerce.js */', 'bundled preferred-color commerce runtime');
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-retail-v4.js */', 'bundled placeholder detail opener runtime');
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/live-prices.js */', 'bundled fixed-discount-aware live prices');
@@ -58,12 +58,12 @@ forbidText('index.html', 'id="smLangs"', 'storefront language picker');
 requireMatch('sw.js', /restbr-pasha-baby-v\d+/, 'retail cache generation');
 requireText('sw.js', 'css/pasha-baby-commerce.css?v=1.0', 'cached retail commerce stylesheet');
 requireText('sw.js', 'css/pasha-baby-final-tweaks.css?v=1.0', 'cached final Pasha UI tweaks');
-requireText('sw.js', 'js/pasha-baby-storefront-bundle.js?v=1.1', 'cached retail storefront JavaScript bundle');
-requireText('sw.js', 'js/runtime-config.js?v=2.2', 'cached product gallery runtime config');
-requireText('sw.js', 'js/pasha-arabic-only.js?v=2.0', 'cached Arabic-only policy');
+requireText('sw.js', 'js/pasha-baby-storefront-bundle.js?v=1.2', 'cached retail storefront JavaScript bundle');
+requireText('sw.js', 'js/runtime-config.js?v=2.3', 'cached product gallery runtime config');
+requireText('sw.js', 'js/pasha-arabic-only.js?v=2.1', 'cached Arabic-only policy');
 requireText('sw.js', 'js/pasha-number-normalizer.js?v=1.2', 'cached English-digit normalizer');
 
-requireText('js/supabase-config.js', 'js/pasha-arabic-only.js?v=2.0', 'Arabic-only policy loader');
+requireText('js/supabase-config.js', 'js/pasha-arabic-only.js?v=2.1', 'Arabic-only policy loader');
 forbidText('js/supabase-config.js', 'language-settings.js', 'legacy multilingual loader');
 requireText('js/pasha-arabic-only.js', "localStorage.setItem('RESTBR_LANG_V1', 'ar')", 'Arabic language lock');
 requireText('js/pasha-arabic-only.js', 'data-pasha-multilang-hidden', 'admin multilingual field suppression');
@@ -84,7 +84,7 @@ requireText('js/pasha-baby-commerce.js', 'dataset.retailBypass', 'existing cart 
 requireText('js/pasha-baby-commerce.js', 'dataset.pbPreferredColorId', 'detail-sheet preferred color handoff');
 requireText('js/pasha-baby-commerce.js', "compose('ar', 'اللون')", 'Arabic color carried into cart');
 
-requireText('js/runtime-config.js', 'js/pasha-baby-product-description-v2.js?v=3.0', 'product details gallery v3 loader');
+requireText('js/runtime-config.js', 'js/pasha-baby-product-description-v2.js?v=3.1', 'product details gallery v3 loader');
 requireText('js/pasha-baby-product-description-v2.js', '__PB_PRODUCT_DETAILS_GALLERY_V3__', 'product details gallery v3 guard');
 requireText('js/pasha-baby-product-description-v2.js', 'window.PASHA_OPEN_PRODUCT_DETAILS', 'public product details opener');
 requireText('js/pasha-baby-product-description-v2.js', 'data-pb-detail-color-id', 'interactive detail color picker');

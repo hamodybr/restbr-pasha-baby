@@ -152,11 +152,11 @@
       if (logo) {
         applyLogo(img);
         img.style.display = 'block';
-        mark.classList.add('has-store-logo');
+        if (!mark.classList.contains('has-store-logo')) mark.classList.add('has-store-logo');
       } else {
-        img.removeAttribute('src');
+        if (img.hasAttribute('src')) img.removeAttribute('src');
         img.style.display = 'none';
-        mark.classList.remove('has-store-logo');
+        if (mark.classList.contains('has-store-logo')) mark.classList.remove('has-store-logo');
       }
     }
 
@@ -174,11 +174,11 @@
       if (logo) {
         applyLogo(img);
         img.style.display = 'block';
-        introMark.classList.add('has-store-logo');
+        if (!introMark.classList.contains('has-store-logo')) introMark.classList.add('has-store-logo');
       } else {
-        img.removeAttribute('src');
+        if (img.hasAttribute('src')) img.removeAttribute('src');
         img.style.display = 'none';
-        introMark.classList.remove('has-store-logo');
+        if (introMark.classList.contains('has-store-logo')) introMark.classList.remove('has-store-logo');
       }
     }
   }

@@ -21,16 +21,16 @@ async function expect(path, markers, label) {
 
 await expect('js/pasha-arabic-only.js', [
   'js/admin-option-price-fast.js?v=1.0',
-  'js/pasha-color-image-gallery.js?v=2.0'
+  'js/pasha-color-image-gallery.js?v=2.1'
 ], 'production loaders');
 
 await expect('', [
-  'js/runtime-config.js?v=2.2',
-  'js/pasha-baby-storefront-bundle.js?v=1.1'
+  'js/runtime-config.js?v=2.3',
+  'js/pasha-baby-storefront-bundle.js?v=1.2'
 ], 'production product-detail entry assets');
 
 await expect('js/runtime-config.js', [
-  'js/pasha-baby-product-description-v2.js?v=3.0'
+  'js/pasha-baby-product-description-v2.js?v=3.1'
 ], 'production product details gallery loader');
 
 await expect('js/admin-option-price-fast.js', [
