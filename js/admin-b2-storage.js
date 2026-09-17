@@ -1,15 +1,16 @@
 (() => {
-  if (window.__PASHA_B2_STORAGE_V1__) return;
+  if (window.__PASHA_B2_STORAGE_V2__) return;
+  window.__PASHA_B2_STORAGE_V2__ = true;
+  // Also block an old cached copy from booting a second compression pipeline.
   window.__PASHA_B2_STORAGE_V1__ = true;
 
   const TARGET_BYTES = 620 * 1024;
   const SERVER_MAX_BYTES = 700 * 1024;
-  const SOURCE_LIMIT = 30 * 1024 * 1024;
   const FUNCTION_NAME = 'b2-images';
   const GB = 1024 * 1024 * 1024;
+  const previewUrls = new Map();
 
   const $ = id => document.getElementById(id);
-  const sleepPaint = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
 
   function client() {
     try {
@@ -18,112 +19,42 @@
     return window.supabaseClient || null;
   }
 
+  function pipeline() {
+    return window.PASHA_ADMIN_IMAGE_PIPELINE || null;
+  }
+
   function setProgress(id, text) {
     const el = $(id);
     if (el) el.textContent = text || '';
   }
 
   function fmt(bytes) {
-    const n = Number(bytes || 0);
+    const helper = pipeline()?.formatBytes;
+    if (typeof helper === 'function') return helper(bytes);
+    const n = Math.max(0, Number(bytes || 0));
     if (n >= GB) return `${(n / GB).toFixed(2)} GB`;
     if (n >= 1024 * 1024) return `${(n / 1024 / 1024).toFixed(2)} MB`;
-    return `${Math.max(0, Math.round(n / 1024))} KB`;
-  }
-
-  function fileBase(name) {
-    return String(name || 'product').replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]+/g, '-') || 'product';
-  }
-
-  async function canvasBlob(canvas, type, quality) {
-    return await new Promise((resolve, reject) => {
-      try { canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('تعذر ضغط الصورة.')), type, quality); }
-      catch (error) { reject(error); }
-    });
-  }
-
-  async function decode(file) {
-    if (typeof createImageBitmap === 'function') {
-      try { return { source: await createImageBitmap(file, { imageOrientation: 'from-image' }), close: source => source.close?.() }; }
-      catch (_) {
-        try { return { source: await createImageBitmap(file), close: source => source.close?.() }; } catch (_) {}
-      }
-    }
-
-    const url = URL.createObjectURL(file);
-    const image = new Image();
-    image.decoding = 'async';
-    image.src = url;
-    if (typeof image.decode === 'function') await image.decode();
-    else await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; });
-    return { source: image, close: () => URL.revokeObjectURL(url) };
-  }
-
-  async function renderWebp(source, originalName, maxEdge, quality) {
-    const sw = Number(source.width || source.naturalWidth || 0);
-    const sh = Number(source.height || source.naturalHeight || 0);
-    if (!sw || !sh) throw new Error('تعذر معرفة أبعاد الصورة.');
-    const scale = Math.min(1, maxEdge / Math.max(sw, sh));
-    const width = Math.max(1, Math.round(sw * scale));
-    const height = Math.max(1, Math.round(sh * scale));
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    if (!ctx) throw new Error('تعذر تشغيل معالج الصور.');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, width, height);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(source, 0, 0, width, height);
-    const blob = await canvasBlob(canvas, 'image/webp', quality);
-    canvas.width = 1;
-    canvas.height = 1;
-    return new File([blob], `${fileBase(originalName)}.webp`, { type: 'image/webp', lastModified: Date.now() });
+    return `${Math.round(n / 1024)} KB`;
   }
 
   async function prepareForB2(file, progressId) {
-    if (!(file instanceof Blob) || !String(file.type || '').startsWith('image/')) throw new Error('الملف المختار ليس صورة.');
-    if (file.size > SOURCE_LIMIT) throw new Error('الحد الأقصى للصورة الأصلية قبل الضغط هو 30MB.');
-
-    if (/image\/(?:gif|svg\+xml)/i.test(file.type || '')) {
-      if (file.size > TARGET_BYTES) throw new Error('GIF/SVG يجب أن يكون أقل من 620KB.');
+    const helper = pipeline();
+    if (!helper?.prepare) {
+      if (!(file instanceof Blob) || !String(file.type || '').startsWith('image/')) {
+        throw new Error('الملف المختار ليس صورة.');
+      }
+      if (file.size > SERVER_MAX_BYTES) {
+        throw new Error('معالج الصور غير جاهز. اعمل Refresh للوحة وحاول مرة ثانية.');
+      }
       return file;
     }
 
-    if (String(file.type).toLowerCase() === 'image/webp' && file.size <= TARGET_BYTES) return file;
-
-    setProgress(progressId, `جاري ضغط الصورة تلقائياً... ${fmt(file.size)}`);
-    await sleepPaint();
-
-    const decoded = await decode(file);
-    try {
-      const attempts = [
-        [1400, .78],
-        [1280, .72],
-        [1150, .68],
-        [1024, .64],
-        [900, .60],
-        [800, .56],
-        [720, .52],
-        [640, .48],
-        [560, .44],
-        [480, .40]
-      ];
-
-      let best = null;
-      for (const [edge, quality] of attempts) {
-        const candidate = await renderWebp(decoded.source, file.name, edge, quality);
-        if (!best || candidate.size < best.size) best = candidate;
-        setProgress(progressId, `جاري تحسين الصورة... ${fmt(candidate.size)}`);
-        await sleepPaint();
-        if (candidate.size <= TARGET_BYTES) return candidate;
-      }
-
-      if (best?.size <= SERVER_MAX_BYTES) return best;
-      throw new Error(`الصورة بقيت كبيرة بعد الضغط (${fmt(best?.size || 0)}). جرّب صورة أخرى.`);
-    } finally {
-      try { decoded.close?.(decoded.source); } catch (_) {}
-    }
+    return helper.prepare(file, {
+      profile: 'product',
+      targetBytes: TARGET_BYTES,
+      maxBytes: SERVER_MAX_BYTES,
+      onProgress: text => setProgress(progressId, text)
+    });
   }
 
   async function detailedInvokeError(error) {
@@ -177,11 +108,16 @@
     if (!original) return String($(urlInputId)?.value || '').trim();
 
     const prepared = await prepareForB2(original, progressId);
-    setProgress(progressId, `تم الضغط ${fmt(original.size)} → ${fmt(prepared.size)}. جاري الرفع إلى التخزين...`);
+    setProgress(
+      progressId,
+      prepared === original
+        ? `الصورة جاهزة. جاري الرفع... ${fmt(prepared.size)}`
+        : `تم تجهيز الصورة ${fmt(original.size)} → ${fmt(prepared.size)}. جاري الرفع...`
+    );
 
     const form = new FormData();
     form.append('productId', String(productId || ''));
-    form.append('file', prepared, prepared.name || 'product.webp');
+    form.append('file', prepared, prepared.name || original.name || 'product.webp');
 
     const data = await invoke('upload', form);
     if (!data.publicUrl) throw new Error('تم الرفع لكن لم يرجع رابط الصورة.');
@@ -216,6 +152,37 @@
     window.uploadNewProductImage = add;
   }
 
+  function setLocalPreview(file, nameId, previewId, slot) {
+    if (!file) return;
+    const name = $(nameId);
+    const preview = $(previewId);
+    if (name) name.textContent = file.name || '';
+    if (!preview) return;
+
+    const previous = previewUrls.get(slot);
+    if (previous) URL.revokeObjectURL(previous);
+    const url = URL.createObjectURL(file);
+    previewUrls.set(slot, url);
+    preview.src = url;
+  }
+
+  function patchPreviewFunctions() {
+    window.previewAdminImage = input => {
+      const file = input?.files?.[0];
+      if (file) setLocalPreview(file, 'p_image_file_name', 'p_image_preview', 'edit-product');
+    };
+
+    window.previewNewProductImage = input => {
+      const file = input?.files?.[0];
+      if (file) setLocalPreview(file, 'np_image_file_name', 'np_image_preview', 'new-product');
+    };
+
+    window.previewRestaurantLogo = input => {
+      const file = input?.files?.[0];
+      if (file) setLocalPreview(file, '', 'rs_logo_preview', 'restaurant-logo');
+    };
+  }
+
   function meterCss() {
     if ($('pbB2MeterStyle')) return;
     const style = document.createElement('style');
@@ -235,7 +202,8 @@
   function ensureMeter() {
     meterCss();
     const root = $('viewTools') || document.querySelector('.admin-main');
-    if (!root || $('pbB2Meter')) return;
+    if (!root) return false;
+    if ($('pbB2Meter')) return true;
     const card = document.createElement('div');
     card.id = 'pbB2Meter';
     card.className = 'pb-b2-meter';
@@ -245,6 +213,7 @@
       <div class="pb-b2-meter-note"><span>تنبيه عند 8 GB</span><span>منع الرفع قبل 9 GB</span></div>`;
     root.insertAdjacentElement('afterbegin', card);
     refreshMeterSoon(50);
+    return true;
   }
 
   let meterTimer = 0;
@@ -272,20 +241,26 @@
     }
   }
 
-  function boot() {
-    let tries = 0;
-    const timer = setInterval(() => {
-      tries += 1;
-      patchUploaders();
-      ensureMeter();
-      if (tries > 120) clearInterval(timer);
-    }, 150);
+  function cleanupPreviewUrls() {
+    previewUrls.forEach(url => {
+      try { URL.revokeObjectURL(url); } catch (_) {}
+    });
+    previewUrls.clear();
+  }
 
+  function boot() {
     patchUploaders();
+    patchPreviewFunctions();
     ensureMeter();
-    const observer = new MutationObserver(() => ensureMeter());
-    observer.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener('pageshow', () => refreshMeterSoon(100));
+
+    // The old build repatched the page every 150ms for ~18 seconds. Admin
+    // loads this file after unlock now, so one bounded retry is enough.
+    if (!document.getElementById('viewTools')) {
+      requestAnimationFrame(ensureMeter);
+    }
+
+    window.addEventListener('pageshow', () => refreshMeterSoon(100), { passive: true });
+    window.addEventListener('pagehide', cleanupPreviewUrls, { once: true });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
