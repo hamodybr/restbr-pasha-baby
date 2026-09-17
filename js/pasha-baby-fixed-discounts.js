@@ -133,7 +133,7 @@
           chip.className = 'pb-fixed-discount-chip';
           row.appendChild(chip);
         }
-        chip.textContent = 'خصم';
+        if (chip.textContent !== 'خصم') chip.textContent = 'خصم';
         chip.title = 'يوجد خصم على هذا الصنف';
         chip.setAttribute('aria-label', 'خصم');
       } else {
@@ -148,11 +148,12 @@
         const original = Number(option.originalPrice ?? option.__retailOriginalPrice ?? option.price ?? 0);
         const current = Number(option.price ?? 0);
         if (amount > 0 && Number.isFinite(original) && original > current && current >= 0) {
-          buy.innerHTML = `
+          const priceHTML = `
             <span class="pb-price-stack">
               <span class="pb-old-price">${Math.max(0, original).toLocaleString('en-US')} د.ع</span>
               <b class="sm-price">${Math.max(0, current).toLocaleString('en-US')} د.ع</b>
             </span>`;
+          if (buy.innerHTML !== priceHTML) buy.innerHTML = priceHTML;
         }
       });
     });

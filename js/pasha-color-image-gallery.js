@@ -107,7 +107,7 @@
         img.decoding = 'async';
         button.insertBefore(img, button.firstChild);
       }
-      if (img.src !== image) img.src = image;
+      if (img.getAttribute('src') !== image) img.src = image;
       img.alt = colorName(entry);
       img.dataset.pbColorPreview = image;
       img.dataset.pbColorCaption = colorName(entry);
@@ -131,11 +131,11 @@
     }
     const img = preview.querySelector('img');
     const title = preview.querySelector('b');
-    if (img.src !== image) img.src = image;
+    if (img.getAttribute('src') !== image) img.src = image;
     img.alt = colorName(entry);
     img.dataset.pbColorPreview = image;
     img.dataset.pbColorCaption = colorName(entry);
-    title.textContent = colorName(entry);
+    if (title.textContent !== colorName(entry)) title.textContent = colorName(entry);
   }
 
   let scheduled = false;

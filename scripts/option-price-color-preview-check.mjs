@@ -46,12 +46,12 @@ requireText('js/pasha-baby-product-description-v2.js', "stage.addEventListener('
 requireText('js/pasha-baby-product-description-v2.js', "stage.addEventListener('pointerup'", 'carousel swipe finish');
 requireText('js/pasha-baby-product-description-v2.js', 'originalAction.dataset.pbPreferredColorId', 'selected color cart handoff');
 requireText('js/pasha-baby-commerce.js', 'button.dataset.pbPreferredColorId', 'preferred color cart intake');
-requireText('js/runtime-config.js', 'js/pasha-baby-product-description-v2.js?v=3.0', 'details gallery v3 loader');
+requireText('js/runtime-config.js', 'js/pasha-baby-product-description-v2.js?v=3.1', 'details gallery v3 loader');
 requireText('css/pasha-baby-card-density-v2.css', '.pb-product-sheet-stage', 'carousel stage styling');
 requireText('css/pasha-baby-card-density-v2.css', '.pb-product-sheet-color', 'detail color styling');
 
 requireText('js/pasha-arabic-only.js', "js/admin-option-price-fast.js?v=1.0", 'admin fast option-price loader');
-requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=2.0", 'color image gallery v2 loader');
+requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=2.1", 'color image gallery v2 loader');
 
 if (failures.length) {
   console.error('\nOption price / color preview audit failed:');

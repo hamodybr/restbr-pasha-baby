@@ -206,7 +206,7 @@ window.RESTBR_CONFIG = Object.freeze({
 
   const script = document.createElement('script');
   script.id = 'pbProductDescriptionV2Script';
-  script.src = 'js/pasha-baby-product-description-v2.js?v=3.0';
+  script.src = 'js/pasha-baby-product-description-v2.js?v=3.1';
   script.defer = true;
   document.head.appendChild(script);
 })();
@@ -218,7 +218,7 @@ window.RESTBR_CONFIG = Object.freeze({
 
   const script = document.createElement('script');
   script.id = 'pbCardDetailsButtonV3Script';
-  script.src = 'js/pasha-baby-details-button-v3.js?v=3.1';
+  script.src = 'js/pasha-baby-details-button-v3.js?v=3.2';
   script.defer = true;
   document.head.appendChild(script);
 })();

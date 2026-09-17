@@ -232,7 +232,7 @@
     }
 
     loadScript('pashaOrderColorBridgeScript', 'js/pasha-order-color-bridge.js?v=1.1');
-    loadScript('pashaColorImageGalleryScript', 'js/pasha-color-image-gallery.js?v=2.0');
+    loadScript('pashaColorImageGalleryScript', 'js/pasha-color-image-gallery.js?v=2.1');
     loadScript('pashaOrderSubmitScript', 'js/pasha-order-submit.js?v=2.0');
     loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.1');
     installStorefrontPerformanceGuards();

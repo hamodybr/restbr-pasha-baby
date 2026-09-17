@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v41";
+const CACHE_NAME = "restbr-pasha-baby-v42";
 
 const CORE = [
   "./",
@@ -18,18 +18,18 @@ const CORE = [
   "./css/pasha-baby-brand-background.css?v=1.0",
   "./css/pasha-baby-footer-v2.css?v=2.0",
   "./css/pasha-baby-final-tweaks.css?v=1.0",
-  "./js/pasha-baby-storefront-bundle.js?v=1.1",
+  "./js/pasha-baby-storefront-bundle.js?v=1.2",
   "./js/vendor/supabase-2.114.0.min.js",
-  "./js/runtime-config.js?v=2.2",
+  "./js/runtime-config.js?v=2.3",
   "./js/restbr-hardening.js?v=1.0",
   "./js/url-safety.js?v=1.5",
-  "./js/pasha-arabic-only.js?v=2.0",
+  "./js/pasha-arabic-only.js?v=2.1",
   "./js/pasha-number-normalizer.js?v=1.2",
   "./js/restaurant-hours.js?v=1.3",
   "./js/whatsapp-order-bullets.js?v=1.0",
   "./js/arabic-news-ticker.js?v=1.1",
-  "./js/pasha-baby-product-description-v2.js?v=3.0",
-  "./js/pasha-baby-details-button-v3.js?v=3.1",
+  "./js/pasha-baby-product-description-v2.js?v=3.1",
+  "./js/pasha-baby-details-button-v3.js?v=3.2",
   "./css/pasha-baby-card-density-v2.css?v=3.0",
   "./css/pasha-baby-details-button-v3.css?v=3.1",
   "./data/menu.json?v=32",

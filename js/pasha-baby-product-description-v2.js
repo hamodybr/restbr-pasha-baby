@@ -23,6 +23,17 @@
   let activeGalleryIndex = 0;
   let selectedDetailColorId = '';
   let swipeStart = null;
+  let renderedSheetState = '';
+  let renderedSheetCard = null;
+
+  // Menu observers can fire for unrelated badges. Only rebuild an open sheet
+  // when its own content changes; keep image/thumbnail nodes alive otherwise.
+  const sheetState = (card, product) => JSON.stringify([
+    currentLanguage(), productNameFor(card, product), descriptionFor(product),
+    mainImageFor(card, product), colorsFor(product),
+    card.querySelector('.sm-options-scroll')?.innerHTML,
+    card.querySelector('.sm-direct-add, .sm-choose-options')?.outerHTML
+  ]);
 
   const ensureStyle = () => {
     if (document.getElementById(STYLE_ID)) return;
@@ -276,8 +287,11 @@
     const stage = sheet.querySelector('.pb-product-sheet-stage');
 
     if (image) {
-      delete image.dataset.pbFallbackApplied;
-      image.src = slide.src;
+      if (image.dataset.pbSlideSrc !== slide.src) {
+        image.dataset.pbSlideSrc = slide.src;
+        delete image.dataset.pbFallbackApplied;
+        image.src = slide.src;
+      }
       image.alt = slide.alt || slide.caption || '';
       image.hidden = false;
     }
@@ -670,6 +684,8 @@
       }
     }
 
+    renderedSheetState = sheetState(card, product);
+    renderedSheetCard = card;
     return true;
   };
 
@@ -719,6 +735,7 @@
     const product = productById(activeProductId);
     const card = cardByProductId(activeProductId);
     if (!product || !card) return;
+    if (card === renderedSheetCard && sheetState(card, product) === renderedSheetState) return;
     renderSheet(card, product, { preserveColor: selectedDetailColorId });
   };
 
@@ -784,7 +801,8 @@
         node.insertAdjacentElement('afterend', more);
       }
 
-      more.textContent = uiText('more');
+      // Writing identical text still triggers childList observers.
+      if (more.textContent !== uiText('more')) more.textContent = uiText('more');
       more.setAttribute('aria-label', `${uiText('more')}: ${String(name.textContent || '').trim()}`);
       more.onclick = event => {
         event.preventDefault();

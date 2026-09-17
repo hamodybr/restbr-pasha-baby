@@ -63,7 +63,7 @@
         actionRow.appendChild(details);
       }
 
-      details.textContent = detailsLabel();
+      if (details.textContent !== detailsLabel()) details.textContent = detailsLabel();
       details.setAttribute('aria-label', `${detailsLabel()} — ${String(card.querySelector('.sm-name')?.textContent || '').trim()}`);
 
       details.onclick = event => {
