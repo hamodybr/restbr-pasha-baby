@@ -3,7 +3,7 @@
   if (window.__PASHA_PRODUCT_GALLERY_THERMAL_V1__) return;
   window.__PASHA_PRODUCT_GALLERY_THERMAL_V1__ = true;
 
-  const SHEET_ID = 'pbProductDetailsSheet';
+  const SHEET_ID = 'pbProductDetailSheet';
   const STYLE_ID = 'pbProductGalleryThermalV1Style';
   let observer = null;
   let queued = false;
