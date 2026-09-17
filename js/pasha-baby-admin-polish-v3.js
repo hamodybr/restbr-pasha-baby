@@ -271,7 +271,10 @@
   function updateOptionLabels(holder){
     visibleRows(holder).forEach((row,index) => {
       const label = row.querySelector(':scope > .sm-option-order-bar .sm-option-order-number');
-      if (label) label.textContent = `الخيار ${index + 1}`;
+      const next = `الخيار ${index + 1}`;
+      // Writing identical text creates a childList mutation in Safari/Chrome.
+      // Only touch the DOM when the visible label really changed.
+      if (label && label.textContent !== next) label.textContent = next;
     });
   }
 
@@ -378,15 +381,33 @@
   }
 
   function startObserver(){
-    if (observer || !document.body) return;
+    if (observer) return;
+    const modal = document.getElementById('editorModal');
+    if (!modal) return;
+
+    // Option rows only change inside the product editor. Keep the observer
+    // scoped to that modal instead of watching every mutation in the dashboard.
     observer = new MutationObserver(mutations => {
       const changedHolders = new Set();
+      let relevant = false;
 
       mutations.forEach(mutation => {
         if (mutation.type !== 'childList') return;
         const target = mutation.target;
-        if (!(target instanceof Element)) return;
-        if (HOLDER_IDS.includes(target.id)) changedHolders.add(target);
+        const holder = target instanceof Element
+          ? (HOLDER_IDS.includes(target.id) ? target : target.closest?.('#optionsEditor,#newOptionsEditor'))
+          : null;
+        if (holder) {
+          changedHolders.add(holder);
+          relevant = true;
+        }
+
+        mutation.addedNodes.forEach(node => {
+          if (!(node instanceof Element)) return;
+          if (node.matches?.('#optionsEditor,#newOptionsEditor,.option-editor') || node.querySelector?.('#optionsEditor,#newOptionsEditor,.option-editor')) {
+            relevant = true;
+          }
+        });
       });
 
       changedHolders.forEach(holder => {
@@ -394,9 +415,9 @@
         animateReflow(holder);
       });
 
-      queuePolish();
+      if (relevant) queuePolish();
     });
-    observer.observe(document.body,{childList:true,subtree:true});
+    observer.observe(modal,{childList:true,subtree:true});
   }
 
   document.addEventListener('click',event => {
@@ -411,13 +432,8 @@
     installStyles();
     polish();
     startObserver();
-
-    let attempts = 0;
-    const timer = setInterval(() => {
-      polish();
-      attempts += 1;
-      if (attempts >= 80) clearInterval(timer);
-    },250);
+    // Removed the old 250ms × 80 polling loop. Dynamic option rows are handled
+    // by the scoped observer above, and all writes are idempotent.
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
