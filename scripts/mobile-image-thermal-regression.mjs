@@ -86,7 +86,7 @@ const pipelinePos = files.arabic.indexOf('admin-image-pipeline.js?v=1.0');
 const b2Pos = files.arabic.indexOf('admin-b2-storage.js?v=2.0');
 assert(pipelinePos >= 0 && b2Pos > pipelinePos, 'shared image pipeline must load before B2 uploader');
 assert(files.arabic.includes('admin-color-image-upload.js?v=2.0'), 'color uploader v2 must be loaded explicitly');
-assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.1'), 'storefront gallery helper must be loaded');
+assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.2'), 'storefront gallery helper must be loaded');
 assert(!files.arabic.includes('admin-image-optimizer.js?v=1.0'), 'Arabic admin loader must not boot the retired legacy optimizer');
 
 assert(files.config.includes('pasha-arabic-only.js?v=2.2'), 'Arabic policy cache version must be bumped');
