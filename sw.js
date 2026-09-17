@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v43";
+const CACHE_NAME = "restbr-pasha-baby-v44";
 
 const CORE = [
   "./",
@@ -29,7 +29,7 @@ const CORE = [
   "./js/whatsapp-order-bullets.js?v=1.0",
   "./js/arabic-news-ticker.js?v=1.1",
   "./js/pasha-baby-product-description-v2.js?v=3.1",
-  "./js/pasha-product-gallery-thermal-v1.js?v=1.0",
+  "./js/pasha-product-gallery-thermal-v1.js?v=1.1",
   "./js/pasha-baby-details-button-v3.js?v=3.2",
   "./css/pasha-baby-card-density-v2.css?v=3.0",
   "./css/pasha-baby-details-button-v3.css?v=3.1",
