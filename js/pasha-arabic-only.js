@@ -138,8 +138,9 @@
   function loadArabicAdminTools() {
     if (!IS_ADMIN) return;
     loadScript('pashaBabyAdminCopyScript', 'js/pasha-baby-admin-copy.js?v=1.1', true);
-    loadScript('pashaBabyImageOptimizerScript', 'js/admin-image-optimizer.js?v=1.0', true);
-    loadScript('pashaBabyB2StorageScript', 'js/admin-b2-storage.js?v=1.1', true);
+    // One shared decode/canvas pipeline is used by product and color uploads.
+    loadScript('pashaBabyImagePipelineScript', 'js/admin-image-pipeline.js?v=1.0', true);
+    loadScript('pashaBabyB2StorageScript', 'js/admin-b2-storage.js?v=2.0', true);
     loadScript('pashaBabyB2CleanupScript', 'js/admin-b2-cleanup.js?v=1.0', true);
     loadScript('pashaBabyLargeCatalogScript', 'js/admin-large-catalog.js?v=1.0', true);
     loadScript('pashaOptionPriceFastScript', 'js/admin-option-price-fast.js?v=1.0', true);
@@ -148,6 +149,7 @@
     loadScript('pashaProductEditorCleanupScript', 'js/pasha-admin-product-editor-cleanup.js?v=1.0', true);
     loadScript('pashaCategoryRetailCleanupScript', 'js/admin-category-retail-cleanup.js?v=1.2', true);
     loadScript('pashaNewProductColorsScript', 'js/admin-new-product-colors.js?v=1.0', true);
+    loadScript('pashaColorImageUploadScript', 'js/admin-color-image-upload.js?v=2.0', true);
     loadScript('pashaAdminProgressiveDisclosureScript', 'js/admin-progressive-disclosure.js?v=2.0', true);
     loadScript('pashaAdminInteractionPolishScript', 'js/admin-interaction-polish.js?v=1.5', true);
     loadScript('pashaInvoiceSettingsScript', 'js/admin-invoice-settings.js?v=1.1', true);
@@ -233,6 +235,7 @@
 
     loadScript('pashaOrderColorBridgeScript', 'js/pasha-order-color-bridge.js?v=1.1');
     loadScript('pashaColorImageGalleryScript', 'js/pasha-color-image-gallery.js?v=2.1');
+    loadScript('pashaProductGalleryThermalScript', 'js/pasha-product-gallery-thermal-v1.js?v=1.0');
     loadScript('pashaOrderSubmitScript', 'js/pasha-order-submit.js?v=2.0');
     loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.1');
     installStorefrontPerformanceGuards();
