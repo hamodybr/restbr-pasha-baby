@@ -12,6 +12,7 @@ const files = {
   legacy: read('js/admin-image-optimizer.js'),
   optionOrder: read('js/admin-option-order.js'),
   polish: read('js/pasha-baby-admin-polish-v3.js'),
+  details: read('js/pasha-baby-product-description-v2.js'),
   gallery: read('js/pasha-product-gallery-thermal-v1.js'),
   arabic: read('js/pasha-arabic-only.js'),
   config: read('js/supabase-config.js')
@@ -55,8 +56,10 @@ assert(!files.polish.includes('setInterval('), 'admin polish must not keep the o
 assert(files.polish.includes("const modal = document.getElementById('editorModal')"), 'admin polish observer must be scoped to the editor modal');
 assert(!files.polish.includes('observer.observe(document.body'), 'admin polish must not observe the whole dashboard body');
 
-assert(files.gallery.includes("const SHEET_ID = 'pbProductDetailSheet'"), 'thermal gallery must target the real product details sheet id');
-assert(!files.gallery.includes("pbProductDetailsSheet"), 'thermal gallery must not use the stale plural sheet id');
+const realSheetMarker = "const SHEET_ID = 'pbProductDetailSheet'";
+assert(files.details.includes(realSheetMarker), 'product details runtime must keep the expected live sheet id');
+assert(files.gallery.includes(realSheetMarker), 'thermal gallery must target the exact live product details sheet id');
+assert(!files.gallery.includes('pbProductDetailsSheet'), 'thermal gallery must not use the stale plural sheet id');
 assert(files.gallery.includes('name.before(picker)'), 'color strip must be moved above the product name');
 assert(files.gallery.includes("querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())"), 'tiny color chips must not decode duplicate full color photos');
 assert(files.gallery.includes("stage.addEventListener('pointermove'"), 'gallery must follow the finger during a swipe');
