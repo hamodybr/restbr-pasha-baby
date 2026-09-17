@@ -61,7 +61,8 @@ assert(files.gallery.includes(realSheetMarker), 'gallery polish must target the 
 assert(!files.gallery.includes('pbProductDetailsSheet'), 'gallery polish must not use the stale plural sheet id');
 assert(files.gallery.includes('__PASHA_PRODUCT_GALLERY_THERMAL_V3__'), 'continuous iOS carousel generation must be active');
 assert(files.gallery.includes('name.before(picker)'), 'color strip must be moved above the product name');
-assert(files.gallery.includes("querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())"), 'tiny color chips must not keep duplicate full color photos');
+assert(files.gallery.includes("button.dataset.pbCarouselSrc = src"), 'color slide sources must survive observer passes');
+assert(!files.gallery.includes("querySelectorAll('.pb-product-sheet-color-image').forEach(img => img.remove())"), 'base gallery color sources must not be removed');
 assert(files.gallery.includes('min-height:40px!important') && files.gallery.includes('max-width:none!important'), 'color chips must fit compound color names comfortably');
 assert(files.gallery.includes("stage.addEventListener('pointermove'"), 'carousel must follow the finger during a swipe');
 assert(files.gallery.includes('pb-carousel-track'), 'carousel must render a real three-image track');
@@ -86,7 +87,7 @@ const pipelinePos = files.arabic.indexOf('admin-image-pipeline.js?v=1.0');
 const b2Pos = files.arabic.indexOf('admin-b2-storage.js?v=2.0');
 assert(pipelinePos >= 0 && b2Pos > pipelinePos, 'shared image pipeline must load before B2 uploader');
 assert(files.arabic.includes('admin-color-image-upload.js?v=2.0'), 'color uploader v2 must be loaded explicitly');
-assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.2'), 'storefront gallery helper must be loaded');
+assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.3'), 'storefront gallery helper must be loaded');
 assert(!files.arabic.includes('admin-image-optimizer.js?v=1.0'), 'Arabic admin loader must not boot the retired legacy optimizer');
 
 assert(files.config.includes('pasha-arabic-only.js?v=2.2'), 'Arabic policy cache version must be bumped');
