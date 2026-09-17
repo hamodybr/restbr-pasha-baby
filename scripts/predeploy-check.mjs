@@ -98,7 +98,7 @@ if (!sw.includes('js/restbr-hardening.js?v=1.0')) fail('sw.js: hardening layer i
 if (!sw.includes('js/pasha-arabic-only.js?v=2.2')) fail('sw.js: Arabic-only policy v2.2 is not cached');
 if (!sw.includes('js/pasha-number-normalizer.js?v=1.2')) fail('sw.js: English-digit normalizer is not cached');
 if (!sw.includes('js/arabic-news-ticker.js?v=1.1')) fail('sw.js: Arabic announcement ticker is not cached');
-if (!sw.includes('js/pasha-product-gallery-thermal-v1.js?v=1.1')) fail('sw.js: thermal product gallery helper v1.1 is not cached');
+if (!sw.includes('js/pasha-product-gallery-thermal-v1.js?v=1.2')) fail('sw.js: thermal product gallery helper v1.2 is not cached');
 
 // 6) Pasha deployment identity / feature isolation.
 const runtime = read('js/runtime-config.js');
@@ -180,7 +180,7 @@ forbidText('js/supabase-config.js', 'language-settings.js', 'legacy multilingual
 requireText('js/pasha-arabic-only.js', "localStorage.setItem('RESTBR_LANG_V1', 'ar')", 'Arabic language lock');
 requireText('js/pasha-arabic-only.js', 'data-pasha-multilang-hidden', 'admin multilingual field suppression');
 requireText('js/pasha-arabic-only.js', 'js/arabic-news-ticker.js?v=1.1', 'Arabic announcement ticker loader');
-requireText('js/pasha-arabic-only.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.1', 'mobile thermal gallery loader v1.1');
+requireText('js/pasha-arabic-only.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.2', 'mobile thermal gallery loader v1.2');
 forbidText('index.html', 'id="smLangs"', 'storefront language picker');
 forbidText('index.html', 'english-card-ltr.css', 'English-only card stylesheet');
 forbidText('index.html', 'english-news-ticker.js', 'legacy multilingual ticker');

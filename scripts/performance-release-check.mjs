@@ -46,12 +46,12 @@ requireText('js/admin-large-catalog.js', 'function catalogMayBeTruncated()', 'la
 requireText('js/admin-large-catalog.js', 'async function ensureCompleteCatalog()', 'conditional full-catalog hydration');
 requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row boundary detection');
 
-requireText('sw.js', 'restbr-pasha-baby-v45', 'version-safe code cache generation');
-requireText('sw.js', '2026-09-17: refresh the existing cache generation', 'install-time storefront cache refresh marker');
+requireText('sw.js', 'restbr-pasha-baby-v46', 'version-safe code cache generation');
+requireText('sw.js', '2026-09-17: v46 forces iOS Safari', 'install-time storefront cache refresh marker');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
 requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin asset path');
-requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.1', 'carousel gallery precache');
+requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.2', 'carousel gallery precache');
 
 requireText('index.html', 'rel="preconnect" href="https://wlollfpmjzenhkjwxrqo.supabase.co"', 'Supabase preconnect');
 requireText('index.html', 'src="js/vendor/supabase-2.114.0.min.js"', 'self-hosted pinned Supabase browser SDK');
