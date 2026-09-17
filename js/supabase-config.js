@@ -105,7 +105,7 @@ if (RESTBR_CONFIGURED) {
     if (document.getElementById('pashaArabicOnlyScript')) return;
     const script = document.createElement('script');
     script.id = 'pashaArabicOnlyScript';
-    script.src = 'js/pasha-arabic-only.js?v=2.1';
+    script.src = 'js/pasha-arabic-only.js?v=2.2';
     script.async = false;
     document.head.appendChild(script);
   };
@@ -204,7 +204,7 @@ if (RESTBR_CONFIGURED) {
 
   const script = document.createElement('script');
   script.id = 'restbrAdminOptionOrderScript';
-  script.src = 'js/admin-option-order.js?v=1.4';
+  script.src = 'js/admin-option-order.js?v=3.0';
   script.async = false;
   document.head.appendChild(script);
 })();
@@ -253,7 +253,7 @@ if (RESTBR_CONFIGURED) {
 
   const script = document.createElement('script');
   script.id = 'pashaBabyAdminPolishV3Script';
-  script.src = 'js/pasha-baby-admin-polish-v3.js?v=3.0';
+  script.src = 'js/pasha-baby-admin-polish-v3.js?v=3.1';
   script.async = false;
   document.head.appendChild(script);
 })();
