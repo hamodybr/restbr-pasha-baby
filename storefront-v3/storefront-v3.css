@@ -2356,3 +2356,53 @@ body.pb-v3-product-open{
   font:900 9px/1 system-ui;
 }
 .pb-v3-catalog-status>button[hidden]{display:none!important}
+
+
+/* Compact cart/details action row for V3 cards. */
+.pb-v3-page #smMenu .sm-card .pb-product-action-row{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto auto!important;
+  align-items:center!important;
+  gap:6px!important;
+  margin-top:auto!important;
+}
+.pb-v3-page #smMenu .sm-card .pb-product-action-row>.sm-direct-add,
+.pb-v3-page #smMenu .sm-card .pb-product-action-row>.sm-choose-options{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  min-height:34px!important;
+  height:34px!important;
+  margin:0!important;
+}
+.pb-v3-page #smMenu .sm-card .pb-product-action-row>.pb-fixed-discount-chip{
+  min-width:30px!important;
+  height:28px!important;
+  min-height:28px!important;
+  margin:0!important;
+  padding:0 6px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:9px!important;
+}
+.pb-v3-page #smMenu .sm-card .pb-product-action-row>.pb-v3-details-btn{
+  width:34px!important;
+  min-width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  margin:0!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  border:1px solid var(--v3-line)!important;
+  border-radius:10px!important;
+  background:#f4f5f0!important;
+  color:var(--v3-sage-dark)!important;
+  font-size:0!important;
+}
+.pb-v3-page #smMenu .sm-card .pb-product-action-row>.pb-v3-details-btn::before{
+  content:"⌕";
+  font-size:15px;
+  line-height:1;
+}
