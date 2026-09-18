@@ -316,7 +316,7 @@
       trust.className = 'pb-v3-checkout-trust';
       trust.innerHTML = `
         <span><i>✓</i> الدفع عند الاستلام</span>
-        <span><i>✓</i> بياناتك للطلب فقط</span>
+        <span><i>✓</i> بدون إنشاء حساب</span>
         <span><i>✓</i> تثبيت مباشر</span>`;
       body.appendChild(trust);
     }
