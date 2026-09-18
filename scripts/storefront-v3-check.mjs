@@ -4,6 +4,9 @@ const html = fs.readFileSync('storefront-v3/index.html', 'utf8');
 const css = fs.readFileSync('storefront-v3/storefront-v3.css', 'utf8');
 const js = fs.readFileSync('storefront-v3/storefront-v3.js', 'utf8');
 const detailsJs = fs.readFileSync('storefront-v3/product-details-v3.js', 'utf8');
+const commerceJs = fs.readFileSync('js/pasha-baby-commerce.js', 'utf8');
+const fixedDiscountJs = fs.readFileSync('js/pasha-baby-fixed-discounts.js', 'utf8');
+const liveBadgesJs = fs.readFileSync('js/live-card-badges.js', 'utf8');
 
 const fail = message => {
   console.error('Storefront V3 check failed:', message);
@@ -90,6 +93,19 @@ if (!detailsJs.includes('window.PASHA_V3_OPEN_PRODUCT_DETAILS') ||
     !detailsJs.includes('pointerdown') ||
     !detailsJs.includes('data-v3-color-id')) {
   fail('V3 lightweight gallery/choice API is incomplete.');
+}
+
+for (const [name, source, api] of [
+  ['commerce', commerceJs, 'PASHA_RETAIL_DECORATE_CARDS'],
+  ['fixed discounts', fixedDiscountJs, 'PASHA_FIXED_DISCOUNTS_DECORATE'],
+  ['live badges', liveBadgesJs, 'PASHA_LIVE_BADGES_SYNC']
+]) {
+  if (!source.includes('IS_STOREFRONT_V3')) {
+    fail(name + ' is missing the V3 observer guard.');
+  }
+  if (!source.includes(api)) {
+    fail(name + ' is missing its V3 event-driven decoration API.');
+  }
 }
 
 if (!js.includes("window.addEventListener('restbr:ready'")) {
