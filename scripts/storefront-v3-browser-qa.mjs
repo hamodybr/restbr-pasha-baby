@@ -155,11 +155,17 @@ async function prepareCartAndCheckout(page) {
   await assertInsideViewport(page, '#smCartDrawer', 'Cart drawer');
   await assertNoHorizontalOverflow(page, 'Cart drawer');
 
+  const bottomNavDisplay = await page.locator('.pb-v3-bottom-nav').evaluate(node => getComputedStyle(node).display);
+  assert(bottomNavDisplay === 'none', 'Bottom navigation remained visible over the cart drawer');
+
   const continueButton = page.locator('#smCartContinue');
   await continueButton.click();
   await page.locator('#smCheckoutSheet.open').waitFor({ state: 'visible', timeout: 5000 });
   await assertInsideViewport(page, '#smCheckoutSheet', 'Checkout sheet');
   await assertNoHorizontalOverflow(page, 'Checkout');
+
+  const checkoutBottomNavDisplay = await page.locator('.pb-v3-bottom-nav').evaluate(node => getComputedStyle(node).display);
+  assert(checkoutBottomNavDisplay === 'none', 'Bottom navigation remained visible over checkout');
 
   const send = page.locator('#smSendWhatsApp');
   assert(await send.count() === 1, 'Checkout submit button is missing');
