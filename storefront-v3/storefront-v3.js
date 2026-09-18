@@ -133,9 +133,9 @@
 
     overlay.classList.remove('open');
     document.documentElement.classList.remove('pb-v3-search-open');
-    relocateSearch($('#pbV3SearchHost'));
 
     window.setTimeout(() => {
+      relocateSearch($('#pbV3SearchHost'));
       overlay.hidden = true;
       if (restoreFocus) $('#pbV3SearchBtn')?.focus?.({ preventScroll: true });
       syncBottomNavScroll();
