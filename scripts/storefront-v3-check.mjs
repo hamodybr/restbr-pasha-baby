@@ -234,6 +234,8 @@ for (const token of [
   'assertNoHorizontalOverflow',
   'smCheckoutSheet.open',
   'pbV3ProductSheet.open',
+  'DOMContentLoaded is too slow',
+  'early menu interaction is too slow',
   'catalog first-open is too slow',
   'Product details interaction is too slow',
   'Cart interaction is too slow',
