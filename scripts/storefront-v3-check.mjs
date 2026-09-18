@@ -222,8 +222,10 @@ if (!serviceWorkerJs.includes('const isStorefrontV3 =') ||
 }
 
 for (const token of [
+  'iPhone-Pro-Max',
   'iPhone-like',
   'Android-small',
+  'Tiny-mobile',
   'Desktop',
   'assertNoHorizontalOverflow',
   'smCheckoutSheet.open',
