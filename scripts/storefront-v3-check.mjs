@@ -99,6 +99,12 @@ if (!html.includes('id="pbV3Announcement"') ||
   fail('V3 store-driven announcement/delivery copy anchors are missing.');
 }
 
+if (!html.includes('id="pbV3CatalogStatus"') ||
+    !js.includes('function syncCatalogStatus()') ||
+    !js.includes('function markCatalogDelayed()')) {
+  fail('V3 quiet catalog loading/retry state is missing.');
+}
+
 if (/MutationObserver|setInterval\s*\(/.test(js)) {
   fail('V3 shell must avoid persistent observers and polling.');
 }
