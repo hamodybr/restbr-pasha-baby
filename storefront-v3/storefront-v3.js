@@ -332,7 +332,7 @@
     const href = String(source?.href || source?.getAttribute?.('href') || '').trim();
     const valid = /^https?:\/\//i.test(href) || /^whatsapp:/i.test(href);
 
-    ['pbV3HeroWhatsapp', 'pbV3DrawerWhatsapp'].forEach(id => {
+    ['pbV3HeroWhatsapp', 'pbV3DrawerWhatsapp', 'pbV3WhatsAppFab'].forEach(id => {
       const target = document.getElementById(id);
       if (!target) return;
       if (valid) {
