@@ -2579,3 +2579,34 @@ html.pb-v3-search-open{overflow:hidden!important}
   box-sizing:border-box;
 }
 #pbV3BottomCartCount[hidden]{display:none!important}
+
+
+.pb-v3-whatsapp-fab{
+  position:fixed;
+  z-index:124;
+  left:18px;
+  bottom:calc(82px + env(safe-area-inset-bottom));
+  width:50px;
+  height:50px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(48,74,59,.12);
+  border-radius:16px;
+  background:#fffdf9;
+  color:var(--v3-sage-dark);
+  text-decoration:none;
+  box-shadow:0 14px 28px rgba(48,60,51,.14);
+  font-size:20px;
+}
+.pb-v3-whatsapp-fab[hidden]{display:none!important}
+.pb-v3-whatsapp-fab:active{transform:scale(.96)}
+@media(max-width:680px){
+  .pb-v3-whatsapp-fab{
+    left:14px;
+    bottom:calc(79px + env(safe-area-inset-bottom));
+    width:46px;
+    height:46px;
+    border-radius:14px;
+    box-shadow:0 8px 18px rgba(48,60,51,.11);
+  }
+}
