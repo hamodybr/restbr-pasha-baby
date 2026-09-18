@@ -9,6 +9,7 @@ const fixedDiscountJs = fs.readFileSync('js/pasha-baby-fixed-discounts.js', 'utf
 const liveBadgesJs = fs.readFileSync('js/live-card-badges.js', 'utf8');
 const arabicOnlyJs = fs.readFileSync('js/pasha-arabic-only.js', 'utf8');
 const numberNormalizerJs = fs.readFileSync('js/pasha-number-normalizer.js', 'utf8');
+const unavailableJs = fs.readFileSync('js/unavailable-card-state.js', 'utf8');
 
 const fail = message => {
   console.error('Storefront V3 check failed:', message);
@@ -80,6 +81,16 @@ if (!css.includes('@media(max-width:680px)') ||
 
 if (css.includes('V3 product details sheet — same proven logic, new shell')) {
   fail('Obsolete legacy product-details CSS returned to V3.');
+}
+
+for (const token of [
+  '.pb-v3-page #smMenu .pb-color-preview',
+  '.pb-v3-page #smMenu .sm-display-badge',
+  '.pb-v3-page #smMenu .sm-card.sm-unavailable-card::after',
+  'animation:none!important',
+  'backdrop-filter:none!important'
+]) {
+  if (!css.includes(token)) fail('V3 static card metadata/thermal rule missing: ' + token);
 }
 
 if (!js.includes('function renderHighlights()') ||
@@ -177,6 +188,12 @@ if (!fixedDiscountJs.includes('if (!IS_STOREFRONT_V3) subscribe();')) {
 if (!numberNormalizerJs.includes('IS_STOREFRONT_V3') ||
     !numberNormalizerJs.includes('if (!IS_STOREFRONT_V3)')) {
   fail('V3 numeric input handling is missing the body-observer guard.');
+}
+
+if (!unavailableJs.includes('IS_STOREFRONT_V3') ||
+    !unavailableJs.includes('if (IS_STOREFRONT_V3) return;') ||
+    !unavailableJs.includes('PASHA_UNAVAILABLE_SYNC')) {
+  fail('V3 unavailable-card state is missing its observer-free event API.');
 }
 
 if (arabicOnlyJs.includes("if (!IS_STOREFRONT_V3) {\n      loadScript('pashaArabicNewsTickerScript'") === false) {
