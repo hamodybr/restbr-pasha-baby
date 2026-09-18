@@ -195,6 +195,30 @@ if (searchWrap?.parentElement?.id !== 'pbV3SearchOverlayHost') {
   fail('Live data sync moved search out of the open overlay.');
 }
 
+const searchClose = document.getElementById('pbV3SearchClose');
+const searchResults = document.getElementById('pbV3SearchShowResults');
+
+searchResults?.focus();
+searchResults?.dispatchEvent(new window.KeyboardEvent('keydown', {
+  key: 'Tab',
+  bubbles: true,
+  cancelable: true
+}));
+if (document.activeElement !== searchClose) {
+  fail('Tab did not wrap from the last mobile-search control to the first.');
+}
+
+searchClose?.focus();
+searchClose?.dispatchEvent(new window.KeyboardEvent('keydown', {
+  key: 'Tab',
+  shiftKey: true,
+  bubbles: true,
+  cancelable: true
+}));
+if (document.activeElement !== searchResults) {
+  fail('Shift+Tab did not wrap from the first mobile-search control to the last.');
+}
+
 document.getElementById('pbV3SearchClose')?.click();
 await new Promise(resolve => setTimeout(resolve, 170));
 if (!searchOverlay?.hidden || searchWrap?.parentElement?.id !== 'pbV3SearchHost') {
