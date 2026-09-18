@@ -2259,3 +2259,62 @@ body.pb-v3-product-open{
   .pb-v3-cat-copy b{font-size:9px}
   .pb-v3-cat-copy small{font-size:7px}
 }
+
+
+/* Always-visible compact price summary for mobile cards. */
+.pb-v3-card-summary{
+  min-height:28px;
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:7px;
+  margin-top:1px;
+}
+.pb-v3-card-summary[hidden]{display:none!important}
+.pb-v3-card-summary>span{
+  min-width:0;
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:3px 5px;
+}
+.pb-v3-card-summary small{
+  flex:0 0 100%;
+  color:var(--v3-muted);
+  font-size:7px;
+  line-height:1;
+  font-weight:800;
+}
+.pb-v3-card-summary del{
+  color:#a3a8a3;
+  font-size:7.5px;
+  line-height:1;
+  font-weight:750;
+}
+.pb-v3-card-summary b{
+  color:var(--v3-sage-dark);
+  font-size:12px;
+  line-height:1.1;
+  font-weight:1000;
+  white-space:nowrap;
+}
+.pb-v3-card-summary>i{
+  flex:0 0 auto;
+  min-height:21px;
+  display:flex;
+  align-items:center;
+  padding:0 6px;
+  border-radius:999px;
+  background:#e7efe5;
+  color:var(--v3-sage-dark);
+  font-size:7px;
+  line-height:1;
+  font-style:normal;
+  font-weight:1000;
+}
+@media(max-width:680px){
+  .pb-v3-card-summary{min-height:25px}
+  .pb-v3-card-summary b{font-size:10.5px}
+  .pb-v3-card-summary del{font-size:7px}
+  .pb-v3-card-summary>i{min-height:19px;font-size:6.5px}
+}
