@@ -13,6 +13,16 @@ const dom = new JSDOM(html, {
 const { window } = dom;
 const { document } = window;
 
+window.matchMedia = query => ({
+  matches: String(query).includes('max-width:680px'),
+  media: query,
+  onchange: null,
+  addListener() {},
+  removeListener() {},
+  addEventListener() {},
+  removeEventListener() {},
+  dispatchEvent() { return false; }
+});
 window.RESTBR_SAFE_MEDIA_URL = value => String(value || '');
 window.RESTBR_OPTIMIZED_MEDIA_URL = value => String(value || '');
 window.RESTBR_DB = {
@@ -22,7 +32,11 @@ window.RESTBR_DB = {
     announcementEnabled: true,
     announcement: { ar: 'التوصيل متوفر لجميع محافظات العراق 🇮🇶' },
     deliveryInfo: { ar: 'التوصيل متوفر لجميع محافظات العراق 🇮🇶' },
-    footerLocation: { ar: 'دهوك — بروشكي' }
+    footerLocation: { ar: 'دهوك — بروشكي' },
+    deliveryEnabled: true,
+    pickupEnabled: true,
+    phone: '07500200660',
+    location: 'https://maps.example.test/pasha'
   },
   products: [{
     id: 'p1',
@@ -41,6 +55,16 @@ window.RESTBR_DB = {
     options: [{ ar: 'علبة', price: 5000, originalPrice: 5000 }]
   }]
 };
+
+document.querySelector('.pb-v3-compat-header').insertAdjacentHTML('beforeend', `
+  <div id="smSearchWrap">
+    <div class="sm-search-row">
+      <button id="smSearchToggle" type="button">Search</button>
+      <input id="smSearchInput" class="sm-search-input">
+      <button id="smSearchClear" type="button">×</button>
+    </div>
+    <div id="smSearchCount" class="sm-search-count"></div>
+  </div>`);
 
 document.getElementById('smCats').innerHTML = `
   <button class="sm-cat active" data-cat="c1" data-cat-id="c1">الحفاضات والمناديل</button>`;
@@ -98,6 +122,44 @@ if (document.querySelectorAll('[data-v3-highlight-list="new"] .pb-v3-feature-car
 }
 if (!document.getElementById('pbV3OfferSection')?.hidden) {
   fail('Offer rail should stay hidden with no real offers.');
+}
+
+const mapLink = document.getElementById('pbV3InfoMap');
+const callLink = document.getElementById('pbV3InfoCall');
+if (!mapLink?.href.includes('maps.example.test/pasha')) {
+  fail('Store info map did not sync from restaurant settings.');
+}
+if (callLink?.getAttribute('href') !== 'tel:07500200660') {
+  fail('Store info call link did not sync from restaurant settings.');
+}
+if (!document.getElementById('pbV3InfoPickup')?.textContent.includes('يمكن اختيار')) {
+  fail('Pickup availability did not sync from restaurant settings.');
+}
+if (!document.getElementById('pbV3InfoDelivery')?.textContent.includes('جميع محافظات العراق')) {
+  fail('Store info delivery text did not sync from restaurant settings.');
+}
+
+document.getElementById('pbV3SearchBtn')?.click();
+await new Promise(resolve => window.requestAnimationFrame(() => resolve()));
+const searchOverlay = document.getElementById('pbV3SearchOverlay');
+const searchWrap = document.getElementById('smSearchWrap');
+if (!searchOverlay || searchOverlay.hidden || !searchOverlay.classList.contains('open')) {
+  fail('Mobile search overlay did not open.');
+}
+if (searchWrap?.parentElement?.id !== 'pbV3SearchOverlayHost') {
+  fail('Search UI was not moved into the mobile overlay.');
+}
+
+window.dispatchEvent(new window.CustomEvent('restbr:prices-updated'));
+await new Promise(resolve => setTimeout(resolve, 0));
+if (searchWrap?.parentElement?.id !== 'pbV3SearchOverlayHost') {
+  fail('Live data sync moved search out of the open overlay.');
+}
+
+document.getElementById('pbV3SearchClose')?.click();
+await new Promise(resolve => setTimeout(resolve, 170));
+if (!searchOverlay?.hidden || searchWrap?.parentElement?.id !== 'pbV3SearchHost') {
+  fail('Closing mobile search did not restore the hero search host.');
 }
 
 const hero = document.querySelector('.pb-v3-hero-art img');
