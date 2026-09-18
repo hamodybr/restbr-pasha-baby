@@ -2902,3 +2902,44 @@ body.pb-v3-page.sm-hours-closed #smCartContinue,
 body.pb-v3-page.sm-hours-closed #smSendWhatsApp{
   filter:none!important;
 }
+
+
+/* V3 anchor offsets under the sticky header. */
+#pbV3Hero,
+#smCatsSentinel,
+#smMenu,
+#pbV3StoreInfo,
+.pb-v3-page .pb-reviews,
+.pb-v3-page .sm-footer{
+  scroll-margin-top:92px;
+}
+
+/* Broken-image fallback follows V3 instead of the old dark restaurant skin. */
+.pb-v3-page .sm-product-image.sm-image-fallback{
+  padding:18px!important;
+  background:#f1f0e9!important;
+  filter:none!important;
+}
+.pb-v3-page .sm-img.sm-image-fallback-empty{
+  background:linear-gradient(145deg,#f5f2e9,#e9eee6)!important;
+}
+.pb-v3-page .sm-img.sm-image-fallback-empty::after{
+  content:"لا توجد صورة";
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:var(--v3-muted);
+  font-size:8px;
+  font-weight:850;
+}
+
+/* Orders-disabled banner: static and visually consistent. */
+.pb-v3-page #smOrderStateBanner{
+  border:1px solid #e3d4bb!important;
+  background:#fff6e8!important;
+  color:#745b37!important;
+  box-shadow:0 8px 20px rgba(79,60,35,.08)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
