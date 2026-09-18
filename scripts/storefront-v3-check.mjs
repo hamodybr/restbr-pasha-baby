@@ -16,8 +16,8 @@ const requiredHtml = [
   'id="smCats"',
   'id="smMenu"',
   'id="pbV3BottomCart"',
-  'storefront-v3/storefront-v3.css?v=1.0',
-  'storefront-v3/storefront-v3.js?v=1.0'
+  'storefront-v3/storefront-v3.css?v=1.1',
+  'storefront-v3/storefront-v3.js?v=1.1'
 ];
 
 for (const token of requiredHtml) {
@@ -50,6 +50,24 @@ if (!css.includes('grid-template-columns:repeat(2,minmax(0,1fr))')) {
 
 if (!css.includes('--v3-sage') || !css.includes('--v3-beige')) {
   fail('V3 design tokens are missing.');
+}
+
+for (const token of [
+  'id="pbV3Highlights"',
+  'js/pasha-baby-product-description-v2.js?v=3.1',
+  'js/pasha-product-gallery-thermal-v1.js?v=1.3'
+]) {
+  if (!html.includes(token)) fail('V3 phase 2 feature missing: ' + token);
+}
+
+if (!css.includes('.pb-v3-page .pb-product-sheet-panel') ||
+    !css.includes('.pb-v3-page .sm-checkout-sheet')) {
+  fail('V3 details/checkout visual layer is missing.');
+}
+
+if (!js.includes('function renderHighlights()') ||
+    !js.includes('function enhanceCheckout()')) {
+  fail('V3 real-data highlights or checkout enhancer is missing.');
 }
 
 if (/MutationObserver|setInterval\s*\(/.test(js)) {
