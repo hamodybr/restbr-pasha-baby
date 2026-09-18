@@ -3618,3 +3618,32 @@ body.pb-v3-page.sm-hours-closed #smSendWhatsApp{
     transition:none!important;
   }
 }
+
+
+/* =========================================================
+   V3 modal safety — floating chrome must never cover sheet CTAs
+   ========================================================= */
+body.pb-v3-page:has(#smCartDrawer.open) .pb-v3-bottom-nav,
+body.pb-v3-page:has(#smCheckoutSheet.open) .pb-v3-bottom-nav,
+body.pb-v3-page:has(#pbV3ProductSheet.open) .pb-v3-bottom-nav,
+body.pb-v3-page:has(#pbCommerceSheet.open) .pb-v3-bottom-nav,
+body.pb-v3-page:has(#smChoiceSheet.open) .pb-v3-bottom-nav,
+html.pb-v3-search-open .pb-v3-bottom-nav{
+  display:none!important;
+}
+
+body.pb-v3-page:has(#smCartDrawer.open) .pb-v3-whatsapp-fab,
+body.pb-v3-page:has(#smCheckoutSheet.open) .pb-v3-whatsapp-fab,
+body.pb-v3-page:has(#pbV3ProductSheet.open) .pb-v3-whatsapp-fab,
+body.pb-v3-page:has(#pbCommerceSheet.open) .pb-v3-whatsapp-fab,
+body.pb-v3-page:has(#smChoiceSheet.open) .pb-v3-whatsapp-fab{
+  display:none!important;
+}
+
+body.pb-v3-page:has(#smCartDrawer.open) #smCartFab,
+body.pb-v3-page:has(#smCheckoutSheet.open) #smCartFab,
+body.pb-v3-page:has(#pbV3ProductSheet.open) #smCartFab,
+body.pb-v3-page:has(#pbCommerceSheet.open) #smCartFab,
+body.pb-v3-page:has(#smChoiceSheet.open) #smCartFab{
+  display:none!important;
+}
