@@ -2713,3 +2713,16 @@ html.pb-v3-search-open{overflow:hidden!important}
     transition:none!important;
   }
 }
+
+
+.pb-v3-search-show-results{
+  width:calc(100% - 20px);
+  min-height:42px;
+  margin:0 10px 10px;
+  border:0;
+  border-radius:12px;
+  background:var(--v3-sage-dark);
+  color:#fff;
+  font:1000 10px/1 system-ui;
+  box-shadow:0 8px 18px rgba(48,74,59,.16);
+}
