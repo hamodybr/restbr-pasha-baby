@@ -17,6 +17,7 @@ const livePricesJs = fs.readFileSync('js/live-prices.js', 'utf8');
 const restaurantHoursJs = fs.readFileSync('js/restaurant-hours.js', 'utf8');
 const appJs = fs.readFileSync('js/app.js', 'utf8');
 const cartJs = fs.readFileSync('js/cart.js', 'utf8');
+const serviceWorkerJs = fs.readFileSync('sw.js', 'utf8');
 
 const fail = message => {
   console.error('Storefront V3 check failed:', message);
@@ -200,6 +201,11 @@ for (const token of [
 if (!cartJs.includes('window.RESTBR_CART_ADD_QUANTITY') ||
     !cartJs.includes('function addItemQuantity')) {
   fail('Cart quantity API is missing.');
+}
+
+if (!serviceWorkerJs.includes('const isStorefrontV3 =') ||
+    !serviceWorkerJs.includes('fetch(request, { cache: "no-store" })')) {
+  fail('Service worker can still serve stale Storefront V3 files.');
 }
 
 if (!css.includes('.pb-v3-product-quantity')) {
