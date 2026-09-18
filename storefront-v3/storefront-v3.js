@@ -160,7 +160,11 @@
     const input = $('#smSearchInput');
     if (!input) return false;
 
-    if (window.matchMedia?.('(max-width:680px)').matches) {
+    const narrow = window.matchMedia?.('(max-width:680px)').matches === true;
+    const coarsePointer = window.matchMedia?.('(pointer:coarse)').matches === true;
+    const touchDevice = Number(navigator.maxTouchPoints || 0) > 0;
+
+    if (narrow || coarsePointer || touchDevice) {
       return openSearchOverlay();
     }
 
