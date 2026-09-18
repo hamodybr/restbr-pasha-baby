@@ -27,6 +27,7 @@ const restaurantHoursJs = fs.readFileSync('js/restaurant-hours.js', 'utf8');
 const appJs = fs.readFileSync('js/app.js', 'utf8');
 const cartJs = fs.readFileSync('js/cart.js', 'utf8');
 const serviceWorkerJs = fs.readFileSync('sw.js', 'utf8');
+const browserQaJs = fs.readFileSync('scripts/storefront-v3-browser-qa.mjs', 'utf8');
 
 const fail = message => {
   console.error('Storefront V3 check failed:', message);
@@ -218,6 +219,19 @@ if (!cartJs.includes('window.RESTBR_CART_ADD_QUANTITY') ||
 if (!serviceWorkerJs.includes('const isStorefrontV3 =') ||
     !serviceWorkerJs.includes('fetch(request, { cache: "no-store" })')) {
   fail('Service worker can still serve stale Storefront V3 files.');
+}
+
+for (const token of [
+  'iPhone-like',
+  'Android-small',
+  'Desktop',
+  'assertNoHorizontalOverflow',
+  'smCheckoutSheet.open',
+  'pbV3ProductSheet.open'
+]) {
+  if (!browserQaJs.includes(token)) {
+    fail('V3 real-browser QA is incomplete: ' + token);
+  }
 }
 
 if (!css.includes('.pb-v3-product-quantity')) {
