@@ -22,7 +22,7 @@ const requiredHtml = [
   'id="smCats"',
   'id="smMenu"',
   'id="pbV3BottomCart"',
-  'storefront-v3/storefront-v3.css?v=1.1',
+  'storefront-v3/storefront-v3.css?v=1.2',
   'storefront-v3/storefront-v3.js?v=1.2'
 ];
 
@@ -81,6 +81,22 @@ if (!css.includes('@media(max-width:680px)') ||
 if (!js.includes('function renderHighlights()') ||
     !js.includes('function enhanceCheckout()')) {
   fail('V3 real-data highlights or checkout enhancer is missing.');
+}
+
+for (const token of [
+  'function syncStorefrontCopy()',
+  'pb-v3-cat-media',
+  'function syncCardSummaries()',
+  'pb-v3-card-summary'
+]) {
+  if (!js.includes(token) && !css.includes(token)) {
+    fail('V3 storefront polish missing: ' + token);
+  }
+}
+
+if (!html.includes('id="pbV3Announcement"') ||
+    !html.includes('id="pbV3DeliveryBenefit"')) {
+  fail('V3 store-driven announcement/delivery copy anchors are missing.');
 }
 
 if (/MutationObserver|setInterval\s*\(/.test(js)) {
