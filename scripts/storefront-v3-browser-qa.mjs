@@ -269,6 +269,33 @@ async function runViewport(browser, spec) {
     assert(searchElapsed <= 1200, `${spec.name} search interaction is too slow: ${searchElapsed}ms`);
     await assertInsideViewport(page, '#pbV3SearchOverlay .pb-v3-search-overlay-card', `${spec.name} search overlay`);
     await assertNoHorizontalOverflow(page, `${spec.name} search overlay`);
+
+    const realProductName = await page.evaluate(() => {
+      const product = window.RESTBR_DB?.products?.find(item => item?.badges?.unavailable !== true);
+      const name = product?.name;
+      if (name && typeof name === 'object') return String(name.ar || name.en || name.ku || '').trim();
+      return String(name || '').trim();
+    });
+    assert(realProductName, `${spec.name} could not resolve a real product name for search QA`);
+
+    const searchInput = page.locator('#smSearchInput');
+    await searchInput.fill(realProductName);
+    await page.waitForTimeout(120);
+    const matchingCards = await page.locator('#smMenu [data-product-card]:visible').count();
+    assert(matchingCards > 0, `${spec.name} real product search returned no visible products`);
+
+    await searchInput.fill('__V3_NO_MATCH_9XQ__');
+    await page.waitForTimeout(120);
+    const noMatchCards = await page.locator('#smMenu [data-product-card]:visible').count();
+    assert(noMatchCards === 0, `${spec.name} impossible search still showed product cards`);
+    const emptyVisible = await page.locator('#smMenu .analytics-empty:visible').count();
+    assert(emptyVisible > 0, `${spec.name} no-result search did not show the empty state`);
+
+    await searchInput.fill('');
+    await page.waitForTimeout(120);
+    const restoredCards = await page.locator('#smMenu [data-product-card]:visible').count();
+    assert(restoredCards > 0, `${spec.name} clearing search did not restore the catalog`);
+
     await page.locator('#pbV3SearchClose').click();
     await page.waitForTimeout(180);
   } else {
