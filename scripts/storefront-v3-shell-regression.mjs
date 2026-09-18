@@ -178,6 +178,26 @@ if (!document.getElementById('pbV3InfoDelivery')?.textContent.includes('جميع
   fail('Store info delivery text did not sync from restaurant settings.');
 }
 
+window.RESTBR_DB.restaurant.deliveryEnabled = false;
+window.RESTBR_DB.restaurant.pickupEnabled = false;
+window.dispatchEvent(new window.CustomEvent('restbr:prices-updated'));
+await new Promise(resolve => setTimeout(resolve, 0));
+
+if (!document.getElementById('pbV3DeliveryBenefitCard')?.hidden ||
+    !document.getElementById('pbV3PickupBenefitCard')?.hidden) {
+  fail('Disabled delivery/pickup benefits remained visible.');
+}
+
+window.RESTBR_DB.restaurant.deliveryEnabled = true;
+window.RESTBR_DB.restaurant.pickupEnabled = true;
+window.dispatchEvent(new window.CustomEvent('restbr:prices-updated'));
+await new Promise(resolve => setTimeout(resolve, 0));
+
+if (document.getElementById('pbV3DeliveryBenefitCard')?.hidden ||
+    document.getElementById('pbV3PickupBenefitCard')?.hidden) {
+  fail('Re-enabled delivery/pickup benefits did not return.');
+}
+
 document.getElementById('pbV3SearchBtn')?.click();
 await new Promise(resolve => window.requestAnimationFrame(() => resolve()));
 const searchOverlay = document.getElementById('pbV3SearchOverlay');
