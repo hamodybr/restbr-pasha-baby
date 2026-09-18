@@ -224,17 +224,23 @@ async function runViewport(browser, spec) {
     }
   });
 
+  const catalogStarted = Date.now();
   await page.goto(`${BASE}/storefront-v3/`, {
     waitUntil: 'domcontentloaded',
     timeout: 20000
   });
 
   await waitForCatalog(page);
+  const catalogElapsed = Date.now() - catalogStarted;
+  assert(catalogElapsed <= 5000,
+    `${spec.name} catalog first-open is too slow: ${catalogElapsed}ms`);
   await page.waitForTimeout(500);
 
   await assertNoHorizontalOverflow(page, `${spec.name} home`);
   await assertInsideViewport(page, '#pbV3Topbar', `${spec.name} topbar`);
   await assertInsideViewport(page, '#pbV3Hero', `${spec.name} hero`);
+
+  let searchElapsed = 0;
 
   if (spec.mobile) {
     await assertInsideViewport(page, '.pb-v3-bottom-nav', `${spec.name} bottom navigation`);
@@ -244,7 +250,7 @@ async function runViewport(browser, spec) {
     const searchStarted = Date.now();
     await page.locator('#pbV3SearchBtn').click();
     await page.locator('#pbV3SearchOverlay.open').waitFor({ state: 'visible', timeout: 3000 });
-    const searchElapsed = Date.now() - searchStarted;
+    searchElapsed = Date.now() - searchStarted;
     assert(searchElapsed <= 1200, `${spec.name} search interaction is too slow: ${searchElapsed}ms`);
     await assertInsideViewport(page, '#pbV3SearchOverlay .pb-v3-search-overlay-card', `${spec.name} search overlay`);
     await assertNoHorizontalOverflow(page, `${spec.name} search overlay`);
@@ -280,7 +286,8 @@ async function runViewport(browser, spec) {
 
   console.log(
     `Browser QA passed: ${spec.name} (${spec.width}x${spec.height}) | ` +
-    `product ${productElapsed}ms | cart ${cartElapsed}ms | checkout ${checkoutElapsed}ms | ` +
+    `catalog ${catalogElapsed}ms | search ${searchElapsed}ms | product ${productElapsed}ms | ` +
+    `cart ${cartElapsed}ms | checkout ${checkoutElapsed}ms | ` +
     `max-long-task ${maxLongTask}ms | DOM ${perf.domNodes}`
   );
   await context.close();
@@ -304,6 +311,8 @@ try {
     { name: 'iPhone-like', width: 390, height: 844, scale: 2, mobile: true },
     { name: 'Android-small', width: 360, height: 800, scale: 2, mobile: true },
     { name: 'Tiny-mobile', width: 320, height: 568, scale: 2, mobile: true },
+    { name: 'Mobile-landscape', width: 844, height: 390, scale: 2, mobile: true },
+    { name: 'Tablet', width: 820, height: 1180, scale: 2, mobile: true },
     { name: 'Desktop', width: 1366, height: 900, scale: 1, mobile: false }
   ]) {
     await runViewport(browser, spec);
