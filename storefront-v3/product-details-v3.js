@@ -429,6 +429,7 @@
     requestAnimationFrame(() => {
       backdrop.classList.add('open');
       sheet.classList.add('open');
+      window.setTimeout(() => $('#pbV3ProductClose')?.focus?.({ preventScroll: true }), 0);
     });
     sheet.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('pb-v3-product-open');
