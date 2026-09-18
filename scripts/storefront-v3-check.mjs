@@ -16,6 +16,7 @@ const urlSafetyJs = fs.readFileSync('js/url-safety.js', 'utf8');
 const livePricesJs = fs.readFileSync('js/live-prices.js', 'utf8');
 const restaurantHoursJs = fs.readFileSync('js/restaurant-hours.js', 'utf8');
 const appJs = fs.readFileSync('js/app.js', 'utf8');
+const cartJs = fs.readFileSync('js/cart.js', 'utf8');
 
 const fail = message => {
   console.error('Storefront V3 check failed:', message);
@@ -168,6 +169,26 @@ if (!detailsJs.includes('window.PASHA_V3_OPEN_PRODUCT_DETAILS') ||
     !detailsJs.includes('pointerdown') ||
     !detailsJs.includes('data-v3-color-id')) {
   fail('V3 lightweight gallery/choice API is incomplete.');
+}
+
+for (const token of [
+  'pbV3QtyMinus',
+  'pbV3QtyPlus',
+  'pbV3QtyValue',
+  'RESTBR_CART_ADD_QUANTITY'
+]) {
+  if (!detailsJs.includes(token) && !cartJs.includes(token)) {
+    fail('V3 quantity flow missing: ' + token);
+  }
+}
+
+if (!cartJs.includes('window.RESTBR_CART_ADD_QUANTITY') ||
+    !cartJs.includes('function addItemQuantity')) {
+  fail('Cart quantity API is missing.');
+}
+
+if (!css.includes('.pb-v3-product-quantity')) {
+  fail('V3 product quantity styling is missing.');
 }
 
 for (const [name, source, api] of [
