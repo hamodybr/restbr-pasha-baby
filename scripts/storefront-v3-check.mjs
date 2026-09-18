@@ -2,6 +2,15 @@ import fs from 'node:fs';
 
 const html = fs.readFileSync('storefront-v3/index.html', 'utf8');
 const css = fs.readFileSync('storefront-v3/storefront-v3.css', 'utf8');
+
+const V3_CSS_MAX_BYTES = 100000;
+const V3_CSS_MAX_LINES = 4000;
+if (Buffer.byteLength(css, 'utf8') > V3_CSS_MAX_BYTES) {
+  fail('V3 CSS exceeded the 100 KB maintenance budget.');
+}
+if (css.split('\n').length > V3_CSS_MAX_LINES) {
+  fail('V3 CSS exceeded the 4,000-line maintenance budget.');
+}
 const js = fs.readFileSync('storefront-v3/storefront-v3.js', 'utf8');
 const detailsJs = fs.readFileSync('storefront-v3/product-details-v3.js', 'utf8');
 const commerceJs = fs.readFileSync('js/pasha-baby-commerce.js', 'utf8');
