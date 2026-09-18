@@ -14,6 +14,11 @@ const { window } = dom;
 const { document } = window;
 
 window.RESTBR_SAFE_MEDIA_URL = value => String(value || '');
+let cartAdd = null;
+window.RESTBR_CART_ADD_QUANTITY = (product, optionIndex, quantity) => {
+  cartAdd = { productId: String(product.id), optionIndex: Number(optionIndex), quantity: Number(quantity) };
+  return true;
+};
 window.RESTBR_DB = {
   products: [{
     id: 'p1',
@@ -101,7 +106,23 @@ if (!document.querySelector('[data-v3-slide-index="1"]')?.classList.contains('se
 const priceText = document.getElementById('pbV3ProductPrice')?.textContent || '';
 if (!priceText.includes('15,000')) fail('Selected option price did not update.');
 
+document.getElementById('pbV3QtyPlus')?.click();
+document.getElementById('pbV3QtyPlus')?.click();
+
+if (document.getElementById('pbV3QtyValue')?.textContent !== '3') {
+  fail('Product quantity selector did not reach 3.');
+}
+
+const footerPrice = document.getElementById('pbV3ProductFooterPrice')?.textContent || '';
+if (!footerPrice.includes('45,000')) {
+  fail('Product quantity total did not update to 45,000.');
+}
+
 add?.click();
+
+if (!cartAdd || cartAdd.productId !== 'p1' || cartAdd.quantity !== 3) {
+  fail('Quantity-aware cart API did not receive quantity 3.');
+}
 if (sheet?.classList.contains('open')) fail('Product details sheet did not close after add.');
 
 if (!process.exitCode) {
