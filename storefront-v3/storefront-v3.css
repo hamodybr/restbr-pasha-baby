@@ -2840,3 +2840,39 @@ html.pb-v3-search-open{overflow:hidden!important}
     padding-bottom:calc(10px + env(safe-area-inset-bottom))!important;
   }
 }
+
+
+.pb-v3-desktop-nav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  min-width:0;
+}
+.pb-v3-desktop-nav button{
+  min-height:38px;
+  padding:0 12px;
+  border:1px solid transparent;
+  border-radius:11px;
+  background:transparent;
+  color:var(--v3-muted);
+  font:900 9.5px/1 system-ui;
+  white-space:nowrap;
+}
+.pb-v3-desktop-nav button:hover,
+.pb-v3-desktop-nav button:focus-visible{
+  border-color:var(--v3-line);
+  background:#fffdf9;
+  color:var(--v3-sage-dark);
+}
+@media(min-width:901px){
+  .pb-v3-topbar{
+    grid-template-columns:48px auto minmax(0,1fr) auto!important;
+  }
+  .pb-v3-brand{
+    justify-self:start!important;
+  }
+}
+@media(max-width:900px){
+  .pb-v3-desktop-nav{display:none!important}
+}
