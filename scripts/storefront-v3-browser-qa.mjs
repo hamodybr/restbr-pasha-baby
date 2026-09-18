@@ -300,8 +300,10 @@ try {
   });
 
   for (const spec of [
+    { name: 'iPhone-Pro-Max', width: 440, height: 956, scale: 3, mobile: true },
     { name: 'iPhone-like', width: 390, height: 844, scale: 2, mobile: true },
     { name: 'Android-small', width: 360, height: 800, scale: 2, mobile: true },
+    { name: 'Tiny-mobile', width: 320, height: 568, scale: 2, mobile: true },
     { name: 'Desktop', width: 1366, height: 900, scale: 1, mobile: false }
   ]) {
     await runViewport(browser, spec);
