@@ -225,8 +225,25 @@ if (!restaurantHoursJs.includes('IS_STOREFRONT_V3') ||
 
 if (!appJs.includes('IS_STOREFRONT_V3') ||
     !appJs.includes('if(!IS_STOREFRONT_V3){') ||
-    !appJs.includes('if(IS_STOREFRONT_V3){')) {
-  fail('V3 app runtime-presentation/footer observer guards are missing.');
+    !appJs.includes('if(IS_STOREFRONT_V3){') ||
+    !appJs.includes('if(IS_STOREFRONT_V3) return;') ||
+    !appJs.includes('if (!IS_STOREFRONT_V3 && "IntersectionObserver" in window)')) {
+  fail('V3 app runtime-presentation/scroll/reveal guards are missing.');
+}
+
+for (const token of [
+  '.pb-v3-page .sm-checkout-sheet',
+  'display:flex!important',
+  '.pb-v3-page .sm-checkout-body',
+  'overflow-y:auto!important',
+  '.pb-v3-page .sm-checkout-actions',
+  'scroll-padding-bottom:130px!important'
+]) {
+  if (!css.includes(token)) fail('V3 checkout viewport/keyboard rule missing: ' + token);
+}
+
+if (!js.includes("button.setAttribute('aria-current', 'page')")) {
+  fail('V3 bottom navigation active state is missing aria-current.');
 }
 
 if (arabicOnlyJs.includes("if (!IS_STOREFRONT_V3) {\n      loadScript('pashaArabicNewsTickerScript'") === false) {
