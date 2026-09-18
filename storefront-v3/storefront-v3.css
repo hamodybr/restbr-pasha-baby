@@ -3054,3 +3054,73 @@ body.pb-v3-page.sm-hours-closed #smSendWhatsApp{
   .pb-v3-desktop-nav{grid-column:2!important}
   .pb-v3-top-actions{grid-column:3!important}
 }
+
+
+/* =========================================================
+   V3 quiet empty/offline states
+   ========================================================= */
+.pb-v3-page #smMenu .analytics-empty{
+  min-height:150px!important;
+  display:grid!important;
+  place-items:center!important;
+  margin:8px 0 18px!important;
+  padding:24px 16px!important;
+  border:1px dashed rgba(48,74,59,.16)!important;
+  border-radius:18px!important;
+  background:rgba(255,253,249,.68)!important;
+  color:var(--v3-muted)!important;
+  font-size:11px!important;
+  line-height:1.7!important;
+  font-weight:800!important;
+}
+
+.pb-v3-page .sm-cart-empty{
+  min-height:170px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:9px!important;
+  margin:8px 0!important;
+  border:1px dashed var(--v3-line)!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  color:var(--v3-muted)!important;
+  font-size:11px!important;
+}
+.pb-v3-page .sm-cart-empty div{
+  width:44px!important;
+  height:44px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:14px!important;
+  background:#edf2ea!important;
+  font-size:20px!important;
+}
+
+.pb-v3-page .sm-offline-banner{
+  position:fixed!important;
+  z-index:180!important;
+  left:50%!important;
+  bottom:calc(86px + env(safe-area-inset-bottom))!important;
+  transform:translateX(-50%)!important;
+  width:max-content!important;
+  max-width:calc(100% - 28px)!important;
+  padding:7px 11px!important;
+  border:1px solid #e6d7bb!important;
+  border-radius:999px!important;
+  background:#fff7e9!important;
+  color:#755c36!important;
+  box-shadow:0 7px 18px rgba(76,58,34,.08)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  font-size:8.5px!important;
+  line-height:1.35!important;
+  font-weight:850!important;
+  text-align:center!important;
+}
+@media(min-width:901px){
+  .pb-v3-page .sm-offline-banner{
+    bottom:24px!important;
+  }
+}
