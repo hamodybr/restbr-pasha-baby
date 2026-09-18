@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="css/pasha-baby-commerce.css?v=1.0">
   <link rel="stylesheet" href="css/live-card-badges.css?v=1.5">
   <link rel="stylesheet" href="css/pasha-reviews.css?v=5">
-  <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.2">
+  <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.3">
 </head>
 <body class="pb-v3-page">
   <div id="smIntro" class="sm-intro pb-v3-intro" aria-hidden="true">
@@ -52,6 +52,16 @@
     <div id="pbV3Announcement" class="pb-v3-announcement" hidden>
       <span aria-hidden="true">●</span>
       <strong id="pbV3AnnouncementText"></strong>
+    </div>
+
+    <div id="pbV3SearchOverlay" class="pb-v3-search-overlay" hidden>
+      <div class="pb-v3-search-overlay-card" role="dialog" aria-modal="true" aria-label="البحث في المنتجات">
+        <div class="pb-v3-search-overlay-head">
+          <strong>البحث في المنتجات</strong>
+          <button id="pbV3SearchClose" type="button" aria-label="إغلاق البحث">×</button>
+        </div>
+        <div id="pbV3SearchOverlayHost" class="pb-v3-search-overlay-host"></div>
+      </div>
     </div>
 
     <!-- Compatibility host for the existing storefront engine.
@@ -180,6 +190,39 @@
       <div><span>✓</span><b>طلب بسيط وسريع</b></div>
     </section>
 
+    <section id="pbV3StoreInfo" class="pb-v3-store-info" aria-label="معلومات المتجر">
+      <div class="pb-v3-section-head">
+        <div><small>معلومات مهمة</small><h2>قبل تثبيت الطلب</h2></div>
+      </div>
+      <div class="pb-v3-info-grid">
+        <article>
+          <span>🚚</span>
+          <div><b>التوصيل</b><p id="pbV3InfoDelivery">حسب إعدادات المتجر.</p></div>
+        </article>
+        <article>
+          <span>🏬</span>
+          <div><b>الاستلام</b><p id="pbV3InfoPickup">يمكن اختيار الاستلام من المحل عند توفره.</p></div>
+        </article>
+        <article>
+          <span>↺</span>
+          <div><b>الاستبدال</b><p>للاستفسار عن إمكانية وشروط استبدال أي صنف، تواصل مع المتجر مباشرة.</p></div>
+        </article>
+        <article>
+          <span>📍</span>
+          <div><b>الموقع والتواصل</b><p id="pbV3InfoLocation">دهوك — بروشكي</p><div class="pb-v3-info-actions"><a id="pbV3InfoMap" href="#" target="_blank" rel="noopener noreferrer">الموقع</a><a id="pbV3InfoCall" href="#">اتصال</a></div></div>
+        </article>
+      </div>
+
+      <details class="pb-v3-faq">
+        <summary>أسئلة شائعة</summary>
+        <div class="pb-v3-faq-body">
+          <p><b>هل أحتاج حساب؟</b><span>لا، يمكن تثبيت الطلب مباشرة بدون إنشاء حساب.</span></p>
+          <p><b>كيف أختار اللون؟</b><span>إذا كان للمنتج ألوان، تظهر داخل تفاصيل المنتج وتُحفظ مع الطلب.</span></p>
+          <p><b>كيف أعرف رسوم التوصيل؟</b><span>تظهر رسوم التوصيل ضمن الطلب حسب إعدادات المتجر والمنطقة.</span></p>
+        </div>
+      </details>
+    </section>
+
     <footer class="sm-footer">
       <div class="sm-footer-card">
         <div class="sm-footer-line"></div>
@@ -203,10 +246,10 @@
   </main>
 
   <nav class="pb-v3-bottom-nav" aria-label="التنقل السفلي">
-    <button type="button" data-v3-target="#pbV3Hero"><span>⌂</span><b>الرئيسية</b></button>
-    <button type="button" data-v3-target="#smCatsSentinel"><span>◉</span><b>الأقسام</b></button>
-    <button id="pbV3BottomSearch" type="button"><span>⌕</span><b>بحث</b></button>
-    <button id="pbV3BottomCart" type="button"><span>🛒</span><b>السلة</b></button>
+    <button type="button" data-v3-target="#pbV3Hero" data-v3-nav="home" class="active"><span>⌂</span><b>الرئيسية</b></button>
+    <button type="button" data-v3-target="#smCatsSentinel" data-v3-nav="categories"><span>◉</span><b>الأقسام</b></button>
+    <button id="pbV3BottomSearch" type="button" data-v3-nav="search"><span>⌕</span><b>بحث</b></button>
+    <button id="pbV3BottomCart" type="button" data-v3-nav="cart"><span>🛒</span><b>السلة</b></button>
   </nav>
 
   <button id="smTopBtn" class="sm-top-btn" type="button" aria-label="الرجوع إلى الأعلى">↑</button>
@@ -227,6 +270,6 @@
   <script src="js/pasha-checkout-review.js?v=3" defer></script>
   <script src="js/pasha-reviews.js?v=4" defer></script>
   <script src="storefront-v3/product-details-v3.js?v=1.0" defer></script>
-  <script src="storefront-v3/storefront-v3.js?v=1.2" defer></script>
+  <script src="storefront-v3/storefront-v3.js?v=1.3" defer></script>
 </body>
 </html>
