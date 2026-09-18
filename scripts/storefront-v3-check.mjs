@@ -7,6 +7,7 @@ const detailsJs = fs.readFileSync('storefront-v3/product-details-v3.js', 'utf8')
 const commerceJs = fs.readFileSync('js/pasha-baby-commerce.js', 'utf8');
 const fixedDiscountJs = fs.readFileSync('js/pasha-baby-fixed-discounts.js', 'utf8');
 const liveBadgesJs = fs.readFileSync('js/live-card-badges.js', 'utf8');
+const arabicOnlyJs = fs.readFileSync('js/pasha-arabic-only.js', 'utf8');
 
 const fail = message => {
   console.error('Storefront V3 check failed:', message);
@@ -106,6 +107,11 @@ for (const [name, source, api] of [
   if (!source.includes(api)) {
     fail(name + ' is missing its V3 event-driven decoration API.');
   }
+}
+
+if (!arabicOnlyJs.includes('IS_STOREFRONT_V3') ||
+    !arabicOnlyJs.includes('if (!IS_STOREFRONT_V3)')) {
+  fail('Arabic-only bootstrap can reload legacy gallery observers into V3.');
 }
 
 if (!js.includes("window.addEventListener('restbr:ready'")) {
