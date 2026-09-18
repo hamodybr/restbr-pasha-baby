@@ -427,7 +427,7 @@
         window.setTimeout(() => {
           syncCategoryIcons();
           syncProductCount();
-          window.PASHA_V3_ENHANCE_PRODUCT_CARDS?.();
+          syncCardDecorations();
         }, 0);
       }
 
@@ -437,6 +437,12 @@
 
       if (event.target.closest('.sm-direct-add,.sm-add-cart,.sm-choose-options,#smCartContinue,.sm-cart-qty button,.sm-cart-remove')) {
         window.setTimeout(syncCartCount, 0);
+      }
+    });
+
+    document.addEventListener('input', event => {
+      if (event.target?.id === 'smSearchInput') {
+        window.setTimeout(syncCardDecorations, 0);
       }
     });
 
@@ -459,6 +465,13 @@
     }, { passive: true });
   }
 
+  function syncCardDecorations() {
+    window.PASHA_RETAIL_DECORATE_CARDS?.();
+    window.PASHA_FIXED_DISCOUNTS_DECORATE?.();
+    window.PASHA_LIVE_BADGES_SYNC?.();
+    window.PASHA_V3_ENHANCE_PRODUCT_CARDS?.();
+  }
+
   function stripLegacyPresentationRuntime() {
     [
       'smDiscoveryStyle',
@@ -478,7 +491,7 @@
     renderHighlights();
     syncHeroProduct();
     enhanceCheckout();
-    window.PASHA_V3_ENHANCE_PRODUCT_CARDS?.();
+    syncCardDecorations();
 
     const cartFab = $('#smCartFab');
     if (cartFab) {
