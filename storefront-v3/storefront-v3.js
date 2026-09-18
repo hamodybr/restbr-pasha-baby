@@ -427,7 +427,17 @@
     }, { passive: true });
   }
 
+  function stripLegacyPresentationRuntime() {
+    [
+      'smDiscoveryStyle',
+      'smV44PolishStyles',
+      'smUiDesignRuntime',
+      'smMenuCardPolishV38'
+    ].forEach(id => document.getElementById(id)?.remove());
+  }
+
   function syncRuntimeUI() {
+    stripLegacyPresentationRuntime();
     relocateSearch();
     syncCategoryIcons();
     syncProductCount();
@@ -453,6 +463,7 @@
     window.setTimeout(syncRuntimeUI, 0);
     window.setTimeout(syncRuntimeUI, 180);
     window.setTimeout(syncRuntimeUI, 520);
+    window.setTimeout(syncRuntimeUI, 1200);
 
     window.addEventListener('restbr:ready', syncRuntimeUI, { once: true });
   }
