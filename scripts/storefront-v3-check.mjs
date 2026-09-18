@@ -216,6 +216,9 @@ if (!css.includes('.pb-v3-product-quantity')) {
 
 for (const token of [
   'function syncPromoBanner(',
+  'function isRealOffer(',
+  'available.filter(isRealOffer)',
+  'discountAmount',
   'pb-v3-promo-banner',
   'pbV3PromoDiscount',
   'data-v3-feature-product'
