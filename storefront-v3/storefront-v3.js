@@ -555,6 +555,9 @@
     const offerDrawer = $('#pbV3DrawerOffers');
     if (offerDrawer) offerDrawer.hidden = offerProducts.length === 0;
 
+    const offerDesktop = $('#pbV3DesktopOffers');
+    if (offerDesktop) offerDesktop.hidden = offerProducts.length === 0;
+
     const holder = $('#pbV3Highlights');
     if (holder) {
       holder.hidden = !holder.querySelector('.pb-v3-highlight-group:not([hidden])');
