@@ -3043,3 +3043,14 @@ body.pb-v3-page.sm-hours-closed #smSendWhatsApp{
     bottom:24px!important;
   }
 }
+
+
+@media(min-width:901px){
+  #pbV3MenuBtn{display:none!important}
+  .pb-v3-topbar{
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+  }
+  .pb-v3-brand{grid-column:1!important}
+  .pb-v3-desktop-nav{grid-column:2!important}
+  .pb-v3-top-actions{grid-column:3!important}
+}
