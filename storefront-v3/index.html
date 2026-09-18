@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f1e7">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Pasha Baby Storefront V3 experimental storefront">
+  <base href="../">
+  <title>Pasha Baby — Storefront V3</title>
+
+  <script src="js/url-safety.js?v=1.5"></script>
+  <script src="js/runtime-config.js?v=2.3"></script>
+
+  <link rel="preload" as="image" href="assets/pasha-baby-logo-256.webp" type="image/webp" fetchpriority="high">
+  <link rel="stylesheet" href="css/style.css?v=4.1">
+  <link rel="stylesheet" href="css/cart.css?v=3.6">
+  <link rel="stylesheet" href="css/pasha-baby-commerce.css?v=1.0">
+  <link rel="stylesheet" href="css/live-card-badges.css?v=1.5">
+  <link rel="stylesheet" href="css/pasha-reviews.css?v=5">
+  <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.0">
+</head>
+<body class="pb-v3-page">
+  <div id="smIntro" class="sm-intro pb-v3-intro" aria-hidden="true">
+    <img src="assets/pasha-baby-logo-256.webp" alt="" width="108" height="108">
+    <strong>پاشا بيبي</strong>
+  </div>
+
+  <main id="smApp" class="sm-app pb-v3-app">
+    <header id="pbV3Topbar" class="pb-v3-topbar">
+      <button id="pbV3MenuBtn" class="pb-v3-icon-btn" type="button" aria-label="فتح القائمة" aria-controls="pbV3Drawer" aria-expanded="false">
+        <span aria-hidden="true">☰</span>
+      </button>
+
+      <a class="pb-v3-brand" href="#pbV3Hero" aria-label="پاشا بيبي — الرئيسية">
+        <img src="assets/pasha-baby-logo-256.webp" alt="" width="48" height="48">
+        <span>
+          <b>پاشا بيبي</b>
+          <small>Pasha Baby</small>
+        </span>
+      </a>
+
+      <div class="pb-v3-top-actions">
+        <button id="pbV3SearchBtn" class="pb-v3-icon-btn" type="button" aria-label="البحث">⌕</button>
+        <button id="pbV3CartBtn" class="pb-v3-icon-btn pb-v3-cart-shortcut" type="button" aria-label="السلة">
+          🛒
+          <span id="pbV3CartCount" hidden>0</span>
+        </button>
+      </div>
+    </header>
+
+    <aside id="pbV3Drawer" class="pb-v3-drawer" aria-hidden="true">
+      <div class="pb-v3-drawer-head">
+        <div class="pb-v3-drawer-brand">
+          <img src="assets/pasha-baby-logo-256.webp" alt="" width="58" height="58">
+          <div><b>پاشا بيبي</b><small>كل احتياجات طفلك بمكان واحد</small></div>
+        </div>
+        <button id="pbV3DrawerClose" type="button" aria-label="إغلاق القائمة">×</button>
+      </div>
+      <nav class="pb-v3-drawer-nav" aria-label="التنقل">
+        <button type="button" data-v3-target="#pbV3Hero">⌂ <span>الرئيسية</span></button>
+        <button type="button" data-v3-target="#smCatsSentinel">◉ <span>الأقسام</span></button>
+        <button type="button" data-v3-target="#smMenu">▦ <span>المنتجات</span></button>
+        <button type="button" data-v3-target="[data-pb-reviews-host],.pb-reviews,.sm-footer">★ <span>التقييمات</span></button>
+        <button type="button" data-v3-target=".sm-footer">● <span>التواصل والموقع</span></button>
+      </nav>
+      <a id="pbV3DrawerWhatsapp" class="pb-v3-drawer-whatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>واتساب</a>
+    </aside>
+    <div id="pbV3DrawerBackdrop" class="pb-v3-drawer-backdrop" hidden></div>
+
+    <section id="pbV3Hero" class="pb-v3-hero">
+      <div class="pb-v3-hero-copy">
+        <span class="pb-v3-kicker">مستلزمات الأطفال في دهوك</span>
+        <h1>كل شيء لطفلك،<br><em>بمكان واحد.</em></h1>
+        <p>تسوّق بسهولة، اختَر اللون والخيار، وثبّت طلبك مباشرة.</p>
+        <div class="pb-v3-hero-actions">
+          <button id="pbV3ShopNow" type="button">تسوّق الآن</button>
+          <a id="pbV3HeroWhatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>واتساب</a>
+        </div>
+      </div>
+      <div class="pb-v3-hero-art" aria-hidden="true">
+        <span class="pb-v3-blob pb-v3-blob-a"></span>
+        <span class="pb-v3-blob pb-v3-blob-b"></span>
+        <img src="assets/pasha-baby-logo-256.webp" alt="" width="190" height="190">
+      </div>
+      <div id="pbV3SearchHost" class="pb-v3-search-host" role="search" aria-label="البحث في المنتجات"></div>
+    </section>
+
+    <section class="pb-v3-benefits" aria-label="مميزات الطلب">
+      <div><span>🚚</span><b>توصيل داخل دهوك</b><small>حسب المنطقة</small></div>
+      <div><span>🏬</span><b>استلام من المحل</b><small>سريع ومباشر</small></div>
+      <div><span>💬</span><b>تثبيت عبر واتساب</b><small>بدون إنشاء حساب</small></div>
+    </section>
+
+    <section class="pb-v3-section-head pb-v3-categories-head">
+      <div><small>اكتشف</small><h2>تسوّق حسب القسم</h2></div>
+      <button id="pbV3SeeProducts" type="button">كل المنتجات</button>
+    </section>
+
+    <div class="sm-cats-wrap pb-v3-cats-wrap">
+      <div id="smCats" class="sm-cats"></div>
+      <div id="smProgress" class="sm-progress"><span></span></div>
+    </div>
+
+    <div id="smCatsSentinel"></div>
+
+    <section class="pb-v3-section-head pb-v3-products-head">
+      <div><small>مختارات المتجر</small><h2>المنتجات</h2></div>
+      <span id="pbV3ProductCount"></span>
+    </section>
+
+    <section id="smMenu" class="sm-menu"></section>
+
+    <section class="pb-v3-service-strip">
+      <div><span>✓</span><b>أسعار واضحة</b></div>
+      <div><span>✓</span><b>ألوان وخيارات حقيقية</b></div>
+      <div><span>✓</span><b>طلب بسيط وسريع</b></div>
+    </section>
+
+    <footer class="sm-footer">
+      <div class="sm-footer-card">
+        <div class="sm-footer-line"></div>
+        <h2>باشا بيبي – Pasha Baby</h2>
+        <p class="sm-footer-location">بروشكي، مقابل برانگوس، شارع الفوق، دهوك</p>
+        <div class="sm-footer-main-actions">
+          <a id="smFooterLocation" href="#" target="_blank" rel="noopener noreferrer">موقعنا</a>
+          <a id="smFooterCall" href="#">اتصال</a>
+          <a id="smFooterWhatsapp" href="#" target="_blank" rel="noopener noreferrer">واتساب</a>
+        </div>
+        <div class="sm-footer-socials">
+          <a id="smFacebook" href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a id="smSnapchat" href="#" target="_blank" rel="noopener noreferrer">Snapchat</a>
+          <a id="smTikTok" href="#" target="_blank" rel="noopener noreferrer">TikTok</a>
+          <a id="smInstagram" href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
+        </div>
+        <div class="sm-footer-phone"></div>
+        <div class="sm-footer-copy"></div>
+      </div>
+    </footer>
+  </main>
+
+  <nav class="pb-v3-bottom-nav" aria-label="التنقل السفلي">
+    <button type="button" data-v3-target="#pbV3Hero"><span>⌂</span><b>الرئيسية</b></button>
+    <button type="button" data-v3-target="#smCatsSentinel"><span>◉</span><b>الأقسام</b></button>
+    <button id="pbV3BottomSearch" type="button"><span>⌕</span><b>بحث</b></button>
+    <button id="pbV3BottomCart" type="button"><span>🛒</span><b>السلة</b></button>
+  </nav>
+
+  <button id="smTopBtn" class="sm-top-btn" type="button" aria-label="الرجوع إلى الأعلى">↑</button>
+
+  <script src="js/vendor/supabase-2.114.0.min.js" integrity="sha384-0UK+HVlz5Y7F//atDpPysyocv/PjGXQoBX+XSaL/eEotARW8rPFh+lL5sO0Ljzfi" crossorigin="anonymous" defer></script>
+  <script src="js/supabase-config.js?v=1.0" defer></script>
+  <script src="js/unavailable-card-state.js?v=1.0" defer></script>
+  <script src="js/app.js?v=1.0" defer></script>
+  <script src="js/pasha-baby-commerce.js?v=1.0" defer></script>
+  <script src="js/product-image-fallback.js?v=1.0" defer></script>
+  <script src="js/price-safety.js?v=1.0" defer></script>
+  <script src="js/cart.js?v=1.0" defer></script>
+  <script src="js/cart-stale-item-guard.js?v=1.0" defer></script>
+  <script src="js/live-prices.js?v=1.0" defer></script>
+  <script src="js/pasha-baby-fixed-discounts.js?v=1.0" defer></script>
+  <script src="js/live-card-badges.js?v=1.0" defer></script>
+  <script src="js/pasha-review-ui.js?v=3" defer></script>
+  <script src="js/pasha-checkout-review.js?v=3" defer></script>
+  <script src="js/pasha-reviews.js?v=4" defer></script>
+  <script src="storefront-v3/storefront-v3.js?v=1.0" defer></script>
+</body>
+</html>
