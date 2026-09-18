@@ -39,6 +39,9 @@ jobs:
       - name: Storefront V3 cart quantity regression
         run: node scripts/storefront-v3-cart-quantity-regression.mjs
 
+      - name: Storefront V3 color quantity cart regression
+        run: node scripts/storefront-v3-color-quantity-cart-regression.mjs
+
       - name: Storefront V3 shell regression
         run: node scripts/storefront-v3-shell-regression.mjs
 
