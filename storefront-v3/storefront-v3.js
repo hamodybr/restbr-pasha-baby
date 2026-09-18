@@ -90,6 +90,7 @@
   function openCart() {
     const cart = $('#smCartFab');
     if (!cart) return false;
+    setBottomNavActive('cart');
     cart.click();
     window.setTimeout(syncCartCount, 0);
     return true;
@@ -668,7 +669,12 @@
       }
 
       if (event.target.closest('#smCartContinue')) {
+        setBottomNavActive('cart');
         window.setTimeout(enhanceCheckout, 0);
+      }
+
+      if (event.target.closest('#smCartClose,#smCartBackdrop,#smCheckoutClose,#smCheckoutBackdrop')) {
+        window.setTimeout(syncBottomNavScroll, 0);
       }
 
       if (event.target.closest('.sm-direct-add,.sm-add-cart,.sm-choose-options,#smCartContinue,.sm-cart-qty button,.sm-cart-remove')) {
