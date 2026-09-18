@@ -3,7 +3,8 @@
   window.__PASHA_STOREFRONT_V3__ = true;
 
   const $ = selector => document.querySelector(selector);
-  const $$ = selector => [...document.querySelectorAll(selector)];
+  const $ = selector => [...document.querySelectorAll(selector)];
+  let catalogDelayTimer = 0;
 
   function iconFor(value) {
     const text = String(value || '').toLowerCase();
@@ -185,6 +186,47 @@
 
     const drawerBrand = $('.pb-v3-drawer-brand b');
     if (drawerBrand) drawerBrand.textContent = brandAr;
+  }
+
+  function syncCatalogStatus() {
+    const status = $('#pbV3CatalogStatus');
+    const text = status?.querySelector('strong');
+    const retry = $('#pbV3CatalogRetry');
+    if (!status || !text || !retry) return;
+
+    const products = Array.isArray(window.RESTBR_DB?.products)
+      ? window.RESTBR_DB.products
+      : [];
+
+    if (products.length) {
+      status.hidden = true;
+      retry.hidden = true;
+      if (catalogDelayTimer) {
+        clearTimeout(catalogDelayTimer);
+        catalogDelayTimer = 0;
+      }
+      return;
+    }
+
+    status.hidden = false;
+    text.textContent = 'جاري تحميل المنتجات...';
+    retry.hidden = true;
+  }
+
+  function markCatalogDelayed() {
+    const products = Array.isArray(window.RESTBR_DB?.products)
+      ? window.RESTBR_DB.products
+      : [];
+    if (products.length) return;
+
+    const status = $('#pbV3CatalogStatus');
+    const text = status?.querySelector('strong');
+    const retry = $('#pbV3CatalogRetry');
+    if (!status || !text || !retry) return;
+
+    status.hidden = false;
+    text.textContent = 'التحميل أخذ وقتًا أطول من المعتاد.';
+    retry.hidden = false;
   }
 
   function syncProductCount() {
@@ -468,6 +510,7 @@
 
     $('#pbV3ShopNow')?.addEventListener('click', () => scrollToTarget('#smCatsSentinel'));
     $('#pbV3SeeProducts')?.addEventListener('click', () => scrollToTarget('#smMenu'));
+    $('#pbV3CatalogRetry')?.addEventListener('click', () => window.location.reload());
 
     document.addEventListener('click', event => {
       const nav = event.target.closest('[data-v3-target]');
@@ -610,6 +653,7 @@
     relocateSearch();
     syncCategoryIcons();
     syncStorefrontCopy();
+    syncCatalogStatus();
     syncProductCount();
     syncCartCount();
     syncWhatsApp();
@@ -636,6 +680,7 @@
     window.setTimeout(syncRuntimeUI, 180);
     window.setTimeout(syncRuntimeUI, 520);
     window.setTimeout(syncRuntimeUI, 1200);
+    catalogDelayTimer = window.setTimeout(markCatalogDelayed, 3500);
 
     window.addEventListener('restbr:ready', syncRuntimeUI, { once: true });
     window.addEventListener('restbr:commerce-ready', syncRuntimeUI);
