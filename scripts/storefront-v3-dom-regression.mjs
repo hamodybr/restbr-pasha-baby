@@ -16,7 +16,14 @@ const { document } = window;
 window.RESTBR_SAFE_MEDIA_URL = value => String(value || '');
 let cartAdd = null;
 window.RESTBR_CART_ADD_QUANTITY = (product, optionIndex, quantity) => {
-  cartAdd = { productId: String(product.id), optionIndex: Number(optionIndex), quantity: Number(quantity) };
+  const option = product.options?.[Number(optionIndex)] || null;
+  cartAdd = {
+    productId: String(product.id),
+    optionIndex: Number(optionIndex),
+    quantity: Number(quantity),
+    optionAr: String(option?.ar || ''),
+    image: String(product.image || '')
+  };
   return true;
 };
 window.RESTBR_DB = {
@@ -122,6 +129,12 @@ add?.click();
 
 if (!cartAdd || cartAdd.productId !== 'p1' || cartAdd.quantity !== 3) {
   fail('Quantity-aware cart API did not receive quantity 3.');
+}
+if (!cartAdd.optionAr.includes('اللون: أخضر')) {
+  fail('Selected color name was not handed to the cart option.');
+}
+if (!cartAdd.image.includes('green.webp')) {
+  fail('Selected color image was not handed to the cart.');
 }
 if (sheet?.classList.contains('open')) fail('Product details sheet did not close after add.');
 
