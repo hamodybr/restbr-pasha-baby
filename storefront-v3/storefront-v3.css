@@ -3297,3 +3297,8 @@ body.pb-v3-page.sm-hours-closed #smSendWhatsApp{
     box-shadow:none;
   }
 }
+
+
+.pb-v3-desktop-nav [hidden]{
+  display:none!important;
+}
