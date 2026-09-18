@@ -112,6 +112,12 @@ if (topCartCount?.textContent !== '3' || bottomCartCount?.textContent !== '3') {
   fail('Header and bottom cart counts are not synchronized.');
 }
 
+const footerActions = document.querySelector('.sm-footer-main-actions');
+const footerSocials = document.querySelector('.sm-footer-socials');
+if (!footerActions?.hidden || !footerSocials?.hidden) {
+  fail('Placeholder-only footer rows should be hidden in V3.');
+}
+
 const unavailableCard = document.querySelector('[data-product-card="ghost-unavailable"]');
 if (!unavailableCard?.classList.contains('sm-unavailable-card')) {
   fail('Unavailable V3 card did not sync through the event-driven API.');
