@@ -9,6 +9,7 @@
   let currentProduct = null;
   let selectedOptionIndex = null;
   let selectedColorId = '';
+  let selectedQuantity = 1;
   let slides = [];
   let slideIndex = 0;
   let pointerStartX = null;
@@ -96,6 +97,15 @@
                 <div id="pbV3ProductColors" class="pb-v3-product-colors"></div>
               </section>
 
+              <div class="pb-v3-product-quantity">
+                <span><b>الكمية</b><small>يمكن إضافة حتى 99 قطعة</small></span>
+                <div role="group" aria-label="اختيار الكمية">
+                  <button id="pbV3QtyMinus" type="button" aria-label="تقليل الكمية">−</button>
+                  <output id="pbV3QtyValue" aria-live="polite">1</output>
+                  <button id="pbV3QtyPlus" type="button" aria-label="زيادة الكمية">+</button>
+                </div>
+              </div>
+
               <div class="pb-v3-product-assurance">
                 <span>✓ السعر الظاهر هو السعر الحالي</span>
                 <span>✓ الألوان حسب المتوفر</span>
@@ -115,6 +125,8 @@
     $('#pbV3ProductPrev').addEventListener('click', () => moveSlide(-1));
     $('#pbV3ProductNext').addEventListener('click', () => moveSlide(1));
     $('#pbV3ProductAdd').addEventListener('click', addSelected);
+    $('#pbV3QtyMinus').addEventListener('click', () => setQuantity(selectedQuantity - 1));
+    $('#pbV3QtyPlus').addEventListener('click', () => setQuantity(selectedQuantity + 1));
 
     $('#pbV3ProductThumbs').addEventListener('click', event => {
       const button = event.target.closest('[data-v3-slide-index]');
@@ -262,7 +274,20 @@
       ? `<span class="pb-v3-product-old-price">${esc(money(original))}</span><strong>${esc(money(current))}</strong>`
       : `<strong>${esc(money(current))}</strong>`;
 
-    footer.textContent = money(current);
+    footer.innerHTML = selectedQuantity > 1
+      ? `<small>${selectedQuantity} × ${esc(money(current))}</small><b>${esc(money(current * selectedQuantity))}</b>`
+      : `<b>${esc(money(current))}</b>`;
+  }
+
+  function setQuantity(value) {
+    selectedQuantity = Math.max(1, Math.min(99, Math.floor(Number(value) || 1)));
+    const output = $('#pbV3QtyValue');
+    const minus = $('#pbV3QtyMinus');
+    const plus = $('#pbV3QtyPlus');
+    if (output) output.textContent = String(selectedQuantity);
+    if (minus) minus.disabled = selectedQuantity <= 1;
+    if (plus) plus.disabled = selectedQuantity >= 99;
+    renderPrice();
   }
 
   function renderOptions() {
@@ -317,6 +342,7 @@
 
   function renderProduct(product) {
     currentProduct = product;
+    selectedQuantity = 1;
     selectedOptionIndex = (product.options || []).length === 1 ? 0 : null;
 
     const availableColors = (product.colors || []).filter(color => color.isAvailable !== false);
@@ -341,7 +367,7 @@
     renderGallery();
     renderOptions();
     renderColors();
-    renderPrice();
+    setQuantity(1);
     syncAddState();
   }
 
@@ -424,6 +450,7 @@
       backdrop.hidden = true;
       sheet.hidden = true;
       currentProduct = null;
+      selectedQuantity = 1;
       slides = [];
       lastTrigger?.focus?.({ preventScroll: true });
       lastTrigger = null;
@@ -447,7 +474,7 @@
     };
   }
 
-  function proxyAdd(product, optionIndex, color = null) {
+  function proxyAdd(product, optionIndex, color = null, quantity = 1) {
     const options = product.options || [];
     const originalLength = options.length;
     const originalImage = product.image;
@@ -462,21 +489,30 @@
       if (color.image) product.image = color.image;
     }
 
-    const proxy = document.createElement('button');
-    proxy.type = 'button';
-    proxy.className = 'sm-direct-add';
-    proxy.dataset.productId = String(product.id);
-    proxy.dataset.optionIndex = String(targetIndex);
-    proxy.dataset.retailBypass = '1';
-    proxy.hidden = true;
-    document.body.appendChild(proxy);
-    proxy.click();
-    proxy.remove();
+    const qty = Math.max(1, Math.min(99, Math.floor(Number(quantity) || 1)));
+    let added = false;
+
+    if (typeof window.RESTBR_CART_ADD_QUANTITY === 'function') {
+      added = window.RESTBR_CART_ADD_QUANTITY(product, targetIndex, qty) !== false;
+    } else {
+      const proxy = document.createElement('button');
+      proxy.type = 'button';
+      proxy.className = 'sm-direct-add';
+      proxy.dataset.productId = String(product.id);
+      proxy.dataset.optionIndex = String(targetIndex);
+      proxy.dataset.retailBypass = '1';
+      proxy.hidden = true;
+      document.body.appendChild(proxy);
+      for (let index = 0; index < qty; index += 1) proxy.click();
+      proxy.remove();
+      added = true;
+    }
 
     if (color) options.length = originalLength;
     product.image = originalImage;
 
-    window.dispatchEvent(new CustomEvent('pasha:v3-cart-changed'));
+    if (added) window.dispatchEvent(new CustomEvent('pasha:v3-cart-changed'));
+    return added;
   }
 
   function addSelected() {
@@ -490,8 +526,7 @@
     const color = colors.length ? selectedColor() : null;
     if (colors.length && !color) return;
 
-    proxyAdd(currentProduct, optionIndex, color);
-    close();
+    if (proxyAdd(currentProduct, optionIndex, color, selectedQuantity)) close();
   }
 
   function enhanceCards() {
