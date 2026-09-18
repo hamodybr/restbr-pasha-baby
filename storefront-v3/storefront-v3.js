@@ -111,7 +111,10 @@
 
   function setBottomNavActive(name) {
     all('.pb-v3-bottom-nav [data-v3-nav]').forEach(button => {
-      button.classList.toggle('active', String(button.dataset.v3Nav || '') === name);
+      const active = String(button.dataset.v3Nav || '') === name;
+      button.classList.toggle('active', active);
+      if (active) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
     });
   }
 
