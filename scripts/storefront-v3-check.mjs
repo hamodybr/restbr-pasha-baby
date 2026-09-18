@@ -57,6 +57,20 @@ for (const token of forbiddenLegacy) {
   if (html.includes(token)) fail('V3 must not load legacy presentation layer: ' + token);
 }
 
+for (const token of [
+  'js/unavailable-card-state.js?v=v3.1',
+  'js/app.js?v=v3.1',
+  'js/pasha-baby-commerce.js?v=v3.1',
+  'js/product-image-fallback.js?v=v3.1',
+  'js/price-safety.js?v=v3.1',
+  'js/cart.js?v=v3.1',
+  'js/live-prices.js?v=v3.1',
+  'js/pasha-baby-fixed-discounts.js?v=v3.1',
+  'js/live-card-badges.js?v=v3.1'
+]) {
+  if (!html.includes(token)) fail('V3 isolated cache key missing: ' + token);
+}
+
 if (!html.includes('name="robots" content="noindex,nofollow"')) {
   fail('Experimental V3 page must stay noindex until approval.');
 }
@@ -71,7 +85,7 @@ if (!css.includes('--v3-sage') || !css.includes('--v3-beige')) {
 
 for (const token of [
   'id="pbV3Highlights"',
-  'storefront-v3/product-details-v3.js?v=1.0'
+  'storefront-v3/product-details-v3.js?v=1.1'
 ]) {
   if (!html.includes(token)) fail('V3 phase 2 feature missing: ' + token);
 }
