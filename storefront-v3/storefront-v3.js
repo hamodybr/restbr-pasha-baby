@@ -613,6 +613,10 @@
     $('#pbV3SearchBtn')?.addEventListener('click', focusSearch);
     $('#pbV3BottomSearch')?.addEventListener('click', focusSearch);
     $('#pbV3SearchClose')?.addEventListener('click', () => closeSearchOverlay({ restoreFocus: true }));
+    $('#pbV3SearchShowResults')?.addEventListener('click', () => {
+      closeSearchOverlay();
+      window.setTimeout(() => scrollToTarget('#smMenu'), 170);
+    });
     $('#pbV3SearchOverlay')?.addEventListener('click', event => {
       if (event.target?.id === 'pbV3SearchOverlay') closeSearchOverlay();
     });
