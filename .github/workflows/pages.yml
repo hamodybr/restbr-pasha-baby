@@ -36,6 +36,9 @@ jobs:
       - name: Storefront V3 DOM regression
         run: node scripts/storefront-v3-dom-regression.mjs
 
+      - name: Storefront V3 shell regression
+        run: node scripts/storefront-v3-shell-regression.mjs
+
       - name: Mobile image upload and thermal regression
         run: node scripts/mobile-image-thermal-regression.mjs
 
