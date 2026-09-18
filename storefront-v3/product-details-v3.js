@@ -301,7 +301,7 @@
   function syncAddState() {
     const options = currentProduct?.options || [];
     const colors = Array.isArray(currentProduct?.colors) ? currentProduct.colors : [];
-    const optionReady = options.length <= 1 || Number.isInteger(selectedOptionIndex);
+    const optionReady = options.length === 1 || (options.length > 1 && Number.isInteger(selectedOptionIndex));
     const colorReady = colors.length === 0 || Boolean(selectedColor());
     const add = $('#pbV3ProductAdd');
 
