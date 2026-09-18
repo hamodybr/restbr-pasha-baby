@@ -2,6 +2,7 @@ name: Validate and Deploy Pasha Baby Pages
 
 on:
   push:
+  pull_request:
   workflow_dispatch:
 
 permissions:
