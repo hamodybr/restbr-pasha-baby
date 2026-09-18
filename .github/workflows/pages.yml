@@ -32,6 +32,9 @@ jobs:
           npm install --no-save --package-lock=false jsdom@26.1.0
           node scripts/mobile-idle-regression.mjs
 
+      - name: Storefront V3 DOM regression
+        run: node scripts/storefront-v3-dom-regression.mjs
+
       - name: Mobile image upload and thermal regression
         run: node scripts/mobile-image-thermal-regression.mjs
 
