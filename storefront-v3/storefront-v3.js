@@ -43,6 +43,12 @@
     button?.setAttribute('aria-expanded', open ? 'true' : 'false');
     backdrop.hidden = !open;
     document.documentElement.style.overflow = open ? 'hidden' : '';
+
+    if (open) {
+      window.setTimeout(() => $('#pbV3DrawerClose')?.focus?.({ preventScroll: true }), 0);
+    } else if (drawer.contains(document.activeElement)) {
+      button?.focus?.({ preventScroll: true });
+    }
   }
 
   function resolveTarget(selector) {
@@ -237,6 +243,11 @@
 
     const drawerBrand = $('.pb-v3-drawer-brand b');
     if (drawerBrand) drawerBrand.textContent = brandAr;
+
+    const footerBrand = $('.sm-footer-card h2');
+    if (footerBrand) footerBrand.textContent = brandEn && brandEn !== brandAr
+      ? brandAr + ' — ' + brandEn
+      : brandAr;
 
     const infoDelivery = $('#pbV3InfoDelivery');
     if (infoDelivery) {
