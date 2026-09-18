@@ -393,6 +393,25 @@
     return prices.length ? Math.min(...prices) : null;
   }
 
+  function productOriginalPrice(product) {
+    const rows = (product?.options || [])
+      .map(option => {
+        const current = Number(option?.price);
+        const original = Number(option?.originalPrice ?? current);
+        return {
+          current: Number.isFinite(current) && current >= 0 ? current : null,
+          original: Number.isFinite(original) && original >= 0 ? original : null
+        };
+      })
+      .filter(row => row.current !== null && row.original !== null);
+
+    if (!rows.length) return null;
+    const cheapest = rows.reduce((best, row) =>
+      best === null || row.current < best.current ? row : best
+    , null);
+    return cheapest?.original ?? null;
+  }
+
   function money(value) {
     if (!Number.isFinite(Number(value))) return '';
     return Number(value).toLocaleString('en-US') + ' د.ع';
@@ -451,6 +470,57 @@
     list.innerHTML = rows.map(product => featureCard(product, type)).join('');
   }
 
+  function syncPromoBanner(offerProducts) {
+    const banner = $('#pbV3PromoBanner');
+    const title = $('#pbV3PromoTitle');
+    const meta = $('#pbV3PromoMeta');
+    const image = $('#pbV3PromoImage');
+    const discount = $('#pbV3PromoDiscount');
+    const open = $('#pbV3PromoOpen');
+
+    if (!banner || !title || !meta || !image || !discount || !open) return;
+
+    const product = (offerProducts || []).find(item =>
+      item?.badges?.unavailable !== true
+    );
+
+    if (!product) {
+      banner.hidden = true;
+      banner.removeAttribute('data-v3-promo-product');
+      open.removeAttribute('data-v3-feature-product');
+      return;
+    }
+
+    const name = productName(product);
+    const category = categoryName(product);
+    const current = productPrice(product);
+    const original = productOriginalPrice(product);
+    const percent = Math.max(0, Number(product?.discountPercent || 0));
+    const discounted = current !== null && original !== null && original > current;
+
+    title.textContent = name;
+    meta.textContent = discounted
+      ? `${money(original)} ← ${money(current)}`
+      : current !== null
+        ? [category, money(current)].filter(Boolean).join(' • ')
+        : category;
+
+    image.src = productImage(product);
+    image.alt = name;
+
+    discount.hidden = !(percent > 0 || discounted);
+    discount.textContent = percent > 0
+      ? `-${Math.round(percent)}%`
+      : discounted
+        ? 'عرض'
+        : '';
+
+    banner.dataset.v3PromoProduct = String(product.id);
+    open.dataset.v3FeatureProduct = String(product.id);
+    open.setAttribute('aria-label', `عرض تفاصيل ${name}`);
+    banner.hidden = false;
+  }
+
   function renderHighlights() {
     const products = Array.isArray(window.RESTBR_DB?.products)
       ? window.RESTBR_DB.products
@@ -462,6 +532,7 @@
     renderHighlightGroup('new', available.filter(product => product?.badges?.new === true));
     const offerProducts = available.filter(product => product?.badges?.offer === true);
     renderHighlightGroup('offer', offerProducts);
+    syncPromoBanner(offerProducts);
 
     const offerDrawer = $('#pbV3DrawerOffers');
     if (offerDrawer) offerDrawer.hidden = offerProducts.length === 0;
