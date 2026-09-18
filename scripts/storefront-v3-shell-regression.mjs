@@ -40,7 +40,8 @@ window.RESTBR_DB = {
     deliveryEnabled: true,
     pickupEnabled: true,
     phone: '07500200660',
-    location: 'https://maps.example.test/pasha'
+    location: 'https://maps.example.test/pasha',
+    whatsapp: 'https://wa.me/9647500200660'
   },
   products: [{
     id: 'p1',
@@ -135,6 +136,15 @@ if (document.querySelectorAll('[data-v3-highlight-list="new"] .pb-v3-feature-car
 }
 if (!document.getElementById('pbV3OfferSection')?.hidden) {
   fail('Offer rail should stay hidden with no real offers.');
+}
+
+const whatsappFab = document.getElementById('pbV3WhatsAppFab');
+if (!whatsappFab || whatsappFab.hidden || !whatsappFab.href.includes('wa.me/9647500200660')) {
+  fail('Floating WhatsApp action did not sync from store settings.');
+}
+
+if (!document.getElementById('pbV3DrawerOffers')?.hidden) {
+  fail('Drawer offers action should stay hidden without real offers.');
 }
 
 const mapLink = document.getElementById('pbV3InfoMap');
