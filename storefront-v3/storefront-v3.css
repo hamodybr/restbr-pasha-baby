@@ -3026,3 +3026,20 @@ body.pb-v3-page.sm-hours-closed #smSendWhatsApp{
   }
   #pbV3QtyValue{min-width:36px}
 }
+
+
+/* Desktop uses the top navigation; bottom navigation is mobile/tablet only. */
+@media(min-width:901px){
+  body.pb-v3-page{
+    padding-bottom:32px!important;
+  }
+  .pb-v3-bottom-nav{
+    display:none!important;
+  }
+  .pb-v3-whatsapp-fab{
+    bottom:24px!important;
+  }
+  .pb-v3-page #smCartFab{
+    bottom:24px!important;
+  }
+}
