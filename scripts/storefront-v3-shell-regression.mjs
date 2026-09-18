@@ -153,6 +153,55 @@ if (document.querySelectorAll('[data-v3-highlight-list="new"] .pb-v3-feature-car
 if (!document.getElementById('pbV3OfferSection')?.hidden) {
   fail('Offer rail should stay hidden with no real offers.');
 }
+if (!document.getElementById('pbV3PromoBanner')?.hidden) {
+  fail('Promo banner should stay hidden with no real offers.');
+}
+
+let openedPromoProduct = '';
+window.PASHA_V3_OPEN_PRODUCT_DETAILS = id => {
+  openedPromoProduct = String(id || '');
+  return true;
+};
+
+window.RESTBR_DB.products[0].badges.offer = true;
+window.dispatchEvent(new window.CustomEvent('restbr:prices-updated'));
+await new Promise(resolve => setTimeout(resolve, 0));
+
+const promo = document.getElementById('pbV3PromoBanner');
+if (!promo || promo.hidden) {
+  fail('Promo banner did not appear for a real offer product.');
+}
+if (document.getElementById('pbV3PromoTitle')?.textContent !== 'حفاضات أطفال') {
+  fail('Promo banner title did not come from the offer product.');
+}
+if (!document.getElementById('pbV3PromoImage')?.src.includes('diaper.webp')) {
+  fail('Promo banner image did not come from the offer product.');
+}
+if (document.getElementById('pbV3PromoDiscount')?.textContent !== '-17%') {
+  fail('Promo banner discount did not reflect real discount data.');
+}
+if (document.getElementById('pbV3OfferSection')?.hidden ||
+    document.querySelectorAll('[data-v3-highlight-list="offer"] .pb-v3-feature-card').length !== 1) {
+  fail('Offer rail did not appear with the same real offer product.');
+}
+if (document.getElementById('pbV3DrawerOffers')?.hidden) {
+  fail('Drawer offers action stayed hidden after a real offer appeared.');
+}
+
+document.getElementById('pbV3PromoOpen')?.click();
+if (openedPromoProduct !== 'p1') {
+  fail('Promo banner details action did not open the real offer product.');
+}
+
+window.RESTBR_DB.products[0].badges.offer = false;
+window.dispatchEvent(new window.CustomEvent('restbr:prices-updated'));
+await new Promise(resolve => setTimeout(resolve, 0));
+
+if (!document.getElementById('pbV3PromoBanner')?.hidden ||
+    !document.getElementById('pbV3OfferSection')?.hidden ||
+    !document.getElementById('pbV3DrawerOffers')?.hidden) {
+  fail('Offer surfaces did not hide after the real offer was removed.');
+}
 
 const whatsappFab = document.getElementById('pbV3WhatsAppFab');
 if (!whatsappFab || whatsappFab.hidden || !whatsappFab.href.includes('wa.me/9647500200660')) {
