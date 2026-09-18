@@ -229,6 +229,12 @@
     const deliveryNode = $('#pbV3DeliveryBenefit');
     if (deliveryNode) deliveryNode.textContent = deliveryText;
 
+    const deliveryBenefitCard = $('#pbV3DeliveryBenefitCard');
+    if (deliveryBenefitCard) deliveryBenefitCard.hidden = restaurant.deliveryEnabled === false;
+
+    const pickupBenefitCard = $('#pbV3PickupBenefitCard');
+    if (pickupBenefitCard) pickupBenefitCard.hidden = restaurant.pickupEnabled === false;
+
     const footerLocation = localStoreText(restaurant.footerLocation);
     const footerLocationNode = $('.sm-footer-location');
     if (footerLocationNode && footerLocation) footerLocationNode.textContent = footerLocation;
