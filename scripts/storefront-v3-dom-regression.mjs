@@ -67,6 +67,7 @@ const detailsButton = document.querySelector('.pb-v3-details-btn');
 if (!detailsButton) fail('Details button was not attached without observers.');
 
 detailsButton?.click();
+await new Promise(resolve => window.requestAnimationFrame(() => resolve()));
 await new Promise(resolve => setTimeout(resolve, 0));
 
 const sheet = document.getElementById('pbV3ProductSheet');
