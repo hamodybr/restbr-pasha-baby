@@ -78,6 +78,10 @@ if (!css.includes('@media(max-width:680px)') ||
   fail('V3 mobile Safari compositing guard is missing.');
 }
 
+if (css.includes('V3 product details sheet — same proven logic, new shell')) {
+  fail('Obsolete legacy product-details CSS returned to V3.');
+}
+
 if (!js.includes('function renderHighlights()') ||
     !js.includes('function enhanceCheckout()')) {
   fail('V3 real-data highlights or checkout enhancer is missing.');
@@ -113,7 +117,8 @@ for (const token of [
   'id="pbV3InfoMap"',
   'id="pbV3InfoCall"',
   'data-v3-nav="home"',
-  'id="pbV3DrawerOffers"'
+  'id="pbV3DrawerOffers"',
+  'id="pbV3SearchShowResults"'
 ]) {
   if (!html.includes(token)) fail('V3 navigation/search/info element missing: ' + token);
 }
