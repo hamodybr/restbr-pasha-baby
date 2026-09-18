@@ -98,7 +98,7 @@
               </section>
 
               <div class="pb-v3-product-quantity">
-                <span><b>الكمية</b><small>يمكن إضافة حتى 99 قطعة</small></span>
+                <span><b>الكمية</b><small>حدد الكمية المطلوبة</small></span>
                 <div role="group" aria-label="اختيار الكمية">
                   <button id="pbV3QtyMinus" type="button" aria-label="تقليل الكمية">−</button>
                   <output id="pbV3QtyValue" aria-live="polite">1</output>
