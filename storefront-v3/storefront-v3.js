@@ -147,6 +147,195 @@
     });
   }
 
+  function esc(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function productName(product) {
+    return String(product?.name?.ar || product?.name?.en || '').trim();
+  }
+
+  function categoryName(product) {
+    return String(product?.category?.ar || product?.category?.en || '').trim();
+  }
+
+  function productPrice(product) {
+    const prices = (product?.options || [])
+      .map(option => Number(option?.price))
+      .filter(value => Number.isFinite(value) && value >= 0);
+    return prices.length ? Math.min(...prices) : null;
+  }
+
+  function money(value) {
+    if (!Number.isFinite(Number(value))) return '';
+    return Number(value).toLocaleString('en-US') + ' د.ع';
+  }
+
+  function productImage(product) {
+    const original = String(product?.image || '').trim();
+    const safe = typeof window.RESTBR_SAFE_MEDIA_URL === 'function'
+      ? window.RESTBR_SAFE_MEDIA_URL(original)
+      : original;
+    const source = safe || 'assets/pasha-baby-product-placeholder.svg';
+    if (typeof window.RESTBR_OPTIMIZED_MEDIA_URL === 'function') {
+      return window.RESTBR_OPTIMIZED_MEDIA_URL(source, 'product-card') || source;
+    }
+    return source;
+  }
+
+  function featureBadge(type) {
+    if (type === 'popular') return 'الأكثر طلبًا';
+    if (type === 'new') return 'جديد';
+    if (type === 'offer') return 'عرض';
+    return '';
+  }
+
+  function featureCard(product, type) {
+    const price = productPrice(product);
+    const name = productName(product);
+    const category = categoryName(product);
+    return `
+      <article class="pb-v3-feature-card" data-v3-feature-product="${esc(product.id)}" tabindex="0" role="button"
+               aria-label="عرض تفاصيل ${esc(name)}">
+        <div class="pb-v3-feature-image">
+          <img src="${esc(productImage(product))}" alt="${esc(name)}" loading="lazy" decoding="async">
+          <span class="pb-v3-feature-badge">${esc(featureBadge(type))}</span>
+        </div>
+        <div class="pb-v3-feature-copy">
+          <strong>${esc(name)}</strong>
+          <small>${esc(category)}</small>
+          <span class="pb-v3-feature-price">${price === null ? '' : esc(money(price))}</span>
+          <span class="pb-v3-feature-open">التفاصيل</span>
+        </div>
+      </article>`;
+  }
+
+  function renderHighlightGroup(type, products) {
+    const section = document.getElementById(
+      type === 'popular' ? 'pbV3PopularSection' :
+      type === 'new' ? 'pbV3NewSection' :
+      'pbV3OfferSection'
+    );
+    const list = document.querySelector(`[data-v3-highlight-list="${type}"]`);
+    if (!section || !list) return;
+
+    const rows = products.slice(0, 6);
+    section.hidden = rows.length === 0;
+    list.innerHTML = rows.map(product => featureCard(product, type)).join('');
+  }
+
+  function renderHighlights() {
+    const products = Array.isArray(window.RESTBR_DB?.products)
+      ? window.RESTBR_DB.products
+      : [];
+    if (!products.length) return;
+
+    const available = products.filter(product => product?.badges?.unavailable !== true);
+    renderHighlightGroup('popular', available.filter(product => product?.badges?.popular === true));
+    renderHighlightGroup('new', available.filter(product => product?.badges?.new === true));
+    renderHighlightGroup('offer', available.filter(product => product?.badges?.offer === true));
+
+    const holder = $('#pbV3Highlights');
+    if (holder) {
+      holder.hidden = !holder.querySelector('.pb-v3-highlight-group:not([hidden])');
+    }
+  }
+
+  function findProductCard(productId) {
+    return [...document.querySelectorAll('[data-product-card]')].find(
+      card => String(card.dataset.productCard || '') === String(productId || '')
+    ) || null;
+  }
+
+  function activateProductCategory(product) {
+    const categoryId = String(product?.category?.id || '');
+    if (!categoryId) return false;
+    const button = [...document.querySelectorAll('#smCats .sm-cat')].find(
+      item => String(item.dataset.cat || item.dataset.catId || '') === categoryId
+    );
+    if (!button) return false;
+    if (!button.classList.contains('active')) button.click();
+    return true;
+  }
+
+  function showFeatureProduct(productId) {
+    const product = window.RESTBR_DB?.products?.find(
+      item => String(item.id) === String(productId)
+    );
+    if (!product) return;
+
+    activateProductCategory(product);
+
+    const reveal = () => {
+      const card = findProductCard(product.id);
+      if (!card) return false;
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.add('sm-deep-highlight');
+      window.setTimeout(() => card.classList.remove('sm-deep-highlight'), 1600);
+
+      const details = card.querySelector('.pb-card-details-btn,.pb-product-description-more');
+      if (details) {
+        window.setTimeout(() => details.click(), 260);
+      }
+      return true;
+    };
+
+    if (!reveal()) {
+      window.setTimeout(reveal, 120);
+      window.setTimeout(reveal, 320);
+    }
+  }
+
+  function enhanceCheckout() {
+    const sheet = $('#smCheckoutSheet');
+    const body = sheet?.querySelector('.sm-checkout-body');
+    const head = sheet?.querySelector('.sm-checkout-head');
+    if (!sheet || !body || !head) return false;
+
+    if (!$('#pbV3CheckoutIntro')) {
+      const intro = document.createElement('div');
+      intro.id = 'pbV3CheckoutIntro';
+      intro.className = 'pb-v3-checkout-intro';
+      intro.innerHTML = `
+        <b>✓</b>
+        <span>
+          <strong>بيانات بسيطة لتثبيت الطلب</strong>
+          <small>لا تحتاج إلى حساب أو تسجيل دخول.</small>
+        </span>`;
+      head.insertAdjacentElement('afterend', intro);
+    }
+
+    if (!$('#pbV3CheckoutTrust')) {
+      const trust = document.createElement('div');
+      trust.id = 'pbV3CheckoutTrust';
+      trust.className = 'pb-v3-checkout-trust';
+      trust.innerHTML = `
+        <span><i>✓</i> الدفع عند الاستلام</span>
+        <span><i>✓</i> بياناتك للطلب فقط</span>
+        <span><i>✓</i> تثبيت مباشر</span>`;
+      body.appendChild(trust);
+    }
+
+    const name = $('#smCustomerName');
+    const phone = $('#smCustomerPhone');
+    const address = $('#smCustomerAddress');
+    const notes = $('#smCustomerNotes');
+    if (name) name.placeholder = 'الاسم الكامل';
+    if (phone) phone.placeholder = '07xx xxx xxxx';
+    if (address) address.placeholder = 'المنطقة، الشارع، أقرب نقطة دالة';
+    if (notes) notes.placeholder = 'أي ملاحظة تخص الطلب...';
+
+    const pickup = $('#smPickupBtn');
+    if (pickup) pickup.textContent = 'استلام من المحل';
+
+    return true;
+  }
+
   function syncTopbarScroll() {
     const topbar = $('#pbV3Topbar');
     if (!topbar) return;
@@ -188,12 +377,44 @@
         return;
       }
 
+      const feature = event.target.closest('[data-v3-feature-product]');
+      if (feature) {
+        event.preventDefault();
+        showFeatureProduct(feature.dataset.v3FeatureProduct);
+        return;
+      }
+
+      const highlightJump = event.target.closest('[data-v3-highlight-jump]');
+      if (highlightJump) {
+        const type = String(highlightJump.dataset.v3HighlightJump || '');
+        const first = document.querySelector(`[data-v3-highlight-list="${type}"] [data-v3-feature-product]`);
+        if (first) showFeatureProduct(first.dataset.v3FeatureProduct);
+        return;
+      }
+
+      if (event.target.closest('#smCats .sm-cat')) {
+        window.setTimeout(() => {
+          syncCategoryIcons();
+          syncProductCount();
+        }, 0);
+      }
+
+      if (event.target.closest('#smCartContinue')) {
+        window.setTimeout(enhanceCheckout, 0);
+      }
+
       if (event.target.closest('.sm-direct-add,.sm-add-cart,.sm-choose-options,#smCartContinue,.sm-cart-qty button,.sm-cart-remove')) {
         window.setTimeout(syncCartCount, 0);
       }
     });
 
     document.addEventListener('keydown', event => {
+      const feature = event.target.closest?.('[data-v3-feature-product]');
+      if (feature && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        showFeatureProduct(feature.dataset.v3FeatureProduct);
+        return;
+      }
       if (event.key === 'Escape') setDrawer(false);
     });
 
@@ -212,6 +433,8 @@
     syncProductCount();
     syncCartCount();
     syncWhatsApp();
+    renderHighlights();
+    enhanceCheckout();
 
     const cartFab = $('#smCartFab');
     if (cartFab) {
