@@ -10,6 +10,12 @@ const liveBadgesJs = fs.readFileSync('js/live-card-badges.js', 'utf8');
 const arabicOnlyJs = fs.readFileSync('js/pasha-arabic-only.js', 'utf8');
 const numberNormalizerJs = fs.readFileSync('js/pasha-number-normalizer.js', 'utf8');
 const unavailableJs = fs.readFileSync('js/unavailable-card-state.js', 'utf8');
+const imageFallbackJs = fs.readFileSync('js/product-image-fallback.js', 'utf8');
+const priceSafetyJs = fs.readFileSync('js/price-safety.js', 'utf8');
+const urlSafetyJs = fs.readFileSync('js/url-safety.js', 'utf8');
+const livePricesJs = fs.readFileSync('js/live-prices.js', 'utf8');
+const restaurantHoursJs = fs.readFileSync('js/restaurant-hours.js', 'utf8');
+const appJs = fs.readFileSync('js/app.js', 'utf8');
 
 const fail = message => {
   console.error('Storefront V3 check failed:', message);
@@ -23,8 +29,8 @@ const requiredHtml = [
   'id="smCats"',
   'id="smMenu"',
   'id="pbV3BottomCart"',
-  'storefront-v3/storefront-v3.css?v=1.3',
-  'storefront-v3/storefront-v3.js?v=1.3'
+  'storefront-v3/storefront-v3.css?v=1.4',
+  'storefront-v3/storefront-v3.js?v=1.4'
 ];
 
 for (const token of requiredHtml) {
@@ -131,7 +137,8 @@ for (const token of [
   'id="pbV3DrawerOffers"',
   'id="pbV3SearchShowResults"',
   'id="pbV3WhatsAppFab"',
-  'id="pbV3BottomCartCount"'
+  'id="pbV3BottomCartCount"',
+  'class="pb-v3-desktop-nav"'
 ]) {
   if (!html.includes(token)) fail('V3 navigation/search/info element missing: ' + token);
 }
@@ -194,6 +201,32 @@ if (!unavailableJs.includes('IS_STOREFRONT_V3') ||
     !unavailableJs.includes('if (IS_STOREFRONT_V3) return;') ||
     !unavailableJs.includes('PASHA_UNAVAILABLE_SYNC')) {
   fail('V3 unavailable-card state is missing its observer-free event API.');
+}
+
+for (const [name, source, api] of [
+  ['image fallback', imageFallbackJs, 'RESTBR_PRODUCT_IMAGE_SCAN'],
+  ['price safety', priceSafetyJs, 'RESTBR_PRICE_SAFETY_PATCH'],
+  ['URL safety', urlSafetyJs, 'RESTBR_URL_SAFETY_SCAN']
+]) {
+  if (!source.includes('IS_STOREFRONT_V3') || !source.includes(api)) {
+    fail(name + ' is missing its V3 event-driven guard/API.');
+  }
+}
+
+if (!livePricesJs.includes('IS_STOREFRONT_V3') ||
+    !livePricesJs.includes('if (!IS_STOREFRONT_V3) {\n      window.setInterval')) {
+  fail('V3 live-price reconciliation timer guard is missing.');
+}
+
+if (!restaurantHoursJs.includes('IS_STOREFRONT_V3') ||
+    !restaurantHoursJs.includes('scheduleNextV3Refresh')) {
+  fail('V3 restaurant-hours single refresh loop is missing.');
+}
+
+if (!appJs.includes('IS_STOREFRONT_V3') ||
+    !appJs.includes('if(!IS_STOREFRONT_V3){') ||
+    !appJs.includes('if(IS_STOREFRONT_V3){')) {
+  fail('V3 app runtime-presentation/footer observer guards are missing.');
 }
 
 if (arabicOnlyJs.includes("if (!IS_STOREFRONT_V3) {\n      loadScript('pashaArabicNewsTickerScript'") === false) {
