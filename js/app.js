@@ -67,6 +67,7 @@ const I18N = {
 };
 
 
+const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
 let DB = null;
 let lang = localStorage.getItem("RESTBR_LANG_V1") || "ar";
 let active = "";
@@ -1595,6 +1596,11 @@ function scheduleFooterGlassSync(){
 
 
 function initFooterGlassSync(){
+
+  if(IS_STOREFRONT_V3){
+    footerGlassObserver?.disconnect();
+    return;
+  }
 
   const menu=
     document.getElementById(
@@ -4529,10 +4535,12 @@ async function startRestbr() {
        INITIALIZE WEBSITE
     ========================= */
 
-    installMenuCardPolish();
-    installMenuDiscoveryUI();
-    installV44PolishStyles();
-    applyUiDesignSettings();
+    if(!IS_STOREFRONT_V3){
+      installMenuCardPolish();
+      installMenuDiscoveryUI();
+      installV44PolishStyles();
+      applyUiDesignSettings();
+    }
     ensureSearchUI();
 
     applyDeepLinkBeforeRender();
