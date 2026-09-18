@@ -100,7 +100,8 @@ if (!css.includes('@media(max-width:680px)') ||
   fail('V3 mobile Safari compositing guard is missing.');
 }
 
-if (css.includes('V3 product details sheet — same proven logic, new shell')) {
+if (css.includes('V3 product details sheet — same proven logic, new shell') ||
+    css.includes('.pb-product-sheet')) {
   fail('Obsolete legacy product-details CSS returned to V3.');
 }
 
