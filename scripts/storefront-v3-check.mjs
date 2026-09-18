@@ -155,7 +155,9 @@ for (const token of [
   'id="pbV3SearchShowResults"',
   'id="pbV3WhatsAppFab"',
   'id="pbV3BottomCartCount"',
-  'class="pb-v3-desktop-nav"'
+  'class="pb-v3-desktop-nav"',
+  'id="pbV3PromoBanner"',
+  'id="pbV3PromoOpen"'
 ]) {
   if (!html.includes(token)) fail('V3 navigation/search/info element missing: ' + token);
 }
@@ -210,6 +212,17 @@ if (!serviceWorkerJs.includes('const isStorefrontV3 =') ||
 
 if (!css.includes('.pb-v3-product-quantity')) {
   fail('V3 product quantity styling is missing.');
+}
+
+for (const token of [
+  'function syncPromoBanner(',
+  'pb-v3-promo-banner',
+  'pbV3PromoDiscount',
+  'data-v3-feature-product'
+]) {
+  if (!js.includes(token) && !css.includes(token) && !html.includes(token)) {
+    fail('V3 real-offer promo banner integration missing: ' + token);
+  }
 }
 
 for (const [name, source, api] of [
