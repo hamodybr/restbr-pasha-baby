@@ -3124,3 +3124,8 @@ body.pb-v3-page.sm-hours-closed #smSendWhatsApp{
     bottom:24px!important;
   }
 }
+
+
+.pb-v3-benefits>[hidden]{
+  display:none!important;
+}
