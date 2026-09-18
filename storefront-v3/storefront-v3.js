@@ -3,7 +3,7 @@
   window.__PASHA_STOREFRONT_V3__ = true;
 
   const $ = selector => document.querySelector(selector);
-  const $ = selector => [...document.querySelectorAll(selector)];
+  const all = selector => [...document.querySelectorAll(selector)];
   let catalogDelayTimer = 0;
 
   function iconFor(value) {
@@ -236,7 +236,7 @@
     const dbCount = Array.isArray(window.RESTBR_DB?.products)
       ? window.RESTBR_DB.products.length
       : 0;
-    const domCount = $$('#smMenu .sm-card').length;
+    const domCount = all('#smMenu .sm-card').length;
     const count = dbCount || domCount;
     node.textContent = count > 0 ? count.toLocaleString('en-US') + ' منتج' : '';
   }
