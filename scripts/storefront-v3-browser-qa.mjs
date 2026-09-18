@@ -129,12 +129,16 @@ async function waitForCatalog(page) {
 async function openProductDetails(page) {
   const button = page.locator('#smMenu .pb-v3-details-btn').first();
   await button.scrollIntoViewIfNeeded();
+  const started = Date.now();
   await button.click();
   await page.locator('#pbV3ProductSheet.open').waitFor({ state: 'visible', timeout: 5000 });
+  const elapsed = Date.now() - started;
+  assert(elapsed <= 1600, `Product details interaction is too slow: ${elapsed}ms`);
   await assertInsideViewport(page, '#pbV3ProductSheet', 'Product details sheet');
   await assertNoHorizontalOverflow(page, 'Product details');
   await page.locator('#pbV3ProductClose').click();
   await page.waitForTimeout(180);
+  return elapsed;
 }
 
 async function prepareCartAndCheckout(page) {
@@ -150,8 +154,11 @@ async function prepareCartAndCheckout(page) {
   assert(added, 'Could not seed the cart through the real cart API');
 
   const cartTrigger = page.locator('#pbV3BottomCart:visible, #pbV3CartBtn:visible').first();
+  const cartStarted = Date.now();
   await cartTrigger.click();
   await page.locator('#smCartDrawer.open').waitFor({ state: 'visible', timeout: 5000 });
+  const cartElapsed = Date.now() - cartStarted;
+  assert(cartElapsed <= 1200, `Cart interaction is too slow: ${cartElapsed}ms`);
   await assertInsideViewport(page, '#smCartDrawer', 'Cart drawer');
   await assertNoHorizontalOverflow(page, 'Cart drawer');
 
@@ -159,8 +166,11 @@ async function prepareCartAndCheckout(page) {
   assert(bottomNavDisplay === 'none', 'Bottom navigation remained visible over the cart drawer');
 
   const continueButton = page.locator('#smCartContinue');
+  const checkoutStarted = Date.now();
   await continueButton.click();
   await page.locator('#smCheckoutSheet.open').waitFor({ state: 'visible', timeout: 5000 });
+  const checkoutElapsed = Date.now() - checkoutStarted;
+  assert(checkoutElapsed <= 1600, `Checkout interaction is too slow: ${checkoutElapsed}ms`);
   await assertInsideViewport(page, '#smCheckoutSheet', 'Checkout sheet');
   await assertNoHorizontalOverflow(page, 'Checkout');
 
@@ -175,6 +185,8 @@ async function prepareCartAndCheckout(page) {
 
   await page.locator('#smCheckoutClose').click();
   await page.waitForTimeout(120);
+
+  return { cartElapsed, checkoutElapsed };
 }
 
 async function runViewport(browser, spec) {
@@ -185,6 +197,21 @@ async function runViewport(browser, spec) {
     hasTouch: spec.mobile,
     serviceWorkers: 'block',
     locale: 'ar-IQ'
+  });
+
+  await context.addInitScript(() => {
+    window.__V3_LONG_TASKS__ = [];
+    try {
+      const supported = window.PerformanceObserver?.supportedEntryTypes || [];
+      if (supported.includes('longtask')) {
+        const observer = new PerformanceObserver(list => {
+          for (const entry of list.getEntries()) {
+            window.__V3_LONG_TASKS__.push(Math.round(entry.duration));
+          }
+        });
+        observer.observe({ type: 'longtask', buffered: true });
+      }
+    } catch (_) {}
   });
 
   const page = await context.newPage();
@@ -214,8 +241,11 @@ async function runViewport(browser, spec) {
     const desktopDisplay = await page.locator('.pb-v3-desktop-nav').evaluate(node => getComputedStyle(node).display);
     assert(desktopDisplay === 'none', `${spec.name} desktop navigation should be hidden`);
 
+    const searchStarted = Date.now();
     await page.locator('#pbV3SearchBtn').click();
     await page.locator('#pbV3SearchOverlay.open').waitFor({ state: 'visible', timeout: 3000 });
+    const searchElapsed = Date.now() - searchStarted;
+    assert(searchElapsed <= 1200, `${spec.name} search interaction is too slow: ${searchElapsed}ms`);
     await assertInsideViewport(page, '#pbV3SearchOverlay .pb-v3-search-overlay-card', `${spec.name} search overlay`);
     await assertNoHorizontalOverflow(page, `${spec.name} search overlay`);
     await page.locator('#pbV3SearchClose').click();
@@ -226,18 +256,33 @@ async function runViewport(browser, spec) {
     assert(bottomDisplay === 'none', 'Desktop bottom navigation should be hidden');
   }
 
-  await openProductDetails(page);
-  await prepareCartAndCheckout(page);
+  const productElapsed = await openProductDetails(page);
+  const { cartElapsed, checkoutElapsed } = await prepareCartAndCheckout(page);
 
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   await page.waitForTimeout(150);
   await assertNoHorizontalOverflow(page, `${spec.name} footer`);
   await assertInsideViewport(page, '.sm-footer-card', `${spec.name} footer card`);
 
+  const perf = await page.evaluate(() => ({
+    longTasks: Array.isArray(window.__V3_LONG_TASKS__) ? window.__V3_LONG_TASKS__ : [],
+    domNodes: document.getElementsByTagName('*').length
+  }));
+
+  const maxLongTask = perf.longTasks.length ? Math.max(...perf.longTasks) : 0;
+  assert(maxLongTask <= 1500,
+    `${spec.name} has a severe long task: ${maxLongTask}ms`);
+  assert(perf.domNodes <= 5000,
+    `${spec.name} DOM is unexpectedly large: ${perf.domNodes} nodes`);
+
   assert(consoleErrors.length === 0,
     `${spec.name} browser errors: ${consoleErrors.join(' | ')}`);
 
-  console.log(`Browser QA passed: ${spec.name} (${spec.width}x${spec.height})`);
+  console.log(
+    `Browser QA passed: ${spec.name} (${spec.width}x${spec.height}) | ` +
+    `product ${productElapsed}ms | cart ${cartElapsed}ms | checkout ${checkoutElapsed}ms | ` +
+    `max-long-task ${maxLongTask}ms | DOM ${perf.domNodes}`
+  );
   await context.close();
 }
 
