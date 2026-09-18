@@ -991,6 +991,21 @@
     ].forEach(id => document.getElementById(id)?.remove());
   }
 
+  function syncFooterVisibility() {
+    ['.sm-footer-main-actions', '.sm-footer-socials'].forEach(selector => {
+      const wrap = document.querySelector(selector);
+      if (!wrap) return;
+
+      const visibleLinks = [...wrap.querySelectorAll('a')].filter(link => {
+        if (link.hidden || !link.hasAttribute('href')) return false;
+        const style = window.getComputedStyle?.(link);
+        return style?.display !== 'none' && style?.visibility !== 'hidden';
+      });
+
+      wrap.hidden = visibleLinks.length === 0;
+    });
+  }
+
   function syncRuntimeUI() {
     stripLegacyPresentationRuntime();
     const searchOverlay = $('#pbV3SearchOverlay');
@@ -1009,7 +1024,10 @@
     renderHighlights();
     syncHeroProduct();
     enhanceCheckout();
+    syncFooterVisibility();
     syncCardDecorations();
+
+    requestAnimationFrame(syncFooterVisibility);
 
     const cartFab = $('#smCartFab');
     if (cartFab) {
