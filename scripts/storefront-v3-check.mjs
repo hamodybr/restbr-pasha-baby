@@ -157,7 +157,8 @@ for (const token of [
   'id="pbV3BottomCartCount"',
   'class="pb-v3-desktop-nav"',
   'id="pbV3PromoBanner"',
-  'id="pbV3PromoOpen"'
+  'id="pbV3PromoOpen"',
+  'id="pbV3DesktopOffers"'
 ]) {
   if (!html.includes(token)) fail('V3 navigation/search/info element missing: ' + token);
 }
