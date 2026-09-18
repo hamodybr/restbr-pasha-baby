@@ -113,9 +113,78 @@
   }
 
   function syncCategoryIcons(root = document) {
+    const products = Array.isArray(window.RESTBR_DB?.products)
+      ? window.RESTBR_DB.products
+      : [];
+
     root.querySelectorAll?.('#smCats .sm-cat').forEach(button => {
-      if (!button.dataset.v3Icon) button.dataset.v3Icon = iconFor(button.textContent);
+      const categoryId = String(button.dataset.cat || button.dataset.catId || '');
+      const label = String(button.dataset.v3Label || button.textContent || '').trim();
+      if (!label) return;
+
+      button.dataset.v3Label = label;
+      button.dataset.v3Icon = iconFor(label);
+
+      const matching = products.filter(product =>
+        String(product?.category?.id || '') === categoryId
+      );
+      const candidate = matching.find(product => String(product?.image || '').trim());
+      const count = matching.length;
+
+      const media = candidate
+        ? `<span class="pb-v3-cat-media has-image"><img src="${esc(productImage(candidate))}" alt="" loading="lazy" decoding="async"></span>`
+        : `<span class="pb-v3-cat-media"><span aria-hidden="true">${esc(iconFor(label))}</span></span>`;
+
+      button.classList.add('pb-v3-cat-tile');
+      button.innerHTML = `
+        ${media}
+        <span class="pb-v3-cat-copy">
+          <b>${esc(label)}</b>
+          <small>${count ? count.toLocaleString('en-US') + ' منتج' : ''}</small>
+        </span>`;
     });
+  }
+
+  function localStoreText(value) {
+    if (value && typeof value === 'object') {
+      return String(value.ar || value.en || value.ku || '').trim();
+    }
+    return String(value || '').trim();
+  }
+
+  function syncStorefrontCopy() {
+    const restaurant = window.RESTBR_DB?.restaurant || {};
+
+    const announcementText = localStoreText(restaurant.announcement);
+    const announcement = $('#pbV3Announcement');
+    const announcementNode = $('#pbV3AnnouncementText');
+    if (announcement && announcementNode) {
+      const enabled = restaurant.announcementEnabled !== false && Boolean(announcementText);
+      announcement.hidden = !enabled;
+      announcementNode.textContent = enabled ? announcementText : '';
+    }
+
+    const deliveryText =
+      localStoreText(restaurant.deliveryInfo) ||
+      announcementText ||
+      'التوصيل متوفر حسب المنطقة';
+    const deliveryNode = $('#pbV3DeliveryBenefit');
+    if (deliveryNode) deliveryNode.textContent = deliveryText;
+
+    const footerLocation = localStoreText(restaurant.footerLocation);
+    const footerLocationNode = $('.sm-footer-location');
+    if (footerLocationNode && footerLocation) footerLocationNode.textContent = footerLocation;
+
+    const brandAr = String(restaurant.nameAr || restaurant.name || 'پاشا بيبي').trim();
+    const brandEn = String(restaurant.nameEn || restaurant.name || 'Pasha Baby').trim();
+
+    const topAr = $('.pb-v3-brand b');
+    const topEn = $('.pb-v3-brand small');
+    if (topAr) topAr.textContent = brandAr;
+    if (topEn) topEn.textContent = brandEn;
+
+    const drawerBrand = $('.pb-v3-drawer-brand b');
+    if (drawerBrand) drawerBrand.textContent = brandAr;
   }
 
   function syncProductCount() {
@@ -485,6 +554,7 @@
     stripLegacyPresentationRuntime();
     relocateSearch();
     syncCategoryIcons();
+    syncStorefrontCopy();
     syncProductCount();
     syncCartCount();
     syncWhatsApp();
