@@ -167,6 +167,9 @@ async function prepareCartAndCheckout(page) {
   const checkoutBottomNavDisplay = await page.locator('.pb-v3-bottom-nav').evaluate(node => getComputedStyle(node).display);
   assert(checkoutBottomNavDisplay === 'none', 'Bottom navigation remained visible over checkout');
 
+  const checkoutTopbarVisibility = await page.locator('.pb-v3-topbar').evaluate(node => getComputedStyle(node).visibility);
+  assert(checkoutTopbarVisibility === 'hidden', 'Sticky topbar remained interactive over checkout');
+
   const send = page.locator('#smSendWhatsApp');
   assert(await send.count() === 1, 'Checkout submit button is missing');
 
