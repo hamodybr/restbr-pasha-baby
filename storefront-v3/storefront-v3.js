@@ -429,6 +429,21 @@
     return source;
   }
 
+  function isRealOffer(product) {
+    if (product?.badges?.offer === true) return true;
+    if (Math.max(0, Number(product?.discountPercent || 0)) > 0) return true;
+    if (Math.max(0, Number(product?.discountAmount || 0)) > 0) return true;
+
+    return (product?.options || []).some(option => {
+      const current = Number(option?.price);
+      const original = Number(option?.originalPrice ?? option?.__retailOriginalPrice ?? current);
+      return Number.isFinite(current) &&
+        Number.isFinite(original) &&
+        current >= 0 &&
+        original > current;
+    });
+  }
+
   function featureBadge(type) {
     if (type === 'popular') return 'الأكثر طلبًا';
     if (type === 'new') return 'جديد';
@@ -496,11 +511,12 @@
     const current = productPrice(product);
     const original = productOriginalPrice(product);
     const percent = Math.max(0, Number(product?.discountPercent || 0));
+    const amount = Math.max(0, Number(product?.discountAmount || 0));
     const discounted = current !== null && original !== null && original > current;
 
     title.textContent = name;
     meta.textContent = discounted
-      ? `${money(original)} ← ${money(current)}`
+      ? `قبل ${money(original)} • الآن ${money(current)}`
       : current !== null
         ? [category, money(current)].filter(Boolean).join(' • ')
         : category;
@@ -508,12 +524,14 @@
     image.src = productImage(product);
     image.alt = name;
 
-    discount.hidden = !(percent > 0 || discounted);
+    discount.hidden = !(percent > 0 || amount > 0 || discounted);
     discount.textContent = percent > 0
       ? `-${Math.round(percent)}%`
-      : discounted
-        ? 'عرض'
-        : '';
+      : amount > 0
+        ? 'خصم'
+        : discounted
+          ? 'عرض'
+          : '';
 
     banner.dataset.v3PromoProduct = String(product.id);
     open.dataset.v3FeatureProduct = String(product.id);
@@ -530,7 +548,7 @@
     const available = products.filter(product => product?.badges?.unavailable !== true);
     renderHighlightGroup('popular', available.filter(product => product?.badges?.popular === true));
     renderHighlightGroup('new', available.filter(product => product?.badges?.new === true));
-    const offerProducts = available.filter(product => product?.badges?.offer === true);
+    const offerProducts = available.filter(isRealOffer);
     renderHighlightGroup('offer', offerProducts);
     syncPromoBanner(offerProducts);
 
