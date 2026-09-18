@@ -118,7 +118,9 @@ for (const token of [
   'id="pbV3InfoCall"',
   'data-v3-nav="home"',
   'id="pbV3DrawerOffers"',
-  'id="pbV3SearchShowResults"'
+  'id="pbV3SearchShowResults"',
+  'id="pbV3WhatsAppFab"',
+  'id="pbV3BottomCartCount"'
 ]) {
   if (!html.includes(token)) fail('V3 navigation/search/info element missing: ' + token);
 }
