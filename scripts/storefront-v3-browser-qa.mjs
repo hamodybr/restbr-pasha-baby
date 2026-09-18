@@ -229,6 +229,21 @@ async function runViewport(browser, spec) {
     waitUntil: 'domcontentloaded',
     timeout: 20000
   });
+  const domReadyElapsed = Date.now() - catalogStarted;
+  assert(domReadyElapsed <= 3000,
+    `${spec.name} DOMContentLoaded is too slow: ${domReadyElapsed}ms`);
+
+  let earlyMenuElapsed = 0;
+  if (spec.mobile) {
+    const menuStarted = Date.now();
+    await page.locator('#pbV3MenuBtn').click({ timeout: 1500 });
+    await page.locator('#pbV3Drawer.open').waitFor({ state: 'visible', timeout: 800 });
+    earlyMenuElapsed = Date.now() - menuStarted;
+    assert(earlyMenuElapsed <= 800,
+      `${spec.name} early menu interaction is too slow: ${earlyMenuElapsed}ms`);
+    await page.locator('#pbV3DrawerClose').click();
+    await page.waitForTimeout(80);
+  }
 
   await waitForCatalog(page);
   const catalogElapsed = Date.now() - catalogStarted;
@@ -286,7 +301,8 @@ async function runViewport(browser, spec) {
 
   console.log(
     `Browser QA passed: ${spec.name} (${spec.width}x${spec.height}) | ` +
-    `catalog ${catalogElapsed}ms | search ${searchElapsed}ms | product ${productElapsed}ms | ` +
+    `dom-ready ${domReadyElapsed}ms | early-menu ${earlyMenuElapsed}ms | catalog ${catalogElapsed}ms | ` +
+    `search ${searchElapsed}ms | product ${productElapsed}ms | ` +
     `cart ${cartElapsed}ms | checkout ${checkoutElapsed}ms | ` +
     `max-long-task ${maxLongTask}ms | DOM ${perf.domNodes}`
   );
