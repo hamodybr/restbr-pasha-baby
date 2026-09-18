@@ -45,6 +45,11 @@ jobs:
       - name: Storefront V3 shell regression
         run: node scripts/storefront-v3-shell-regression.mjs
 
+      - name: Storefront V3 real-browser viewport QA
+        run: |
+          npm install --no-save --package-lock=false playwright-core@1.55.0
+          node scripts/storefront-v3-browser-qa.mjs
+
       - name: Mobile image upload and thermal regression
         run: node scripts/mobile-image-thermal-regression.mjs
 
