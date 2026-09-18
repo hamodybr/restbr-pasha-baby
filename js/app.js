@@ -2398,7 +2398,7 @@ function applyLang() {
 let observer = null;
 
 
-if ("IntersectionObserver" in window) {
+if (!IS_STOREFRONT_V3 && "IntersectionObserver" in window) {
 
   observer =
     new IntersectionObserver(
@@ -3413,6 +3413,8 @@ function unpinCategories() {
 ======================================== */
 
 function scrollEffects() {
+
+  if(IS_STOREFRONT_V3) return;
 
   const root =
     document.documentElement;
