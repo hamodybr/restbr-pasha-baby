@@ -784,12 +784,14 @@
     window.PASHA_RETAIL_DECORATE_CARDS?.();
     window.PASHA_FIXED_DISCOUNTS_DECORATE?.();
     window.PASHA_LIVE_BADGES_SYNC?.();
+    window.PASHA_UNAVAILABLE_SYNC?.();
     window.PASHA_V3_ENHANCE_PRODUCT_CARDS?.();
     syncCardSummaries();
     syncCardActionRows();
 
     requestAnimationFrame(() => {
       window.PASHA_V3_ENHANCE_PRODUCT_CARDS?.();
+      window.PASHA_UNAVAILABLE_SYNC?.();
       syncCardSummaries();
       syncCardActionRows();
     });
