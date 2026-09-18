@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="css/pasha-baby-commerce.css?v=1.0">
   <link rel="stylesheet" href="css/live-card-badges.css?v=1.5">
   <link rel="stylesheet" href="css/pasha-reviews.css?v=5">
-  <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.1">
+  <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.2">
 </head>
 <body class="pb-v3-page">
   <div id="smIntro" class="sm-intro pb-v3-intro" aria-hidden="true">
@@ -48,6 +48,11 @@
         </button>
       </div>
     </header>
+
+    <div id="pbV3Announcement" class="pb-v3-announcement" hidden>
+      <span aria-hidden="true">●</span>
+      <strong id="pbV3AnnouncementText"></strong>
+    </div>
 
     <!-- Compatibility host for the existing storefront engine.
          V3 keeps it visually hidden and moves generated controls into the new shell. -->
@@ -88,7 +93,7 @@
 
     <section id="pbV3Hero" class="pb-v3-hero">
       <div class="pb-v3-hero-copy">
-        <span class="pb-v3-kicker">مستلزمات الأطفال في دهوك</span>
+        <span class="pb-v3-kicker">مستلزمات الأطفال والبيبي</span>
         <h1>كل شيء لطفلك،<br><em>بمكان واحد.</em></h1>
         <p>تسوّق بسهولة، اختَر اللون والخيار، وثبّت طلبك مباشرة.</p>
         <div class="pb-v3-hero-actions">
@@ -105,7 +110,7 @@
     </section>
 
     <section class="pb-v3-benefits" aria-label="مميزات الطلب">
-      <div><span>🚚</span><b>توصيل داخل دهوك</b><small>حسب المنطقة</small></div>
+      <div><span>🚚</span><b>التوصيل متوفر</b><small id="pbV3DeliveryBenefit">حسب إعدادات المتجر</small></div>
       <div><span>🏬</span><b>استلام من المحل</b><small>سريع ومباشر</small></div>
       <div><span>💬</span><b>تثبيت عبر واتساب</b><small>بدون إنشاء حساب</small></div>
     </section>
@@ -173,7 +178,7 @@
       <div class="sm-footer-card">
         <div class="sm-footer-line"></div>
         <h2>باشا بيبي – Pasha Baby</h2>
-        <p class="sm-footer-location">بروشكي، مقابل برانگوس، شارع الفوق، دهوك</p>
+        <p class="sm-footer-location">دهوك — بروشكي</p>
         <div class="sm-footer-main-actions">
           <a id="smFooterLocation" href="#" target="_blank" rel="noopener noreferrer">موقعنا</a>
           <a id="smFooterCall" href="#">اتصال</a>
