@@ -8,6 +8,7 @@ const commerceJs = fs.readFileSync('js/pasha-baby-commerce.js', 'utf8');
 const fixedDiscountJs = fs.readFileSync('js/pasha-baby-fixed-discounts.js', 'utf8');
 const liveBadgesJs = fs.readFileSync('js/live-card-badges.js', 'utf8');
 const arabicOnlyJs = fs.readFileSync('js/pasha-arabic-only.js', 'utf8');
+const numberNormalizerJs = fs.readFileSync('js/pasha-number-normalizer.js', 'utf8');
 
 const fail = message => {
   console.error('Storefront V3 check failed:', message);
@@ -112,6 +113,19 @@ for (const [name, source, api] of [
 if (!arabicOnlyJs.includes('IS_STOREFRONT_V3') ||
     !arabicOnlyJs.includes('if (!IS_STOREFRONT_V3)')) {
   fail('Arabic-only bootstrap can reload legacy gallery observers into V3.');
+}
+
+if (!fixedDiscountJs.includes('if (!IS_STOREFRONT_V3) subscribe();')) {
+  fail('V3 must not keep the fixed-discount realtime channel open.');
+}
+
+if (!numberNormalizerJs.includes('IS_STOREFRONT_V3') ||
+    !numberNormalizerJs.includes('if (!IS_STOREFRONT_V3)')) {
+  fail('V3 numeric input handling is missing the body-observer guard.');
+}
+
+if (arabicOnlyJs.includes("if (!IS_STOREFRONT_V3) {\n      loadScript('pashaArabicNewsTickerScript'") === false) {
+  fail('V3 can still load the legacy animated news ticker.');
 }
 
 if (!js.includes("window.addEventListener('restbr:ready'")) {
