@@ -329,7 +329,11 @@
 
   function syncWhatsApp() {
     const source = $('#smFooterWhatsapp');
-    const href = String(source?.href || source?.getAttribute?.('href') || '').trim();
+    const configured = String(window.RESTBR_DB?.restaurant?.whatsapp || '').trim();
+    const fallback = String(source?.href || source?.getAttribute?.('href') || '').trim();
+    const href = /^https?:\/\//i.test(configured) || /^whatsapp:/i.test(configured)
+      ? configured
+      : fallback;
     const valid = /^https?:\/\//i.test(href) || /^whatsapp:/i.test(href);
 
     ['pbV3HeroWhatsapp', 'pbV3DrawerWhatsapp', 'pbV3WhatsAppFab'].forEach(id => {
