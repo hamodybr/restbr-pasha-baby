@@ -2777,3 +2777,66 @@ html.pb-v3-search-open{overflow:hidden!important}
     flex-basis:11px!important;
   }
 }
+
+
+/* =========================================================
+   V3 checkout viewport / keyboard stability
+   ========================================================= */
+.pb-v3-page .sm-checkout-sheet{
+  height:min(94dvh,880px)!important;
+  max-height:calc(100dvh - max(8px,env(safe-area-inset-top)))!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  overscroll-behavior:contain!important;
+}
+.pb-v3-page .sm-checkout-head{
+  flex:0 0 auto!important;
+}
+.pb-v3-page .sm-checkout-body{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  scroll-padding-top:20px!important;
+  scroll-padding-bottom:110px!important;
+}
+.pb-v3-page .sm-checkout-actions{
+  position:relative!important;
+  z-index:3!important;
+  flex:0 0 auto!important;
+  margin-top:auto!important;
+  box-shadow:0 -8px 18px rgba(48,60,51,.055)!important;
+}
+.pb-v3-page .sm-checkout-review-total{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  min-height:42px!important;
+}
+.pb-v3-page .sm-checkout-review-total>b{
+  color:var(--v3-sage-dark)!important;
+  font-size:15px!important;
+  font-weight:1000!important;
+  white-space:nowrap!important;
+}
+.pb-v3-page #smSendWhatsApp:disabled{
+  opacity:.48!important;
+  box-shadow:none!important;
+}
+@media(max-width:680px){
+  .pb-v3-page .sm-checkout-sheet{
+    width:100%!important;
+    height:calc(100dvh - max(4px,env(safe-area-inset-top)))!important;
+    max-height:calc(100dvh - max(4px,env(safe-area-inset-top)))!important;
+    border-radius:22px 22px 0 0!important;
+  }
+  .pb-v3-page .sm-checkout-body{
+    scroll-padding-bottom:130px!important;
+  }
+  .pb-v3-page .sm-checkout-actions{
+    padding-bottom:calc(10px + env(safe-area-inset-bottom))!important;
+  }
+}
