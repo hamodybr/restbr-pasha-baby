@@ -23,6 +23,10 @@ window.matchMedia = query => ({
   removeEventListener() {},
   dispatchEvent() { return false; }
 });
+window.localStorage.setItem('RESTBR_CART_V1', JSON.stringify([
+  { key: 'p1:o1', qty: 2 },
+  { key: 'p2:o1', qty: 1 }
+]));
 window.RESTBR_SAFE_MEDIA_URL = value => String(value || '');
 window.RESTBR_OPTIMIZED_MEDIA_URL = value => String(value || '');
 window.RESTBR_DB = {
@@ -90,6 +94,15 @@ const fail = message => {
   console.error('Storefront V3 shell regression failed:', message);
   process.exitCode = 1;
 };
+
+const topCartCount = document.getElementById('pbV3CartCount');
+const bottomCartCount = document.getElementById('pbV3BottomCartCount');
+if (topCartCount?.hidden || bottomCartCount?.hidden) {
+  fail('Cart count should be visible in both V3 navigation surfaces.');
+}
+if (topCartCount?.textContent !== '3' || bottomCartCount?.textContent !== '3') {
+  fail('Header and bottom cart counts are not synchronized.');
+}
 
 const announcement = document.getElementById('pbV3Announcement');
 if (!announcement || announcement.hidden) fail('Store announcement should be visible.');
