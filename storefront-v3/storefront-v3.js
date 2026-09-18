@@ -534,11 +534,66 @@
     }, { passive: true });
   }
 
+  function syncCardSummaries() {
+    const products = Array.isArray(window.RESTBR_DB?.products)
+      ? window.RESTBR_DB.products
+      : [];
+
+    document.querySelectorAll('#smMenu [data-product-card]').forEach(card => {
+      const product = products.find(item =>
+        String(item?.id || '') === String(card.dataset.productCard || '')
+      );
+      if (!product) return;
+
+      const info = card.querySelector('.sm-info');
+      const action = info?.querySelector('.sm-direct-add,.sm-choose-options');
+      if (!info || !action) return;
+
+      let summary = info.querySelector('.pb-v3-card-summary');
+      if (!summary) {
+        summary = document.createElement('div');
+        summary.className = 'pb-v3-card-summary';
+        action.insertAdjacentElement('beforebegin', summary);
+      }
+
+      const options = Array.isArray(product.options) ? product.options : [];
+      const sorted = options
+        .map(option => ({
+          current: Number(option?.price),
+          original: Number(option?.originalPrice ?? option?.price)
+        }))
+        .filter(row => Number.isFinite(row.current))
+        .sort((a, b) => a.current - b.current);
+
+      if (!sorted.length) {
+        summary.hidden = true;
+        return;
+      }
+
+      summary.hidden = false;
+      const lowest = sorted[0];
+      const hasRange = new Set(sorted.map(row => row.current)).size > 1;
+      const discounted = Number.isFinite(lowest.original) && lowest.original > lowest.current;
+
+      summary.innerHTML = `
+        <span>
+          ${hasRange ? '<small>ابتداءً من</small>' : ''}
+          ${discounted ? `<del>${esc(money(lowest.original))}</del>` : ''}
+          <b>${esc(money(lowest.current))}</b>
+        </span>
+        ${Number(product.discountPercent || 0) > 0
+          ? `<i>-${Math.round(Number(product.discountPercent))}%</i>`
+          : ''}
+      `;
+    });
+  }
+
   function syncCardDecorations() {
     window.PASHA_RETAIL_DECORATE_CARDS?.();
     window.PASHA_FIXED_DISCOUNTS_DECORATE?.();
     window.PASHA_LIVE_BADGES_SYNC?.();
     window.PASHA_V3_ENHANCE_PRODUCT_CARDS?.();
+    syncCardSummaries();
   }
 
   function stripLegacyPresentationRuntime() {
