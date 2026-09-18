@@ -76,11 +76,15 @@
   }
 
   function syncCartCount() {
-    const badge = $('#pbV3CartCount');
-    if (!badge) return;
     const count = cartQuantity();
-    badge.textContent = count > 99 ? '99+' : String(count);
-    badge.hidden = count <= 0;
+    const label = count > 99 ? '99+' : String(count);
+
+    ['pbV3CartCount', 'pbV3BottomCartCount'].forEach(id => {
+      const badge = document.getElementById(id);
+      if (!badge) return;
+      badge.textContent = label;
+      badge.hidden = count <= 0;
+    });
   }
 
   function openCart() {
