@@ -31,8 +31,8 @@ const requiredHtml = [
   'id="smCats"',
   'id="smMenu"',
   'id="pbV3BottomCart"',
-  'storefront-v3/storefront-v3.css?v=1.4',
-  'storefront-v3/storefront-v3.js?v=1.4'
+  'storefront-v3/storefront-v3.css?v=1.5',
+  'storefront-v3/storefront-v3.js?v=1.5'
 ];
 
 for (const token of requiredHtml) {
@@ -86,7 +86,7 @@ if (!css.includes('--v3-sage') || !css.includes('--v3-beige')) {
 
 for (const token of [
   'id="pbV3Highlights"',
-  'storefront-v3/product-details-v3.js?v=1.1'
+  'storefront-v3/product-details-v3.js?v=1.2'
 ]) {
   if (!html.includes(token)) fail('V3 phase 2 feature missing: ' + token);
 }
@@ -303,6 +303,18 @@ for (const token of [
 
 if (!js.includes("button.setAttribute('aria-current', 'page')")) {
   fail('V3 bottom navigation active state is missing aria-current.');
+}
+
+for (const token of [
+  'function syncFooterVisibility()',
+  "href === '#'",
+  '@media(max-width:380px)',
+  '.pb-v3-page .sm-footer-main-actions[hidden]',
+  '.pb-v3-card-summary{'
+]) {
+  if (!js.includes(token) && !css.includes(token)) {
+    fail('V3 final pixel/footer polish missing: ' + token);
+  }
 }
 
 if (arabicOnlyJs.includes("if (!IS_STOREFRONT_V3) {\n      loadScript('pashaArabicNewsTickerScript'") === false) {
