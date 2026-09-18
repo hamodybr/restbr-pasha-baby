@@ -270,7 +270,7 @@
 
   function start() {
     observeMenu();
-    subscribe();
+    if (!IS_STOREFRONT_V3) subscribe();
     void reload({ render: true });
   }
 
