@@ -1,6 +1,7 @@
 (() => {
   if (/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
 
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
   const TIMEZONE = 'Asia/Baghdad';
   const DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
   const DAY_FROM_SHORT = {
@@ -318,6 +319,18 @@
   });
 
   loadSettings();
-  setInterval(() => applyToMenu({ broadcast:true }), 30000);
-  setInterval(loadSettings, 60000);
+
+  if (IS_STOREFRONT_V3) {
+    const scheduleNextV3Refresh = () => {
+      const delay = Math.max(1000, 60000 - (Date.now() % 60000) + 250);
+      window.setTimeout(async () => {
+        await loadSettings();
+        scheduleNextV3Refresh();
+      }, delay);
+    };
+    scheduleNextV3Refresh();
+  } else {
+    setInterval(() => applyToMenu({ broadcast:true }), 30000);
+    setInterval(loadSettings, 60000);
+  }
 })();
