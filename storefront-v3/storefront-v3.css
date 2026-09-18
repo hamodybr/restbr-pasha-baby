@@ -3647,3 +3647,34 @@ body.pb-v3-page:has(#pbCommerceSheet.open) #smCartFab,
 body.pb-v3-page:has(#smChoiceSheet.open) #smCartFab{
   display:none!important;
 }
+
+
+/* =========================================================
+   V3 modal stacking — sheets always sit above the sticky header
+   ========================================================= */
+.pb-v3-page .sm-cart-backdrop,
+.pb-v3-page .sm-checkout-backdrop,
+.pb-v3-page .sm-choice-backdrop{
+  z-index:240!important;
+}
+
+.pb-v3-page .sm-cart-drawer,
+.pb-v3-page .sm-checkout-sheet,
+.pb-v3-page .sm-choice-sheet{
+  z-index:241!important;
+}
+
+.pb-v3-page .pb-commerce-backdrop{
+  z-index:248!important;
+}
+.pb-v3-page .pb-commerce-sheet{
+  z-index:249!important;
+}
+
+body.pb-v3-page:has(#smCartDrawer.open) .pb-v3-topbar,
+body.pb-v3-page:has(#smCheckoutSheet.open) .pb-v3-topbar,
+body.pb-v3-page:has(#smChoiceSheet.open) .pb-v3-topbar,
+body.pb-v3-page:has(#pbCommerceSheet.open) .pb-v3-topbar{
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
