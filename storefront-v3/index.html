@@ -17,8 +17,10 @@
   <link rel="stylesheet" href="css/cart.css?v=3.6">
   <link rel="stylesheet" href="css/pasha-baby-commerce.css?v=1.0">
   <link rel="stylesheet" href="css/live-card-badges.css?v=1.5">
+  <link rel="stylesheet" href="css/pasha-baby-card-density-v2.css?v=3.0">
+  <link rel="stylesheet" href="css/pasha-baby-details-button-v3.css?v=3.1">
   <link rel="stylesheet" href="css/pasha-reviews.css?v=5">
-  <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.0">
+  <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.1">
 </head>
 <body class="pb-v3-page">
   <div id="smIntro" class="sm-intro pb-v3-intro" aria-hidden="true">
@@ -122,6 +124,40 @@
 
     <div id="smCatsSentinel"></div>
 
+    <section id="pbV3Highlights" class="pb-v3-highlights" aria-label="مختارات پاشا بيبي">
+      <div id="pbV3PopularSection" class="pb-v3-highlight-group" hidden>
+        <div class="pb-v3-section-head">
+          <div><small>مختارات الزبائن</small><h2>الأكثر طلبًا</h2></div>
+          <button type="button" data-v3-highlight-jump="popular">عرض بالقسم</button>
+        </div>
+        <div class="pb-v3-product-rail" data-v3-highlight-list="popular"></div>
+      </div>
+
+      <div id="pbV3NewSection" class="pb-v3-highlight-group" hidden>
+        <div class="pb-v3-section-head">
+          <div><small>وصل حديثًا</small><h2>منتجات جديدة</h2></div>
+          <button type="button" data-v3-highlight-jump="new">عرض بالقسم</button>
+        </div>
+        <div class="pb-v3-product-rail" data-v3-highlight-list="new"></div>
+      </div>
+
+      <div id="pbV3OfferSection" class="pb-v3-highlight-group" hidden>
+        <div class="pb-v3-section-head">
+          <div><small>حسب العروض الفعلية</small><h2>العروض</h2></div>
+          <button type="button" data-v3-highlight-jump="offer">عرض بالقسم</button>
+        </div>
+        <div class="pb-v3-product-rail" data-v3-highlight-list="offer"></div>
+      </div>
+    </section>
+
+    <section class="pb-v3-order-flow" aria-label="طريقة الطلب">
+      <div><b>1</b><span><strong>اختَر المنتج</strong><small>من القسم المناسب</small></span></div>
+      <i>←</i>
+      <div><b>2</b><span><strong>حدّد اللون والخيار</strong><small>حسب المتوفر فعليًا</small></span></div>
+      <i>←</i>
+      <div><b>3</b><span><strong>ثبّت الطلب</strong><small>ببياناتك وواتساب</small></span></div>
+    </section>
+
     <section class="pb-v3-section-head pb-v3-products-head">
       <div><small>مختارات المتجر</small><h2>المنتجات</h2></div>
       <span id="pbV3ProductCount"></span>
@@ -178,9 +214,12 @@
   <script src="js/live-prices.js?v=1.0" defer></script>
   <script src="js/pasha-baby-fixed-discounts.js?v=1.0" defer></script>
   <script src="js/live-card-badges.js?v=1.0" defer></script>
+  <script src="js/pasha-baby-product-description-v2.js?v=3.1" defer></script>
+  <script src="js/pasha-baby-details-button-v3.js?v=3.2" defer></script>
+  <script src="js/pasha-product-gallery-thermal-v1.js?v=1.3" defer></script>
   <script src="js/pasha-review-ui.js?v=3" defer></script>
   <script src="js/pasha-checkout-review.js?v=3" defer></script>
   <script src="js/pasha-reviews.js?v=4" defer></script>
-  <script src="storefront-v3/storefront-v3.js?v=1.0" defer></script>
+  <script src="storefront-v3/storefront-v3.js?v=1.1" defer></script>
 </body>
 </html>
