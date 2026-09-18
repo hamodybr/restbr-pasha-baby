@@ -180,6 +180,9 @@ if (document.getElementById('pbV3OfferSection')?.hidden ||
 if (document.getElementById('pbV3DrawerOffers')?.hidden) {
   fail('Drawer offers action stayed hidden for a real percentage discount.');
 }
+if (document.getElementById('pbV3DesktopOffers')?.hidden) {
+  fail('Desktop offers action stayed hidden for a real percentage discount.');
+}
 
 document.getElementById('pbV3PromoOpen')?.click();
 if (openedPromoProduct !== 'p1') {
@@ -195,7 +198,8 @@ await new Promise(resolve => setTimeout(resolve, 0));
 
 if (!document.getElementById('pbV3PromoBanner')?.hidden ||
     !document.getElementById('pbV3OfferSection')?.hidden ||
-    !document.getElementById('pbV3DrawerOffers')?.hidden) {
+    !document.getElementById('pbV3DrawerOffers')?.hidden ||
+    !document.getElementById('pbV3DesktopOffers')?.hidden) {
   fail('Offer surfaces did not hide after all real discount signals were removed.');
 }
 
@@ -222,7 +226,8 @@ await new Promise(resolve => setTimeout(resolve, 0));
 
 if (!document.getElementById('pbV3PromoBanner')?.hidden ||
     !document.getElementById('pbV3OfferSection')?.hidden ||
-    !document.getElementById('pbV3DrawerOffers')?.hidden) {
+    !document.getElementById('pbV3DrawerOffers')?.hidden ||
+    !document.getElementById('pbV3DesktopOffers')?.hidden) {
   fail('Offer surfaces did not hide after the fixed-IQD discount was removed.');
 }
 
