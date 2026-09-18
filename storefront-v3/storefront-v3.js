@@ -794,7 +794,12 @@
 
   function syncRuntimeUI() {
     stripLegacyPresentationRuntime();
-    relocateSearch();
+    const searchOverlay = $('#pbV3SearchOverlay');
+    relocateSearch(
+      searchOverlay && !searchOverlay.hidden
+        ? $('#pbV3SearchOverlayHost')
+        : $('#pbV3SearchHost')
+    );
     syncCategoryIcons();
     syncStorefrontCopy();
     syncCatalogStatus();
