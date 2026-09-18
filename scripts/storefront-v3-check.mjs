@@ -22,8 +22,8 @@ const requiredHtml = [
   'id="smCats"',
   'id="smMenu"',
   'id="pbV3BottomCart"',
-  'storefront-v3/storefront-v3.css?v=1.2',
-  'storefront-v3/storefront-v3.js?v=1.2'
+  'storefront-v3/storefront-v3.css?v=1.3',
+  'storefront-v3/storefront-v3.js?v=1.3'
 ];
 
 for (const token of requiredHtml) {
@@ -105,6 +105,30 @@ if (!html.includes('id="pbV3CatalogStatus"') ||
     !js.includes('function syncCatalogStatus()') ||
     !js.includes('function markCatalogDelayed()')) {
   fail('V3 quiet catalog loading/retry state is missing.');
+}
+
+for (const token of [
+  'id="pbV3SearchOverlay"',
+  'id="pbV3StoreInfo"',
+  'id="pbV3InfoMap"',
+  'id="pbV3InfoCall"',
+  'data-v3-nav="home"',
+  'id="pbV3DrawerOffers"'
+]) {
+  if (!html.includes(token)) fail('V3 navigation/search/info element missing: ' + token);
+}
+
+for (const token of [
+  'function openSearchOverlay()',
+  'function closeSearchOverlay(',
+  'function syncBottomNavScroll()',
+  'pb-v3-search-overlay',
+  'pb-v3-store-info',
+  '.pb-v3-page .pb-reviews-premium'
+]) {
+  if (!js.includes(token) && !css.includes(token)) {
+    fail('V3 navigation/search/reviews integration missing: ' + token);
+  }
 }
 
 if (/MutationObserver|setInterval\s*\(/.test(js)) {
