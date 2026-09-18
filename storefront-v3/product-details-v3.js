@@ -288,6 +288,7 @@
     if (minus) minus.disabled = selectedQuantity <= 1;
     if (plus) plus.disabled = selectedQuantity >= 99;
     renderPrice();
+    syncAddState();
   }
 
   function renderOptions() {
@@ -328,16 +329,24 @@
     const colors = Array.isArray(currentProduct?.colors) ? currentProduct.colors : [];
     const optionReady = options.length === 1 || (options.length > 1 && Number.isInteger(selectedOptionIndex));
     const colorReady = colors.length === 0 || Boolean(selectedColor());
+    const unavailable = currentProduct?.badges?.unavailable === true;
     const add = $('#pbV3ProductAdd');
+    const minus = $('#pbV3QtyMinus');
+    const plus = $('#pbV3QtyPlus');
 
-    add.disabled = !(optionReady && colorReady) || currentProduct?.badges?.unavailable === true;
-    add.textContent = currentProduct?.badges?.unavailable === true
+    if (minus) minus.disabled = unavailable || selectedQuantity <= 1;
+    if (plus) plus.disabled = unavailable || selectedQuantity >= 99;
+
+    add.disabled = !(optionReady && colorReady) || unavailable;
+    add.textContent = unavailable
       ? 'غير متوفر حالياً'
       : !optionReady
         ? 'اختَر النوع أولاً'
         : !colorReady
           ? 'اختَر اللون أولاً'
-          : 'إضافة للسلة';
+          : selectedQuantity > 1
+            ? `إضافة ${selectedQuantity} للسلة`
+            : 'إضافة للسلة';
   }
 
   function renderProduct(product) {
