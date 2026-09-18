@@ -997,7 +997,8 @@
       if (!wrap) return;
 
       const visibleLinks = [...wrap.querySelectorAll('a')].filter(link => {
-        if (link.hidden || !link.hasAttribute('href')) return false;
+        const href = String(link.getAttribute('href') || '').trim();
+        if (link.hidden || !href || href === '#' || /^javascript:/i.test(href)) return false;
         const style = window.getComputedStyle?.(link);
         return style?.display !== 'none' && style?.visibility !== 'hidden';
       });
