@@ -628,6 +628,64 @@
     syncTopbarScroll();
   }
 
+  function activeDialogSurface() {
+    const selectors = [
+      '#pbV3ProductSheet.open:not([hidden])',
+      '#pbCommerceSheet.open',
+      '#smChoiceSheet.open',
+      '#smCheckoutSheet.open',
+      '#smCartDrawer.open',
+      '#pbV3SearchOverlay.open:not([hidden])',
+      '#pbV3Drawer.open'
+    ];
+
+    for (const selector of selectors) {
+      const node = document.querySelector(selector);
+      if (node) return node;
+    }
+    return null;
+  }
+
+  function trapDialogTab(event) {
+    if (event.key !== 'Tab') return false;
+
+    const surface = activeDialogSurface();
+    if (!surface) return false;
+
+    const focusable = [...surface.querySelectorAll(
+      'a[href]:not([aria-disabled="true"]),button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])'
+    )].filter(node => {
+      if (node.hidden) return false;
+      const style = window.getComputedStyle?.(node);
+      return style?.display !== 'none' && style?.visibility !== 'hidden';
+    });
+
+    if (!focusable.length) {
+      event.preventDefault();
+      surface.setAttribute('tabindex', '-1');
+      surface.focus?.({ preventScroll: true });
+      return true;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const active = document.activeElement;
+
+    if (event.shiftKey && (active === first || !surface.contains(active))) {
+      event.preventDefault();
+      last.focus?.({ preventScroll: true });
+      return true;
+    }
+
+    if (!event.shiftKey && (active === last || !surface.contains(active))) {
+      event.preventDefault();
+      first.focus?.({ preventScroll: true });
+      return true;
+    }
+
+    return false;
+  }
+
   function bindStaticControls() {
     $('#pbV3MenuBtn')?.addEventListener('click', () => setDrawer(true));
     $('#pbV3DrawerClose')?.addEventListener('click', () => setDrawer(false));
@@ -703,6 +761,8 @@
     });
 
     document.addEventListener('keydown', event => {
+      if (trapDialogTab(event)) return;
+
       const feature = event.target.closest?.('[data-v3-feature-product]');
       if (feature && (event.key === 'Enter' || event.key === ' ')) {
         event.preventDefault();
