@@ -3,6 +3,7 @@ import { JSDOM } from 'jsdom';
 
 const html = fs.readFileSync('storefront-v3/index.html', 'utf8');
 const shellCode = fs.readFileSync('storefront-v3/storefront-v3.js', 'utf8');
+const unavailableCode = fs.readFileSync('js/unavailable-card-state.js', 'utf8');
 
 const dom = new JSDOM(html, {
   url: 'https://example.test/storefront-v3/',
@@ -84,9 +85,15 @@ document.getElementById('smMenu').innerHTML = `
           <button class="sm-direct-add" type="button" data-product-id="p1" data-option-index="0"><b>إضافة للسلة</b></button>
         </div>
       </article>
+      <article class="sm-card" data-product-card="ghost-unavailable">
+        <div class="sm-off">غير متوفر</div>
+        <div class="sm-img"></div>
+        <div class="sm-info"><div class="sm-name">غير متوفر</div></div>
+      </article>
     </div>
   </section>`;
 
+window.eval(unavailableCode);
 window.eval(shellCode);
 document.dispatchEvent(new window.Event('DOMContentLoaded', { bubbles: true }));
 await new Promise(resolve => setTimeout(resolve, 30));
@@ -103,6 +110,15 @@ if (topCartCount?.hidden || bottomCartCount?.hidden) {
 }
 if (topCartCount?.textContent !== '3' || bottomCartCount?.textContent !== '3') {
   fail('Header and bottom cart counts are not synchronized.');
+}
+
+const unavailableCard = document.querySelector('[data-product-card="ghost-unavailable"]');
+if (!unavailableCard?.classList.contains('sm-unavailable-card')) {
+  fail('Unavailable V3 card did not sync through the event-driven API.');
+}
+const unavailableStyle = document.getElementById('smUnavailableCardStyles')?.textContent || '';
+if (!unavailableStyle.includes('backdrop-filter:none')) {
+  fail('Unavailable V3 card still injects backdrop blur.');
 }
 
 const announcement = document.getElementById('pbV3Announcement');
