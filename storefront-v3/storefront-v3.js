@@ -636,6 +636,8 @@
 
   function activeDialogSurface() {
     const selectors = [
+      'dialog.pb-checkout-review[open]',
+      '#smImageViewer.open',
       '#pbV3ProductSheet.open:not([hidden])',
       '#pbCommerceSheet.open',
       '#smChoiceSheet.open',
