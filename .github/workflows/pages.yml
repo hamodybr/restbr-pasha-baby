@@ -36,6 +36,9 @@ jobs:
       - name: Storefront V3 DOM regression
         run: node scripts/storefront-v3-dom-regression.mjs
 
+      - name: Storefront V3 cart quantity regression
+        run: node scripts/storefront-v3-cart-quantity-regression.mjs
+
       - name: Storefront V3 shell regression
         run: node scripts/storefront-v3-shell-regression.mjs
 
