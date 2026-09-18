@@ -8,6 +8,7 @@
   };
 
   let frame = 0;
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
 
   const currentLanguage = () => {
     const value = document.documentElement.lang || localStorage.getItem('RESTBR_LANG_V1') || 'ar';
@@ -83,7 +84,9 @@
 
   const start = () => {
     const menu = document.getElementById('smMenu');
-    if (menu) new MutationObserver(scheduleSync).observe(menu, { childList: true, subtree: true });
+    if (menu && !IS_STOREFRONT_V3) {
+      new MutationObserver(scheduleSync).observe(menu, { childList: true, subtree: true });
+    }
     scheduleSync();
   };
 
@@ -92,4 +95,5 @@
   } else {
     start();
   }
+  window.PASHA_LIVE_BADGES_SYNC = scheduleSync;
 })();
