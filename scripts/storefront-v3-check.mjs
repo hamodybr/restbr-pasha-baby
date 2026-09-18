@@ -227,7 +227,12 @@ for (const token of [
   'Desktop',
   'assertNoHorizontalOverflow',
   'smCheckoutSheet.open',
-  'pbV3ProductSheet.open'
+  'pbV3ProductSheet.open',
+  'Product details interaction is too slow',
+  'Cart interaction is too slow',
+  'Checkout interaction is too slow',
+  '__V3_LONG_TASKS__',
+  'domNodes <= 5000'
 ]) {
   if (!browserQaJs.includes(token)) {
     fail('V3 real-browser QA is incomplete: ' + token);
