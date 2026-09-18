@@ -3,6 +3,7 @@ import fs from 'node:fs';
 const html = fs.readFileSync('storefront-v3/index.html', 'utf8');
 const css = fs.readFileSync('storefront-v3/storefront-v3.css', 'utf8');
 const js = fs.readFileSync('storefront-v3/storefront-v3.js', 'utf8');
+const detailsJs = fs.readFileSync('storefront-v3/product-details-v3.js', 'utf8');
 
 const fail = message => {
   console.error('Storefront V3 check failed:', message);
@@ -17,7 +18,7 @@ const requiredHtml = [
   'id="smMenu"',
   'id="pbV3BottomCart"',
   'storefront-v3/storefront-v3.css?v=1.1',
-  'storefront-v3/storefront-v3.js?v=1.1'
+  'storefront-v3/storefront-v3.js?v=1.2'
 ];
 
 for (const token of requiredHtml) {
@@ -33,7 +34,10 @@ const forbiddenLegacy = [
   'css/pasha-baby-brand-background.css',
   'css/pasha-baby-footer-v2.css',
   'css/pasha-baby-final-tweaks.css',
-  'js/pasha-baby-storefront-bundle.js'
+  'js/pasha-baby-storefront-bundle.js',
+  'js/pasha-baby-product-description-v2.js',
+  'js/pasha-baby-details-button-v3.js',
+  'js/pasha-product-gallery-thermal-v1.js'
 ];
 
 for (const token of forbiddenLegacy) {
@@ -54,15 +58,19 @@ if (!css.includes('--v3-sage') || !css.includes('--v3-beige')) {
 
 for (const token of [
   'id="pbV3Highlights"',
-  'js/pasha-baby-product-description-v2.js?v=3.1',
-  'js/pasha-product-gallery-thermal-v1.js?v=1.3'
+  'storefront-v3/product-details-v3.js?v=1.0'
 ]) {
   if (!html.includes(token)) fail('V3 phase 2 feature missing: ' + token);
 }
 
-if (!css.includes('.pb-v3-page .pb-product-sheet-panel') ||
+if (!css.includes('.pb-v3-product-panel') ||
     !css.includes('.pb-v3-page .sm-checkout-sheet')) {
   fail('V3 details/checkout visual layer is missing.');
+}
+
+if (!css.includes('@media(max-width:680px)') ||
+    !css.includes('backdrop-filter:none!important')) {
+  fail('V3 mobile Safari compositing guard is missing.');
 }
 
 if (!js.includes('function renderHighlights()') ||
@@ -72,6 +80,16 @@ if (!js.includes('function renderHighlights()') ||
 
 if (/MutationObserver|setInterval\s*\(/.test(js)) {
   fail('V3 shell must avoid persistent observers and polling.');
+}
+
+if (/MutationObserver|setInterval\s*\(/.test(detailsJs)) {
+  fail('V3 product details must remain observer-free and polling-free.');
+}
+
+if (!detailsJs.includes('window.PASHA_V3_OPEN_PRODUCT_DETAILS') ||
+    !detailsJs.includes('pointerdown') ||
+    !detailsJs.includes('data-v3-color-id')) {
+  fail('V3 lightweight gallery/choice API is incomplete.');
 }
 
 if (!js.includes("window.addEventListener('restbr:ready'")) {
