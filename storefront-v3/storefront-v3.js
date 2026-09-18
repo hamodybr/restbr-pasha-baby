@@ -631,12 +631,38 @@
     });
   }
 
+  function syncCardActionRows() {
+    document.querySelectorAll('#smMenu [data-product-card]').forEach(card => {
+      const info = card.querySelector('.sm-info');
+      const action = info?.querySelector('.sm-direct-add,.sm-choose-options');
+      const details = info?.querySelector('.pb-v3-details-btn');
+      if (!info || !action || !details) return;
+
+      let row = action.closest('.pb-product-action-row');
+      if (!row) {
+        row = document.createElement('div');
+        row.className = 'pb-product-action-row';
+        action.insertAdjacentElement('beforebegin', row);
+        row.appendChild(action);
+      }
+
+      if (details.parentElement !== row) row.appendChild(details);
+    });
+  }
+
   function syncCardDecorations() {
     window.PASHA_RETAIL_DECORATE_CARDS?.();
     window.PASHA_FIXED_DISCOUNTS_DECORATE?.();
     window.PASHA_LIVE_BADGES_SYNC?.();
     window.PASHA_V3_ENHANCE_PRODUCT_CARDS?.();
     syncCardSummaries();
+    syncCardActionRows();
+
+    requestAnimationFrame(() => {
+      window.PASHA_V3_ENHANCE_PRODUCT_CARDS?.();
+      syncCardSummaries();
+      syncCardActionRows();
+    });
   }
 
   function stripLegacyPresentationRuntime() {
