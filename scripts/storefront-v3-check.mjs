@@ -174,6 +174,8 @@ for (const token of [
 }
 
 for (const token of [
+  '(pointer:coarse)',
+  'navigator.maxTouchPoints',
   'function openSearchOverlay()',
   'function closeSearchOverlay(',
   'function syncBottomNavScroll()',
