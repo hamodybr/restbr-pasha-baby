@@ -2554,3 +2554,28 @@ html.pb-v3-search-open{overflow:hidden!important}
   font:1000 10px/1 system-ui;
   box-shadow:0 8px 18px rgba(48,74,59,.16);
 }
+
+
+.pb-v3-bottom-cart-icon{
+  position:relative;
+  display:inline-grid;
+  place-items:center;
+}
+#pbV3BottomCartCount{
+  position:absolute;
+  top:-8px;
+  inset-inline-start:-11px;
+  min-width:17px;
+  height:17px;
+  padding:0 4px;
+  display:grid;
+  place-items:center;
+  border:2px solid #fffdf9;
+  border-radius:999px;
+  background:var(--v3-sage-dark);
+  color:#fff;
+  font:900 8px/1 system-ui;
+  font-style:normal;
+  box-sizing:border-box;
+}
+#pbV3BottomCartCount[hidden]{display:none!important}
