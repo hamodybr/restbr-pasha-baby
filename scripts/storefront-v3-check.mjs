@@ -329,6 +329,9 @@ if (!js.includes("button.setAttribute('aria-current', 'page')")) {
 }
 
 for (const token of [
+  'body.pb-v3-page:has(#smCartDrawer.open) .pb-v3-bottom-nav',
+  'body.pb-v3-page:has(#smCheckoutSheet.open) .pb-v3-bottom-nav',
+  'body.pb-v3-page:has(#pbV3ProductSheet.open) .pb-v3-bottom-nav',
   'function syncFooterVisibility()',
   "href === '#'",
   '@media(max-width:380px)',
