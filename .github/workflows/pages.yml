@@ -21,6 +21,9 @@ jobs:
       - name: Build storefront bundles
         run: node scripts/build-storefront-bundles.mjs
 
+      - name: Storefront V3 isolated prototype check
+        run: node scripts/storefront-v3-check.mjs
+
       - name: Pre-deploy audit
         run: node scripts/predeploy-check.mjs
 
