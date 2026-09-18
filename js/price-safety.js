@@ -212,6 +212,8 @@
     });
   }
 
+  window.RESTBR_PRICE_SAFETY_PATCH = () => patchAll();
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded',start,{once:true});
   } else {
