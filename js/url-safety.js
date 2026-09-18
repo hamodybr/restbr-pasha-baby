@@ -4,6 +4,8 @@
   if (window.__RESTBR_URL_SAFETY_V1__) return;
   window.__RESTBR_URL_SAFETY_V1__ = true;
 
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
+
   const ALLOWED_SCHEMES = new Set([
     'http:',
     'https:',
@@ -263,13 +265,17 @@
 
   const start = () => {
     scan(document);
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['href', 'src']
-    });
+    if (!IS_STOREFRONT_V3) {
+      observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['href', 'src']
+      });
+    }
   };
+
+  window.RESTBR_URL_SAFETY_SCAN = () => scan(document);
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start, { once: true });

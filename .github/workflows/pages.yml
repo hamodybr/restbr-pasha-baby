@@ -2,6 +2,7 @@ name: Validate and Deploy Pasha Baby Pages
 
 on:
   push:
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -21,6 +22,9 @@ jobs:
       - name: Build storefront bundles
         run: node scripts/build-storefront-bundles.mjs
 
+      - name: Storefront V3 isolated prototype check
+        run: node scripts/storefront-v3-check.mjs
+
       - name: Pre-deploy audit
         run: node scripts/predeploy-check.mjs
 
@@ -28,6 +32,23 @@ jobs:
         run: |
           npm install --no-save --package-lock=false jsdom@26.1.0
           node scripts/mobile-idle-regression.mjs
+
+      - name: Storefront V3 DOM regression
+        run: node scripts/storefront-v3-dom-regression.mjs
+
+      - name: Storefront V3 cart quantity regression
+        run: node scripts/storefront-v3-cart-quantity-regression.mjs
+
+      - name: Storefront V3 color quantity cart regression
+        run: node scripts/storefront-v3-color-quantity-cart-regression.mjs
+
+      - name: Storefront V3 shell regression
+        run: node scripts/storefront-v3-shell-regression.mjs
+
+      - name: Storefront V3 real-browser viewport QA
+        run: |
+          npm install --no-save --package-lock=false playwright-core@1.55.0
+          node scripts/storefront-v3-browser-qa.mjs
 
       - name: Mobile image upload and thermal regression
         run: node scripts/mobile-image-thermal-regression.mjs

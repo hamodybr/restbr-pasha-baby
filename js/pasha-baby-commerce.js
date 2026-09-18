@@ -4,6 +4,7 @@
 
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
   let commerceReady = false;
   let currentProduct = null;
   let selectedOptionIndex = null;
@@ -620,6 +621,7 @@
   });
 
   function startObserver() {
+    if (IS_STOREFRONT_V3) return;
     if (observer) return;
     const menu = document.getElementById('smMenu');
     if (!menu) return;
@@ -657,4 +659,5 @@
       }, 60);
     }
   });
+  window.PASHA_RETAIL_DECORATE_CARDS = () => requestAnimationFrame(decorateCards);
 })();
