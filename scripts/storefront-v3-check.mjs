@@ -87,7 +87,9 @@ for (const token of [
   'function syncStorefrontCopy()',
   'pb-v3-cat-media',
   'function syncCardSummaries()',
-  'pb-v3-card-summary'
+  'pb-v3-card-summary',
+  'function syncCardActionRows()',
+  'pb-product-action-row>.pb-v3-details-btn'
 ]) {
   if (!js.includes(token) && !css.includes(token)) {
     fail('V3 storefront polish missing: ' + token);
