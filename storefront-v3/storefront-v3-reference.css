@@ -3,6 +3,14 @@
    Palette, spacing and component proportions are based on the
    approved cream / deep-green / warm-gold mobile references.
    ========================================================= */
+@font-face{
+  font-family:"Pasha Arabic";
+  src:url("../assets/pasha-arabic.woff") format("woff");
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+}
+
 :root{
   --pb36-green:#086b5c;
   --pb36-green-dark:#075548;
@@ -21,13 +29,13 @@
 html{background:var(--pb36-cream)!important}
 body.pb-v3-page{
   color:var(--pb36-ink)!important;
-  font-family:Arial,Tahoma,"Noto Sans Arabic",sans-serif!important;
+  font-family:"Pasha Arabic",Arial,Tahoma,"Noto Sans Arabic",sans-serif!important;
   background:
     radial-gradient(circle at 8% 8%,rgba(239,211,187,.18),transparent 25%),
     radial-gradient(circle at 92% 28%,rgba(182,220,207,.16),transparent 28%),
     var(--pb36-cream)!important;
 }
-body.pb-v3-page button,body.pb-v3-page input,body.pb-v3-page textarea,body.pb-v3-page select{font-family:Arial,Tahoma,"Noto Sans Arabic",sans-serif!important}
+body.pb-v3-page button,body.pb-v3-page input,body.pb-v3-page textarea,body.pb-v3-page select{font-family:"Pasha Arabic",Arial,Tahoma,"Noto Sans Arabic",sans-serif!important}
 .pb-v3-app{max-width:1180px!important;padding-inline:18px!important}
 
 /* Header */
@@ -270,7 +278,7 @@ body.pb-v3-page button,body.pb-v3-page input,body.pb-v3-page textarea,body.pb-v3
   .pb-v3-topbar{height:74px!important;grid-template-columns:112px 1fr 48px!important;background:#fffaf6!important;border-bottom:0!important}
   #pbV3MenuBtn{grid-column:3!important}
   .pb-v3-top-actions{grid-column:1!important;display:flex!important;direction:ltr!important}
-  .pb-v3-brand{grid-column:2!important}.pb-v3-brand img{width:43px!important;height:43px!important}.pb-v3-brand b{font-size:14px!important}.pb-v3-brand small{display:block!important;font-size:6px!important;letter-spacing:2px!important}
+  .pb-v3-brand{grid-column:2!important}.pb-v3-brand img{width:76px!important;height:58px!important;object-fit:contain!important}.pb-v3-brand span{display:none!important}
   .pb-v3-icon-btn{width:36px!important;height:40px!important;padding:6px!important}.pb-v3-icon-btn svg{width:24px!important;height:24px!important;stroke-width:1.7!important}
   .pb-v3-search-host-top{margin:3px 0 7px!important}.pb-v3-page #smSearchInput{height:46px!important;min-height:46px!important;border-radius:14px!important;background:#fff!important;border:1px solid #d5dbd8!important;box-shadow:0 2px 7px rgba(25,56,50,.08)!important;font-size:13px!important}.pb-v3-page #smSearchClear{display:none!important}
   .pb-v3-announcement{display:none!important}
