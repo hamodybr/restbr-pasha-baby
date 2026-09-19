@@ -2,6 +2,8 @@ import fs from 'node:fs';
 
 const html = fs.readFileSync('storefront-v3/index.html', 'utf8');
 const css = fs.readFileSync('storefront-v3/storefront-v3.css', 'utf8');
+const referenceCss = fs.readFileSync('storefront-v3/storefront-v3-reference.css', 'utf8');
+const allCss = css + '\n' + referenceCss;
 
 const V3_CSS_MAX_BYTES = 100000;
 const V3_CSS_MAX_LINES = 4000;
@@ -10,6 +12,9 @@ if (Buffer.byteLength(css, 'utf8') > V3_CSS_MAX_BYTES) {
 }
 if (css.split('\n').length > V3_CSS_MAX_LINES) {
   fail('V3 CSS exceeded the 4,000-line maintenance budget.');
+}
+if (Buffer.byteLength(referenceCss, 'utf8') > 50000) {
+  fail('V3 reference theme exceeded the 50 KB maintenance budget.');
 }
 const js = fs.readFileSync('storefront-v3/storefront-v3.js', 'utf8');
 const detailsJs = fs.readFileSync('storefront-v3/product-details-v3.js', 'utf8');
@@ -41,8 +46,9 @@ const requiredHtml = [
   'id="smCats"',
   'id="smMenu"',
   'id="pbV3BottomCart"',
-  'storefront-v3/storefront-v3.css?v=1.5',
-  'storefront-v3/storefront-v3.js?v=1.5'
+  'storefront-v3/storefront-v3.css?v=1.6',
+  'storefront-v3/storefront-v3-reference.css?v=1.0',
+  'storefront-v3/storefront-v3.js?v=1.6'
 ];
 
 for (const token of requiredHtml) {
@@ -86,33 +92,33 @@ if (!html.includes('name="robots" content="noindex,nofollow"')) {
   fail('Experimental V3 page must stay noindex until approval.');
 }
 
-if (!css.includes('grid-template-columns:repeat(2,minmax(0,1fr))')) {
+if (!allCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))')) {
   fail('V3 mobile product grid must keep two columns.');
 }
 
-if (!css.includes('--v3-sage') || !css.includes('--v3-beige')) {
+if (!allCss.includes('--v3-sage') || !allCss.includes('--v3-beige')) {
   fail('V3 design tokens are missing.');
 }
 
 for (const token of [
   'id="pbV3Highlights"',
-  'storefront-v3/product-details-v3.js?v=1.2'
+  'storefront-v3/product-details-v3.js?v=1.3'
 ]) {
   if (!html.includes(token)) fail('V3 phase 2 feature missing: ' + token);
 }
 
-if (!css.includes('.pb-v3-product-panel') ||
-    !css.includes('.pb-v3-page .sm-checkout-sheet')) {
+if (!allCss.includes('.pb-v3-product-panel') ||
+    !allCss.includes('.pb-v3-page .sm-checkout-sheet')) {
   fail('V3 details/checkout visual layer is missing.');
 }
 
-if (!css.includes('@media(max-width:680px)') ||
-    !css.includes('backdrop-filter:none!important')) {
+if (!allCss.includes('@media(max-width:680px)') ||
+    !allCss.includes('backdrop-filter:none!important')) {
   fail('V3 mobile Safari compositing guard is missing.');
 }
 
-if (css.includes('V3 product details sheet — same proven logic, new shell') ||
-    css.includes('.pb-product-sheet')) {
+if (allCss.includes('V3 product details sheet — same proven logic, new shell') ||
+    allCss.includes('.pb-product-sheet')) {
   fail('Obsolete legacy product-details CSS returned to V3.');
 }
 
@@ -123,7 +129,7 @@ for (const token of [
   'animation:none!important',
   'backdrop-filter:none!important'
 ]) {
-  if (!css.includes(token)) fail('V3 static card metadata/thermal rule missing: ' + token);
+  if (!allCss.includes(token)) fail('V3 static card metadata/thermal rule missing: ' + token);
 }
 
 if (!js.includes('function renderHighlights()') ||
@@ -139,7 +145,7 @@ for (const token of [
   'function syncCardActionRows()',
   'pb-product-action-row>.pb-v3-details-btn'
 ]) {
-  if (!js.includes(token) && !css.includes(token)) {
+  if (!js.includes(token) && !allCss.includes(token)) {
     fail('V3 storefront polish missing: ' + token);
   }
 }
@@ -183,7 +189,7 @@ for (const token of [
   'pb-v3-store-info',
   '.pb-v3-page .pb-reviews-premium'
 ]) {
-  if (!js.includes(token) && !css.includes(token)) {
+  if (!js.includes(token) && !allCss.includes(token)) {
     fail('V3 navigation/search/reviews integration missing: ' + token);
   }
 }
