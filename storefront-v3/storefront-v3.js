@@ -808,6 +808,10 @@
 
     $('#pbV3CartBtn')?.addEventListener('click', openCart);
     $('#pbV3BottomCart')?.addEventListener('click', openCart);
+    $('#pbV3BottomMenu')?.addEventListener('click', () => {
+      setBottomNavActive('menu');
+      setDrawer(true);
+    });
 
     $('#pbV3ShopNow')?.addEventListener('click', () => scrollToTarget('#smCatsSentinel'));
     $('#pbV3SeeProducts')?.addEventListener('click', () => scrollToTarget('#smMenu'));
