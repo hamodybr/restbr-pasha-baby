@@ -51,6 +51,7 @@
 
       <div class="pb-v3-top-actions">
         <button id="pbV3SearchBtn" class="pb-v3-icon-btn" type="button" aria-label="البحث"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+        <button id="pbV3FavoriteBtn" class="pb-v3-icon-btn" type="button" aria-label="المفضلة" aria-pressed="false"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z"/></svg></button>
         <button id="pbV3CartBtn" class="pb-v3-icon-btn pb-v3-cart-shortcut" type="button" aria-label="السلة">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L20 8H6"/><circle cx="9.5" cy="19" r="1.2"/><circle cx="17" cy="19" r="1.2"/></svg>
           <span id="pbV3CartCount" hidden>0</span>
@@ -64,6 +65,65 @@
     </div>
 
     <div id="pbV3SearchHost" class="pb-v3-search-host pb-v3-search-host-top" role="search" aria-label="البحث في المنتجات"></div>
+
+    <div class="pb-ref-home" aria-label="واجهة پاشا بيبي التجريبية">
+      <section class="pb-ref-order-card" aria-label="متابعة الطلب">
+        <div class="pb-ref-order-summary">
+          <span class="pb-ref-box" aria-hidden="true">📦</span>
+          <div><b>#PB-260911-59056</b><small>تجهيز طلبك الآن وسيتم شحنه قريبًا</small></div>
+          <span class="pb-ref-status">قيد التجهيز ⚙</span>
+          <button type="button" data-v3-target="#pbV3StoreInfo">متابعة الطلب ←</button>
+        </div>
+        <div class="pb-ref-order-steps">
+          <span class="done"><i>✓</i><b>تم الاستلام</b></span>
+          <span class="current"><i>⚙</i><b>قيد التجهيز</b></span>
+          <span><i>▣</i><b>تم الشحن</b></span>
+          <span><i>⌂</i><b>تم التسليم</b></span>
+        </div>
+      </section>
+
+      <section class="pb-ref-category-row" aria-label="الأقسام التجريبية">
+        <button type="button" data-v3-target="#pbRefProducts"><span class="pb-ref-cat-photo seat"><img src="assets/v3-demo-kidilo-seat.webp" alt=""></span><b>KIDILO</b></button>
+        <button type="button" data-v3-target="#pbRefProducts"><span>🚼</span><b>عربات</b></button>
+        <button type="button" data-v3-target="#pbRefPopular"><span>🛏️</span><b>مستلزمات النوم</b></button>
+        <button type="button" data-v3-target="#pbRefPopular"><span>🍼</span><b>رضاعة</b></button>
+        <button type="button" data-v3-target="#pbRefPopular"><span>👕</span><b>ملابس</b></button>
+        <button type="button" data-v3-target="#pbRefPopular"><span>🧦</span><b>جوارب</b></button>
+        <button type="button" data-v3-target="#pbRefPopular"><span>🧸</span><b>ألعاب</b></button>
+      </section>
+
+      <button class="pb-ref-delivery" type="button" data-v3-target="#pbV3StoreInfo"><span>🚚</span><b>التوصيل 5,000 د.ع لجميع محافظات العراق 🇮🇶</b><em>اعرف أكثر ←</em></button>
+
+      <section id="pbRefProducts" class="pb-ref-products">
+        <header><div><h2>منتجات KIDILO</h2></div><button type="button" data-v3-target="#smMenu">عرض الكل ←</button></header>
+        <div class="pb-ref-grid">
+          <article class="pb-ref-card">
+            <div class="pb-ref-card-media"><img src="assets/v3-demo-kidilo-seat.webp" alt="كرسي سيارة للأطفال"><button type="button" aria-label="إضافة للمفضلة">♡</button><span>⭐ الأكثر طلبًا</span></div>
+            <div class="pb-ref-card-body"><h3>كرسي سيارة</h3><p>كرسي سيارة للأطفال بمواصفات أمان عالية</p><strong>130,000 د.ع</strong><div class="pb-ref-colors"><i class="sand"></i><i class="black"></i><i class="gray"></i><i class="light"></i></div><footer><button type="button" data-ref-demo-details="0">تفاصيل</button><button type="button" data-ref-demo-details="0">🛒 أضف للسلة</button></footer></div>
+          </article>
+          <article class="pb-ref-card">
+            <div class="pb-ref-card-media"><img src="assets/v3-demo-car-set.webp" alt="مجموعة كراسي سيارة"><button type="button" aria-label="إضافة للمفضلة">♡</button><span class="new">جديد ✨</span></div>
+            <div class="pb-ref-card-body"><h3>Car set</h3><p>كرسي سيارة للرضع بتصميم عصري ومريح</p><del>80,000 د.ع</del><strong>75,000 د.ع</strong><div class="pb-ref-colors"><i class="gray"></i><i class="sand"></i><i class="black"></i><i class="teal"></i></div><footer><button type="button" data-ref-demo-details="1">تفاصيل</button><button type="button" data-ref-demo-details="1">🛒 أضف للسلة</button></footer></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="pb-ref-offer">
+        <img src="assets/v3-demo-offer-banner.webp" alt="حقيبة ومستلزمات أطفال">
+        <div><h2>🎁 عروض مميزة</h2><p>على مستلزمات طفلك</p><button type="button" data-v3-target="#pbRefPopular">تسوّق العروض ←</button></div>
+        <strong><small>خصومات تصل</small>30%</strong>
+      </section>
+
+      <section id="pbRefPopular" class="pb-ref-popular">
+        <header><div><h2>🔥 الأكثر مبيعًا</h2><p>منتجات يفضلها عملاؤنا</p></div><button type="button" data-v3-target="#smMenu">عرض الكل ←</button></header>
+        <div class="pb-ref-mini-rail">
+          <button type="button" data-ref-demo-details="0"><img src="assets/v3-demo-kidilo-seat.webp" alt=""><b>كرسي أطفال</b><small>95,000 د.ع</small></button>
+          <button type="button" data-ref-demo-details="1"><img src="assets/v3-demo-car-set.webp" alt=""><b>كراسي أطفال</b><small>75,000 د.ع</small></button>
+          <button type="button" data-v3-target="#smMenu"><span>🍼</span><b>رضاعات</b><small>18,000 د.ع</small></button>
+          <button type="button" data-v3-target="#smMenu"><span>👕</span><b>ملابس</b><small>12,000 د.ع</small></button>
+        </div>
+      </section>
+    </div>
 
     <div id="pbV3SearchOverlay" class="pb-v3-search-overlay" hidden>
       <div class="pb-v3-search-overlay-card" role="dialog" aria-modal="true" aria-label="البحث في المنتجات">
@@ -280,7 +340,7 @@
     <button type="button" data-v3-target="#smCatsSentinel" data-v3-nav="categories"><span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><b>الأقسام</b></button>
     <button id="pbV3BottomSearch" type="button" data-v3-nav="search"><span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><b>بحث</b></button>
     <button id="pbV3BottomCart" type="button" data-v3-nav="cart"><span class="pb-v3-bottom-cart-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L20 8H6"/><circle cx="9.5" cy="19" r="1.2"/><circle cx="17" cy="19" r="1.2"/></svg><i id="pbV3BottomCartCount" hidden>0</i></span><b>السلة</b></button>
-    <button id="pbV3BottomMenu" type="button" data-v3-nav="menu"><span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span><b>القائمة</b></button>
+    <button id="pbV3BottomMenu" type="button" data-v3-nav="menu"><span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg></span><b>حسابي</b></button>
   </nav>
 
   <button id="smTopBtn" class="sm-top-btn" type="button" aria-label="الرجوع إلى الأعلى">↑</button>

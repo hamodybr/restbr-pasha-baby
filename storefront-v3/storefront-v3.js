@@ -812,6 +812,21 @@
       setBottomNavActive('menu');
       setDrawer(true);
     });
+    $('#pbV3FavoriteBtn')?.addEventListener('click', event => {
+      const button = event.currentTarget;
+      const pressed = button.getAttribute('aria-pressed') !== 'true';
+      button.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+      button.classList.toggle('active', pressed);
+    });
+
+    all('[data-ref-demo-details]').forEach(button => {
+      button.addEventListener('click', () => {
+        const products = (window.RESTBR_DB?.products || []).filter(product => product?.badges?.unavailable !== true);
+        const product = products[Number(button.dataset.refDemoDetails || 0)] || products[0];
+        if (product) showFeatureProduct(product.id);
+        else scrollToTarget('#smMenu');
+      });
+    });
 
     $('#pbV3ShopNow')?.addEventListener('click', () => scrollToTarget('#smCatsSentinel'));
     $('#pbV3SeeProducts')?.addEventListener('click', () => scrollToTarget('#smMenu'));
