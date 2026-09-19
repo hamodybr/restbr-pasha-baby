@@ -30,7 +30,7 @@
   <main id="smApp" class="sm-app pb-v3-app">
     <header id="pbV3Topbar" class="pb-v3-topbar">
       <button id="pbV3MenuBtn" class="pb-v3-icon-btn" type="button" aria-label="فتح القائمة" aria-controls="pbV3Drawer" aria-expanded="false">
-        <span aria-hidden="true">☰</span>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
 
       <a class="pb-v3-brand" href="#pbV3Hero" aria-label="پاشا بيبي — الرئيسية">
@@ -50,9 +50,9 @@
       </nav>
 
       <div class="pb-v3-top-actions">
-        <button id="pbV3SearchBtn" class="pb-v3-icon-btn" type="button" aria-label="البحث">⌕</button>
+        <button id="pbV3SearchBtn" class="pb-v3-icon-btn" type="button" aria-label="البحث"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
         <button id="pbV3CartBtn" class="pb-v3-icon-btn pb-v3-cart-shortcut" type="button" aria-label="السلة">
-          🛒
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L20 8H6"/><circle cx="9.5" cy="19" r="1.2"/><circle cx="17" cy="19" r="1.2"/></svg>
           <span id="pbV3CartCount" hidden>0</span>
         </button>
       </div>
@@ -276,11 +276,11 @@
   </a>
 
   <nav class="pb-v3-bottom-nav" aria-label="التنقل السفلي">
-    <button type="button" data-v3-target="#pbV3Hero" data-v3-nav="home" class="active"><span>⌂</span><b>الرئيسية</b></button>
-    <button type="button" data-v3-target="#smCatsSentinel" data-v3-nav="categories"><span>◉</span><b>الأقسام</b></button>
-    <button id="pbV3BottomSearch" type="button" data-v3-nav="search"><span>⌕</span><b>بحث</b></button>
-    <button id="pbV3BottomCart" type="button" data-v3-nav="cart"><span class="pb-v3-bottom-cart-icon">🛒<i id="pbV3BottomCartCount" hidden>0</i></span><b>السلة</b></button>
-    <button id="pbV3BottomMenu" type="button" data-v3-nav="menu"><span>☰</span><b>القائمة</b></button>
+    <button type="button" data-v3-target="#pbV3Hero" data-v3-nav="home" class="active"><span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></span><b>الرئيسية</b></button>
+    <button type="button" data-v3-target="#smCatsSentinel" data-v3-nav="categories"><span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><b>الأقسام</b></button>
+    <button id="pbV3BottomSearch" type="button" data-v3-nav="search"><span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><b>بحث</b></button>
+    <button id="pbV3BottomCart" type="button" data-v3-nav="cart"><span class="pb-v3-bottom-cart-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L20 8H6"/><circle cx="9.5" cy="19" r="1.2"/><circle cx="17" cy="19" r="1.2"/></svg><i id="pbV3BottomCartCount" hidden>0</i></span><b>السلة</b></button>
+    <button id="pbV3BottomMenu" type="button" data-v3-nav="menu"><span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span><b>القائمة</b></button>
   </nav>
 
   <button id="smTopBtn" class="sm-top-btn" type="button" aria-label="الرجوع إلى الأعلى">↑</button>
