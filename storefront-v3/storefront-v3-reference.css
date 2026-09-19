@@ -275,7 +275,7 @@ body.pb-v3-page button,body.pb-v3-page input,body.pb-v3-page textarea,body.pb-v3
 @media (max-width:680px){
   body.pb-v3-page{background:#fffaf6!important;color:#103b37!important}
   .pb-v3-app{padding-inline:14px!important}
-  .pb-v3-topbar{height:68px!important;min-height:68px!important;grid-template-columns:112px 1fr 48px!important;background:#fffaf6!important;border-bottom:0!important}
+  .pb-v3-topbar{height:68px!important;min-height:68px!important;grid-template-columns:112px minmax(0,1fr) 112px!important;background:#fffaf6!important;border-bottom:0!important}
   #pbV3MenuBtn{grid-column:3!important}
   .pb-v3-top-actions{grid-column:1!important;display:flex!important;direction:ltr!important}
   .pb-v3-brand{grid-column:2!important}.pb-v3-brand img{width:76px!important;height:58px!important;object-fit:contain!important;transform:scale(1.4)}.pb-v3-brand span{display:none!important}
