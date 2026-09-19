@@ -52,9 +52,9 @@ body.pb-v3-page button,body.pb-v3-page input,body.pb-v3-page textarea,body.pb-v3
   width:42px!important;height:42px!important;border:0!important;border-radius:50%!important;
   color:var(--pb36-green-dark)!important;background:transparent!important;font-size:24px!important;
 }
-#pbV3MenuBtn{grid-column:1!important;grid-row:1!important;justify-self:start!important}
+#pbV3MenuBtn{grid-column:3!important;grid-row:1!important;justify-self:end!important}
 .pb-v3-brand{grid-column:2!important;grid-row:1!important}
-.pb-v3-top-actions{grid-column:3!important;grid-row:1!important;justify-self:end!important;gap:0!important}
+.pb-v3-top-actions{grid-column:1!important;grid-row:1!important;justify-self:start!important;gap:0!important}
 .pb-v3-icon-btn svg,.pb-v3-bottom-nav svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .pb-v3-bottom-nav svg{width:22px;height:22px}
 .pb-v3-cart-shortcut{position:relative!important}
