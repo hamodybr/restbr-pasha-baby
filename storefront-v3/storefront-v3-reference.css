@@ -21,11 +21,13 @@
 html{background:var(--pb36-cream)!important}
 body.pb-v3-page{
   color:var(--pb36-ink)!important;
+  font-family:Arial,Tahoma,"Noto Sans Arabic",sans-serif!important;
   background:
     radial-gradient(circle at 8% 8%,rgba(239,211,187,.18),transparent 25%),
     radial-gradient(circle at 92% 28%,rgba(182,220,207,.16),transparent 28%),
     var(--pb36-cream)!important;
 }
+body.pb-v3-page button,body.pb-v3-page input,body.pb-v3-page textarea,body.pb-v3-page select{font-family:Arial,Tahoma,"Noto Sans Arabic",sans-serif!important}
 .pb-v3-app{max-width:1180px!important;padding-inline:18px!important}
 
 /* Header */
@@ -50,8 +52,11 @@ body.pb-v3-page{
   width:42px!important;height:42px!important;border:0!important;border-radius:50%!important;
   color:var(--pb36-green-dark)!important;background:transparent!important;font-size:24px!important;
 }
-.pb-v3-menu-btn{justify-self:start!important}
-.pb-v3-top-actions{justify-self:end!important;gap:0!important}
+#pbV3MenuBtn{grid-column:1!important;grid-row:1!important;justify-self:start!important}
+.pb-v3-brand{grid-column:2!important;grid-row:1!important}
+.pb-v3-top-actions{grid-column:3!important;grid-row:1!important;justify-self:end!important;gap:0!important}
+.pb-v3-icon-btn svg,.pb-v3-bottom-nav svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pb-v3-bottom-nav svg{width:22px;height:22px}
 .pb-v3-cart-shortcut{position:relative!important}
 #pbV3CartCount,.pb-v3-bottom-cart-icon i{
   top:-1px!important;right:-1px!important;min-width:18px!important;height:18px!important;padding:0 4px!important;
