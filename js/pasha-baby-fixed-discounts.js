@@ -4,6 +4,7 @@
 
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
   let cachedDiscounts = [];
   let loadPromise = null;
   let boundaryTimer = null;
@@ -260,6 +261,7 @@
   }
 
   function observeMenu() {
+    if (IS_STOREFRONT_V3) return;
     const menu = document.getElementById('smMenu');
     if (!menu || menu.dataset.pbFixedDiscountObserver === '1') return;
     menu.dataset.pbFixedDiscountObserver = '1';
@@ -268,7 +270,7 @@
 
   function start() {
     observeMenu();
-    subscribe();
+    if (!IS_STOREFRONT_V3) subscribe();
     void reload({ render: true });
   }
 
@@ -283,4 +285,5 @@
 
   window.addEventListener('restbr:ready', start, { once: true });
   if (window.RESTBR_DB?.products) start();
+  window.PASHA_FIXED_DISCOUNTS_DECORATE = scheduleDecoration;
 })();

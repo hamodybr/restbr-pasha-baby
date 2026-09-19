@@ -10,6 +10,7 @@
     'input[data-pb-numeric]'
   ].join(',');
   const IS_ADMIN = /(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname);
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
   const SKIP_TEXT_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA']);
   const UA = String(globalThis.navigator?.userAgent || '');
   const PLATFORM = String(globalThis.navigator?.platform || '');
@@ -251,7 +252,9 @@
   const boot = () => {
     enhance(document);
     if (IS_ADMIN) normalizeTextTree(document.body);
-    observer.observe(document.body, { childList: true, subtree: true, characterData: IS_ADMIN });
+    if (!IS_STOREFRONT_V3) {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: IS_ADMIN });
+    }
   };
 
   window.RESTBR_TO_ENGLISH_DIGITS = toEnglishDigits;
