@@ -557,7 +557,7 @@
     syncPromoBanner(offerProducts);
 
     const offerDrawer = $('#pbV3DrawerOffers');
-    if (offerDrawer) offerDrawer.hidden = offerProducts.length === 0;
+    if (offerDrawer) offerDrawer.hidden = false;
 
     const offerDesktop = $('#pbV3DesktopOffers');
     if (offerDesktop) offerDesktop.hidden = offerProducts.length === 0;
@@ -833,6 +833,14 @@
     $('#pbV3CatalogRetry')?.addEventListener('click', () => window.location.reload());
 
     document.addEventListener('click', event => {
+      const drawerAction = event.target.closest('[data-v3-action="favorites"]');
+      if (drawerAction) {
+        setDrawer(false);
+        $('#pbV3FavoriteBtn')?.click();
+        window.setTimeout(() => scrollToTarget('#smMenu'), 120);
+        return;
+      }
+
       const nav = event.target.closest('[data-v3-target]');
       if (nav) {
         event.preventDefault();
@@ -1040,7 +1048,6 @@
       ['#smSnapchat', '#pbV3DrawerSnapchat']
     ];
 
-    let visibleCount = 0;
     pairs.forEach(([sourceSelector, targetSelector]) => {
       const source = $(sourceSelector);
       const target = $(targetSelector);
@@ -1048,16 +1055,17 @@
 
       const href = String(source?.getAttribute('href') || '').trim();
       const available = Boolean(source && !source.hidden && href && href !== '#' && !/^javascript:/i.test(href));
-      target.hidden = !available;
+      target.hidden = false;
       if (available) {
         target.href = href;
-        visibleCount += 1;
+        target.removeAttribute('aria-disabled');
       } else {
         target.removeAttribute('href');
+        target.setAttribute('aria-disabled', 'true');
       }
     });
 
-    section.hidden = visibleCount === 0;
+    section.hidden = false;
   }
 
   function syncRuntimeUI() {
