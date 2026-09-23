@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="css/live-card-badges.css?v=1.5">
   <link rel="stylesheet" href="css/pasha-reviews.css?v=5">
   <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.6">
-  <link rel="stylesheet" href="storefront-v3/storefront-v3-reference.css?v=1.0">
+  <link rel="stylesheet" href="storefront-v3/storefront-v3-reference.css?v=1.1">
 </head>
 <body class="pb-v3-page pb-v3-reviews-paused">
   <div id="smIntro" class="sm-intro pb-v3-intro" aria-hidden="true">
@@ -158,19 +158,24 @@
     <aside id="pbV3Drawer" class="pb-v3-drawer" role="dialog" aria-modal="true" aria-label="قائمة المتجر" aria-hidden="true">
       <div class="pb-v3-drawer-head">
         <div class="pb-v3-drawer-brand">
-          <img src="assets/pasha-baby-reference-logo.png" alt="" width="58" height="58">
-          <div><b>پاشا بيبي</b><small>كل احتياجات طفلك بمكان واحد</small></div>
+          <img src="assets/pasha-baby-reference-logo.png" alt="Pasha Baby Store" width="124" height="124">
+          <div><small><span aria-hidden="true">♥</span> كل احتياجات طفلك بمكان واحد</small></div>
         </div>
+        <span class="pb-v3-drawer-mood" aria-hidden="true">Happy<br>Little<br>Moments<span>♥</span></span>
         <button id="pbV3DrawerClose" type="button" aria-label="إغلاق القائمة">×</button>
       </div>
       <nav class="pb-v3-drawer-nav" aria-label="التنقل">
-        <button type="button" data-v3-target="#pbV3Hero">⌂ <span>الرئيسية</span></button>
-        <button type="button" data-v3-target="#smCatsSentinel">◉ <span>الأقسام</span></button>
-        <button type="button" data-v3-target="#smMenu">▦ <span>المنتجات</span></button>
-        <button id="pbV3DrawerOffers" type="button" data-v3-target="#pbV3OfferSection" hidden>٪ <span>العروض</span></button>
-        <button type="button" data-v3-target="#pbV3StoreInfo">🚚 <span>التوصيل والمعلومات</span></button>
-        <button type="button" data-v3-target="[data-pb-reviews-host],.pb-reviews,.sm-footer" hidden>★ <span>التقييمات</span></button>
-        <button type="button" data-v3-target=".sm-footer">● <span>التواصل والموقع</span></button>
+        <button class="active" type="button" data-v3-target="#pbV3Hero"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9H15v-6H9v6H3z"/></svg></span><span>الرئيسية</span><i>‹</i></button>
+        <button type="button" data-v3-target="#smCatsSentinel"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>الأقسام والمنتجات</span><i>‹</i></button>
+        <button type="button" data-v3-target=".pb-ref-order-card"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="M6 8h12l1 13H5zM9 8V6a3 3 0 0 1 6 0v2"/></svg></span><span>طلباتي</span><i>‹</i></button>
+        <button type="button" data-v3-action="favorites"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z"/></svg></span><span>المفضلة</span><i>‹</i></button>
+        <button type="button" data-v3-target="[data-pb-reviews-host],.pb-reviews,.sm-footer" hidden><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="m12 2 3 6.1 6.7 1-4.9 4.7 1.2 6.7-6-3.1-6 3.1 1.2-6.7-4.9-4.7 6.7-1z"/></svg></span><span>تقييمات الزبائن</span><i>‹</i></button>
+        <button id="pbV3DrawerOffers" type="button" data-v3-target=".pb-ref-offer"><span class="pb-v3-drawer-icon pb-v3-drawer-icon-solid"><svg viewBox="0 0 24 24"><path d="m3 8 5-5h8l5 5v8l-5 5H8l-5-5z"/><path class="cut" d="m8 16 8-8M9 8.5h.01M15 15.5h.01"/></svg></span><span>العروض والخصومات</span><i>‹</i></button>
+        <button type="button" data-v3-target="#pbV3StoreInfo"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z"/><circle cx="7" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></span><span>التوصيل والشحن</span><i>‹</i></button>
+        <button type="button" data-v3-target="#pbV3StoreInfo"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="m12 2 8 4-8 4-8-4zM4 6v12l8 4 8-4V6M12 10v12"/></svg></span><span>الاستبدال والاسترجاع</span><i>‹</i></button>
+        <button type="button" data-v3-target="#pbV3StoreInfo"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span>موقعنا</span><i>‹</i></button>
+        <button type="button" data-v3-target=".sm-footer"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="M4 13v-2a8 8 0 0 1 16 0v2M4 13H2v5h4v-5zM20 13h2v5h-4v-5zM18 18c0 2-2 3-5 3"/></svg></span><span>تواصل معنا</span><i>‹</i></button>
+        <button type="button" data-v3-target=".pb-v3-faq"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.7 2.7 0 1 1 4.1 2.3c-1 .6-1.6 1.1-1.6 2.2M12 17h.01"/></svg></span><span>الأسئلة الشائعة</span><i>‹</i></button>
       </nav>
 
       <section id="pbV3DrawerSocials" class="pb-v3-drawer-socials" aria-labelledby="pbV3DrawerSocialsTitle" hidden>
@@ -196,6 +201,11 @@
           </a>
         </div>
       </section>
+      <div class="pb-v3-drawer-legal">
+        <button type="button" data-v3-target="#pbV3StoreInfo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1z"/></svg><span>سياسة الخصوصية</span><i>‹</i></button>
+        <button type="button" data-v3-target="#pbV3StoreInfo"><svg viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6zM14 2v5h5M9 12h6M9 16h6"/></svg><span>الشروط والأحكام</span><i>‹</i></button>
+      </div>
+      <div class="pb-v3-drawer-thanks"><b><span>♥</span> شكراً لاختيارك PASHA BABY</b><small>نهتم بكل تفاصيل طفلك <span>♥</span></small></div>
       <a id="pbV3DrawerWhatsapp" class="pb-v3-drawer-whatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>واتساب</a>
     </aside>
     <div id="pbV3DrawerBackdrop" class="pb-v3-drawer-backdrop" hidden></div>
@@ -386,6 +396,6 @@
   <script src="js/pasha-checkout-review.js?v=3" defer></script>
   <script src="js/pasha-reviews.js?v=4" defer></script>
   <script src="storefront-v3/product-details-v3.js?v=1.3" defer></script>
-  <script src="storefront-v3/storefront-v3.js?v=1.6" defer></script>
+  <script src="storefront-v3/storefront-v3.js?v=1.7" defer></script>
 </body>
 </html>
