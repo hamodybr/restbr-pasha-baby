@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.6">
   <link rel="stylesheet" href="storefront-v3/storefront-v3-reference.css?v=1.0">
 </head>
-<body class="pb-v3-page">
+<body class="pb-v3-page pb-v3-reviews-paused">
   <div id="smIntro" class="sm-intro pb-v3-intro" aria-hidden="true">
     <img src="assets/pasha-baby-reference-logo.png" alt="" width="108" height="108">
     <strong>پاشا بيبي</strong>
@@ -46,7 +46,7 @@
         <button type="button" data-v3-target="#pbV3Hero">الرئيسية</button>
         <button type="button" data-v3-target="#smCatsSentinel">الأقسام</button>
         <button id="pbV3DesktopOffers" type="button" data-v3-target="#pbV3PromoBanner" hidden>العروض</button>
-        <button type="button" data-v3-target="[data-pb-reviews-host],.pb-reviews,.sm-footer">التقييمات</button>
+        <button type="button" data-v3-target="[data-pb-reviews-host],.pb-reviews,.sm-footer" hidden>التقييمات</button>
         <button type="button" data-v3-target="#pbV3StoreInfo">معلومات المتجر</button>
       </nav>
 
@@ -169,9 +169,33 @@
         <button type="button" data-v3-target="#smMenu">▦ <span>المنتجات</span></button>
         <button id="pbV3DrawerOffers" type="button" data-v3-target="#pbV3OfferSection" hidden>٪ <span>العروض</span></button>
         <button type="button" data-v3-target="#pbV3StoreInfo">🚚 <span>التوصيل والمعلومات</span></button>
-        <button type="button" data-v3-target="[data-pb-reviews-host],.pb-reviews,.sm-footer">★ <span>التقييمات</span></button>
+        <button type="button" data-v3-target="[data-pb-reviews-host],.pb-reviews,.sm-footer" hidden>★ <span>التقييمات</span></button>
         <button type="button" data-v3-target=".sm-footer">● <span>التواصل والموقع</span></button>
       </nav>
+
+      <section id="pbV3DrawerSocials" class="pb-v3-drawer-socials" aria-labelledby="pbV3DrawerSocialsTitle" hidden>
+        <h3 id="pbV3DrawerSocialsTitle">تابعنا على</h3>
+        <div>
+          <a id="pbV3DrawerInstagram" href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" hidden>
+            <span class="instagram" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><defs><linearGradient id="pbV3InstagramGradient" x1="2" y1="22" x2="22" y2="2"><stop stop-color="#ffb000"/><stop offset=".48" stop-color="#ef3369"/><stop offset="1" stop-color="#8b3fd6"/></linearGradient></defs><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.9" r="1" class="dot"/></svg>
+            </span>
+            <b>Instagram</b>
+          </a>
+          <a id="pbV3DrawerTikTok" href="#" target="_blank" rel="noopener noreferrer" aria-label="TikTok" hidden>
+            <span class="tiktok" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path class="cyan" d="M14 3.5c.5 2.5 2 4 4.7 4.3v3.1c-1.7-.1-3.1-.6-4.5-1.5v6.5a5.3 5.3 0 1 1-4.6-5.2v3.2a2.2 2.2 0 1 0 1.4 2V3.5z"/><path class="pink" d="M14 3.5c.5 2.5 2 4 4.7 4.3v3.1c-1.7-.1-3.1-.6-4.5-1.5v6.5a5.3 5.3 0 1 1-4.6-5.2v3.2a2.2 2.2 0 1 0 1.4 2V3.5z"/><path class="ink" d="M14 3.5c.5 2.5 2 4 4.7 4.3v3.1c-1.7-.1-3.1-.6-4.5-1.5v6.5a5.3 5.3 0 1 1-4.6-5.2v3.2a2.2 2.2 0 1 0 1.4 2V3.5z"/></svg>
+            </span>
+            <b>TikTok</b>
+          </a>
+          <a id="pbV3DrawerSnapchat" href="#" target="_blank" rel="noopener noreferrer" aria-label="Snapchat" hidden>
+            <span class="snapchat" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3.4c-3 0-4.7 2.4-4.7 5.3v2c0 .7-.4 1.2-1 1.5l-1.4.6c-.6.2-.6 1-.1 1.3 1 .7 2.1 1 3.2 1.2.4.1.7.4.8.8l.2 1.1c1-.2 1.9-.7 3-.7s2 .5 3 .7l.2-1.1c.1-.4.4-.7.8-.8 1.1-.2 2.2-.5 3.2-1.2.5-.3.5-1.1-.1-1.3l-1.4-.6c-.6-.3-1-.8-1-1.5v-2c0-2.9-1.7-5.3-4.7-5.3Z"/></svg>
+            </span>
+            <b>Snapchat</b>
+          </a>
+        </div>
+      </section>
       <a id="pbV3DrawerWhatsapp" class="pb-v3-drawer-whatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>واتساب</a>
     </aside>
     <div id="pbV3DrawerBackdrop" class="pb-v3-drawer-backdrop" hidden></div>
