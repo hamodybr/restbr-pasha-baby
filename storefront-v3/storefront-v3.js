@@ -1030,6 +1030,36 @@
     });
   }
 
+  function syncDrawerSocials() {
+    const section = $('#pbV3DrawerSocials');
+    if (!section) return;
+
+    const pairs = [
+      ['#smInstagram', '#pbV3DrawerInstagram'],
+      ['#smTikTok', '#pbV3DrawerTikTok'],
+      ['#smSnapchat', '#pbV3DrawerSnapchat']
+    ];
+
+    let visibleCount = 0;
+    pairs.forEach(([sourceSelector, targetSelector]) => {
+      const source = $(sourceSelector);
+      const target = $(targetSelector);
+      if (!target) return;
+
+      const href = String(source?.getAttribute('href') || '').trim();
+      const available = Boolean(source && !source.hidden && href && href !== '#' && !/^javascript:/i.test(href));
+      target.hidden = !available;
+      if (available) {
+        target.href = href;
+        visibleCount += 1;
+      } else {
+        target.removeAttribute('href');
+      }
+    });
+
+    section.hidden = visibleCount === 0;
+  }
+
   function syncRuntimeUI() {
     stripLegacyPresentationRuntime();
     const searchOverlay = $('#pbV3SearchOverlay');
@@ -1049,9 +1079,13 @@
     syncHeroProduct();
     enhanceCheckout();
     syncFooterVisibility();
+    syncDrawerSocials();
     syncCardDecorations();
 
-    requestAnimationFrame(syncFooterVisibility);
+    requestAnimationFrame(() => {
+      syncFooterVisibility();
+      syncDrawerSocials();
+    });
 
     const cartFab = $('#smCartFab');
     if (cartFab) {
