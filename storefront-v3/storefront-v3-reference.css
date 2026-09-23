@@ -271,6 +271,20 @@ body.pb-v3-page button,body.pb-v3-page input,body.pb-v3-page textarea,body.pb-v3
 /* V3.7 — exact mobile reference composition */
 .pb-ref-home{display:none}
 #pbV3FavoriteBtn.active svg{fill:#e76876;color:#e76876}
+body.pb-v3-reviews-paused [data-pb-reviews-host],body.pb-v3-reviews-paused .pb-reviews,body.pb-v3-reviews-paused .pb-reviews-premium{display:none!important}
+
+.pb-v3-drawer-socials{margin-top:auto;padding-top:14px;border-top:1px solid #ece6df;text-align:center}
+.pb-v3-drawer-socials[hidden],.pb-v3-drawer-socials a[hidden]{display:none!important}
+.pb-v3-drawer-socials h3{margin:0 0 11px;color:var(--pb36-green-dark);font-size:12px;font-weight:900}
+.pb-v3-drawer-socials>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));direction:ltr;gap:10px}
+.pb-v3-drawer-socials a{min-width:0;display:grid;justify-items:center;gap:6px;color:#273c39;text-decoration:none}
+.pb-v3-drawer-socials a>span{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;box-shadow:0 4px 12px rgba(35,58,53,.08)}
+.pb-v3-drawer-socials a b{font-size:9px;font-weight:800;white-space:nowrap}
+.pb-v3-drawer-socials svg{width:27px;height:27px;display:block}
+.pb-v3-drawer-socials .instagram{background:#fff3f5}.pb-v3-drawer-socials .instagram svg{fill:none;stroke:url(#pbV3InstagramGradient);stroke-width:2;stroke-linecap:round}.pb-v3-drawer-socials .instagram .dot{fill:url(#pbV3InstagramGradient);stroke:none}
+.pb-v3-drawer-socials .tiktok{background:#fff}.pb-v3-drawer-socials .tiktok path{transform-origin:center}.pb-v3-drawer-socials .tiktok .cyan{fill:#25f4ee;transform:translate(-1px,1px)}.pb-v3-drawer-socials .tiktok .pink{fill:#fe2c55;transform:translate(1px,0)}.pb-v3-drawer-socials .tiktok .ink{fill:#111}
+.pb-v3-drawer-socials .snapchat{background:#fffc00}.pb-v3-drawer-socials .snapchat path{fill:#fff;stroke:#111;stroke-width:1.45;stroke-linejoin:round}
+.pb-v3-drawer-socials+.pb-v3-drawer-whatsapp{margin-top:0!important}
 
 @media (max-width:680px){
   body.pb-v3-page{background:#fffaf6!important;color:#103b37!important}
