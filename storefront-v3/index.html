@@ -67,7 +67,7 @@
 
     <div id="pbV3SearchHost" class="pb-v3-search-host pb-v3-search-host-top" role="search" aria-label="البحث في المنتجات"></div>
 
-    <div class="pb-ref-home" aria-label="واجهة پاشا بيبي التجريبية">
+    <div class="pb-ref-home" hidden aria-label="واجهة پاشا بيبي التجريبية">
       <section class="pb-ref-order-card" aria-label="متابعة الطلب">
         <div class="pb-ref-order-summary">
           <span class="pb-ref-box" aria-hidden="true">📦</span>
@@ -199,7 +199,7 @@
       <nav class="pb-v3-drawer-nav" aria-label="التنقل">
         <button class="active" type="button" data-v3-target="#pbV3Hero"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9H15v-6H9v6H3z"/></svg></span><span>الرئيسية</span><i>‹</i></button>
         <button type="button" data-v3-target="#smCatsSentinel"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>الأقسام والمنتجات</span><i>‹</i></button>
-        <button type="button" data-v3-target=".pb-ref-order-card"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="M6 8h12l1 13H5zM9 8V6a3 3 0 0 1 6 0v2"/></svg></span><span>طلباتي</span><i>‹</i></button>
+        <button type="button" data-v3-target=".pb-ref-order-card" hidden><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="M6 8h12l1 13H5zM9 8V6a3 3 0 0 1 6 0v2"/></svg></span><span>طلباتي</span><i>‹</i></button>
         <button type="button" data-v3-action="favorites"><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z"/></svg></span><span>المفضلة</span><i>‹</i></button>
         <button type="button" data-v3-target="[data-pb-reviews-host],.pb-reviews,.sm-footer" hidden><span class="pb-v3-drawer-icon"><svg viewBox="0 0 24 24"><path d="m12 2 3 6.1 6.7 1-4.9 4.7 1.2 6.7-6-3.1-6 3.1 1.2-6.7-4.9-4.7 6.7-1z"/></svg></span><span>تقييمات الزبائن</span><i>‹</i></button>
         <button id="pbV3DrawerOffers" type="button" data-v3-target=".pb-ref-offer"><span class="pb-v3-drawer-icon pb-v3-drawer-icon-solid"><svg viewBox="0 0 24 24"><path d="m3 8 5-5h8l5 5v8l-5 5H8l-5-5z"/><path class="cut" d="m8 16 8-8M9 8.5h.01M15 15.5h.01"/></svg></span><span>العروض والخصومات</span><i>‹</i></button>
