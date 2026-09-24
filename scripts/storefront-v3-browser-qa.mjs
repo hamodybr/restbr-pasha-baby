@@ -353,7 +353,7 @@ async function runViewport(browser, spec) {
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   await page.waitForTimeout(150);
   await assertNoHorizontalOverflow(page, `${spec.name} footer`);
-  await assertInsideViewport(page, spec.mobile ? '.pb-ref-footer' : '.sm-footer-card', `${spec.name} footer card`);
+  await assertInsideViewport(page, spec.width <= 680 ? '.pb-ref-footer' : '.sm-footer-card', `${spec.name} footer card`);
 
   const perf = await page.evaluate(() => ({
     longTasks: Array.isArray(window.__V3_LONG_TASKS__) ? window.__V3_LONG_TASKS__ : [],
