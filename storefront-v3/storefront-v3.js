@@ -983,10 +983,26 @@
   function syncCardActionRows() {
     document.querySelectorAll('#smMenu [data-product-card]').forEach(card => {
       const info = card.querySelector('.sm-info');
-      const action = info?.querySelector('.sm-direct-add,.sm-choose-options');
-      const details = info?.querySelector('.pb-v3-details-btn');
-      if (!info || !action || !details) return;
+      if (!info) return;
 
+      // A category/search rerender replaces the whole card. Build the details
+      // control here as well, so ordering never depends on a delayed enhancer.
+      let details = card.querySelector('.pb-v3-details-btn');
+      if (!details) {
+        details = document.createElement('button');
+        details.type = 'button';
+        details.className = 'pb-v3-details-btn';
+        details.textContent = 'التفاصيل';
+        info.appendChild(details);
+      }
+      const name = String(card.querySelector('.sm-name')?.textContent || '').trim();
+      details.setAttribute('aria-label', `تفاصيل — ${name}`);
+
+      const action = card.querySelector('.sm-direct-add,.sm-choose-options');
+      if (!action) {
+        if (details.parentElement !== info) info.appendChild(details);
+        return;
+      }
       let row = action.closest('.pb-product-action-row');
       if (!row) {
         row = document.createElement('div');
@@ -994,7 +1010,6 @@
         action.insertAdjacentElement('beforebegin', row);
         row.appendChild(action);
       }
-
       if (details.parentElement !== row) row.appendChild(details);
     });
   }
@@ -1128,6 +1143,10 @@
     window.addEventListener('restbr:ready', syncRuntimeUI, { once: true });
     window.addEventListener('restbr:commerce-ready', syncRuntimeUI);
     window.addEventListener('restbr:prices-updated', syncRuntimeUI);
+    window.addEventListener('restbr:v3-menu-rendered', () => {
+      syncProductCount();
+      syncCardDecorations();
+    });
     window.addEventListener('pasha:v3-cart-changed', syncCartCount);
   }
 
