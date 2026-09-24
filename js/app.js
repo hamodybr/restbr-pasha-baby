@@ -2288,13 +2288,14 @@ function render() {
           ${escapeUi(sectionTitle)}
         </h2>
 
+        ${!IS_STOREFRONT_V3 || v3CatalogFilter === 'category' ? `
         <button
           class="sm-share-category"
           type="button"
           data-share-category="${escapeUi(category.id)}"
           aria-label="${I18N[lang].share}">
           ↗
-        </button>
+        </button>` : ''}
       </div>
 
       <div class="sm-grid">
