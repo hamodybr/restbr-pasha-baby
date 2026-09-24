@@ -2233,6 +2233,7 @@ function render() {
 
     watchCards();
     scheduleFooterGlassSync();
+    if(IS_STOREFRONT_V3)window.dispatchEvent(new Event('restbr:v3-menu-rendered'));
     return;
   }
 
@@ -2246,6 +2247,7 @@ function render() {
 
   if(!products.length){
     menu.innerHTML="";
+    if(IS_STOREFRONT_V3)window.dispatchEvent(new Event('restbr:v3-menu-rendered'));
     return;
   }
 
@@ -2280,6 +2282,7 @@ function render() {
 
   watchCards();
   scheduleFooterGlassSync();
+  if(IS_STOREFRONT_V3)window.dispatchEvent(new Event('restbr:v3-menu-rendered'));
 }
 
 /* ========================================
