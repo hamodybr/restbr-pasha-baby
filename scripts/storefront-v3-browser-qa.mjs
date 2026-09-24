@@ -209,6 +209,93 @@ async function prepareCartAndCheckout(page) {
   return { cartElapsed, checkoutElapsed };
 }
 
+async function assertCatalogNavigation(page, spec) {
+  const announcement = await page.evaluate(() => {
+    const restaurant = window.RESTBR_DB.restaurant;
+    const original = { announcement: restaurant.announcement, announcementEnabled: restaurant.announcementEnabled };
+    const message = 'عرض تجريبي طويل للتأكد من أن شريط الإعلان يعرض كامل المحتوى بدون اقتصاص أو إخفاء، بما فيه السطر الثاني والثالث وجميع تفاصيل الإعلان حتى آخر كلمة: النهاية.';
+    restaurant.announcement = { ar: message };
+    restaurant.announcementEnabled = true;
+    window.dispatchEvent(new Event('restbr:commerce-ready'));
+    const node = document.getElementById('pbV3Announcement');
+    const copy = document.getElementById('pbV3AnnouncementText');
+    const style = getComputedStyle(node);
+    const result = {
+      full: copy?.textContent === message,
+      visible: style.display !== 'none' && node.getBoundingClientRect().height > 0,
+      scrollWidth: copy?.scrollWidth || 0,
+      clientWidth: copy?.clientWidth || 0,
+      clipping: getComputedStyle(copy).overflow,
+      lastWord: copy?.textContent?.endsWith('النهاية.')
+    };
+    restaurant.announcement = original.announcement;
+    restaurant.announcementEnabled = original.announcementEnabled;
+    window.dispatchEvent(new Event('restbr:commerce-ready'));
+    return result;
+  });
+  assert(announcement.full && announcement.visible && announcement.lastWord &&
+    announcement.clipping === 'visible' && announcement.scrollWidth <= announcement.clientWidth + 2,
+    spec.name + ': full announcement is clipped or hidden: ' + JSON.stringify(announcement));
+
+  await page.locator('#pbV3SeeProducts').click();
+  await page.waitForTimeout(140);
+  const full = await page.evaluate(() => ({
+    expected: window.RESTBR_DB.products.filter(p => p && p.category).length,
+    actual: document.querySelectorAll('#smMenu [data-product-card]').length,
+    title: document.querySelector('#smMenu .sm-section-title')?.textContent?.trim(),
+    allActive: !!document.querySelector('#smCats .sm-cat[data-cat="__all__"].active')
+  }));
+  assert(full.expected > 0 && full.actual === full.expected &&
+    full.title === 'كل المنتجات' && full.allActive,
+    spec.name + ': View all did not show all real products: ' + JSON.stringify(full));
+
+  const category = page.locator('#smCats .sm-cat:not([data-cat="__all__"])').first();
+  const id = await category.getAttribute('data-cat');
+  assert(id, spec.name + ': missing real category');
+  await category.click();
+  await page.waitForTimeout(160);
+  const filtered = await page.evaluate(id => {
+    const cards = [...document.querySelectorAll('#smMenu [data-product-card]')];
+    const expected = window.RESTBR_DB.products.filter(p => String(p?.category?.id || '') === id);
+    return {
+      expected: expected.length,
+      actual: cards.length,
+      matching: cards.every(card => expected.some(p => String(p.id) === card.dataset.productCard)),
+      active: !!document.querySelector('#smCats .sm-cat[data-cat="' + CSS.escape(id) + '"].active')
+    };
+  }, id);
+  assert(filtered.expected > 0 && filtered.actual === filtered.expected &&
+    filtered.matching && filtered.active,
+    spec.name + ': category did not display matching real products: ' + JSON.stringify(filtered));
+  await assertDetailsOnCards(page, spec.name + ' after selecting real category');
+
+  const highlighted = page.locator('#pbV3Highlights .pb-v3-highlight-group:visible [data-v3-highlight-jump]').first();
+  if (await highlighted.count()) {
+    const mode = await highlighted.getAttribute('data-v3-highlight-jump');
+    await highlighted.click();
+    await page.waitForTimeout(160);
+    const stats = await page.evaluate(mode => {
+      const products = window.RESTBR_DB.products;
+      const badges = products.filter(p => p?.badges?.unavailable !== true &&
+        (mode === 'popular' ? p?.badges?.popular === true :
+         mode === 'new' ? p?.badges?.new === true :
+         mode === 'offer' ? p?.badges?.offer === true || Number(p.discountPercent || 0) > 0 ||
+           Number(p.discountAmount || 0) > 0 || (p.options || []).some(o =>
+             Number(o.originalPrice ?? o.__retailOriginalPrice ?? o.price) > Number(o.price)
+           ) : false));
+      const cards = [...document.querySelectorAll('#smMenu [data-product-card]')];
+      return { expected: badges.length, actual: cards.length, matching: cards.every(card =>
+        badges.some(p => String(p.id) === card.dataset.productCard)) };
+    }, mode);
+    assert(stats.expected > 0 && stats.actual >= stats.expected && stats.matching,
+      spec.name + ': View all in highlight did not show the full matching set: ' + JSON.stringify(stats));
+  }
+
+  await page.locator('#pbV3SeeProducts').click();
+  await page.waitForTimeout(160);
+  await assertNoHorizontalOverflow(page, spec.name + ' after catalog filters');
+}
+
 async function runViewport(browser, spec) {
   const context = await browser.newContext({
     viewport: { width: spec.width, height: spec.height },
@@ -346,6 +433,8 @@ async function runViewport(browser, spec) {
       await assertDetailsOnCards(page, 'Desktop after clearing search');
     }
   }
+
+  await assertCatalogNavigation(page, spec);
 
   const productElapsed = await openProductDetails(page);
   const { cartElapsed, checkoutElapsed } = await prepareCartAndCheckout(page);
