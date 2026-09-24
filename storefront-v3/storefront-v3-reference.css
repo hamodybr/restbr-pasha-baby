@@ -430,6 +430,7 @@ body.pb-v3-reviews-paused [data-pb-reviews-host],body.pb-v3-reviews-paused .pb-r
   line-height:14px!important;
   text-align:center!important;
 }
+#pbV3CartCount[hidden],#pbV3BottomCartCount[hidden]{display:none!important}
 
 @media (max-width:680px){
   .pb-ref-card footer{direction:ltr!important}
