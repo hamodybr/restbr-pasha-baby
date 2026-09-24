@@ -264,7 +264,6 @@ body.pb-v3-page button,body.pb-v3-page input,body.pb-v3-page textarea,body.pb-v3
 }
 
 @media (min-width:681px){
-  .pb-v3-bottom-nav{display:none!important}
   .pb-v3-page #smMenu{grid-template-columns:repeat(4,minmax(0,1fr))!important}
 }
 
