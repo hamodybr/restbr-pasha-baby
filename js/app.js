@@ -2247,6 +2247,7 @@ function render() {
   const products = IS_STOREFRONT_V3 && v3CatalogFilter !== 'category'
     ? allProducts.filter(product => {
         if (v3CatalogFilter === 'all') return true;
+        if (product.badges?.unavailable === true) return false;
         if (v3CatalogFilter === 'popular') return product.badges?.popular === true;
         if (v3CatalogFilter === 'new') return product.badges?.new === true;
         if (v3CatalogFilter === 'offer') {
