@@ -57,6 +57,11 @@ for (const token of requiredHtml) {
   if (!html.includes(token)) fail('Missing HTML token: ' + token);
 }
 
+if (!html.includes('class="pb-ref-home" hidden') ||
+    /#smMenu[^{}]*\{[^}]*display:none!important/.test(referenceCss)) {
+  fail('V3 must hide the static demo and keep the real product catalog visible.');
+}
+
 const forbiddenLegacy = [
   'css/pasha-baby-theme.css',
   'css/pasha-baby-storefront-v2.css',
