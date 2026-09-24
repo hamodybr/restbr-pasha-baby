@@ -3,8 +3,8 @@ import { JSDOM } from 'jsdom';
 
 const cartCode = fs.readFileSync('js/cart.js', 'utf8');
 
-const dom = new JSDOM('<!doctype html><html><body></body></html>', {
-  url: 'https://example.test/storefront-v3/',
+const dom = new JSDOM('<!doctype html><html><body class="pb-v3-page"></body></html>', {
+  url: 'https://example.test/',
   runScripts: 'outside-only',
   pretendToBeVisual: true
 });
@@ -33,6 +33,8 @@ window.RESTBR_DB = {
 };
 
 window.eval(cartCode);
+const emittedQuantities = [];
+window.addEventListener('pasha:v3-cart-changed', event => emittedQuantities.push(Number(event.detail?.quantity)));
 
 const fail = message => {
   console.error('Cart quantity regression failed:', message);
@@ -62,6 +64,10 @@ if (typeof window.RESTBR_CART_ADD_QUANTITY !== 'function') {
 
   if (cart[0]?.price !== 10000 || cart[0]?.optionId !== 'o1') {
     fail('Quantity add changed the live price or option identity.');
+  }
+
+  if (JSON.stringify(emittedQuantities) !== JSON.stringify([3, 5])) {
+    fail('Root-path V3 preview did not emit immediate cart changes after adds.');
   }
 
   const totalText = document.getElementById('smCartTotal')?.textContent || '';
