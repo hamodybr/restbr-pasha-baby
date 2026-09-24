@@ -270,6 +270,7 @@ body.pb-v3-page button,body.pb-v3-page input,body.pb-v3-page textarea,body.pb-v3
 
 /* V3.7 — exact mobile reference composition */
 .pb-ref-home{display:none}
+.pb-ref-service-footer,.pb-ref-footer{display:none}
 #pbV3FavoriteBtn.active svg{fill:#e76876;color:#e76876}
 body.pb-v3-reviews-paused [data-pb-reviews-host],body.pb-v3-reviews-paused .pb-reviews,body.pb-v3-reviews-paused .pb-reviews-premium{display:none!important}
 
@@ -389,6 +390,7 @@ body.pb-v3-reviews-paused [data-pb-reviews-host],body.pb-v3-reviews-paused .pb-r
   .pb-v3-search-host-top{min-height:40px!important;margin:0 0 6px!important}.pb-v3-search-host-top #smSearchWrap{min-height:40px!important;padding:0!important;border:0!important;border-radius:14px!important;background:transparent!important;box-shadow:none!important}.pb-v3-search-host-top .sm-search-row{height:40px!important;min-height:40px!important;grid-template-columns:30px minmax(0,1fr)!important;direction:ltr!important;padding:0 9px!important;border:1px solid #d5dbd8!important;border-radius:14px!important;background:#fff!important;box-shadow:0 2px 7px rgba(25,56,50,.08)!important}.pb-v3-search-host-top .sm-search-icon{font-size:22px!important}.pb-v3-page #smSearchInput{height:38px!important;min-height:38px!important;direction:rtl!important;text-align:right!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;font-size:13px!important}.pb-v3-page #smSearchClear{display:none!important}
   .pb-v3-announcement{display:none!important}
   .pb-ref-home{display:none!important;margin:0 -1px 10px}
+  .pb-v3-page .sm-footer{display:none!important}
 
   .pb-ref-order-card{border:1px solid #d9e0dc;border-radius:15px;background:linear-gradient(180deg,#fff,#fbfdfb);padding:7px 8px 6px;box-shadow:0 2px 7px rgba(36,64,58,.04)}
   .pb-ref-order-summary{display:grid;grid-template-columns:39px minmax(0,1fr) auto;grid-template-areas:'box info status' 'box info follow';gap:1px 7px;align-items:center;direction:ltr}
