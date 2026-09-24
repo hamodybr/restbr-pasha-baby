@@ -366,7 +366,7 @@ body.pb-v3-reviews-paused [data-pb-reviews-host],body.pb-v3-reviews-paused .pb-r
 .pb-v3-drawer-whatsapp{display:none!important}
 
 @media (max-width:680px){
-  .pb-v3-drawer{width:88vw!important;max-width:420px!important}
+  .pb-v3-drawer{width:78vw!important;max-width:360px!important}
   .pb-v3-drawer-head{min-height:218px!important}
 }
 
@@ -443,6 +443,24 @@ body.pb-v3-reviews-paused [data-pb-reviews-host],body.pb-v3-reviews-paused .pb-r
   text-align:center!important;
 }
 #pbV3CartCount[hidden],#pbV3BottomCartCount[hidden]{display:none!important}
+
+/* V3.7.4 — slimmer mobile drawer with one consistent RTL row direction */
+@media (max-width:680px){
+  .pb-v3-drawer-nav button,
+  .pb-v3-drawer-legal button{
+    direction:ltr!important;
+  }
+  .pb-v3-drawer-nav button>span:nth-child(2),
+  .pb-v3-drawer-legal button>span{
+    direction:rtl!important;
+    text-align:right!important;
+  }
+  .pb-v3-drawer-nav button>i,
+  .pb-v3-drawer-legal button>i{
+    transform:scaleX(-1)!important;
+    text-align:center!important;
+  }
+}
 
 @media (max-width:680px){
   .pb-ref-card footer{direction:ltr!important}
