@@ -2259,7 +2259,7 @@ function render() {
         }
         return false;
       })
-    : allProducts.filter(product => String(product.category.id) === String(active));
+    : allProducts.filter(product => String(product.category.id)===String(active));
 
 
   if(!products.length){
