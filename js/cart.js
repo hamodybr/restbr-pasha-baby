@@ -64,7 +64,7 @@
   }
   const localized=value=>{const source=value&&typeof value==="object"?value:{ar:value,ku:value,en:value};return{ar:String(source.ar??"").slice(0,500),ku:String(source.ku??"").slice(0,500),en:String(source.en??"").slice(0,500)}};
   const load=()=>{try{const parsed=JSON.parse(localStorage.getItem(KEY)||"[]");cart=(Array.isArray(parsed)?parsed:[]).slice(0,200).map((item,index)=>{const price=Number(item?.price),qty=Math.trunc(Number(item?.qty));return{key:String(item?.key??`${item?.productId??"item"}:${item?.optionIndex??index}`).slice(0,300),productId:String(item?.productId??"").slice(0,200),optionId:item?.optionId===null||item?.optionId===undefined?null:String(item.optionId).slice(0,200),optionIndex:Math.max(0,Math.trunc(Number(item?.optionIndex)||0)),name:localized(item?.name),option:localized(item?.option),price:Number.isFinite(price)&&price>=0?Math.min(price,1e9):0,image:safeMedia(item?.image),qty:Number.isFinite(qty)?Math.max(1,Math.min(qty,99)):1}})}catch{cart=[]}};
-  const save=()=>{localStorage.setItem(KEY,JSON.stringify(cart));render();if(window.IS_STOREFRONT_V3||/\/storefront-v3(?:\/|$)/i.test(location.pathname))window.dispatchEvent(new CustomEvent('pasha:v3-cart-changed',{detail:{quantity:totals().qty}}))};
+  const save=()=>{localStorage.setItem(KEY,JSON.stringify(cart));render();if(document.body?.classList.contains('pb-v3-page')||/\/storefront-v3(?:\/|$)/i.test(location.pathname))window.dispatchEvent(new CustomEvent('pasha:v3-cart-changed',{detail:{quantity:totals().qty}}))};
   const totals=()=>({qty:cart.reduce((s,x)=>s+x.qty,0),sum:cart.reduce((s,x)=>s+x.qty*x.price,0)});
 
   function syncLivePrices(){
