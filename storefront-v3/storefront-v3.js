@@ -242,6 +242,8 @@
     const footerLocation = localStoreText(restaurant.footerLocation);
     const footerLocationNode = $('.sm-footer-location');
     if (footerLocationNode && footerLocation) footerLocationNode.textContent = footerLocation;
+    const referenceFooterLocation = $('#pbRefFooterLocation');
+    if (referenceFooterLocation && footerLocation) referenceFooterLocation.textContent = footerLocation;
 
     const brandAr = String(restaurant.nameAr || restaurant.name || 'پاشا بيبي').trim();
     const brandEn = String(restaurant.nameEn || restaurant.name || 'Pasha Baby').trim();
@@ -296,6 +298,12 @@
       } else {
         infoCall.hidden = true;
       }
+    }
+
+    const referenceFooterPhone = $('#pbRefFooterPhone');
+    if (referenceFooterPhone && phone) {
+      referenceFooterPhone.textContent = phone;
+      referenceFooterPhone.href = 'tel:' + phone.replace(/[^\d+().-]/g, '');
     }
   }
 
@@ -1043,26 +1051,28 @@
     if (!section) return;
 
     const pairs = [
-      ['#smInstagram', '#pbV3DrawerInstagram'],
-      ['#smTikTok', '#pbV3DrawerTikTok'],
-      ['#smSnapchat', '#pbV3DrawerSnapchat']
+      ['#smInstagram', ['#pbV3DrawerInstagram', '#pbRefFooterInstagram']],
+      ['#smTikTok', ['#pbV3DrawerTikTok', '#pbRefFooterTikTok']],
+      ['#smSnapchat', ['#pbV3DrawerSnapchat']],
+      ['#smFacebook', ['#pbRefFooterFacebook']]
     ];
 
-    pairs.forEach(([sourceSelector, targetSelector]) => {
+    pairs.forEach(([sourceSelector, targetSelectors]) => {
       const source = $(sourceSelector);
-      const target = $(targetSelector);
-      if (!target) return;
-
       const href = String(source?.getAttribute('href') || '').trim();
       const available = Boolean(source && !source.hidden && href && href !== '#' && !/^javascript:/i.test(href));
-      target.hidden = false;
-      if (available) {
-        target.href = href;
-        target.removeAttribute('aria-disabled');
-      } else {
-        target.removeAttribute('href');
-        target.setAttribute('aria-disabled', 'true');
-      }
+      targetSelectors.forEach(targetSelector => {
+        const target = $(targetSelector);
+        if (!target) return;
+        target.hidden = false;
+        if (available) {
+          target.href = href;
+          target.removeAttribute('aria-disabled');
+        } else {
+          target.removeAttribute('href');
+          target.setAttribute('aria-disabled', 'true');
+        }
+      });
     });
 
     section.hidden = false;
