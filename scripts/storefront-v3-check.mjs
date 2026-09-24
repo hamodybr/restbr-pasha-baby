@@ -47,8 +47,10 @@ const requiredHtml = [
   'id="smMenu"',
   'id="pbV3BottomCart"',
   'storefront-v3/storefront-v3.css?v=1.6',
-  'storefront-v3/storefront-v3-reference.css?v=1.1',
-  'storefront-v3/storefront-v3.js?v=1.7'
+  'storefront-v3/storefront-v3-reference.css?v=1.2',
+  'storefront-v3/storefront-v3.js?v=1.8',
+  'pb-ref-service-footer',
+  'pb-ref-footer'
 ];
 
 for (const token of requiredHtml) {
