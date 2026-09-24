@@ -126,6 +126,20 @@ async function waitForCatalog(page) {
   );
 }
 
+async function assertDetailsOnCards(page, label) {
+  const state = await page.locator('#smMenu [data-product-card]:visible').evaluateAll(cards => ({
+    total: cards.length,
+    good: cards.filter(card => {
+      const details = card.querySelector('.pb-product-action-row > .pb-v3-details-btn');
+      const action = card.querySelector('.pb-product-action-row > .sm-direct-add, .pb-product-action-row > .sm-choose-options');
+      return details && action && details.getBoundingClientRect().width > 0 &&
+        getComputedStyle(details).visibility !== 'hidden';
+    }).length
+  }));
+  assert(state.total > 0 && state.total === state.good,
+    `${label}: details/actions missing on ${state.total - state.good} of ${state.total} cards`);
+}
+
 async function openProductDetails(page) {
   const button = page.locator('#smMenu .pb-v3-details-btn').first();
   await button.scrollIntoViewIfNeeded();
@@ -142,16 +156,22 @@ async function openProductDetails(page) {
 }
 
 async function prepareCartAndCheckout(page) {
-  const added = await page.evaluate(() => {
+  const cartResult = await page.evaluate(() => {
     const product = window.RESTBR_DB?.products?.find(item =>
       item?.badges?.unavailable !== true &&
       Array.isArray(item?.options) &&
       item.options.length > 0
     );
-    if (!product || typeof window.RESTBR_CART_ADD_QUANTITY !== 'function') return false;
-    return window.RESTBR_CART_ADD_QUANTITY(product, 0, 1) !== false;
+    if (!product || typeof window.RESTBR_CART_ADD_QUANTITY !== 'function') return { added: false };
+    const before = JSON.parse(localStorage.getItem('RESTBR_CART_V1') || '[]')
+      .reduce((sum, item) => sum + Number(item.qty || 0), 0);
+    const added = window.RESTBR_CART_ADD_QUANTITY(product, 0, 1) !== false;
+    const badge = document.getElementById('pbV3BottomCartCount');
+    return { added, before, actual: badge?.textContent, hidden: badge?.hidden };
   });
-  assert(added, 'Could not seed the cart through the real cart API');
+  assert(cartResult.added, 'Could not seed the cart through the real cart API');
+  assert(cartResult.actual === String(cartResult.before + 1) && !cartResult.hidden,
+    'Cart badge did not update synchronously after adding a product with options');
 
   const cartTrigger = page.locator('#pbV3BottomCart:visible, #pbV3CartBtn:visible').first();
   const cartStarted = Date.now();
@@ -283,6 +303,7 @@ async function runViewport(browser, spec) {
     await page.waitForTimeout(120);
     const matchingCards = await page.locator('#smMenu [data-product-card]:visible').count();
     assert(matchingCards > 0, `${spec.name} real product search returned no visible products`);
+    await assertDetailsOnCards(page, `${spec.name} after search`);
 
     await searchInput.fill('__V3_NO_MATCH_9XQ__');
     await page.waitForTimeout(120);
@@ -295,6 +316,7 @@ async function runViewport(browser, spec) {
     await page.waitForTimeout(120);
     const restoredCards = await page.locator('#smMenu [data-product-card]:visible').count();
     assert(restoredCards > 0, `${spec.name} clearing search did not restore the catalog`);
+    await assertDetailsOnCards(page, `${spec.name} after clearing search`);
 
     await page.locator('#pbV3SearchClose').click();
     await page.waitForTimeout(180);
@@ -302,6 +324,26 @@ async function runViewport(browser, spec) {
     await assertInsideViewport(page, '.pb-v3-desktop-nav', 'Desktop navigation');
     const bottomDisplay = await page.locator('.pb-v3-bottom-nav').evaluate(node => getComputedStyle(node).display);
     assert(bottomDisplay === 'none', 'Desktop bottom navigation should be hidden');
+    await assertDetailsOnCards(page, 'Desktop initial render');
+    const tabs = page.locator('#smCats .sm-cat');
+    if (await tabs.count() > 1) {
+      await tabs.nth(1).click();
+      await page.waitForTimeout(150);
+      await assertDetailsOnCards(page, 'Desktop after category switch');
+    }
+    const realProductName = await page.evaluate(() => {
+      const name = window.RESTBR_DB?.products?.[0]?.name;
+      return String(name?.ar || name?.en || '').trim();
+    });
+    if (realProductName) {
+      const input = page.locator('#smSearchInput');
+      await input.fill(realProductName);
+      await page.waitForTimeout(150);
+      await assertDetailsOnCards(page, 'Desktop after search');
+      await input.fill('');
+      await page.waitForTimeout(150);
+      await assertDetailsOnCards(page, 'Desktop after clearing search');
+    }
   }
 
   const productElapsed = await openProductDetails(page);
