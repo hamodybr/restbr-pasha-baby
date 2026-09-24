@@ -565,7 +565,7 @@
     syncPromoBanner(offerProducts);
 
     const offerDrawer = $('#pbV3DrawerOffers');
-    if (offerDrawer) offerDrawer.hidden = false;
+    if (offerDrawer) offerDrawer.hidden = offerProducts.length === 0;
 
     const offerDesktop = $('#pbV3DesktopOffers');
     if (offerDesktop) offerDesktop.hidden = offerProducts.length === 0;
