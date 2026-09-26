@@ -26,7 +26,7 @@ await expect('js/pasha-arabic-only.js', [
 
 await expect('', [
   'js/runtime-config.js?v=2.3',
-  'js/pasha-baby-storefront-bundle.js?v=1.3'
+  'storefront-v3/product-details-v3.js?v=1.3'
 ], 'production product-detail entry assets');
 
 await expect('js/runtime-config.js', [
