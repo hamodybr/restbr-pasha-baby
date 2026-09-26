@@ -2,6 +2,7 @@
   if (window.__RESTBR_LIVE_PRICES_V3__) return;
   window.__RESTBR_LIVE_PRICES_V3__ = true;
 
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
   const PRICE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
@@ -252,10 +253,12 @@
 
     // Reconciliation remains as a safety net for missed Realtime events, but it
     // no longer re-downloads every price every 30 seconds or while the tab is hidden.
-    window.setInterval(() => {
-      if (document.visibilityState !== "visible" || navigator.onLine === false) return;
-      void syncAllPrices();
-    }, PRICE_SYNC_INTERVAL_MS);
+    if (!IS_STOREFRONT_V3) {
+      window.setInterval(() => {
+        if (document.visibilityState !== "visible" || navigator.onLine === false) return;
+        void syncAllPrices();
+      }, PRICE_SYNC_INTERVAL_MS);
+    }
   }
 
   document.addEventListener("click", event => {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v47";
+const CACHE_NAME = "restbr-pasha-baby-v48";
 // 2026-09-17: v46 forces iOS Safari to install a fresh code cache and fetch\n// the continuous carousel helper at its new v1.2 URL.
 
 const CORE = [
@@ -137,6 +137,19 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
 
   if (url.origin !== self.location.origin) return;
+
+  // Storefront V3 is an experimental surface. Never serve its HTML or its
+  // explicitly V3-versioned shared runtime files from the PWA cache.
+  const isStorefrontV3 =
+    /\/storefront-v3(?:\/|$)/i.test(url.pathname) ||
+    /^v3\./i.test(String(url.searchParams.get("v") || ""));
+
+  if (isStorefrontV3) {
+    event.respondWith(
+      fetch(request, { cache: "no-store" }).catch(() => Response.error())
+    );
+    return;
+  }
 
   const isAdminPage = /\/admin(?:\.html)?\/?$/i.test(url.pathname);
   const isAdminAsset =

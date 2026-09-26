@@ -1,4 +1,5 @@
 (() => {
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
   if (/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
 
   const inactiveCategoryIds = new Set();
@@ -145,8 +146,8 @@
         z-index:40;
         border-radius:inherit;
         background:rgba(2,2,2,.58);
-        backdrop-filter:grayscale(.58) saturate(.44) brightness(.58);
-        -webkit-backdrop-filter:grayscale(.58) saturate(.44) brightness(.58);
+        backdrop-filter:${IS_STOREFRONT_V3 ? "none" : "grayscale(.58) saturate(.44) brightness(.58)"};
+        -webkit-backdrop-filter:${IS_STOREFRONT_V3 ? "none" : "grayscale(.58) saturate(.44) brightness(.58)"};
         box-shadow:inset 0 0 0 1px rgba(255,255,255,.025);
         pointer-events:none;
       }
@@ -182,8 +183,8 @@
         white-space:nowrap;
         pointer-events:none;
         filter:none !important;
-        backdrop-filter:blur(12px);
-        -webkit-backdrop-filter:blur(12px);
+        backdrop-filter:${IS_STOREFRONT_V3 ? "none" : "blur(12px)"};
+        -webkit-backdrop-filter:${IS_STOREFRONT_V3 ? "none" : "blur(12px)"};
       }
     `;
 
@@ -205,6 +206,7 @@
 
   function startObserver() {
     scan();
+    if (IS_STOREFRONT_V3) return;
 
     const observer = new MutationObserver(records => {
       records.forEach(record => {
@@ -231,4 +233,5 @@
   } else {
     startObserver();
   }
+  window.PASHA_UNAVAILABLE_SYNC = () => scan();
 })();

@@ -1,5 +1,6 @@
 (() => {
   if (/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
 
   const TEXT = {
     ar: 'السعر غير متوفر',
@@ -196,7 +197,7 @@
 
   function start(){
     patchAll();
-    observer.observe(document.body,{childList:true,subtree:true});
+    if (!IS_STOREFRONT_V3) observer.observe(document.body,{childList:true,subtree:true});
 
     window.addEventListener('restbr:ready',() => setTimeout(patchAll,0));
     window.addEventListener('restbr:prices-updated',() => setTimeout(patchAll,0));
@@ -210,6 +211,8 @@
       }
     });
   }
+
+  window.RESTBR_PRICE_SAFETY_PATCH = () => patchAll();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded',start,{once:true});

@@ -4,79 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#f6f1e7">
-  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <meta name="description" content="باشا بيبي (Pasha Baby) لمستلزمات الأطفال والبيبي في دهوك: ملابس، رضاعة، عناية يومية، ألعاب وتجهيزات الطفل.">\n  <link rel="canonical" href="https://pashababyiq.com/">\n  <meta property="og:type" content="website">\n  <meta property="og:site_name" content="Pasha Baby">\n  <meta property="og:locale" content="ar_IQ">\n  <meta property="og:title" content="باشا بيبي | مستلزمات الأطفال في دهوك">\n  <meta property="og:description" content="كل احتياجات طفلك في مكان واحد من Pasha Baby في دهوك.">\n  <meta property="og:url" content="https://pashababyiq.com/">\n  <meta property="og:image" content="https://pashababyiq.com/assets/pasha-baby-reference-logo.png">\n  <meta name="twitter:card" content="summary">\n  <meta name="twitter:title" content="باشا بيبي | مستلزمات الأطفال في دهوك">\n  <meta name="twitter:description" content="كل احتياجات طفلك في مكان واحد من Pasha Baby في دهوك.">\n  <meta name="twitter:image" content="https://pashababyiq.com/assets/pasha-baby-reference-logo.png">
-  <base href="./">
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  <link rel="preconnect" href="https://wlollfpmjzenhkjwxrqo.supabase.co" crossorigin>
-  <title>باشا بيبي (Pasha Baby) | مستلزمات الأطفال في دهوك</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Pasha Baby Storefront V3 experimental storefront">
+  <base href="../">
+  <title>Pasha Baby — Storefront V3</title>
 
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/url-safety.js?v=1.5"></script>
-  <script>
-    (() => {
-      const cdn = 'https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/';
-      const original = window.RESTBR_SAFE_MEDIA_URL;
-      if (typeof original === 'function') {
-        window.RESTBR_SAFE_MEDIA_URL = value => {
-          const raw = String(value || '').trim();
-          if (/^assets\//.test(raw)) return cdn + raw;
-          return original(value);
-        };
-      }
-      const optimized = window.RESTBR_OPTIMIZED_MEDIA_URL;
-      if (typeof optimized === 'function') {
-        window.RESTBR_OPTIMIZED_MEDIA_URL = (value, preset) => {
-          const result = optimized(value, preset);
-          return /^assets\//.test(result) ? cdn + result : result;
-        };
-      }
-    })();
-  </script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/runtime-config.js?v=2.3"></script>
+  <script src="js/url-safety.js?v=1.5"></script>
+  <script src="js/runtime-config.js?v=2.3"></script>
 
-  <link rel="preload" as="image" href="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-reference-logo.png" type="image/png" fetchpriority="high">
-  <link rel="preload" as="font" href="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-arabic.woff" type="font/woff" crossorigin>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/css/style.css?v=4.1">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/css/cart.css?v=3.6">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/css/pasha-baby-commerce.css?v=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/css/live-card-badges.css?v=1.5">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/css/pasha-reviews.css?v=5">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/storefront-v3/storefront-v3.css?v=1.6">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/storefront-v3/storefront-v3-reference.css?v=1.5">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap">
-  <link rel="stylesheet" href="./v3-reference-match.css?v=4.1"><link rel="stylesheet" href="./v3-reference-responsive.css?v=4.2"><link rel="stylesheet" href="./v3-visual-fixes.css?v=4.6">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Store",
-    "@id": "https://pashababyiq.com/#store",
-    "name": "Pasha Baby",
-    "alternateName": ["باشا بيبي", "پاشا بيبي"],
-    "description": "متجر باشا بيبي لملابس ومستلزمات الأطفال والبيبي في دهوك.",
-    "url": "https://pashababyiq.com/",
-    "logo": "https://pashababyiq.com/assets/pasha-baby-reference-logo.png",
-    "image": "https://pashababyiq.com/assets/pasha-baby-reference-logo.png",
-    "telephone": "+9647500200660",
-    "priceRange": "IQD",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "بروشكي، مقابل برانگوس، شارع الفوق",
-      "addressLocality": "دهوك",
-      "addressRegion": "إقليم كوردستان",
-      "postalCode": "42001",
-      "addressCountry": "IQ"
-    },
-    "hasMap": "https://maps.app.goo.gl/UyXFBL4ULxe8PJjCA",
-    "sameAs": ["https://www.instagram.com/pasha__baby"]
-  }
-  </script>
+  <link rel="preload" as="image" href="assets/pasha-baby-reference-logo.png" type="image/png" fetchpriority="high">
+  <link rel="preload" as="font" href="assets/pasha-arabic.woff" type="font/woff" crossorigin>
+  <link rel="stylesheet" href="css/style.css?v=4.1">
+  <link rel="stylesheet" href="css/cart.css?v=3.6">
+  <link rel="stylesheet" href="css/pasha-baby-commerce.css?v=1.0">
+  <link rel="stylesheet" href="css/live-card-badges.css?v=1.5">
+  <link rel="stylesheet" href="css/pasha-reviews.css?v=5">
+  <link rel="stylesheet" href="storefront-v3/storefront-v3.css?v=1.6">
+  <link rel="stylesheet" href="storefront-v3/storefront-v3-reference.css?v=1.5">
 </head>
 <body class="pb-v3-page pb-v3-reviews-paused">
   <div id="smIntro" class="sm-intro pb-v3-intro" aria-hidden="true">
-    <img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-reference-logo.png" alt="" width="108" height="108">
+    <img src="assets/pasha-baby-reference-logo.png" alt="" width="108" height="108">
     <strong>پاشا بيبي</strong>
   </div>
 
@@ -87,7 +35,7 @@
       </button>
 
       <a class="pb-v3-brand" href="#pbV3Hero" aria-label="پاشا بيبي — الرئيسية">
-        <img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-reference-logo.png" alt="" width="76" height="58">
+        <img src="assets/pasha-baby-reference-logo.png" alt="" width="76" height="58">
         <span>
           <b>پاشا بيبي</b>
           <small>Pasha Baby</small>
@@ -136,7 +84,7 @@
       </section>
 
       <section class="pb-ref-category-row" aria-label="الأقسام التجريبية">
-        <button type="button" data-v3-target="#pbRefProducts"><span class="pb-ref-cat-photo seat"><img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/v3-demo-kidilo-seat.webp" alt=""></span><b>KIDILO</b></button>
+        <button type="button" data-v3-target="#pbRefProducts"><span class="pb-ref-cat-photo seat"><img src="assets/v3-demo-kidilo-seat.webp" alt=""></span><b>KIDILO</b></button>
         <button type="button" data-v3-target="#pbRefProducts"><span>🚼</span><b>عربات</b></button>
         <button type="button" data-v3-target="#pbRefPopular"><span>🛏️</span><b>مستلزمات النوم</b></button>
         <button type="button" data-v3-target="#pbRefPopular"><span>🍼</span><b>رضاعة</b></button>
@@ -151,18 +99,18 @@
         <header><div><h2>منتجات KIDILO</h2></div><button type="button" data-v3-target="#smMenu">عرض الكل ←</button></header>
         <div class="pb-ref-grid">
           <article class="pb-ref-card">
-            <div class="pb-ref-card-media"><img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/v3-demo-kidilo-seat.webp" alt="كرسي سيارة للأطفال"><button type="button" aria-label="إضافة للمفضلة">♡</button><span>⭐ الأكثر طلبًا</span></div>
+            <div class="pb-ref-card-media"><img src="assets/v3-demo-kidilo-seat.webp" alt="كرسي سيارة للأطفال"><button type="button" aria-label="إضافة للمفضلة">♡</button><span>⭐ الأكثر طلبًا</span></div>
             <div class="pb-ref-card-body"><h3>كرسي سيارة</h3><p>كرسي سيارة للأطفال بمواصفات أمان عالية</p><strong>130,000 د.ع</strong><div class="pb-ref-colors"><i class="sand"></i><i class="black"></i><i class="gray"></i><i class="light"></i></div><footer><button type="button" data-ref-demo-details="0">تفاصيل</button><button type="button" data-ref-demo-details="0">🛒 أضف للسلة</button></footer></div>
           </article>
           <article class="pb-ref-card">
-            <div class="pb-ref-card-media"><img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/v3-demo-car-set.webp" alt="مجموعة كراسي سيارة"><button type="button" aria-label="إضافة للمفضلة">♡</button><span class="new">جديد ✨</span></div>
+            <div class="pb-ref-card-media"><img src="assets/v3-demo-car-set.webp" alt="مجموعة كراسي سيارة"><button type="button" aria-label="إضافة للمفضلة">♡</button><span class="new">جديد ✨</span></div>
             <div class="pb-ref-card-body"><h3>Car set</h3><p>كرسي سيارة للرضع بتصميم عصري ومريح</p><del>80,000 د.ع</del><strong>75,000 د.ع</strong><div class="pb-ref-colors"><i class="gray"></i><i class="sand"></i><i class="black"></i><i class="teal"></i></div><footer><button type="button" data-ref-demo-details="1">تفاصيل</button><button type="button" data-ref-demo-details="1">🛒 أضف للسلة</button></footer></div>
           </article>
         </div>
       </section>
 
       <section class="pb-ref-offer">
-        <img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/v3-demo-offer-banner.webp" alt="حقيبة ومستلزمات أطفال">
+        <img src="assets/v3-demo-offer-banner.webp" alt="حقيبة ومستلزمات أطفال">
         <div><h2>🎁 عروض مميزة</h2><p>على مستلزمات طفلك</p><button type="button" data-v3-target="#pbRefPopular">تسوّق العروض ←</button></div>
         <strong><small>خصومات تصل</small>30%</strong>
       </section>
@@ -170,8 +118,8 @@
       <section id="pbRefPopular" class="pb-ref-popular">
         <header><div><h2>🔥 الأكثر مبيعًا</h2><p>منتجات يفضلها عملاؤنا</p></div><button type="button" data-v3-target="#smMenu">عرض الكل ←</button></header>
         <div class="pb-ref-mini-rail">
-          <button type="button" data-ref-demo-details="0"><img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/v3-demo-kidilo-seat.webp" alt=""><b>كرسي أطفال</b><small>95,000 د.ع</small></button>
-          <button type="button" data-ref-demo-details="1"><img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/v3-demo-car-set.webp" alt=""><b>كراسي أطفال</b><small>75,000 د.ع</small></button>
+          <button type="button" data-ref-demo-details="0"><img src="assets/v3-demo-kidilo-seat.webp" alt=""><b>كرسي أطفال</b><small>95,000 د.ع</small></button>
+          <button type="button" data-ref-demo-details="1"><img src="assets/v3-demo-car-set.webp" alt=""><b>كراسي أطفال</b><small>75,000 د.ع</small></button>
           <button type="button" data-v3-target="#smMenu"><span>🍼</span><b>رضاعات</b><small>18,000 د.ع</small></button>
           <button type="button" data-v3-target="#smMenu"><span>👕</span><b>ملابس</b><small>12,000 د.ع</small></button>
         </div>
@@ -196,13 +144,13 @@
     <header class="sm-header pb-v3-compat-header" aria-hidden="true">
       <div id="pbBrand" class="pb-brand">
         <div class="pb-brand-mark has-store-logo">
-          <img class="pb-brand-logo" src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-reference-logo.png" alt="" width="256" height="256">
+          <img class="pb-brand-logo" src="assets/pasha-baby-reference-logo.png" alt="" width="256" height="256">
         </div>
         <div class="pb-brand-name">پاشا بيبي</div>
         <div class="pb-brand-tagline">مستلزمات الأطفال</div>
       </div>
       <div class="sm-logo-wrap">
-        <img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-reference-logo.png" alt="" class="sm-logo">
+        <img src="assets/pasha-baby-reference-logo.png" alt="" class="sm-logo">
       </div>
       <h1>باشا بيبي</h1>
       <p id="smSubtitle">مستلزمات الأطفال والبيبي في دهوك</p>
@@ -212,7 +160,7 @@
     <aside id="pbV3Drawer" class="pb-v3-drawer" role="dialog" aria-modal="true" aria-label="قائمة المتجر" aria-hidden="true">
       <div class="pb-v3-drawer-head">
         <div class="pb-v3-drawer-brand">
-          <img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-reference-logo.png" alt="Pasha Baby Store" width="124" height="124">
+          <img src="assets/pasha-baby-reference-logo.png" alt="Pasha Baby Store" width="124" height="124">
           <div><small><span aria-hidden="true">♥</span> كل احتياجات طفلك بمكان واحد</small></div>
         </div>
         <span class="pb-v3-drawer-mood" aria-hidden="true">Happy<br>Little<br>Moments<span>♥</span></span>
@@ -277,7 +225,7 @@
       <div class="pb-v3-hero-art">
         <span class="pb-v3-blob pb-v3-blob-a"></span>
         <span class="pb-v3-blob pb-v3-blob-b"></span>
-        <img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-reference-logo.png" alt="" width="190" height="190">
+        <img src="assets/pasha-baby-reference-logo.png" alt="" width="190" height="190">
       </div>
     </section>
 
@@ -307,7 +255,7 @@
         <button id="pbV3PromoOpen" type="button">عرض التفاصيل</button>
       </div>
       <div class="pb-v3-promo-media">
-        <img id="pbV3PromoImage" src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-product-placeholder.svg" alt="" loading="lazy" decoding="async">
+        <img id="pbV3PromoImage" src="assets/pasha-baby-product-placeholder.svg" alt="" loading="lazy" decoding="async">
         <span id="pbV3PromoDiscount" hidden></span>
       </div>
     </section>
@@ -428,7 +376,7 @@
 
       <footer class="pb-ref-footer" aria-label="معلومات پاشا بيبي">
         <div class="pb-ref-footer-brand">
-          <img src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-reference-logo.png" alt="Pasha Baby Store" width="88" height="68">
+          <img src="assets/pasha-baby-reference-logo.png" alt="Pasha Baby Store" width="88" height="68">
           <small>متجر أجيال طفلك</small>
         </div>
         <div class="pb-ref-footer-social">
@@ -466,23 +414,22 @@
 
   <button id="smTopBtn" class="sm-top-btn" type="button" aria-label="الرجوع إلى الأعلى">↑</button>
 
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/vendor/supabase-2.114.0.min.js" integrity="sha384-0UK+HVlz5Y7F//atDpPysyocv/PjGXQoBX+XSaL/eEotARW8rPFh+lL5sO0Ljzfi" crossorigin="anonymous" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/supabase-config.js?v=1.0" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/unavailable-card-state.js?v=v3.1" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/app.js?v=v3.1" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/pasha-baby-commerce.js?v=v3.1" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/product-image-fallback.js?v=v3.1" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/price-safety.js?v=v3.1" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/cart.js?v=v3.1" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/cart-stale-item-guard.js?v=1.0" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/live-prices.js?v=v3.1" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/pasha-baby-fixed-discounts.js?v=v3.1" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/live-card-badges.js?v=v3.1" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/pasha-review-ui.js?v=3" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/pasha-checkout-review.js?v=3" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/js/pasha-reviews.js?v=4" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/storefront-v3/product-details-v3.js?v=1.3" defer></script>
-  <script src="https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/storefront-v3/storefront-v3.js?v=1.8" defer></script>
-  <script src="./v3-reference-match.js?v=4.8" defer></script>
+  <script src="js/vendor/supabase-2.114.0.min.js" integrity="sha384-0UK+HVlz5Y7F//atDpPysyocv/PjGXQoBX+XSaL/eEotARW8rPFh+lL5sO0Ljzfi" crossorigin="anonymous" defer></script>
+  <script src="js/supabase-config.js?v=1.0" defer></script>
+  <script src="js/unavailable-card-state.js?v=v3.1" defer></script>
+  <script src="js/app.js?v=v3.1" defer></script>
+  <script src="js/pasha-baby-commerce.js?v=v3.1" defer></script>
+  <script src="js/product-image-fallback.js?v=v3.1" defer></script>
+  <script src="js/price-safety.js?v=v3.1" defer></script>
+  <script src="js/cart.js?v=v3.1" defer></script>
+  <script src="js/cart-stale-item-guard.js?v=1.0" defer></script>
+  <script src="js/live-prices.js?v=v3.1" defer></script>
+  <script src="js/pasha-baby-fixed-discounts.js?v=v3.1" defer></script>
+  <script src="js/live-card-badges.js?v=v3.1" defer></script>
+  <script src="js/pasha-review-ui.js?v=3" defer></script>
+  <script src="js/pasha-checkout-review.js?v=3" defer></script>
+  <script src="js/pasha-reviews.js?v=4" defer></script>
+  <script src="storefront-v3/product-details-v3.js?v=1.3" defer></script>
+  <script src="storefront-v3/storefront-v3.js?v=1.8" defer></script>
 </body>
 </html>

@@ -67,11 +67,13 @@ const I18N = {
 };
 
 
+const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname) || document.body?.classList.contains('pb-v3-page') === true;
 let DB = null;
 let lang = localStorage.getItem("RESTBR_LANG_V1") || "ar";
 let active = "";
 let searchQuery = "";
 let searchTracked = false;
+let v3CatalogFilter = 'category';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -1596,6 +1598,11 @@ function scheduleFooterGlassSync(){
 
 function initFooterGlassSync(){
 
+  if(IS_STOREFRONT_V3){
+    footerGlassObserver?.disconnect();
+    return;
+  }
+
   const menu=
     document.getElementById(
       "smMenu"
@@ -1956,7 +1963,11 @@ function renderCats() {
 
   const savedScroll = rail.scrollLeft;
 
-  rail.innerHTML = categories()
+  const categoryRows = IS_STOREFRONT_V3
+    ? [{ id: '__all__', ar: 'كل المنتجات', en: 'All products', ku: 'هەموو بەرهەمەکان' }, ...categories()]
+    : categories();
+
+  rail.innerHTML = categoryRows
     .map(category => `
       <button
         class="sm-cat ${String(category.id) === String(active) ? "active" : ""}"
@@ -2227,41 +2238,65 @@ function render() {
 
     watchCards();
     scheduleFooterGlassSync();
+    if(IS_STOREFRONT_V3)window.dispatchEvent(new Event('restbr:v3-menu-rendered'));
     return;
   }
 
 
-  const products=DB.products.filter(
-    product=>
-      product.category &&
-      String(product.category.id)===String(active)
-  );
+  const allProducts = DB.products.filter(product => product && product.category);
+  const products = IS_STOREFRONT_V3 && v3CatalogFilter !== 'category'
+    ? allProducts.filter(product => {
+        if (v3CatalogFilter === 'all') return true;
+        if (product.badges?.unavailable === true) return false;
+        if (v3CatalogFilter === 'popular') return product.badges?.popular === true;
+        if (v3CatalogFilter === 'new') return product.badges?.new === true;
+        if (v3CatalogFilter === 'offer') {
+          const discount = Number(product.discountPercent || 0) > 0 ||
+            Number(product.discountAmount || 0) > 0;
+          const optionDiscount = (product.options || []).some(option =>
+            Number(option.originalPrice ?? option.__retailOriginalPrice ?? option.price) > Number(option.price)
+          );
+          return product.badges?.offer === true || discount || optionDiscount;
+        }
+        return false;
+      })
+    : allProducts.filter(product => String(product.category.id)===String(active));
 
 
   if(!products.length){
-    menu.innerHTML="";
+    menu.innerHTML = IS_STOREFRONT_V3 && v3CatalogFilter !== 'category'
+      ? '<section class="sm-section"><div class="analytics-empty" style="padding:30px 12px;text-align:center;">لا توجد منتجات في هذا العرض حاليًا.</div></section>'
+      : '';
+    if(IS_STOREFRONT_V3)window.dispatchEvent(new Event('restbr:v3-menu-rendered'));
     return;
   }
 
 
   const category=products[0].category;
-
+  const v3SectionTitle = IS_STOREFRONT_V3 ? ({
+    all: 'كل المنتجات',
+    popular: 'الأكثر طلبًا',
+    new: 'منتجات جديدة',
+    offer: 'العروض'
+  })[v3CatalogFilter] : '';
+  const sectionTitle = v3SectionTitle || txt(category);
 
   menu.innerHTML=`
     <section class="sm-section">
 
       <div class="sm-section-head">
         <h2 class="sm-section-title">
-          ${escapeUi(txt(category))}
+          ${escapeUi(sectionTitle)}
         </h2>
 
+        ${!IS_STOREFRONT_V3 || v3CatalogFilter === 'category' ? `
         <button
           class="sm-share-category"
           type="button"
           data-share-category="${escapeUi(category.id)}"
           aria-label="${I18N[lang].share}">
           ↗
-        </button>
+        </button>` : ''}
       </div>
 
       <div class="sm-grid">
@@ -2274,6 +2309,7 @@ function render() {
 
   watchCards();
   scheduleFooterGlassSync();
+  if(IS_STOREFRONT_V3)window.dispatchEvent(new Event('restbr:v3-menu-rendered'));
 }
 
 /* ========================================
@@ -2385,6 +2421,24 @@ function applyLang() {
 }
 
 
+// V3 catalog actions are shared by the category rail and the real highlight sections.
+window.RESTBR_V3_SHOW_CATALOG = mode => {
+  if (!IS_STOREFRONT_V3 || !DB || !Array.isArray(DB.products)) return false;
+  if (!['all', 'popular', 'new', 'offer'].includes(mode)) return false;
+  v3CatalogFilter = mode;
+  active = '__all__';
+  searchQuery = '';
+  const input = document.getElementById('smSearchInput');
+  if (input) input.value = '';
+  updateSearchCount();
+  setUrlForCategory('');
+  renderCats();
+  render();
+  window.dispatchEvent(new CustomEvent('restbr:v3-category-selected', { detail: { mode } }));
+  return true;
+};
+
+
 /* ========================================
    CARD REVEAL
 ======================================== */
@@ -2392,7 +2446,7 @@ function applyLang() {
 let observer = null;
 
 
-if ("IntersectionObserver" in window) {
+if (!IS_STOREFRONT_V3 && "IntersectionObserver" in window) {
 
   observer =
     new IntersectionObserver(
@@ -2548,7 +2602,8 @@ document.addEventListener(
 
     if (
       categoryButton &&
-      categoryButton.dataset.cat !== active
+      (categoryButton.dataset.cat !== active ||
+       (IS_STOREFRONT_V3 && v3CatalogFilter !== (categoryButton.dataset.cat === '__all__' ? 'all' : 'category')))
     ) {
 
       const rail = $("#smCats");
@@ -2562,6 +2617,9 @@ document.addEventListener(
       active =
         categoryButton.dataset.cat;
 
+      if (IS_STOREFRONT_V3) {
+        v3CatalogFilter = active === '__all__' ? 'all' : 'category';
+      }
       searchQuery="";
       const searchInput=document.getElementById("smSearchInput");
       if(searchInput)searchInput.value="";
@@ -2576,7 +2634,11 @@ document.addEventListener(
 
       renderCats();
       render();
-
+      if (IS_STOREFRONT_V3) {
+        window.dispatchEvent(new CustomEvent('restbr:v3-category-selected', {
+          detail: { categoryId, mode: v3CatalogFilter }
+        }));
+      }
 
       requestAnimationFrame(() => {
 
@@ -3407,6 +3469,8 @@ function unpinCategories() {
 ======================================== */
 
 function scrollEffects() {
+
+  if(IS_STOREFRONT_V3) return;
 
   const root =
     document.documentElement;
@@ -4529,10 +4593,12 @@ async function startRestbr() {
        INITIALIZE WEBSITE
     ========================= */
 
-    installMenuCardPolish();
-    installMenuDiscoveryUI();
-    installV44PolishStyles();
-    applyUiDesignSettings();
+    if(!IS_STOREFRONT_V3){
+      installMenuCardPolish();
+      installMenuDiscoveryUI();
+      installV44PolishStyles();
+      applyUiDesignSettings();
+    }
     ensureSearchUI();
 
     applyDeepLinkBeforeRender();

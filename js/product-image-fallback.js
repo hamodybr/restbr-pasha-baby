@@ -1,5 +1,6 @@
 (() => {
   if (/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
 
   function safeMedia(value){
     return typeof window.RESTBR_SAFE_MEDIA_URL === 'function'
@@ -125,8 +126,10 @@
 
   function start(){
     scan();
-    observer.observe(document.body, { childList:true, subtree:true });
+    if (!IS_STOREFRONT_V3) observer.observe(document.body, { childList:true, subtree:true });
   }
+
+  window.RESTBR_PRODUCT_IMAGE_SCAN = () => scan();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start, { once:true });
