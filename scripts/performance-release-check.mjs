@@ -50,7 +50,7 @@ requireText('js/admin-large-catalog.js', 'function catalogMayBeTruncated()', 'la
 requireText('js/admin-large-catalog.js', 'async function ensureCompleteCatalog()', 'conditional full-catalog hydration');
 requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row boundary detection');
 
-requireText('sw.js', 'restbr-pasha-baby-v48', 'version-safe code cache generation');
+requireText('sw.js', 'restbr-pasha-baby-v49', 'version-safe code cache generation');
 requireText('sw.js', '2026-09-17: v46 forces iOS Safari', 'install-time storefront cache refresh marker');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');

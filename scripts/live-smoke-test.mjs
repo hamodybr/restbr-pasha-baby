@@ -101,7 +101,7 @@ const indexHtml = await expectText('/', [
   'js/runtime-config.js',
   'js/vendor/supabase-2.114.0.min.js',
   'js/pasha-baby-commerce.js?v=v3.1',
-  'v3-visual-fixes.css?v=4.6'
+  'v3-visual-fixes.css?v=4.7'
 ], 'storefront');
 
 if (indexHtml.includes('id="smLangs"')) fail('Arabic-only storefront', 'language picker still present');
@@ -231,7 +231,7 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v48',
+  'restbr-pasha-baby-v49',
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',

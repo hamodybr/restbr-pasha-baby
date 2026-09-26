@@ -546,3 +546,173 @@ body.pb-v3-page #pb36OfferBanner.pb36-has-discount > .pb36-offer-round {
     left: 51% !important;
   }
 }
+
+
+/* Storefront V3.7 — mobile completeness and full visual audit (2026-09-26). */
+
+/* Mobile catalog cards must never inherit the legacy 160px cap. */
+body.pb-v3-page #smMenu .sm-grid > .sm-card {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+}
+body.pb-v3-page #smMenu .sm-grid > .sm-card > .sm-img {
+  position: relative !important;
+  inset: auto !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+}
+body.pb-v3-page #smMenu .sm-grid > .sm-card > .sm-info {
+  position: relative !important;
+  inset: auto !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  height: auto !important;
+  min-height: 148px !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+}
+
+/* Four equal benefit buttons: one visual language, centered icon and label. */
+body.pb-v3-page .pb-v3-benefits {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+body.pb-v3-page .pb-v3-benefits > div,
+body.pb-v3-page .pb-v3-benefits > div:first-child {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  min-width: 0 !important;
+  min-height: 88px !important;
+  padding: 10px 6px !important;
+  border: 1px solid rgba(18,113,94,.16) !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.82) !important;
+  box-shadow: 0 7px 20px rgba(30,81,68,.06) !important;
+  text-align: center !important;
+}
+body.pb-v3-page .pb-v3-benefits > div > svg {
+  display: block !important;
+  flex: 0 0 auto !important;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+}
+body.pb-v3-page .pb-v3-benefits > div > span {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body.pb-v3-page .pb-v3-benefits > div > span > b {
+  display: block !important;
+  max-width: 100% !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  text-align: center !important;
+}
+body.pb-v3-page .pb-v3-benefits > div > span > small {
+  display: none !important;
+}
+
+/* The offers artwork fills the banner and is mirrored without mirroring the copy. */
+body.pb-v3-page #pb36OfferBanner.pb36-offer-banner {
+  position: relative !important;
+  display: block !important;
+  min-height: 205px !important;
+  padding: 24px 26px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  border-radius: 22px !important;
+  background: #efd2b4 !important;
+}
+body.pb-v3-page #pb36OfferBanner.pb36-offer-banner::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  background: linear-gradient(90deg, rgba(250,228,204,.04) 0%, rgba(250,228,204,.20) 42%, rgba(250,228,204,.93) 73%, rgba(250,228,204,.98) 100%) !important;
+}
+body.pb-v3-page #pb36OfferBanner.pb36-offer-banner > img {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  min-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: inherit !important;
+  transform: scaleX(-1) !important;
+}
+body.pb-v3-page #pb36OfferBanner .pb36-offer-copy {
+  position: relative !important;
+  z-index: 2 !important;
+  width: min(48%, 390px) !important;
+  margin-right: 0 !important;
+  margin-left: auto !important;
+}
+body.pb-v3-page #pb36OfferBanner.pb36-has-discount > .pb36-offer-round {
+  z-index: 2 !important;
+}
+
+@media (max-width: 680px) {
+  body.pb-v3-page .pb-v3-benefits {
+    gap: 7px !important;
+  }
+  body.pb-v3-page .pb-v3-benefits > div,
+  body.pb-v3-page .pb-v3-benefits > div:first-child {
+    min-height: 86px !important;
+    padding: 9px 3px !important;
+    border-radius: 16px !important;
+  }
+  body.pb-v3-page .pb-v3-benefits > div > svg {
+    width: 25px !important;
+    height: 25px !important;
+  }
+  body.pb-v3-page .pb-v3-benefits > div > span > b {
+    font-size: 9px !important;
+    line-height: 1.22 !important;
+  }
+  body.pb-v3-page #pb36OfferBanner.pb36-offer-banner {
+    min-height: 180px !important;
+    padding: 18px 16px !important;
+    border-radius: 19px !important;
+  }
+  body.pb-v3-page #pb36OfferBanner .pb36-offer-copy {
+    width: 51% !important;
+  }
+  body.pb-v3-page #pb36OfferBanner .pb36-offer-copy h2 {
+    font-size: clamp(22px, 7.4vw, 31px) !important;
+  }
+  body.pb-v3-page #pb36OfferBanner.pb36-has-discount > .pb36-offer-round {
+    width: 62px !important;
+    height: 62px !important;
+    left: 42% !important;
+  }
+}
