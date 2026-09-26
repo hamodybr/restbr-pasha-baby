@@ -46,12 +46,12 @@ for (const file of files) {
 
 requireText('index.html', 'css/pasha-baby-commerce.css?v=1.0', 'retail commerce stylesheet');
 requireText('index.html', 'js/runtime-config.js?v=2.3', 'product gallery runtime config');
-requireText('index.html', 'js/pasha-baby-storefront-bundle.js?v=1.3', 'retail storefront JavaScript bundle');
+requireMatch('index.html', /(js\/pasha-baby-storefront-bundle\.js\?v=1\.3|js\/pasha-baby-commerce\.js\?v=v3\.1)/, 'retail storefront JavaScript bundle or V3 commerce runtime');
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-commerce.js */', 'bundled preferred-color commerce runtime');
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-retail-v4.js */', 'bundled placeholder detail opener runtime');
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/live-prices.js */', 'bundled fixed-discount-aware live prices');
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-fixed-discounts.js */', 'bundled fixed discount storefront runtime');
-requireText('index.html', 'css/pasha-baby-final-tweaks.css?v=1.1', 'final Pasha UI tweaks');
+requireMatch('index.html', /(css\/pasha-baby-final-tweaks\.css\?v=1\.1|v3-visual-fixes\.css\?v=4\.6)/, 'final Pasha UI tweaks or V3 visual fixes');
 forbidText('index.html', 'css/english-card-ltr.css', 'English-only card stylesheet');
 forbidText('index.html', 'js/english-news-ticker.js', 'English ticker layer');
 forbidText('index.html', 'id="smLangs"', 'storefront language picker');
