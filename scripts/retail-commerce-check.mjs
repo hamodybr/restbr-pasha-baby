@@ -51,7 +51,7 @@ requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-commerce.js 
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-retail-v4.js */', 'bundled placeholder detail opener runtime');
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/live-prices.js */', 'bundled fixed-discount-aware live prices');
 requireText('js/pasha-baby-storefront-bundle.js', '/* js/pasha-baby-fixed-discounts.js */', 'bundled fixed discount storefront runtime');
-requireMatch('index.html', /(css\/pasha-baby-final-tweaks\.css\?v=1\.1|v3-visual-fixes\.css\?v=4\.6)/, 'final Pasha UI tweaks or V3 visual fixes');
+requireMatch('index.html', /(css\/pasha-baby-final-tweaks\.css\?v=1\.1|v3-visual-fixes\.css\?v=4\.7)/, 'final Pasha UI tweaks or V3 visual fixes');
 forbidText('index.html', 'css/english-card-ltr.css', 'English-only card stylesheet');
 forbidText('index.html', 'js/english-news-ticker.js', 'English ticker layer');
 forbidText('index.html', 'id="smLangs"', 'storefront language picker');
