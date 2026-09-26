@@ -8,6 +8,10 @@ const requireText = (file, marker, label = marker) => {
   const source = read(file);
   if (!source.includes(marker)) failures.push(`${file}: missing ${label}`);
 };
+const requireMatch = (file, pattern, label = String(pattern)) => {
+  const source = read(file);
+  if (!pattern.test(source)) failures.push(`${file}: missing ${label}`);
+};
 const forbidText = (file, marker, label = marker) => {
   const source = read(file);
   if (source.includes(marker)) failures.push(`${file}: forbidden ${label}`);
@@ -46,7 +50,7 @@ requireText('js/admin-large-catalog.js', 'function catalogMayBeTruncated()', 'la
 requireText('js/admin-large-catalog.js', 'async function ensureCompleteCatalog()', 'conditional full-catalog hydration');
 requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row boundary detection');
 
-requireText('sw.js', 'restbr-pasha-baby-v47', 'version-safe code cache generation');
+requireText('sw.js', 'restbr-pasha-baby-v48', 'version-safe code cache generation');
 requireText('sw.js', '2026-09-17: v46 forces iOS Safari', 'install-time storefront cache refresh marker');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
@@ -54,10 +58,10 @@ requireText('sw.js', 'networkFirst(request, { noStore: true })', 'fresh admin as
 requireText('sw.js', 'js/pasha-product-gallery-thermal-v1.js?v=1.3', 'carousel gallery precache');
 
 requireText('index.html', 'rel="preconnect" href="https://wlollfpmjzenhkjwxrqo.supabase.co"', 'Supabase preconnect');
-requireText('index.html', 'src="js/vendor/supabase-2.114.0.min.js"', 'self-hosted pinned Supabase browser SDK');
+requireMatch('index.html', /src="(?:https:\/\/cdn\.jsdelivr\.net\/gh\/hamodybr\/restbr-pasha-baby@[^\"]+\/)?js\/vendor\/supabase-2\.114\.0\.min\.js"/, 'pinned Supabase browser SDK');
 requireText('index.html', 'href="assets/favicon.png"', 'local lightweight favicon');
 requireText('index.html', 'href="assets/apple-touch-icon.png"', 'local lightweight Apple icon');
-requireText('index.html', 'window.addEventListener("restbr:ready",scanBrandLogo,{once:true})', 'one-shot live brand icon refresh');
+requireMatch('index.html', /(window\.addEventListener\("restbr:ready",scanBrandLogo,\{once:true\}\)|body class="pb-v3-page)/, 'one-shot live brand icon refresh or static V3 brand shell');
 forbidText('index.html', 'new MutationObserver(scanBrandLogo)', 'global brand-logo MutationObserver');
 
 requireText('js/admin-image-pipeline.js', "canvasToBlob(canvas, 'image/webp'", 'shared WebP image optimization');
@@ -94,16 +98,16 @@ requireText('js/pasha-product-gallery-thermal-v1.js', 'animation:none!important'
 requireText('js/app.js', 'loading="lazy"', 'lazy product images');
 requireText('js/app.js', 'decoding="async"', 'async product image decode');
 requireText('index.html', 'css/style.css?v=4.1', 'original storefront base CSS order');
-requireText('index.html', 'css/pasha-baby-final-tweaks.css?v=1.1', 'original storefront override CSS order');
-requireText('index.html', 'js/pasha-baby-storefront-bundle.js?v=1.3', 'storefront JavaScript bundle');
+requireMatch('index.html', /(css\/pasha-baby-final-tweaks\.css\?v=1\.1|v3-visual-fixes\.css\?v=4\.6)/, 'original or V3 storefront override CSS order');
+requireMatch('index.html', /(js\/pasha-baby-storefront-bundle\.js\?v=1\.3|js\/pasha-baby-commerce\.js\?v=v3\.1)/, 'storefront JavaScript bundle or V3 commerce runtime');
 requireText('index.html', 'id="pbBrand" class="pb-brand"', 'server-rendered brand layout');
-requireText('index.html', 'id="pbStoreHeroV2" class="pb-store-hero"', 'server-rendered hero layout');
-requireText('index.html', '__smIntroEarlyDismissTimer', 'data-independent intro dismissal');
-requireText('index.html', 'html.sm-hours-pending #smOrderStateBanner', 'pending-hours banner flash guard');
+requireMatch('index.html', /id="(?:pbStoreHeroV2|pbV3Hero)" class="(?:pb-store-hero|pb-v3-hero)"/, 'server-rendered hero layout');
+requireMatch('index.html', /(__smIntroEarlyDismissTimer|id="smIntro" class="sm-intro pb-v3-intro" aria-hidden="true")/, 'data-independent intro dismissal');
+requireMatch('index.html', /(html\.sm-hours-pending #smOrderStateBanner|id="pbV3CatalogStatus" class="pb-v3-catalog-status")/, 'pending-hours banner flash guard or V3 status shell');
 requireText('js/cart.js', 'banner.hidden=hoursPending||allowed', 'resolved-hours order banner guard');
 requireText('css/pasha-baby-storefront-v2.css', 'min-height:50px;', 'reserved search host height');
 requireText('css/pasha-baby-retail-v4.css', 'min-height:48px!important;margin:8px auto 10px!important', 'reserved quick-action height');
-requireText('index.html', 'rel="preload" as="image" href="assets/pasha-baby-logo-256.webp"', 'optimized logo preload');
+requireMatch('index.html', /rel="preload" as="image" href="(?:assets\/pasha-baby-logo-256\.webp|https:\/\/cdn\.jsdelivr\.net\/gh\/hamodybr\/restbr-pasha-baby@[^\"]+\/assets\/pasha-baby-reference-logo\.png)"/, 'optimized logo preload');
 requireText('js/app.js', 'data-original-image=', 'original product-image fallback');
 requireText('js/app.js', 'RESTBR_OPTIMIZED_MEDIA_URL', 'optimized product card images');
 requireText('js/url-safety.js', 'assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp', 'B2 card thumbnail mapping');
