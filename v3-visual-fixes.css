@@ -20,6 +20,8 @@
 }
 
 .pb-v3-search-host #smSearchInput {
+  /* Keep iOS from zooming focused inputs; preserve user pinch zoom. */
+  font-size: 16px !important;
   display: block !important;
   box-sizing: border-box !important;
   background: #fff !important;
@@ -901,3 +903,12 @@ body.pb-v3-page #smCheckoutSheet .sm-checkout-head button {
 body.pb-v3-page .sm-cart-shipping{font-size:11px;line-height:1.6;color:#63766e;padding:0 0 8px;text-align:start}
 body.pb-v3-page #smCheckoutShipping{border-top:1px solid #e4e9e5;margin-top:8px;padding-top:6px}
 body.pb-v3-page #smCheckoutShipping .sm-review-item{font-size:12px;gap:12px;padding:5px 0}
+
+/* Readable order review without enlarging the checkout controls. */
+body.pb-v3-page #smCheckoutSheet .sm-checkout-review h4{font-size:16px!important;line-height:1.5}
+body.pb-v3-page #smCheckoutSheet .sm-review-item{font-size:14px!important;line-height:1.6;gap:12px}
+body.pb-v3-page #smCheckoutSheet .sm-review-item > span{overflow-wrap:anywhere}
+body.pb-v3-page #smCheckoutSheet .sm-review-item small{font-size:12px;line-height:1.5}
+body.pb-v3-page #smCheckoutSheet .sm-review-item b{flex-shrink:0}
+body.pb-v3-page #smCheckoutSheet .sm-checkout-review-total{font-size:15px!important;line-height:1.6}
+body.pb-v3-page #smCheckoutSheet .sm-checkout-review-total b{font-size:18px!important}
