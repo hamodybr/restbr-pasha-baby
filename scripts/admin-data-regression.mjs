@@ -9,6 +9,8 @@ const completeProduct={name_ar:'كرسي أطفال',description_ar:'كرسي م
 assert.equal(api.productContentIssues(completeProduct).length,0);
 assert.equal(api.productContentIssues({...completeProduct,image_url:'  ',description_ar:'  '}).length,2);
 assert.equal(api.productContentIssues({...completeProduct,image_url:'assets/restaurant-placeholder.svg'}).length,1);
+assert.equal(api.productContentIssues({...completeProduct,image_url:'assets/pasha-baby-product-placeholder.svg'}).length,1);
+assert.equal(api.productContentIssues({...completeProduct,image_url:'assets/pasha-baby-logo-256.webp'}).length,1);
 assert.equal(api.productContentIssues({...completeProduct,image_url:'https://example.com/logo.webp'},'https://example.com/logo.webp').length,1);
 assert.equal(api.productContentIssues({...completeProduct,name_ar:''}).length,1);
 const adminSource=fs.readFileSync('admin.html','utf8');
