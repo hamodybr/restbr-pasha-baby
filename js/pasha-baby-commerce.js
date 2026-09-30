@@ -185,6 +185,7 @@
             ku: product.name_ku || product.ku || product.name_ar || '',
             en: product.name_en || product.en || product.name_ar || ''
           },
+          deliveryFee: Number(product.delivery_fee ?? 5000),
           category,
           image: product.image_url || product.image || '',
           order: product.sort_order ?? product.order ?? 999,

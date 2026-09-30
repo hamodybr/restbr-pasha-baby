@@ -3969,6 +3969,8 @@ async function loadMenuFromSupabase() {
           },
 
 
+          deliveryFee: Number(product.delivery_fee ?? 5000),
+
           category:
             category,
 

@@ -239,7 +239,7 @@
       loadScript('pashaColorImageGalleryScript', 'js/pasha-color-image-gallery.js?v=2.1');
       loadScript('pashaProductGalleryThermalScript', 'js/pasha-product-gallery-thermal-v1.js?v=1.3');
     }
-    loadScript('pashaOrderSubmitScript', 'js/pasha-order-submit.js?v=2.0');
+    loadScript('pashaOrderSubmitScript', 'js/pasha-order-submit.js?v=2.1');
     if (!IS_STOREFRONT_V3) {
       loadScript('pashaArabicNewsTickerScript', 'js/arabic-news-ticker.js?v=1.1');
     }
