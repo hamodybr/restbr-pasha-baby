@@ -871,3 +871,28 @@ body.pb-v3-page #pb36DetailBenefits small { font-size:8px!important; line-height
   body.pb-v3-page #pb36DetailBenefits > span { padding-inline:3px!important; gap:1px 3px!important; }
   body.pb-v3-page #pb36DetailBenefits b { font-size:8px!important; }
 }
+
+/* The intro icon is hidden by the retail skin: let the text use the full row. */
+body.pb-v3-page #smCheckoutSheet #pbV3CheckoutIntro {
+  display:block!important; width:auto!important; min-width:0!important;
+  margin:2px 16px 10px!important; padding:10px 12px!important;
+  text-align:start!important; direction:rtl!important; box-sizing:border-box!important;
+}
+body.pb-v3-page #smCheckoutSheet #pbV3CheckoutIntro > b { display:none!important; }
+body.pb-v3-page #smCheckoutSheet #pbV3CheckoutIntro > span {
+  display:grid!important; width:100%!important; min-width:0!important; gap:3px!important;
+}
+body.pb-v3-page #smCheckoutSheet #pbV3CheckoutIntro strong {
+  display:block!important; font-size:13px!important; line-height:1.6!important;
+  white-space:normal!important; word-break:normal!important; overflow-wrap:break-word!important;
+}
+body.pb-v3-page #smCheckoutSheet #pbV3CheckoutIntro small {
+  display:block!important; font-size:11px!important; line-height:1.6!important;
+  white-space:normal!important; word-break:normal!important; overflow-wrap:break-word!important;
+}
+body.pb-v3-page #smCheckoutSheet .sm-checkout-head button {
+  display:grid!important; place-items:center!important; padding:0!important; line-height:1!important;
+}
+@media(max-width:680px) {
+  body.pb-v3-page #smCheckoutSheet #pbV3CheckoutIntro { margin-inline:13px!important; }
+}
