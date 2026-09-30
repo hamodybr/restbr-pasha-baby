@@ -800,3 +800,6 @@ body.pb-v3-page #smMenu .pb50-product-card .sm-badges { top:9px!important; right
  body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row > button { font-size:10px!important; gap:3px!important; }
  body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary b { font-size:13px!important; }
 }
+
+/* Commerce's legacy details control is redundant with the V3 details button. */
+body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row > .pb-card-details-btn { display:none!important; }
