@@ -513,7 +513,7 @@
     fab.setAttribute("aria-label",qty?`${tr("cart")}: ${qty}، ${money(sum)}`:tr("cart"));
     ["smCartClose","smCheckoutClose","smChoiceClose","smImageClose"].forEach(id=>document.getElementById(id)?.setAttribute("aria-label",tr("close")));
     document.getElementById("smCartTitle").textContent=tr("cart");
-    document.getElementById("smCartTotalLabel").textContent=tr("total");
+    document.getElementById("smCartTotalLabel").textContent="مجموع المنتجات";
     document.getElementById("smCartTotal").textContent=money(sum);
     document.getElementById("smCartContinue").textContent=tr("continue");
     const clearBtn=document.getElementById("smCartClear");
