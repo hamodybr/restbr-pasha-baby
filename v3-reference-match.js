@@ -375,7 +375,8 @@
         meta.className = 'pb36-catalog-meta';
         name.insertAdjacentElement('afterend', meta);
       }
-      const nextMeta = localized(product.category) || 'Pasha Baby';
+      card.classList.add('pb50-product-card');
+      const nextMeta = localized(product.description) || localized(product.category) || 'Pasha Baby';
       if (meta.textContent !== nextMeta) meta.textContent = nextMeta;
 
       let dots = $('.pb36-color-dots', info);
@@ -392,6 +393,29 @@
         dots.dataset.pb36Signature = signature;
         dots.innerHTML = colorDots(product);
       }
+
+      let priceRow = $('.pb50-price-row', info);
+      if (!priceRow) {
+        priceRow = document.createElement('div');
+        priceRow.className = 'pb50-price-row';
+        info.appendChild(priceRow);
+      }
+      const summary = $('.pb-v3-card-summary', info);
+      if (summary && summary.parentElement !== priceRow) priceRow.appendChild(summary);
+      if (dots.parentElement !== priceRow) priceRow.appendChild(dots);
+
+
+      const action = $('.sm-direct-add,.sm-choose-options', info);
+      if (action) {
+        const label = action.querySelector('b');
+        if (label && label.textContent !== 'أضف للسلة') label.textContent = 'أضف للسلة';
+        const glyph = action.querySelector('span');
+        if (glyph && glyph.dataset.pb50Cart !== '1') {
+          glyph.dataset.pb50Cart = '1';
+          glyph.innerHTML = icon('cart');
+        }
+      }
+
     });
   }
 
