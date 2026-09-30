@@ -13,7 +13,7 @@
   <meta name="theme-color" content="#080604">
 
   <title>Pasha Baby — Admin Dashboard</title>
-  <script src="js/admin-data-tools.js?v=1.0"></script>
+  <script src="js/admin-data-tools.js?v=1.1"></script>
 
   <link rel="icon" type="image/png" href="assets/favicon.png">
 
@@ -2636,6 +2636,7 @@
       <button class="filter-chip" type="button" data-product-filter="hidden">المخفي</button>
       <button class="filter-chip" type="button" data-product-filter="unavailable">غير متوفر</button>
       <button class="filter-chip" type="button" data-product-filter="warehouse">غير معروض</button>
+      <button class="filter-chip" type="button" data-product-filter="incomplete">بيانات ناقصة <span id="productContentCount"></span></button>
     </div>
 
     <section class="panel">
@@ -5647,6 +5648,10 @@
 
     const inWarehouse=isHiddenCategory(category);
 
+    if(adminProductFilter==='incomplete'){
+      return window.PashaAdminData.productContentIssues(product,adminRestaurantSettings?.logo_url).length > 0;
+    }
+
     if(adminProductFilter==='visible'){
       return !inWarehouse && product.is_visible!==false && category?.is_visible!==false;
     }
@@ -6613,6 +6618,9 @@
       document.getElementById('productsContainer');
 
 
+    const contentCount=document.getElementById('productContentCount');
+    if(contentCount) contentCount.textContent='('+adminProducts.filter(p=>window.PashaAdminData.productContentIssues(p,adminRestaurantSettings?.logo_url).length).length+')';
+
     const query =
       String(search || '')
         .trim()
@@ -6721,6 +6729,7 @@
                 ${product.is_offer?'<span class="system-badge">🏷 عرض مميز</span>':''}
               </div>
 
+              <div class="product-content-issues">${window.PashaAdminData.productContentIssues(product,adminRestaurantSettings?.logo_url).map(issue=>`<span>${escapeAdminHtml(issue)}</span>`).join('')}</div>
               ${renderProductOptionChips(product.id)}
 
             </div>
