@@ -20,6 +20,8 @@
   let customerSearch = '';
   let customerFilterPhone = '';
   let refreshTimer = null;
+  let orderPage = 1, customerPage = 1;
+  let ordersLoading = false, customersLoading = false;
 
   const sb = () => (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
   const esc = value => String(value ?? '')
@@ -105,6 +107,8 @@
       .pb-ops-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 13px}
       .pb-ops-toolbar input{flex:1 1 170px;min-width:0;border:1px solid rgba(255,255,255,.09);background:#0d0b09;color:inherit;border-radius:12px;padding:11px 12px;font:inherit;font-size:16px;outline:none}
       .pb-ops-toolbar button{border:1px solid rgba(216,169,88,.2);background:rgba(216,169,88,.08);color:#e2b55e;border-radius:12px;padding:10px 12px;font:inherit;font-weight:800;cursor:pointer}
+      .pb-data-pages{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:12px 0;font-size:13px}.pb-data-pages button{min-height:40px;padding:8px 14px;border-radius:10px;border:1px solid #c5dcd2;background:#edf5f1;color:#225a48;font:700 13px inherit}.pb-data-pages button:disabled{opacity:.45;cursor:default}
+      .pb-ops-toolbar input{font-size:16px!important}
       .pb-status-filter-bar{display:flex;gap:7px;overflow-x:auto;margin:-2px 0 14px;padding:2px 1px 7px;scroll-snap-type:x proximity;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
       .pb-status-filter-bar button{flex:0 0 auto;scroll-snap-align:start;border:1px solid rgba(216,169,88,.17);border-radius:999px;background:rgba(216,169,88,.055);color:#bdb3a8;padding:8px 12px;font:800 11px/1.2 inherit;white-space:nowrap;cursor:pointer;transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease}
       .pb-status-filter-bar button:active{transform:scale(.97)}.pb-status-filter-bar button.active{border-color:#d8a958;background:linear-gradient(135deg,#e3b85f,#bd8330);color:#181008;box-shadow:0 5px 14px rgba(181,121,38,.2)}
@@ -178,6 +182,7 @@
           ${Object.entries(STATUS).map(([key, value]) => `<button type="button" data-order-filter="${key}" class="${key === orderFilter ? 'active' : ''}" aria-pressed="${key === orderFilter}">${value[1]} ${value[0]}</button>`).join('')}
           <button type="button" data-order-filter="all" class="${orderFilter === 'all' ? 'active' : ''}" aria-pressed="${orderFilter === 'all'}">كل الحالات</button>
         </div>
+        <nav id="pbOrdersPages" class="pb-data-pages" aria-label="صفحات الطلبات"></nav>
         <div id="pbOrdersList" class="pb-order-list"><div class="pb-empty">جاري تحميل الطلبات...</div></div>
       </section>
 
@@ -192,19 +197,21 @@
           <input id="pbCustomerSearch" type="search" placeholder="اسم أو رقم هاتف...">
           <button id="pbRefreshCustomers" type="button">↻ تحديث</button>
         </div>
+        <nav id="pbCustomersPages" class="pb-data-pages" aria-label="صفحات الزبائن"></nav>
         <div id="pbCustomersList" class="pb-customer-list"><div class="pb-empty">جاري تحميل الزبائن...</div></div>
       </section>`);
 
-    document.getElementById('pbOrderSearch')?.addEventListener('input', e => { orderSearch = e.target.value || ''; renderOrders(); });
+    document.getElementById('pbOrderSearch')?.addEventListener('input', e => { orderSearch = englishDigits(e.target.value || ''); orderPage = 1; renderOrders(); });
     document.getElementById('pbOrderStatusBar')?.addEventListener('click', event => {
       const button = event.target.closest?.('[data-order-filter]');
       if (!button) return;
+      orderPage = 1;
       orderFilter = button.dataset.orderFilter || 'new';
       customerFilterPhone = '';
       syncOrderFilterBar();
       renderOrders();
     });
-    document.getElementById('pbCustomerSearch')?.addEventListener('input', e => { customerSearch = e.target.value || ''; renderCustomers(); });
+    document.getElementById('pbCustomerSearch')?.addEventListener('input', e => { customerSearch = englishDigits(e.target.value || ''); customerPage = 1; renderCustomers(); });
     document.getElementById('pbRefreshOrders')?.addEventListener('click', () => void loadOrders(true));
     document.getElementById('pbRefreshCustomers')?.addEventListener('click', () => void loadCustomers(true));
 
@@ -266,57 +273,51 @@
     const list = document.getElementById('pbOrdersList');
     if (force && list) list.innerHTML = '<div class="pb-empty">جاري التحديث...</div>';
 
-    const result = await client
-      .from('orders')
-      .select('id,order_number,customer_id,customer_name,customer_phone,order_type,address,location_url,notes,status,subtotal,delivery_fee,total,created_at,updated_at,order_items(id,product_id,option_id,product_name,option_name,selected_color,quantity,unit_price,line_total)')
-      .order('created_at', { ascending: false })
-      .limit(500);
-
-    if (result.error) {
-      if (list) list.innerHTML = `<div class="pb-empty">تعذر تحميل الطلبات: ${esc(result.error.message || result.error)}</div>`;
-      return;
-    }
-    orders = Array.isArray(result.data) ? result.data : [];
-    updateOrderKPIs();
-    renderOrders();
-    if (!customers.length) void loadCustomers(false);
+    if (ordersLoading) return;
+    ordersLoading = true;
+    try {
+      const next = await window.PashaAdminData.readAll(client, 'orders', 'id,order_number,customer_id,customer_name,customer_phone,order_type,address,location_url,notes,status,subtotal,delivery_fee,total,created_at,updated_at,order_items(id,product_id,option_id,product_name,option_name,selected_color,quantity,unit_price,line_total)');
+      orders = next.sort((a,b) => String(b.created_at).localeCompare(String(a.created_at)) || String(b.id).localeCompare(String(a.id)));
+      updateOrderKPIs();
+      renderOrders();
+    } catch(error) {
+      if(list) list.innerHTML = `<div class="pb-empty">تعذر تحميل الطلبات كاملة: ${esc(error.message || error)} — اضغط تحديث لإعادة المحاولة.</div>`;
+      document.getElementById('pbOrdersPages')?.replaceChildren();
+    } finally { ordersLoading = false; }
   }
 
   async function loadCustomers(force = false) {
     const client = sb();
-    if (!client) return;
+    if (!client || customersLoading) return;
     const list = document.getElementById('pbCustomersList');
     if (force && list) list.innerHTML = '<div class="pb-empty">جاري التحديث...</div>';
+    customersLoading = true;
+    try {
+      // No truncated local fallback: summary failures must remain visible.
+      customers = await window.PashaAdminData.readAll(client, 'customer_order_summary');
+      customers.sort((a,b) => String(b.last_order_at || '').localeCompare(String(a.last_order_at || '')) || String(b.id).localeCompare(String(a.id)));
+      updateCustomerKPIs();
+      renderCustomers();
+    } catch(error) {
+      if(list) list.innerHTML = `<div class="pb-empty">تعذر تحميل الزبائن كاملة: ${esc(error.message || error)} — اضغط تحديث لإعادة المحاولة.</div>`;
+      document.getElementById('pbCustomersPages')?.replaceChildren();
+    } finally { customersLoading = false; }
+  }
 
-    const summary = await client
-      .from('customer_order_summary')
-      .select('*')
-      .order('last_order_at', { ascending: false, nullsFirst: false })
-      .limit(1000);
-
-    if (!summary.error) {
-      customers = Array.isArray(summary.data) ? summary.data : [];
-    } else {
-      const raw = await client.from('customers').select('*').order('updated_at', { ascending: false }).limit(1000);
-      if (raw.error) {
-        if (list) list.innerHTML = `<div class="pb-empty">تعذر تحميل الزبائن: ${esc(raw.error.message || raw.error)}</div>`;
-        return;
-      }
-      const customerRows = Array.isArray(raw.data) ? raw.data : [];
-      customers = customerRows.map(customer => {
-        const related = orders.filter(order => String(order.customer_id || '') === String(customer.id) && order.status !== 'cancelled');
-        return {
-          ...customer,
-          order_count: related.length,
-          total_spent: related.reduce((sum, order) => sum + Number(order.total || 0), 0),
-          first_order_at: related.length ? related[related.length - 1].created_at : null,
-          last_order_at: related.length ? related[0].created_at : null,
-        };
-      });
+  function paginate(rows, kind) {
+    const result = window.PashaAdminData.pageRows(rows, kind === 'orders' ? orderPage : customerPage);
+    if(kind === 'orders') orderPage = result.page; else customerPage = result.page;
+    const host = document.getElementById(kind === 'orders' ? 'pbOrdersPages' : 'pbCustomersPages');
+    if(host){
+      host.innerHTML = rows.length ? `<button type="button" data-page-prev ${result.page === 1 ? 'disabled' : ''}>السابق</button><span aria-live="polite">${result.total} سجل — صفحة ${result.page} / ${result.pages}</span><button type="button" data-page-next ${result.page === result.pages ? 'disabled' : ''}>التالي</button>` : '';
+      host.querySelector('[data-page-prev]')?.addEventListener('click',()=>changePage(-1));
+      host.querySelector('[data-page-next]')?.addEventListener('click',()=>changePage(1));
     }
-
-    updateCustomerKPIs();
-    renderCustomers();
+    function changePage(delta){
+      if(kind === 'orders'){orderPage += delta; renderOrders()}else{customerPage += delta; renderCustomers()}
+      host?.scrollIntoView({block:'start',behavior:'auto'});
+    }
+    return result.rows;
   }
 
   function updateOrderKPIs() {
@@ -356,6 +357,7 @@
         .some(value => String(value || '').toLowerCase().includes(needle));
     });
 
+    const pageRows = paginate(filtered, 'orders');
     if (!filtered.length) {
       const emptyText = customerFilterPhone
         ? 'لا توجد طلبات لهذا الزبون.'
@@ -364,7 +366,7 @@
       return;
     }
 
-    list.innerHTML = filtered.map(order => {
+    list.innerHTML = pageRows.map(order => {
       const items = orderItemsWithColors(order);
       const notes = cleanOrderNotes(order.notes);
       const fee = Number(order.delivery_fee || 0);
@@ -405,6 +407,7 @@
       if (order?.location_url) window.open(order.location_url, '_blank', 'noopener,noreferrer');
     }));
     list.querySelectorAll('[data-customer-orders]').forEach(button => button.addEventListener('click', () => {
+      orderPage = 1;
       customerFilterPhone = button.dataset.customerOrders || '';
       orderFilter = 'all';
       orderSearch = '';
@@ -480,12 +483,13 @@
     const filtered = customers.filter(customer => !needle || [customer.name, customer.phone_e164, customer.default_address]
       .some(value => String(value || '').toLowerCase().includes(needle)));
 
+    const pageRows = paginate(filtered, 'customers');
     if (!filtered.length) {
       list.innerHTML = '<div class="pb-empty">لا توجد زبائن مطابقة.</div>';
       return;
     }
 
-    list.innerHTML = filtered.map(customer => `<article class="pb-customer-card">
+    list.innerHTML = pageRows.map(customer => `<article class="pb-customer-card">
       <div class="pb-customer-head"><div><div class="pb-customer-id">${esc(customer.phone_e164)}</div><div class="pb-customer-name">${esc(customer.name)}</div></div><span class="pb-order-status">${Number(customer.order_count || 0)} طلب</span></div>
       ${customer.default_address ? `<div class="pb-order-address" style="margin-top:8px">📍 ${esc(customer.default_address)}</div>` : ''}
       <div class="pb-customer-stats">
@@ -497,6 +501,9 @@
     </article>`).join('');
 
     list.querySelectorAll('[data-show-customer-orders]').forEach(button => button.addEventListener('click', () => {
+      orderPage = 1; orderFilter = 'all'; orderSearch = '';
+      const search = document.getElementById('pbOrderSearch'); if(search)search.value='';
+      syncOrderFilterBar();
       customerFilterPhone = button.dataset.showCustomerOrders || '';
       showView('orders');
       renderOrders();
@@ -670,9 +677,11 @@
   function startAutoRefresh() {
     clearInterval(refreshTimer);
     refreshTimer = setInterval(() => {
-      if (document.visibilityState !== 'visible') return;
-      void loadOrders(false);
-      if (currentCustomView === 'customers') void loadCustomers(false);
+      if (document.visibilityState !== 'visible' || document.body.classList.contains('auth-locked')) return;
+      // Avoid replacing an administrator's fee/input edit on a timer.
+      if(document.activeElement?.matches('input,textarea,select')) return;
+      if (currentCustomView === 'orders') void loadOrders(false);
+      else if (currentCustomView === 'customers') void loadCustomers(false);
     }, 30000);
   }
 

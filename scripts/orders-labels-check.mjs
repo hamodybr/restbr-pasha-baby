@@ -116,12 +116,12 @@ requireText('supabase/migrations/20260910193840_invoice_assets_bucket.sql', "'fo
 requireText('supabase/migrations/20260910193840_invoice_assets_bucket.sql', 'private.can_manage_restaurant_settings()', 'invoice asset upload authorization');
 forbidText('js/admin-orders-customers.js', 'width:100mm', 'fixed narrow invoice width');
 forbidText('js/admin-orders-customers.js', 'font-size:1.95mm', 'unreadable ultra-compact invoice font');
-requireText('js/admin-orders-customers.js', "from('customer_order_summary')", 'customer summary');
+requireText('js/admin-orders-customers.js', "readAll(client, 'customer_order_summary')", 'customer summary');
 requireText('js/admin-orders-customers.js', "from('orders')", 'orders dashboard');
 requireText('js/admin-orders-customers.js', 'PDF / طباعة ليزر واضحة', 'laser invoice action');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-submit.js?v=2.1", 'public order loader');
 requireText('js/pasha-arabic-only.js', "js/admin-invoice-settings.js?v=1.1", 'invoice editor loader');
-requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=1.9", 'configurable invoice admin orders loader');
+requireText('js/pasha-arabic-only.js', "js/admin-orders-customers.js?v=2.0", 'configurable invoice admin orders loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-order-color-bridge.js?v=1.1", 'color persistence loader');
 requireText('js/pasha-arabic-only.js', "js/pasha-color-image-gallery.js?v=2.1", 'color gallery v2 loader');
 requireText('js/pasha-arabic-only.js', 'js/pasha-number-normalizer.js?v=1.2', 'number normalizer loader');

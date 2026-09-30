@@ -912,3 +912,8 @@ body.pb-v3-page #smCheckoutSheet .sm-review-item small{font-size:12px;line-heigh
 body.pb-v3-page #smCheckoutSheet .sm-review-item b{flex-shrink:0}
 body.pb-v3-page #smCheckoutSheet .sm-checkout-review-total{font-size:15px!important;line-height:1.6}
 body.pb-v3-page #smCheckoutSheet .sm-checkout-review-total b{font-size:18px!important}
+
+/* Keep all editable checkout fields comfortable on iPhone. */
+body.pb-v3-page #smCheckoutSheet input,body.pb-v3-page #smCheckoutSheet textarea{font-size:16px!important}
+body.pb-v3-page #smCheckoutSummary .sm-review-item > span{color:#274e43;font-weight:700}
+body.pb-v3-page #smCheckoutSummary .sm-review-item small{color:#5b7068;font-weight:600}
