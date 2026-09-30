@@ -67,6 +67,25 @@
   const save=()=>{localStorage.setItem(KEY,JSON.stringify(cart));render();if(document.body?.classList.contains('pb-v3-page')||/\/storefront-v3(?:\/|$)/i.test(location.pathname))window.dispatchEvent(new CustomEvent('pasha:v3-cart-changed',{detail:{quantity:totals().qty}}))};
   const totals=()=>({qty:cart.reduce((s,x)=>s+x.qty,0),sum:cart.reduce((s,x)=>s+x.qty*x.price,0)});
 
+  function deliveryFee(type=orderType){
+    if(type!=="delivery"||!cart.length)return 0;
+    return cart.reduce((highest,item)=>{
+      const product=window.RESTBR_DB?.products?.find(p=>String(p.id)===String(item.productId));
+      const fee=Number(product?.deliveryFee ?? 5000);
+      return Math.max(highest,Number.isFinite(fee)&&fee>=0?fee:5000);
+    },0);
+  }
+  function renderShipping(){
+    const {sum}=totals(),fee=deliveryFee();
+    const cartFee=deliveryFee("delivery");
+    const cartRow=document.getElementById("smCartShipping");
+    if(cartRow)cartRow.textContent=cart.length?`أجور التوصيل للطلب: ${money(cartFee)} — الاستلام من المحل مجانًا`:"";
+    const review=document.getElementById("smCheckoutShipping");
+    if(review)review.innerHTML=`<div class="sm-review-item"><span>مجموع المنتجات</span><b>${money(sum)}</b></div><div class="sm-review-item"><span>${orderType==="delivery"?"أجور التوصيل (أعلى أجرة بين الأصناف)":"الاستلام من المحل"}</span><b>${money(fee)}</b></div>`;
+    const total=document.getElementById("smCheckoutTotal");
+    if(total)total.textContent=money(sum+fee);
+  }
+
   function syncLivePrices(){
     const D=window.RESTBR_DB;
     if(!D?.products?.length||!cart.length)return false;
@@ -196,7 +215,7 @@
         <div class="sm-cart-handle"></div>
         <div class="sm-cart-head"><button id="smCartClose" class="sm-cart-close" type="button">×</button><h3 id="smCartTitle"></h3><button id="smCartClear" class="sm-cart-clear" type="button"></button></div>
         <div id="smCartItems" class="sm-cart-items"></div>
-        <div class="sm-cart-bottom"><div class="sm-cart-total-row"><span id="smCartTotalLabel"></span><b id="smCartTotal"></b></div><button id="smCartContinue" class="sm-cart-continue" type="button"></button></div>
+        <div class="sm-cart-bottom"><div id="smCartShipping" class="sm-cart-shipping" role="status"></div><div class="sm-cart-total-row"><span id="smCartTotalLabel"></span><b id="smCartTotal"></b></div><button id="smCartContinue" class="sm-cart-continue" type="button"></button></div>
       </aside>
       <div id="smCartToast" class="sm-cart-toast" role="status" aria-live="polite"></div>
       <div id="smCheckoutBackdrop" class="sm-checkout-backdrop"></div>
@@ -228,7 +247,7 @@
             <div id="smLocationStatus" class="sm-location-status"></div>
           </div>
           <label><span id="smNotesLabel"></span><textarea id="smCustomerNotes" rows="3" maxlength="500"></textarea></label>
-          <div class="sm-checkout-review"><h4 id="smReviewLabel"></h4><div id="smCheckoutSummary"></div><div class="sm-checkout-review-total"><span id="smCheckoutTotalLabel"></span><b id="smCheckoutTotal"></b></div></div>
+          <div class="sm-checkout-review"><h4 id="smReviewLabel"></h4><div id="smCheckoutSummary"></div><div id="smCheckoutShipping" role="status" aria-live="polite"></div><div class="sm-checkout-review-total"><span id="smCheckoutTotalLabel"></span><b id="smCheckoutTotal"></b></div></div>
         </div>
         <div class="sm-checkout-actions"><button id="smSendWhatsApp" type="button"></button></div>
       </section>
@@ -278,6 +297,7 @@
     if(deliveryFields){
       deliveryFields.hidden=type!=="delivery"||!delivery;
     }
+    renderShipping();
   }
   function getCustomerLocation(){if(!navigator.geolocation){toast(tr("locationFail"));return}const b=document.getElementById("smGetLocation");b.disabled=true;navigator.geolocation.getCurrentPosition(pos=>{customerLocation=`https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;document.getElementById("smLocationStatus").textContent="✓ "+tr("locationOk");b.disabled=false},()=>{toast(tr("locationFail"));b.disabled=false},{enableHighAccuracy:true,timeout:10000,maximumAge:60000})}
   function renderCheckout(){
@@ -313,10 +333,7 @@
 
     const info=document.getElementById("smDeliveryInfo");
 
-    const infoText=
-      restaurant().deliveryInfo?.[lang()] ??
-      restaurant().deliveryInfo?.ar ??
-      "";
+    const infoText="تُحتسب أعلى أجرة توصيل بين الأصناف مرة واحدة للطلب كله، دون ضربها بالكمية.";
 
     const showInfo=
       restaurant().deliveryInfoEnabled!==false &&
@@ -489,6 +506,7 @@
   function render(){
     ensureUI();
     const {qty,sum}=totals();
+    renderShipping();
     const fab=document.getElementById("smCartFab");
     document.getElementById("smCartFabText").textContent=qty?`${qty} • ${money(sum)}`:tr("cart");
     fab.classList.toggle("has-items",qty>0);
@@ -509,6 +527,7 @@
   document.addEventListener("click",e=>{const a=e.target.closest(".sm-add-cart,.sm-direct-add");if(a){e.preventDefault();addFromButton(a);return}const choose=e.target.closest(".sm-choose-options");if(choose){e.preventDefault();showChoices(choose.dataset.productId);return}const choice=e.target.closest("[data-choice-product]");if(choice){const D=window.RESTBR_DB,p=D&&D.products.find(x=>String(x.id)===String(choice.dataset.choiceProduct));if(p){addItem(p,Number(choice.dataset.choiceIndex));choiceOpen(false)}return}const image=e.target.closest(".sm-product-image");if(image){showImage(image);return}const p=e.target.closest("[data-cart-plus]");if(p){change(p.dataset.cartPlus,1);return}const m=e.target.closest("[data-cart-minus]");if(m){change(m.dataset.cartMinus,-1);return}const r=e.target.closest("[data-cart-remove]");if(r){remove(r.dataset.cartRemove);return}if(e.target.closest("[data-lang]"))setTimeout(()=>{render();syncOrderState()},40)});
   document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;const image=document.getElementById("smImageViewer"),choice=document.getElementById("smChoiceSheet"),checkout=document.getElementById("smCheckoutSheet"),drawer=document.getElementById("smCartDrawer");if(image?.classList.contains("open")){closeImage();return}if(choice?.classList.contains("open")){choiceOpen(false);return}if(checkout?.classList.contains("open")){checkoutOpen(false);return}if(drawer?.classList.contains("open"))open(false)});
   document.addEventListener("dblclick",e=>{if(e.target.closest("button,.sm-product-image"))e.preventDefault()},{passive:false});
-  window.addEventListener("restbr:prices-updated",()=>{syncLivePrices()});
+  window.addEventListener("restbr:prices-updated",()=>{syncLivePrices();renderShipping()});
+  window.addEventListener("restbr:catalog-expanded",()=>{renderShipping()});
   window.addEventListener("restbr:ready",()=>{syncLivePrices();render();syncOrderState()});load();ensureUI();render();syncOrderState();
 })();

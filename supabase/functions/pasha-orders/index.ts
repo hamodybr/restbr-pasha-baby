@@ -29,6 +29,7 @@ type CatalogProduct = {
   name_ku?: string | null;
   name_en?: string | null;
   base_price?: number | null;
+  delivery_fee?: number | null;
   is_active?: boolean | null;
   is_visible?: boolean | null;
   is_available?: boolean | null;
@@ -287,6 +288,7 @@ function publicErrorMessage(message: string) {
   if (/no longer exist|Invalid product reference|Invalid option reference|Invalid color reference/i.test(message)) {
     return "أحد المنتجات في السلة تغيّر أو لم يعد موجوداً. حدّث الصفحة وحاول مرة ثانية.";
   }
+  if (/Delivery fee changed/i.test(message)) return "أجور التوصيل تغيّرت. حدّث الصفحة وراجع المجموع قبل تثبيت الطلب.";
   if (/Invalid quantity|Invalid item count|Invalid catalog price/i.test(message)) {
     return "تعذر التحقق من تفاصيل السلة. حدّث الصفحة وحاول مرة ثانية.";
   }
@@ -393,7 +395,7 @@ Deno.serve(async (req: Request) => {
     // should return the original order without consuming rate-limit capacity.
     const existingOrderResult = await admin
       .from("orders")
-      .select("id,order_number,total,customer_id,customer_phone")
+      .select("id,order_number,subtotal,delivery_fee,total,customer_id,customer_phone")
       .eq("client_token", clientToken)
       .maybeSingle();
     if (existingOrderResult.error) throw existingOrderResult.error;
@@ -408,6 +410,8 @@ Deno.serve(async (req: Request) => {
         order_id: existingOrderResult.data.id,
         order_number: existingOrderResult.data.order_number,
         customer_id: existingOrderResult.data.customer_id,
+        subtotal: Number(existingOrderResult.data.subtotal || 0),
+        delivery_fee: Number(existingOrderResult.data.delivery_fee || 0),
         total: Number(existingOrderResult.data.total || 0),
         phone_e164: phoneE164,
       }, 200);
@@ -433,7 +437,7 @@ Deno.serve(async (req: Request) => {
         .maybeSingle(),
       admin
         .from("products")
-        .select("id,category_id,name_ar,name_ku,name_en,base_price,is_active,is_visible,is_available,availability_schedule_enabled,available_from,available_to")
+        .select("id,category_id,name_ar,name_ku,name_en,base_price,delivery_fee,is_active,is_visible,is_available,availability_schedule_enabled,available_from,available_to")
         .in("id", productIds),
       admin
         .from("product_options")
@@ -551,6 +555,14 @@ Deno.serve(async (req: Request) => {
       };
     });
 
+    const deliveryFee = orderType === "pickup" ? 0 : products.reduce((highest, product) => {
+      const fee = Number(product.delivery_fee ?? 5000);
+      if (!Number.isSafeInteger(fee) || fee < 0 || fee > 1000000) throw new Error("Invalid catalog price");
+      return Math.max(highest, fee);
+    }, 0);
+    if (orderType === "delivery" && (typeof body.expectedDeliveryFee !== "number" || body.expectedDeliveryFee !== deliveryFee)) {
+      return json(req, { ok: false, error: "أجور التوصيل تغيّرت أو النسخة قديمة. حدّث الصفحة وراجع المجموع قبل تثبيت الطلب." }, 409);
+    }
     const orderNumber = orderNumberFromToken(clientToken);
     const { data: rpcData, error: rpcError } = await admin.rpc("create_pasha_order", {
       p_customer: {
@@ -564,7 +576,8 @@ Deno.serve(async (req: Request) => {
         order_number: orderNumber,
         order_type: orderType,
         notes,
-        delivery_fee: 0,
+        delivery_fee: deliveryFee,
+        expected_delivery_fee: deliveryFee,
       },
       p_items: authoritativeItems,
     });

@@ -157,7 +157,10 @@
         apikey: publishableKey,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ ...payload, expectedDeliveryFee: payload.orderType === 'pickup' ? 0 : readCart().reduce((highest,item)=>{
+        const product=db().products?.find(p=>String(p.id)===String(item.productId));
+        return Math.max(highest,Number(product?.deliveryFee ?? 5000));
+      },0) }),
     });
 
     const data = await response.json().catch(() => ({}));
@@ -194,6 +197,7 @@
       if (index < cart.length - 1) lines.push('');
     });
 
+    lines.push('', `مجموع المنتجات: ${money(order.subtotal ?? (Number(order.total||0)-Number(order.delivery_fee||0)))}`, `أجور التوصيل: ${money(order.delivery_fee||0)}`);
     lines.push('', '━━━━━━━━━━━━', `💰 *الإجمالي*: \`${money(order.total)}\``);
     if (checkout.notes) lines.push('', '📝 *ملاحظات الطلب*', checkout.notes);
 
