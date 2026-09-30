@@ -376,6 +376,15 @@
         name.insertAdjacentElement('afterend', meta);
       }
       card.classList.add('pb50-product-card');
+      // Legacy footer-glass sync writes inline !important styles onto cards.
+      // Normalize only presentation; never touch product/cart data.
+      for (const [key, value] of Object.entries({
+        'background-color': '#ffffff', 'background-image': 'none',
+        'border-color': '#e6ebe7', 'box-shadow': 'none', 'backdrop-filter': 'none'
+      })) {
+        if (card.style.getPropertyValue(key) !== value) card.style.setProperty(key, value, 'important');
+      }
+      if (info.style.getPropertyValue('background') !== 'transparent') info.style.setProperty('background', 'transparent', 'important');
       const nextMeta = localized(product.description) || localized(product.category) || 'Pasha Baby';
       if (meta.textContent !== nextMeta) meta.textContent = nextMeta;
 
