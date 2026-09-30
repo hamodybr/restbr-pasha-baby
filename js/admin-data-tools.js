@@ -51,5 +51,14 @@
       data
     };
   }
-  window.PashaAdminData = { readAll, pageRows, archive };
+  function productContentIssues(product, logo = '') {
+    const image = String(product.image_url || product.image || '').trim();
+    const placeholder = !image || image === String(logo).trim() || /(?:restaurant-placeholder|pasha(?:-baby)?-(?:product-placeholder|placeholder|logo)|store-logo)(?:[.\/_-]|$)/i.test(image);
+    const issues = [];
+    if (placeholder) issues.push('صورة المنتج ناقصة');
+    if (!String(product.description_ar || product.description || '').trim()) issues.push('الوصف العربي ناقص');
+    if (!String(product.name_ar || product.name || '').trim()) issues.push('الاسم العربي ناقص');
+    return issues;
+  }
+  window.PashaAdminData = { readAll, pageRows, archive, productContentIssues };
 })();
