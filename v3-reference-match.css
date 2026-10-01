@@ -1,3 +1,12 @@
+/* Preloaded local Cairo keeps the Arabic typography independent of Google CSS. */
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 600 800;
+  font-display: swap;
+  src: url('assets/fonts/cairo-600-800-arabic-latin.woff2') format('woff2');
+}
+
 /* Pasha Baby Storefront V4 - reference-matched refinement. */
 :root {
   --pb4-green: #086b5c;
@@ -294,7 +303,7 @@ body.pb-v3-page {
   border-radius: 21px !important;
   background:
     linear-gradient(90deg, rgba(247, 229, 213, 0.08), rgba(247, 229, 213, 0.36)),
-    url('https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/v3-demo-offer-banner.webp') center / cover no-repeat !important;
+    url('assets/v3-demo-offer-banner.webp') center / cover no-repeat !important;
   opacity: 1 !important;
 }
 

@@ -161,7 +161,7 @@ body.pb-v3-page #smMenu .sm-grid > .sm-card {
 
 img[src*="restaurant-placeholder.svg"],
 img[src*="pasha-baby-product-placeholder.svg"] {
-  content: url('https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/assets/pasha-baby-reference-logo.png') !important;
+  content: url('assets/pasha-baby-reference-logo-256.webp') !important;
   padding: 16% !important;
   object-fit: contain !important;
   background: linear-gradient(145deg, #fff9f3, #f3e6da) !important;
@@ -917,3 +917,22 @@ body.pb-v3-page #smCheckoutSheet .sm-checkout-review-total b{font-size:18px!impo
 body.pb-v3-page #smCheckoutSheet input,body.pb-v3-page #smCheckoutSheet textarea{font-size:16px!important}
 body.pb-v3-page #smCheckoutSummary .sm-review-item > span{color:#274e43;font-weight:700}
 body.pb-v3-page #smCheckoutSummary .sm-review-item small{color:#5b7068;font-weight:600}
+
+/* Reserve the live shell before the asynchronous catalog is ready. */
+body.pb-v3-page[data-pb-loading] #pbV3Announcement {
+  display: flex !important;
+  visibility: hidden !important;
+}
+body.pb-v3-page #smCats { min-height: 125px !important; }
+body.pb-v3-page .pb-load-card .pb36-feature-body > * {
+  border-radius: 8px;
+  background: #f2f4f1;
+}
+body.pb-v3-page .pb-load-card .pb36-card-actions button {
+  background: #f2f4f1;
+  border-color: transparent;
+}
+@media (max-width: 680px) {
+  body.pb-v3-page .pb-v3-announcement { min-height: 46px !important; }
+  body.pb-v3-page #smCats { min-height: 105px !important; }
+}

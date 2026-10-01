@@ -4,9 +4,8 @@
   if (window.__PASHA_REFERENCE_MATCH_V4__) return;
   window.__PASHA_REFERENCE_MATCH_V4__ = true;
 
-  const CDN = 'https://cdn.jsdelivr.net/gh/hamodybr/restbr-pasha-baby@d717fa9d8c4f2ded231b4e307eadf77f5f5e0929/';
-  const OFFER_ART = CDN + 'assets/v3-demo-offer-banner.webp';
-  const PLACEHOLDER = CDN + 'assets/pasha-baby-reference-logo.png';
+  const OFFER_ART = 'assets/v3-demo-offer-banner.webp';
+  const PLACEHOLDER = 'assets/pasha-baby-reference-logo-256.webp';
   const FAVORITES_KEY = 'PASHA_BABY_V3_FAVORITES';
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -183,9 +182,9 @@
 
   function stabilizeCategoryImages() {
     $$('#smCats .pb-v3-cat-media img').forEach(image => {
-      image.loading = 'eager';
+      image.loading = 'lazy';
       image.decoding = 'async';
-      image.fetchPriority = 'high';
+      image.fetchPriority = 'low';
       if (image.dataset.pb36CategoryImage === '1') return;
       image.dataset.pb36CategoryImage = '1';
       image.addEventListener('error', () => {
@@ -272,6 +271,8 @@
       sentinel.insertAdjacentElement('afterend', section);
     }
     const rows = featuredProducts();
+    if (!rows.length && document.body.hasAttribute('data-pb-loading')) return;
+    section.removeAttribute('aria-busy');
     const rail = $('.pb36-feature-rail', section);
     if (rail && rail.dataset.pb36Signature !== rows.map(item => item.id).join('|')) {
       rail.dataset.pb36Signature = rows.map(item => item.id).join('|');
@@ -671,6 +672,7 @@
   }
 
   function syncAll() {
+    if (products().length) document.body.removeAttribute('data-pb-loading');
     normalizeStorefrontChrome();
     replaceLegacyPlaceholders();
     restoreCategoryTiles();
@@ -789,6 +791,11 @@
       window.setTimeout(enhanceProductSheet, 90);
     }
   });
+
+  window.addEventListener('restbr:ready', () => {
+    document.body.removeAttribute('data-pb-loading');
+    scheduleSync();
+  }, { once: true });
 
   ['restbr:ready', 'restbr:commerce-ready', 'restbr:prices-updated', 'restbr:v3-menu-rendered'].forEach(type => {
     window.addEventListener(type, scheduleSync);

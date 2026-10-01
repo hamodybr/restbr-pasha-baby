@@ -468,6 +468,88 @@ async function runViewport(browser, spec) {
   await context.close();
 }
 
+async function runProductionLoad(browser, spec) {
+  const context = await browser.newContext({
+    viewport: { width: spec.width, height: spec.height },
+    isMobile: spec.mobile, hasTouch: spec.mobile, serviceWorkers: 'block', locale: 'ar-IQ'
+  });
+  let releaseCatalog;
+  const gate = new Promise(resolve => { releaseCatalog = resolve; });
+  await context.route('**/rest/v1/**', async route => {
+    await gate;
+    await route.continue();
+  });
+  await context.addInitScript(() => {
+    window.__ROOT_CLS__ = 0;
+    try {
+      new PerformanceObserver(list => {
+        for (const entry of list.getEntries()) {
+          if (!entry.hadRecentInput) window.__ROOT_CLS__ += entry.value;
+        }
+      }).observe({ type: 'layout-shift', buffered: true });
+    } catch (_) {}
+  });
+  const page = await context.newPage();
+  const originalsRequested = [];
+  const errors = [];
+  page.on('pageerror', error => errors.push(String(error)));
+  page.on('request', request => {
+    if (/backblazeb2\.com\/file\/pasha-baby-products\/products\/.*\/main/.test(request.url())) {
+      originalsRequested.push(request.url());
+    }
+  });
+  try {
+    await page.goto(BASE + '/', { waitUntil: 'domcontentloaded', timeout: 20000 });
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(220);
+    assert(await page.locator('body[data-pb-loading]').count() === 1, 'Root loading shell was lost before catalog data');
+    const before = {
+      hero: await pageBox(page, '#pbV3Hero'),
+      categories: await pageBox(page, '#smCats'),
+      offer: await pageBox(page, '#pb36OfferBanner')
+    };
+    assert(before.categories.height >= 100, 'Empty category rail did not reserve its space');
+    releaseCatalog();
+    await waitForCatalog(page);
+    await page.locator('body[data-pb-loading]').waitFor({ state: 'detached', timeout: 5000 });
+    await page.waitForTimeout(700);
+    const after = {
+      hero: await pageBox(page, '#pbV3Hero'),
+      categories: await pageBox(page, '#smCats'),
+      offer: await pageBox(page, '#pb36OfferBanner')
+    };
+    assert(Math.abs(after.hero.top - before.hero.top) <= 2,
+      `${spec.name} production hero shifted ${after.hero.top - before.hero.top}px after catalog load`);
+    assert(Math.abs(after.categories.height - before.categories.height) <= 2,
+      `${spec.name} category rail height changed after catalog load`);
+    assert(Math.abs(after.offer.top - before.offer.top) <= 5,
+      `${spec.name} offer moved ${after.offer.top - before.offer.top}px when loading placeholders were replaced`);
+    assert(await page.locator('.pb-load-card').count() === 0, 'Loading placeholders remained after catalog load');
+    await assertNoHorizontalOverflow(page, `${spec.name} production homepage`);
+    assert(originalsRequested.length === 0,
+      'Production homepage fetched original B2 photos: ' + originalsRequested.join(', '));
+    const state = await page.evaluate(() => ({
+      cairo: document.fonts.check('700 16px Cairo'),
+      cls: window.__ROOT_CLS__,
+      externalCode: [...document.querySelectorAll('script[src],link[rel="stylesheet"]')]
+        .map(node => node.src || node.href).filter(url => /cdn\.jsdelivr\.net|fonts\.googleapis\.com/.test(url)),
+      categories: [...document.querySelectorAll('#smCats .pb-v3-cat-media img')].map(img => ({ loading: img.loading, priority: img.fetchPriority }))
+    }));
+    assert(state.cairo && state.externalCode.length === 0, 'Root typography or same-origin assets were not loaded');
+    assert(state.categories.every(img => img.loading === 'lazy' && img.priority === 'low'), 'Category photos still compete with the hero');
+    assert(errors.length === 0, 'Production root browser errors: ' + errors.join(' | '));
+    console.log(`Production load QA passed: ${spec.name} | CLS ${state.cls.toFixed(4)} | hero movement ${after.hero.top - before.hero.top}px | offer movement ${after.offer.top - before.offer.top}px | no original B2 image downloads`);
+    await page.locator('#pbV3SeeProducts').click();
+    await page.waitForTimeout(160);
+    await assertDetailsOnCards(page, spec.name + ' production catalog');
+    await openProductDetails(page);
+    await prepareCartAndCheckout(page);
+  } finally {
+    releaseCatalog();
+    await context.close();
+  }
+}
+
 let browser;
 try {
   await listen();
@@ -480,6 +562,11 @@ try {
     headless: true,
     args: ['--no-sandbox', '--disable-dev-shm-usage']
   });
+
+  for (const spec of [
+    { name: 'Production-mobile', width: 390, height: 844, mobile: true },
+    { name: 'Production-desktop', width: 1366, height: 900, mobile: false }
+  ]) await runProductionLoad(browser, spec);
 
   for (const spec of [
     { name: 'iPhone-Pro-Max', width: 440, height: 956, scale: 3, mobile: true },

@@ -116,9 +116,42 @@
   const CURRENT_STORE_LOGO = '/storage/v1/object/public/menu-images/settings/logo/1788645406355-3ib1w5.png';
   const B2_STORAGE_HOST = 'f003.backblazeb2.com';
   const LOCAL_PRODUCT_THUMBNAILS = Object.freeze({
-    '/file/pasha-baby-products/products/9c4f903c-a78b-4620-9279-3c696235e55c/main':
-      'assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp'
-  });
+    "/file/pasha-baby-products/products/9c4f903c-a78b-4620-9279-3c696235e55c/main": {
+        "version": "4_z1d84e1a751897ddca4000717_f10347959c23b475f_d20260907_m205622_c003_v0312018_t0019_u01788814582688",
+        "card": "assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp",
+        "category": "assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c-category.webp"
+    },
+    "/file/pasha-baby-products/products/c3d8409c-14cc-4039-854c-e16530b8a45d/main": {
+        "version": "4_z1d84e1a751897ddca4000717_f1175adc1db5362fa_d20260910_m205842_c003_v0312028_t0057_u01789073922544",
+        "card": "assets/product-thumbnails/c3d8409c-14cc-4039-854c-e16530b8a45d.webp",
+        "category": "assets/product-thumbnails/c3d8409c-14cc-4039-854c-e16530b8a45d-category.webp"
+    },
+    "/file/pasha-baby-products/products/9a23f8f6-9160-4698-b6af-95902ff28d05/main": {
+        "version": "4_z1d84e1a751897ddca4000717_f10919dd1ac5e9dca_d20260916_m192609_c003_v0312027_t0053_u01789586769838",
+        "card": "assets/product-thumbnails/9a23f8f6-9160-4698-b6af-95902ff28d05.webp",
+        "category": "assets/product-thumbnails/9a23f8f6-9160-4698-b6af-95902ff28d05-category.webp"
+    },
+    "/file/pasha-baby-products/products/93f9ebe4-e6be-421d-9867-311233717548/main": {
+        "version": "4_z1d84e1a751897ddca4000717_f114b8123af8c24ab_d20260911_m011936_c003_v0312040_t0025_u01789089576030",
+        "card": "assets/product-thumbnails/93f9ebe4-e6be-421d-9867-311233717548.webp",
+        "category": "assets/product-thumbnails/93f9ebe4-e6be-421d-9867-311233717548-category.webp"
+    },
+    "/file/pasha-baby-products/products/4b57986e-910b-4d7f-81b8-f35828d3307b/main": {
+        "version": "4_z1d84e1a751897ddca4000717_f107548507cdc8828_d20260918_m051800_c003_v0312041_t0029_u01789708680029",
+        "card": "assets/product-thumbnails/4b57986e-910b-4d7f-81b8-f35828d3307b.webp",
+        "category": "assets/product-thumbnails/4b57986e-910b-4d7f-81b8-f35828d3307b-category.webp"
+    },
+    "/file/pasha-baby-products/products/31ead0c1-d2eb-4a6d-9739-4fee2c21781d/main": {
+        "version": "4_z1d84e1a751897ddca4000717_f1117da5f1456d561_d20260918_m053027_c003_v0312046_t0036_u01789709427327",
+        "card": "assets/product-thumbnails/31ead0c1-d2eb-4a6d-9739-4fee2c21781d.webp",
+        "category": "assets/product-thumbnails/31ead0c1-d2eb-4a6d-9739-4fee2c21781d-category.webp"
+    },
+    "/file/pasha-baby-products/products/856ee19f-c52b-41ff-9605-503973a7c8f4/main": {
+        "version": "4_z1d84e1a751897ddca4000717_f11142aa39c45565a_d20260917_m114942_c003_v0312041_t0046_u01789645782487",
+        "card": "assets/product-thumbnails/856ee19f-c52b-41ff-9605-503973a7c8f4.webp",
+        "category": "assets/product-thumbnails/856ee19f-c52b-41ff-9605-503973a7c8f4-category.webp"
+    }
+});
 
   function optimizedMediaUrl(value, preset = 'product-card') {
     const safe = safeMediaUrl(value);
@@ -137,12 +170,13 @@
         return 'assets/pasha-baby-logo-256.webp';
       }
 
+      const thumbnail = LOCAL_PRODUCT_THUMBNAILS[parsed.pathname];
       if (
-        preset === 'product-card' &&
-        parsed.hostname === B2_STORAGE_HOST &&
-        LOCAL_PRODUCT_THUMBNAILS[parsed.pathname]
+        (preset === 'product-card' || preset === 'category') &&
+        parsed.hostname === B2_STORAGE_HOST && thumbnail &&
+        parsed.searchParams.get('v') === thumbnail.version
       ) {
-        return LOCAL_PRODUCT_THUMBNAILS[parsed.pathname];
+        return thumbnail[preset === 'category' ? 'category' : 'card'];
       }
 
       if (
@@ -155,8 +189,8 @@
 
       parsed.pathname = parsed.pathname.replace(PUBLIC_OBJECT_PREFIX, PUBLIC_RENDER_PREFIX);
       parsed.search = '';
-      parsed.searchParams.set('width', preset === 'logo' ? '256' : '480');
-      parsed.searchParams.set('height', preset === 'logo' ? '256' : '480');
+      parsed.searchParams.set('width', preset === 'logo' ? '256' : preset === 'category' ? '160' : '480');
+      parsed.searchParams.set('height', preset === 'logo' ? '256' : preset === 'category' ? '160' : '480');
       parsed.searchParams.set('resize', preset === 'logo' ? 'contain' : 'cover');
       parsed.searchParams.set('quality', preset === 'logo' ? '75' : '72');
       return parsed.href;
