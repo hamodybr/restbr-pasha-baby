@@ -532,6 +532,17 @@
           <span>${icon('shield')}<b>تثبيت آمن</b><small>عبر واتساب</small></span>
         </div>`);
     }
+    // Gallery and copy share the top row; purchase controls span the sheet.
+    const scroll = $('.pb-v3-product-scroll', sheet);
+    if (scroll && !sheet.dataset.referenceDetails) {
+      sheet.dataset.referenceDetails = '1';
+      ['pbV3ProductOptionsSection', 'pbV3ProductColorsSection', 'pb36BuyRow'].forEach(id => {
+        const node = $('#' + id);
+        if (node) scroll.appendChild(node);
+      });
+      scroll.appendChild(footer);
+      scroll.appendChild($('#pb36DetailBenefits'));
+    }
     return true;
   }
 

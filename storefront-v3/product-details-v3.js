@@ -26,6 +26,7 @@
 
   const txt = value => {
     if (!value) return '';
+    if (typeof value === 'string') return value.trim();
     return String(value.ar || value.en || value.ku || '').trim();
   };
 
@@ -147,7 +148,11 @@
       const button = event.target.closest('[data-v3-color-id]');
       if (!button || button.disabled) return;
       selectedColorId = String(button.dataset.v3ColorId || '');
-      renderColors();
+      document.querySelectorAll('#pbV3ProductColors [data-v3-color-id]').forEach(card => {
+        const selected = card.dataset.v3ColorId === selectedColorId;
+        card.classList.toggle('selected', selected);
+        card.setAttribute('aria-pressed', String(selected));
+      });
       const targetIndex = slides.findIndex(slide => String(slide.colorId || '') === selectedColorId);
       if (targetIndex >= 0) setSlide(targetIndex);
       syncAddState();
@@ -316,7 +321,7 @@
     holder.innerHTML = colors.map(color => `
       <button type="button"
               class="${selectedColorId === String(color.id) ? 'selected' : ''} ${color.isAvailable === false ? 'unavailable' : ''}"
-              data-v3-color-id="${esc(color.id)}" ${color.isAvailable === false ? 'disabled' : ''}>
+              data-v3-color-id="${esc(color.id)}" aria-pressed="${selectedColorId === String(color.id)}" ${color.isAvailable === false ? 'disabled' : ''}>
         ${color.image
           ? `<img src="${esc(safeMedia(color.image))}" alt="" loading="lazy" decoding="async">`
           : `<i style="--v3-swatch:${esc(color.hex || '#d8d0d3')}"></i>`}
@@ -359,6 +364,8 @@
 
     slides = buildSlides(product);
     slideIndex = 0;
+    $('#pbV3ProductStage').classList.remove('pb36-zoomed');
+    $('.pb-v3-product-scroll').scrollTop = 0;
 
     $('#pbV3ProductCategory').textContent = txt(product.category);
     $('#pbV3ProductName').textContent = txt(product.name);
