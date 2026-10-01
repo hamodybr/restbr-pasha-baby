@@ -537,6 +537,14 @@ async function runProductionLoad(browser, spec) {
     }));
     assert(state.cairo && state.externalCode.length === 0, 'Root typography or same-origin assets were not loaded');
     assert(state.categories.every(img => img.loading === 'lazy' && img.priority === 'low'), 'Category photos still compete with the hero');
+    const whatsapp = await page.locator('#pbV3WhatsAppFab svg').evaluate(svg => {
+      const style = getComputedStyle(svg);
+      return { fill: style.fill, stroke: style.stroke, width: svg.getBoundingClientRect().width,
+        parentWidth: svg.parentElement.getBoundingClientRect().width };
+    });
+    assert(whatsapp.fill === 'none' && whatsapp.stroke === 'rgb(255, 255, 255)' &&
+      whatsapp.width > 0 && whatsapp.width <= whatsapp.parentWidth,
+      spec.name + ': WhatsApp outline icon is filled, missing or oversized: ' + JSON.stringify(whatsapp));
     assert(errors.length === 0, 'Production root browser errors: ' + errors.join(' | '));
     console.log(`Production load QA passed: ${spec.name} | CLS ${state.cls.toFixed(4)} | hero movement ${after.hero.top - before.hero.top}px | offer movement ${after.offer.top - before.offer.top}px | no original B2 image downloads`);
     await page.locator('#pbV3SeeProducts').click();
