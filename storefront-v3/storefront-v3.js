@@ -194,7 +194,7 @@
       const count = matching.length;
 
       const media = candidate
-        ? `<span class="pb-v3-cat-media has-image"><img src="${esc(productImage(candidate))}" alt="" loading="lazy" decoding="async"></span>`
+        ? `<span class="pb-v3-cat-media has-image"><img src="${esc(productImage(candidate, 'category'))}" alt="" width="160" height="160" loading="lazy" decoding="async" fetchpriority="low"></span>`
         : `<span class="pb-v3-cat-media"><span aria-hidden="true">${esc(iconFor(label))}</span></span>`;
 
       button.classList.add('pb-v3-cat-tile');
@@ -343,6 +343,7 @@
     const retry = $('#pbV3CatalogRetry');
     if (!status || !text || !retry) return;
 
+    document.body.removeAttribute('data-pb-loading');
     status.hidden = false;
     text.textContent = 'التحميل أخذ وقتًا أطول من المعتاد.';
     retry.hidden = false;
@@ -429,14 +430,14 @@
     return Number(value).toLocaleString('en-US') + ' د.ع';
   }
 
-  function productImage(product) {
+  function productImage(product, preset = 'product-card') {
     const original = String(product?.image || '').trim();
     const safe = typeof window.RESTBR_SAFE_MEDIA_URL === 'function'
       ? window.RESTBR_SAFE_MEDIA_URL(original)
       : original;
     const source = safe || 'assets/pasha-baby-product-placeholder.svg';
     if (typeof window.RESTBR_OPTIMIZED_MEDIA_URL === 'function') {
-      return window.RESTBR_OPTIMIZED_MEDIA_URL(source, 'product-card') || source;
+      return window.RESTBR_OPTIMIZED_MEDIA_URL(source, preset) || source;
     }
     return source;
   }
@@ -533,7 +534,7 @@
         ? [category, money(current)].filter(Boolean).join(' • ')
         : category;
 
-    image.src = productImage(product);
+    if (!banner.hasAttribute('data-static-art')) image.src = productImage(product);
     image.alt = name;
 
     discount.hidden = !(percent > 0 || amount > 0 || discounted);
@@ -616,6 +617,9 @@
   }
 
   function syncHeroProduct() {
+    // The production hero already has static artwork; its hidden child must
+    // never fetch an unrelated full-size catalog image.
+    if ($('#pbV3Hero')?.hasAttribute('data-static-art')) return;
     const products = Array.isArray(window.RESTBR_DB?.products)
       ? window.RESTBR_DB.products.filter(product =>
           product?.badges?.unavailable !== true && String(product?.image || '').trim()

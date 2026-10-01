@@ -50,7 +50,7 @@ requireText('js/admin-large-catalog.js', 'function catalogMayBeTruncated()', 'la
 requireText('js/admin-large-catalog.js', 'async function ensureCompleteCatalog()', 'conditional full-catalog hydration');
 requireText('js/admin-large-catalog.js', 'rows.length >= PAGE_SIZE', '1000-row boundary detection');
 
-requireText('sw.js', 'restbr-pasha-baby-v56', 'version-safe code cache generation');
+requireText('sw.js', 'restbr-pasha-baby-v57', 'version-safe code cache generation');
 requireText('sw.js', '2026-09-17: v46 forces iOS Safari', 'install-time storefront cache refresh marker');
 requireText('sw.js', 'function staleWhileRevalidate(event, request)', 'stale-while-revalidate strategy');
 requireText('sw.js', 'event.respondWith(staleWhileRevalidate(event, request))', 'public code cache fast path');
@@ -98,7 +98,7 @@ requireText('js/pasha-product-gallery-thermal-v1.js', 'animation:none!important'
 requireText('js/app.js', 'loading="lazy"', 'lazy product images');
 requireText('js/app.js', 'decoding="async"', 'async product image decode');
 requireText('index.html', 'css/style.css?v=4.1', 'original storefront base CSS order');
-requireMatch('index.html', /(css\/pasha-baby-final-tweaks\.css\?v=1\.1|v3-visual-fixes\.css\?v=4\.14)/, 'original or V3 storefront override CSS order');
+requireMatch('index.html', /(css\/pasha-baby-final-tweaks\.css\?v=1\.1|v3-visual-fixes\.css\?v=4\.15)/, 'original or V3 storefront override CSS order');
 requireMatch('index.html', /(js\/pasha-baby-storefront-bundle\.js\?v=1\.3|js\/pasha-baby-commerce\.js\?v=v3\.1)/, 'storefront JavaScript bundle or V3 commerce runtime');
 requireText('index.html', 'id="pbBrand" class="pb-brand"', 'server-rendered brand layout');
 requireMatch('index.html', /id="(?:pbStoreHeroV2|pbV3Hero)" class="(?:pb-store-hero|pb-v3-hero)"/, 'server-rendered hero layout');
@@ -107,7 +107,7 @@ requireMatch('index.html', /(html\.sm-hours-pending #smOrderStateBanner|id="pbV3
 requireText('js/cart.js', 'banner.hidden=hoursPending||allowed', 'resolved-hours order banner guard');
 requireText('css/pasha-baby-storefront-v2.css', 'min-height:50px;', 'reserved search host height');
 requireText('css/pasha-baby-retail-v4.css', 'min-height:48px!important;margin:8px auto 10px!important', 'reserved quick-action height');
-requireMatch('index.html', /rel="preload" as="image" href="(?:assets\/pasha-baby-logo-256\.webp|https:\/\/cdn\.jsdelivr\.net\/gh\/hamodybr\/restbr-pasha-baby@[^\"]+\/assets\/pasha-baby-reference-logo\.png)"/, 'optimized logo preload');
+requireMatch('index.html', /rel="preload" as="image" href="(?:assets\/pasha-baby-(?:reference-)?logo-256\.webp|https:\/\/cdn\.jsdelivr\.net\/gh\/hamodybr\/restbr-pasha-baby@[^\"]+\/assets\/pasha-baby-reference-logo\.png)"/, 'optimized logo preload');
 requireText('js/app.js', 'data-original-image=', 'original product-image fallback');
 requireText('js/app.js', 'RESTBR_OPTIMIZED_MEDIA_URL', 'optimized product card images');
 requireText('js/url-safety.js', 'assets/product-thumbnails/9c4f903c-a78b-4620-9279-3c696235e55c.webp', 'B2 card thumbnail mapping');

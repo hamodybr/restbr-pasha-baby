@@ -36,6 +36,9 @@ jobs:
       - name: Storefront V3 DOM regression
         run: node scripts/storefront-v3-dom-regression.mjs
 
+      - name: Versioned product thumbnail regression
+        run: node scripts/product-thumbnail-regression.mjs
+
       - name: Admin complete archive and pagination regression
         run: node scripts/admin-data-regression.mjs
 
