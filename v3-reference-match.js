@@ -468,6 +468,8 @@
   }
 
   function sheetProduct() {
+    const active = productById($('#pbV3ProductSheet')?.dataset.productId);
+    if (active) return active;
     const title = $('#pbV3ProductName')?.textContent;
     const found = productByVisibleName(title);
     if (found) {

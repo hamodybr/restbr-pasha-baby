@@ -433,6 +433,7 @@
 
     backdrop.hidden = false;
     sheet.hidden = false;
+    sheet.dataset.productId = String(product.id);
     requestAnimationFrame(() => {
       backdrop.classList.add('open');
       sheet.classList.add('open');
@@ -565,38 +566,32 @@
     });
   }
 
-  document.addEventListener('click', event => {
-    const details = event.target.closest('#smMenu .pb-v3-details-btn');
-    const image = event.target.closest('#smMenu .sm-product-image');
-    if (!details && !image) return;
+  // Capture at window before the legacy document image handler.
+  function detailTarget(event) {
+    const target = event.target.closest?.('[data-pb36-details],#smMenu [data-product-card],[data-v3-feature-product],[data-pb36-product-card]');
+    if (!target) return null;
+    const action = event.target.closest('button,a,input,select,textarea,[data-pb36-favorite],[data-pb36-add]');
+    if (action && !action.matches('.pb-v3-details-btn,[data-pb36-details]')) return null;
+    const id = target.dataset.pb36Details || target.dataset.productCard || target.dataset.v3FeatureProduct || target.dataset.pb36ProductCard;
+    return productById(id) ? { id, trigger: event.target.closest('button,img') || target } : null;
+  }
 
-    const card = (details || image).closest('[data-product-card]');
-    const product = productById(card?.dataset.productCard);
-    if (!product) return;
-
+  function openFromEvent(event) {
+    const match = detailTarget(event);
+    if (!match) return;
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
-    void open(product, details || image);
-  }, true);
-
-  document.addEventListener('keydown', event => {
+    void open(match.id, match.trigger);
+  }
+  window.addEventListener('click', openFromEvent, true);
+  window.addEventListener('keydown', event => {
     if (event.key === 'Escape' && $('#pbV3ProductSheet')?.classList.contains('open')) {
       event.preventDefault();
       close();
-      return;
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      openFromEvent(event);
     }
-
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    const details = event.target.closest?.('#smMenu .pb-v3-details-btn');
-    if (!details) return;
-
-    const card = details.closest('[data-product-card]');
-    const product = productById(card?.dataset.productCard);
-    if (!product) return;
-
-    event.preventDefault();
-    void open(product, details);
   }, true);
 
   document.addEventListener('click', event => {
@@ -611,7 +606,7 @@
     window.addEventListener(type, () => window.setTimeout(enhanceCards, 0));
   });
 
-  window.PASHA_V3_OPEN_PRODUCT_DETAILS = id => open(id);
+  window.PASHA_V3_OPEN_PRODUCT_DETAILS = (id, trigger) => open(id, trigger);
   window.PASHA_V3_ENHANCE_PRODUCT_CARDS = enhanceCards;
 
   if (document.readyState === 'loading') {
