@@ -58,6 +58,8 @@
       headset: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-2a8 8 0 0 1 16 0v2M4 13H2v5h4v-5zM20 13h2v5h-4v-5zM18 18c0 2-2 3-5 3"/></svg>',
       gift: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h18v12H3zM12 9v12M2 5h20v4H2z"/><path d="M12 5c-1.7-3.2-5.8-2.4-5.8-.1 0 2.2 3 2.1 5.8.1Zm0 0c1.7-3.2 5.8-2.4 5.8-.1 0 2.2-3 2.1-5.8.1Z"/></svg>',
       heart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z"/></svg>',
+      carry: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10h14l2 11H3zM8 10V7a4 4 0 0 1 8 0v3"/></svg>',
+      baby: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9a7 7 0 0 1 14 0c4-1 4 6 0 6a7 7 0 0 1-14 0c-4 0-4-6 0-6ZM10 3c0 4 5 4 4 0M9 15q3 3 6 0"/><circle cx="9" cy="10" r=".5"/><circle cx="15" cy="10" r=".5"/></svg>',
       cart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L20 8H6"/><circle cx="9.5" cy="19" r="1.2"/><circle cx="17" cy="19" r="1.2"/></svg>',
       layers: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5-9 5-9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/></svg>',
       check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>',
@@ -549,7 +551,13 @@
   function sheetFeatures(product) {
     const options = Array.isArray(product?.options) ? product.options : [];
     const colors = Array.isArray(product?.colors) ? product.colors.filter(color => color?.isAvailable !== false) : [];
-    const rows = [
+    const copy = $('#pbV3ProductDescription')?.dataset.fullDescription || '';
+    const seat = /car\s*set|car\s*seat/i.test(JSON.stringify(product?.name || ''));
+    const rows = seat && /مقبض/.test(copy) && /حزام/.test(copy) ? [
+      { icon: 'shield', title: /مبطن|مبطّن/.test(copy) ? 'حزام مبطن' : 'حزام أمان' },
+      { icon: 'carry', title: 'مقبض حمل' },
+      { icon: 'baby', title: 'للأطفال' }
+    ] : [
       { icon: 'layers', title: options.length > 1 ? options.length + ' خيارات' : 'خيار واضح' },
       { icon: 'gift', title: colors.length ? colors.length + ' ألوان متوفرة' : 'حسب المتوفر' },
       { icon: 'check', title: 'طلب بسيط وسريع' }
@@ -582,11 +590,12 @@
     const title = $('#pbV3ProductName');
     const arabicTitle = $('#pb36ArabicTitle');
     const category = $('#pbV3ProductCategory');
-    const brand = /kidilo|كيديلو/i.test([arName, enName, localized(product.category)].join(' ')) ? 'KIDILO' : 'PASHA BABY';
+    const brand = /kidilo|كيديلو/i.test([arName, enName, localized(product.category)].join(' ')) ? 'Kidilo' : 'PASHA BABY';
     const nextTitle = enName && enName.toLowerCase() !== arName.toLowerCase() ? enName : arName;
     if (title && title.textContent !== nextTitle) title.textContent = nextTitle;
     if (arabicTitle) {
-      const nextArabicTitle = enName && enName.toLowerCase() !== arName.toLowerCase() ? arName : localized(product.category);
+      const isCarSeat = /car\s*set|car\s*seat/i.test([arName, enName].join(' '));
+      const nextArabicTitle = isCarSeat ? 'كرسي سيارة للأطفال' : enName && enName.toLowerCase() !== arName.toLowerCase() ? arName : localized(product.category);
       if (arabicTitle.textContent !== nextArabicTitle) arabicTitle.textContent = nextArabicTitle;
       arabicTitle.hidden = !arabicTitle.textContent;
     }
@@ -604,6 +613,39 @@
       if (rating.dataset.pb36Signature !== ratingMarkup) {
         rating.dataset.pb36Signature = ratingMarkup;
         rating.innerHTML = ratingMarkup;
+      }
+    }
+
+    // Keep long catalogue copy available without stretching the two-column hero.
+    const description = $('#pbV3ProductDescription');
+    if (description && (description.hidden || !description.textContent.trim())) {
+      delete description.dataset.fullDescription;
+      delete description.dataset.previewText;
+    }
+    const fullDetails = $('#pb36FullDescription');
+    if (fullDetails && (!description || description.hidden || !description.textContent.trim())) fullDetails.hidden = true;
+    if (description && !description.hidden && description.textContent.trim()) {
+      const incoming = description.textContent.trim();
+      if (description.dataset.previewText !== incoming) {
+        const full = incoming;
+        description.dataset.fullDescription = full;
+        const clean = full.split(/الألوان المتوفرة|الالوان المتوفرة/)[0]
+          .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '').trim();
+        const sentences = clean.split(/(?<=[.。!؟])\s+/);
+        let preview = sentences.slice(0, 2).join(' ');
+        if (preview.length > 155) preview = preview.slice(0, 152).replace(/\s+\S*$/, '') + '…';
+        description.dataset.previewText = preview;
+        description.textContent = preview;
+        let details = $('#pb36FullDescription');
+        if (!details) {
+          details = document.createElement('details');
+          details.id = 'pb36FullDescription';
+          details.innerHTML = '<summary>تفاصيل المنتج كاملة</summary><p></p>';
+          $('.pb-v3-product-scroll').appendChild(details);
+        }
+        details.hidden = full === preview;
+        details.open = false;
+        $('p', details).textContent = full;
       }
     }
 
