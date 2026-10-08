@@ -131,9 +131,11 @@ async function assertDetailsOnCards(page, label) {
     total: cards.length,
     good: cards.filter(card => {
       const details = card.querySelector('.pb-product-action-row > .pb-v3-details-btn');
+      const image = card.querySelector('.sm-product-image[role="button"][tabindex="0"][aria-label]');
       const action = card.querySelector('.pb-product-action-row > .sm-direct-add, .pb-product-action-row > .sm-choose-options');
-      return details && action && details.getBoundingClientRect().width > 0 &&
-        getComputedStyle(details).visibility !== 'hidden';
+      const visible = node => node && node.getBoundingClientRect().width > 0 &&
+        getComputedStyle(node).visibility !== 'hidden';
+      return visible(action) && (visible(details) || visible(image));
     }).length
   }));
   assert(state.total > 0 && state.total === state.good,
@@ -142,10 +144,14 @@ async function assertDetailsOnCards(page, label) {
 
 async function openProductDetails(page) {
   const button = page.locator('#smMenu .pb-v3-details-btn').first();
-  await button.scrollIntoViewIfNeeded();
+  const trigger = await button.isVisible() ? button : page.locator('#smMenu .sm-product-image[role="button"][tabindex="0"]').first();
+  const productId = await trigger.evaluate(n => n.closest('[data-product-card]').dataset.productCard);
+  await trigger.scrollIntoViewIfNeeded();
   const started = Date.now();
-  await button.click();
+  await trigger.click();
   await page.locator('#pbV3ProductSheet.open').waitFor({ state: 'visible', timeout: 5000 });
+  assert(await page.locator('#pbV3ProductSheet').getAttribute('data-product-id') === productId,
+    'Details trigger opened the wrong product');
   const elapsed = Date.now() - started;
   assert(elapsed <= 1600, `Product details interaction is too slow: ${elapsed}ms`);
   await assertInsideViewport(page, '#pbV3ProductSheet', 'Product details sheet');
