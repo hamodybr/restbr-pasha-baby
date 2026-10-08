@@ -563,6 +563,12 @@
 
       const name = String(card.querySelector('.sm-name')?.textContent || '').trim();
       button.setAttribute('aria-label', `تفاصيل — ${name}`);
+      const image = card.querySelector('.sm-product-image');
+      if (image) {
+        image.tabIndex = 0;
+        image.setAttribute('role', 'button');
+        image.setAttribute('aria-label', `تفاصيل — ${name}`);
+      }
     });
   }
 

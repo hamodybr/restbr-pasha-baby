@@ -1010,35 +1010,45 @@ body.pb-v3-page #pbV3ProductAdd::before { -webkit-mask:url("data:image/svg+xml,%
  body.pb-v3-page #pbV3ProductAdd,body.pb-v3-page #pb36FooterFavorite { border-radius:17px!important; }
 }
 
-/* Four products per row on mobile, including the opening product rails. */
+/* Four-column retail cards: equal image, two-line name, price and one action. */
 @media(max-width:680px) {
  body.pb-v3-page #smMenu > .sm-section > .sm-grid,
  body.pb-v3-page .pb36-feature-rail { display:grid!important; grid-template-columns:repeat(4,minmax(0,1fr))!important; gap:5px!important; }
  body.pb-v3-page .pb36-feature-rail { overflow:visible!important; }
  body.pb-v3-page .pb-v3-product-rail { display:grid!important; grid-auto-flow:column!important; grid-auto-columns:calc((100% - 15px)/4)!important; gap:5px!important; }
- body.pb-v3-page .pb-v3-feature-card,body.pb-v3-page .pb36-feature-card { min-width:0!important; width:auto!important; border-radius:10px!important; }
- body.pb-v3-page #smMenu .sm-grid > .sm-card { border-radius:10px!important; }
- body.pb-v3-page #smMenu .sm-grid > .sm-card.pb50-product-card > .sm-info { padding:5px!important; min-height:0!important; gap:4px!important; }
- body.pb-v3-page #smMenu .pb50-product-card .sm-name { font-size:10px!important; line-height:1.4!important; min-height:28px!important; overflow-wrap:anywhere!important; }
- body.pb-v3-page #smMenu .pb50-product-card .pb36-catalog-meta { font-size:8px!important; line-height:1.3!important; }
- body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary b { font-size:10px!important; white-space:normal!important; }
- body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary { flex-wrap:wrap!important; gap:3px!important; }
+ body.pb-v3-page .pb-v3-feature-card,body.pb-v3-page .pb36-feature-card,
+ body.pb-v3-page #smMenu .sm-grid > .sm-card { min-width:0!important; width:auto!important; border-radius:12px!important; background:#fff!important; border:1px solid #e6ebe7!important; box-shadow:none!important; }
+ body.pb-v3-page .pb36-feature-media,body.pb-v3-page .pb-v3-feature-image,
+ body.pb-v3-page #smMenu .sm-grid > .sm-card.pb50-product-card > .sm-img { width:auto!important; height:auto!important; min-height:0!important; aspect-ratio:1/1!important; margin:4px 4px 0!important; border-radius:8px!important; overflow:hidden!important; }
+ body.pb-v3-page #smMenu .sm-grid > .sm-card.pb50-product-card > .sm-info,
+ body.pb-v3-page .pb36-feature-body,body.pb-v3-page .pb-v3-feature-copy { display:grid!important; grid-template-rows:28px 28px 32px!important; align-content:start!important; gap:4px!important; padding:6px 5px!important; min-height:0!important; }
+ body.pb-v3-page #smMenu .pb50-product-card .sm-name,
+ body.pb-v3-page .pb36-feature-body h3,body.pb-v3-page .pb-v3-feature-copy strong { display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:2!important; height:28px!important; min-height:0!important; margin:0!important; font-size:10px!important; line-height:14px!important; font-weight:700!important; white-space:normal!important; overflow:hidden!important; overflow-wrap:anywhere!important; text-align:right!important; }
+ body.pb-v3-page #smMenu .pb50-product-card .pb36-catalog-meta,
+ body.pb-v3-page .pb36-feature-body > p,body.pb-v3-page .pb-v3-feature-copy > small,
+ body.pb-v3-page .pb36-feature-body > .pb36-color-dots,
+ body.pb-v3-page #smMenu .pb50-product-card .pb50-price-row > .pb36-color-dots { display:none!important; }
+ body.pb-v3-page #smMenu .pb50-product-card .pb50-price-row { display:flex!important; min-height:0!important; height:28px!important; margin:0!important; padding:0!important; align-items:center!important; }
+ body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary { flex-wrap:nowrap!important; min-width:0!important; gap:0!important; }
+ body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary b,
+ body.pb-v3-page .pb36-card-price strong,body.pb-v3-page .pb-v3-feature-price { font-size:clamp(8px,2.35vw,11px)!important; line-height:14px!important; font-weight:700!important; white-space:nowrap!important; }
+ body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary del,
+ body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary small { font-size:7px!important; line-height:10px!important; }
  body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row { grid-template-columns:1fr!important; gap:4px!important; }
- body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row > button { grid-column:1!important; font-size:9px!important; padding:4px 1px!important; min-height:34px!important; white-space:normal!important; }
- body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row > .pb-v3-details-btn { grid-row:2!important; }
+ body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row > button { grid-column:1!important; font-size:9px!important; padding:0 2px!important; height:32px!important; min-height:32px!important; border-radius:8px!important; white-space:nowrap!important; }
+ body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row button b { font-size:9px!important; line-height:12px!important; }
+ body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row > .pb-v3-details-btn { display:none!important; }
  body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row button > span { display:none!important; }
  body.pb-v3-page #smMenu .pb50-product-card .pb36-catalog-heart { width:23px!important; height:23px!important; padding:4px!important; top:4px!important; left:4px!important; }
  body.pb-v3-page #smMenu .pb50-product-card .sm-badges { top:4px!important; right:3px!important; max-width:calc(100% - 28px)!important; font-size:7px!important; }
- body.pb-v3-page .pb36-feature-body,body.pb-v3-page .pb-v3-feature-copy { padding:5px!important; gap:4px!important; }
- body.pb-v3-page .pb36-feature-body h3,body.pb-v3-page .pb-v3-feature-copy strong { font-size:10px!important; line-height:1.4!important; overflow-wrap:anywhere!important; }
- body.pb-v3-page .pb36-feature-body p,body.pb-v3-page .pb-v3-feature-copy small { font-size:8px!important; }
- body.pb-v3-page .pb36-card-price { flex-wrap:wrap!important; gap:2px!important; }
- body.pb-v3-page .pb36-card-price strong,body.pb-v3-page .pb-v3-feature-price { font-size:10px!important; }
- body.pb-v3-page .pb36-card-price del { font-size:8px!important; }
+ body.pb-v3-page .pb36-card-price { min-height:0!important; height:28px!important; flex-direction:column-reverse!important; justify-content:center!important; align-items:flex-start!important; gap:0!important; }
+ body.pb-v3-page .pb-v3-feature-price { display:flex!important; height:28px!important; align-items:center!important; }
+ body.pb-v3-page .pb36-card-price del { font-size:7px!important; line-height:10px!important; }
  body.pb-v3-page .pb36-card-actions { grid-template-columns:1fr!important; gap:4px!important; }
- body.pb-v3-page .pb36-card-actions button { min-width:0!important; min-height:34px!important; padding:4px 1px!important; font-size:9px!important; }
+ body.pb-v3-page .pb36-card-actions button { min-width:0!important; height:32px!important; min-height:32px!important; padding:0 2px!important; font-size:9px!important; border-radius:8px!important; white-space:nowrap!important; }
+ body.pb-v3-page .pb36-card-actions button:last-child { display:none!important; }
  body.pb-v3-page .pb36-card-actions svg { display:none!important; }
  body.pb-v3-page .pb36-heart { width:23px!important; height:23px!important; padding:4px!important; top:4px!important; left:4px!important; }
- body.pb-v3-page .pb-v3-feature-image { margin:3px!important; border-radius:7px!important; }
- body.pb-v3-page .pb-v3-feature-badge,body.pb-v3-page .pb36-card-badge { font-size:7px!important; padding:2px!important; }
+ body.pb-v3-page .pb-v3-feature-open { display:flex!important; height:32px!important; min-height:32px!important; margin:0!important; border-radius:8px!important; font-size:9px!important; }
+ body.pb-v3-page .pb-v3-feature-badge,body.pb-v3-page .pb36-card-badge { top:auto!important; bottom:4px!important; left:auto!important; right:4px!important; min-height:15px!important; max-width:calc(100% - 8px)!important; font-size:6px!important; line-height:11px!important; padding:1px 4px!important; box-shadow:none!important; }
 }
