@@ -101,7 +101,7 @@ const indexHtml = await expectText('/', [
   'js/runtime-config.js',
   'js/vendor/supabase-2.114.0.min.js',
   'js/pasha-baby-commerce.js?v=v3.1',
-  'v3-visual-fixes.css?v=4.19'
+  'v3-visual-fixes.css?v=4.20'
 ], 'storefront');
 
 if (indexHtml.includes('id="smLangs"')) fail('Arabic-only storefront', 'language picker still present');

@@ -140,6 +140,21 @@ async function assertDetailsOnCards(page, label) {
   }));
   assert(state.total > 0 && state.total === state.good,
     `${label}: details/actions missing on ${state.total - state.good} of ${state.total} cards`);
+  if (page.viewportSize().width <= 680) {
+    const invalid = await page.locator('#smMenu .pb50-product-card:visible').evaluateAll(cards => cards.filter(card => {
+      const info = card.querySelector('.sm-info');
+      const action = card.querySelector('.sm-direct-add,.sm-choose-options');
+      if (!info || !action) return false;
+      const style = getComputedStyle(info), buttonStyle = getComputedStyle(action);
+      const available = info.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const labels = [...card.querySelectorAll('.pb36-product-badge,.sm-badges > *')]
+        .filter(node => node.getBoundingClientRect().height > 0);
+      return Math.abs(action.getBoundingClientRect().width - available) > 1 ||
+        buttonStyle.height !== '32px' || buttonStyle.borderRadius !== '8px' || labels.length > 1 ||
+        !!card.querySelector('.pb36-catalog-heart');
+    }).length);
+    assert(invalid === 0, `${label}: ${invalid} inconsistent mobile cart actions or labels`);
+  }
 }
 
 async function openProductDetails(page) {
