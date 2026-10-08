@@ -341,7 +341,10 @@
       });
       if (result.error) throw result.error;
       mutateLocalOrder(adminProducts, fullOrder);
-      container.dataset.pbPageIds = JSON.stringify(ids);
+      const currentIds = visibleProductRows().map(row => extractIdFromHandler(row, 'editAdminProduct'));
+      if (currentIds.length === ids.length && currentIds.every(id => ids.includes(id))) {
+        container.dataset.pbPageIds = JSON.stringify(currentIds);
+      }
       setStatus(status, 'تم حفظ الترتيب ✓', 'ok');
       window.dispatchEvent(new CustomEvent('restbr:inline-product-order-saved', {
         detail: { categoryId, ids: fullOrder }

@@ -61,6 +61,14 @@ assert.equal(saved.args.p_ids[0], 'p1');
 assert.equal(saved.args.p_ids[1], 'p0');
 assert.equal(saved.args.p_ids[50], 'p50');
 assert.equal(new Set(saved.args.p_ids).size, 5000);
+let finishSave;
+w.supabaseClient.rpc = () => new Promise(resolve => { finishSave = resolve; });
+container.insertBefore(container.children[1], container.children[0]);
+const pendingSave = w.__testOrdering.saveProductOrderInline('c');
+w.document.querySelector('[data-admin-products-page="2"]').click();
+finishSave({error:null});
+await pendingSave;
+assert.equal(JSON.parse(container.dataset.pbPageIds)[0], 'p50', 'a completed save must not overwrite a newly opened page');
 assert.throws(() => w.PashaAdminData.mergePageOrder(['a','b'], ['a'], ['missing']));
 w.close();
 
