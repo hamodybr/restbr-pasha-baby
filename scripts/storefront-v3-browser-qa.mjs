@@ -412,20 +412,20 @@ async function runViewport(browser, spec) {
 
     const searchInput = page.locator('#smSearchInput');
     await searchInput.fill(realProductName);
-    await page.waitForTimeout(120);
+    await page.waitForFunction(name => { const cards = [...document.querySelectorAll('#smMenu [data-product-card]')]; return cards.length > 0 && cards.every(card => card.querySelector('.sm-name')?.textContent.includes(name)); }, realProductName);
     const matchingCards = await page.locator('#smMenu [data-product-card]:visible').count();
     assert(matchingCards > 0, `${spec.name} real product search returned no visible products`);
     await assertDetailsOnCards(page, `${spec.name} after search`);
 
     await searchInput.fill('__V3_NO_MATCH_9XQ__');
-    await page.waitForTimeout(120);
+    await page.locator('#smMenu .analytics-empty').waitFor({state:'visible'});
     const noMatchCards = await page.locator('#smMenu [data-product-card]:visible').count();
     assert(noMatchCards === 0, `${spec.name} impossible search still showed product cards`);
     const emptyVisible = await page.locator('#smMenu .analytics-empty:visible').count();
     assert(emptyVisible > 0, `${spec.name} no-result search did not show the empty state`);
 
     await searchInput.fill('');
-    await page.waitForTimeout(120);
+    await page.locator('#smMenu [data-product-card]').first().waitFor({state:'visible'});
     const restoredCards = await page.locator('#smMenu [data-product-card]:visible').count();
     assert(restoredCards > 0, `${spec.name} clearing search did not restore the catalog`);
     await assertDetailsOnCards(page, `${spec.name} after clearing search`);
