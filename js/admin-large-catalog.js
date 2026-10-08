@@ -18,19 +18,20 @@
     while (true) {
       let query = supabaseClient
         .from(table)
-        .select('*')
+        .select('*', { count: 'exact' })
         .range(from, from + PAGE_SIZE - 1);
 
       if (order) query = query.order(order, { ascending });
 
-      const { data, error } = await query;
+      query = query.order('id', { ascending: true });
+      const { data, error, count } = await query;
       if (error) throw error;
 
       const page = Array.isArray(data) ? data : [];
       rows.push(...page);
 
-      if (page.length < PAGE_SIZE) break;
-      from += PAGE_SIZE;
+      if (!page.length || (Number.isFinite(count) && rows.length >= count)) break;
+      from += page.length;
       if (from >= MAX_ROWS) throw new Error(`${table} exceeded ${MAX_ROWS} row safety limit`);
     }
 
@@ -38,8 +39,9 @@
   }
 
   function catalogMayBeTruncated() {
+    const totals = window.PASHA_ADMIN_CATALOG_TOTALS;
     return [adminCategories, adminProducts, adminOptions]
-      .some(rows => Array.isArray(rows) && rows.length >= PAGE_SIZE);
+      .some((rows, index) => !totals || !Number.isFinite(totals[index]) || rows.length !== totals[index]);
   }
 
   function publishReady() {
@@ -115,9 +117,7 @@
   }
 
   async function ensureCompleteCatalog() {
-    // Supabase's normal Data API page is capped at PAGE_SIZE. For the common
-    // case (<1000 rows per table), the base dashboard request is already the
-    // complete catalog, so a second three-table download only wastes time.
+    // Compare exact server counts so smaller API caps cannot hide rows.
     if (!catalogMayBeTruncated()) {
       publishReady();
       return true;

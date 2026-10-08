@@ -5,6 +5,7 @@ import { chromium } from 'playwright-core';
 
 const ROOT = process.cwd();
 const PORT = 4173;
+const NETWORK_TIMEOUT = Number(process.env.PASHA_QA_NETWORK_TIMEOUT_MS || 15000);
 const HOST = '127.0.0.1';
 const BASE = `http://${HOST}:${PORT}`;
 
@@ -117,12 +118,12 @@ async function waitForCatalog(page) {
   await page.waitForFunction(() =>
     Array.isArray(window.RESTBR_DB?.products) && window.RESTBR_DB.products.length > 0,
     null,
-    { timeout: 15000 }
+    { timeout: NETWORK_TIMEOUT }
   );
   await page.waitForFunction(() =>
     document.querySelectorAll('#smMenu [data-product-card]').length > 0,
     null,
-    { timeout: 15000 }
+    { timeout: NETWORK_TIMEOUT }
   );
 }
 
@@ -177,6 +178,7 @@ async function openProductDetails(page) {
 }
 
 async function prepareCartAndCheckout(page) {
+  await page.waitForFunction(() => window.RESTBR_HOURS_READY === true, null, { timeout: NETWORK_TIMEOUT });
   const cartResult = await page.evaluate(() => {
     const product = window.RESTBR_DB?.products?.find(item =>
       item?.badges?.unavailable !== true &&
@@ -266,7 +268,7 @@ async function assertCatalogNavigation(page, spec) {
     title: document.querySelector('#smMenu .sm-section-title')?.textContent?.trim(),
     allActive: !!document.querySelector('#smCats .sm-cat[data-cat="__all__"].active')
   }));
-  assert(full.expected > 0 && full.actual === full.expected &&
+  assert(full.expected > 0 && full.actual === Math.min(32, full.expected) &&
     full.title === 'كل المنتجات' && full.allActive,
     spec.name + ': View all did not show all real products: ' + JSON.stringify(full));
 
@@ -285,7 +287,7 @@ async function assertCatalogNavigation(page, spec) {
       active: !!document.querySelector('#smCats .sm-cat[data-cat="' + CSS.escape(id) + '"].active')
     };
   }, id);
-  assert(filtered.expected > 0 && filtered.actual === filtered.expected &&
+  assert(filtered.expected > 0 && filtered.actual === Math.min(32, filtered.expected) &&
     filtered.matching && filtered.active,
     spec.name + ': category did not display matching real products: ' + JSON.stringify(filtered));
   await assertDetailsOnCards(page, spec.name + ' after selecting real category');
@@ -308,7 +310,7 @@ async function assertCatalogNavigation(page, spec) {
       return { expected: badges.length, actual: cards.length, matching: cards.every(card =>
         badges.some(p => String(p.id) === card.dataset.productCard)) };
     }, mode);
-    assert(stats.expected > 0 && stats.actual >= stats.expected && stats.matching,
+    assert(stats.expected > 0 && stats.actual === Math.min(32, stats.expected) && stats.matching,
       spec.name + ': View all in highlight did not show the full matching set: ' + JSON.stringify(stats));
   }
 
@@ -319,6 +321,7 @@ async function assertCatalogNavigation(page, spec) {
 
 async function runViewport(browser, spec) {
   const context = await browser.newContext({
+    ignoreHTTPSErrors: Boolean(process.env.HTTPS_PROXY),
     viewport: { width: spec.width, height: spec.height },
     deviceScaleFactor: spec.scale || 1,
     isMobile: spec.mobile,
@@ -375,7 +378,7 @@ async function runViewport(browser, spec) {
 
   await waitForCatalog(page);
   const catalogElapsed = Date.now() - catalogStarted;
-  assert(catalogElapsed <= 5000,
+  assert(catalogElapsed <= (process.env.PASHA_QA_NETWORK_TIMEOUT_MS ? NETWORK_TIMEOUT : 5000),
     `${spec.name} catalog first-open is too slow: ${catalogElapsed}ms`);
   await page.waitForTimeout(500);
 
@@ -409,20 +412,20 @@ async function runViewport(browser, spec) {
 
     const searchInput = page.locator('#smSearchInput');
     await searchInput.fill(realProductName);
-    await page.waitForTimeout(120);
+    await page.waitForFunction(name => { const cards = [...document.querySelectorAll('#smMenu [data-product-card]')]; return cards.length > 0 && cards.every(card => card.querySelector('.sm-name')?.textContent.includes(name)); }, realProductName);
     const matchingCards = await page.locator('#smMenu [data-product-card]:visible').count();
     assert(matchingCards > 0, `${spec.name} real product search returned no visible products`);
     await assertDetailsOnCards(page, `${spec.name} after search`);
 
     await searchInput.fill('__V3_NO_MATCH_9XQ__');
-    await page.waitForTimeout(120);
+    await page.locator('#smMenu .analytics-empty').waitFor({state:'visible'});
     const noMatchCards = await page.locator('#smMenu [data-product-card]:visible').count();
     assert(noMatchCards === 0, `${spec.name} impossible search still showed product cards`);
     const emptyVisible = await page.locator('#smMenu .analytics-empty:visible').count();
     assert(emptyVisible > 0, `${spec.name} no-result search did not show the empty state`);
 
     await searchInput.fill('');
-    await page.waitForTimeout(120);
+    await page.locator('#smMenu [data-product-card]').first().waitFor({state:'visible'});
     const restoredCards = await page.locator('#smMenu [data-product-card]:visible').count();
     assert(restoredCards > 0, `${spec.name} clearing search did not restore the catalog`);
     await assertDetailsOnCards(page, `${spec.name} after clearing search`);
@@ -489,8 +492,40 @@ async function runViewport(browser, spec) {
   await context.close();
 }
 
+async function assertLargeCatalog(page) {
+  await page.evaluate(() => {
+    const source = window.RESTBR_DB.products;
+    window.RESTBR_DB.products = Array.from({ length: 5000 }, (_, i) => ({
+      ...source[i % source.length], id: 'scale-' + i,
+      name: { ar: 'صنف اختبار ' + i, en: 'Scale ' + i }
+    }));
+    window.__SCALE_LONG_TASKS__ = [];
+    new PerformanceObserver(list => window.__SCALE_LONG_TASKS__.push(...list.getEntries().map(entry => entry.duration)))
+      .observe({ type: 'longtask' });
+    window.RESTBR_V3_SHOW_CATALOG('all');
+  });
+  await page.waitForTimeout(1200);
+  const state = await page.evaluate(() => ({
+    cards: document.querySelectorAll('#smMenu [data-product-card]').length,
+    nodes: document.querySelectorAll('*').length,
+    longest: Math.max(0, ...window.__SCALE_LONG_TASKS__)
+  }));
+  assert(state.cards === 32 && state.nodes < 6000, '5000-product catalog grew the DOM: ' + JSON.stringify(state));
+  assert(state.longest < 2000, '5000-product catalog caused a sustained freeze: ' + JSON.stringify(state));
+  await page.locator('#smMenu [data-catalog-page="2"]').click();
+  await page.waitForTimeout(160);
+  assert(await page.locator('#smMenu [data-product-card]').first().getAttribute('data-product-card') === 'scale-32', 'Next page skipped products');
+  await page.evaluate(() => { const input = document.getElementById('smSearchInput'); input.value = 'صنف اختبار 4999'; input.dispatchEvent(new Event('input', { bubbles: true })); });
+  await page.waitForTimeout(350);
+  assert(await page.locator('#smMenu [data-product-card]').count() === 1, 'Debounced search did not reset the page');
+  await page.locator('#smMenu [data-product-card] img').first().click();
+  assert(await page.locator('#pbV3ProductSheet').evaluate(node => !node.hidden && node.dataset.productId === 'scale-4999'), 'Searched product opened the wrong details');
+  console.log('Production scale QA passed: ' + JSON.stringify(state));
+}
+
 async function runProductionLoad(browser, spec) {
   const context = await browser.newContext({
+    ignoreHTTPSErrors: Boolean(process.env.HTTPS_PROXY),
     viewport: { width: spec.width, height: spec.height },
     isMobile: spec.mobile, hasTouch: spec.mobile, serviceWorkers: 'block', locale: 'ar-IQ'
   });
@@ -514,6 +549,7 @@ async function runProductionLoad(browser, spec) {
   const originalsRequested = [];
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
+  if(process.env.PASHA_QA_DIAGNOSTIC) {page.on('console',msg=>console.log(msg.type(),msg.text()));page.on('requestfailed',r=>console.log('Failed request:',r.url(),r.failure()));}
   page.on('request', request => {
     if (/backblazeb2\.com\/file\/pasha-baby-products\/products\/.*\/main/.test(request.url())) {
       originalsRequested.push(request.url());
@@ -573,6 +609,7 @@ async function runProductionLoad(browser, spec) {
     await assertDetailsOnCards(page, spec.name + ' production catalog');
     await openProductDetails(page);
     await prepareCartAndCheckout(page);
+    if (spec.mobile) await assertLargeCatalog(page);
   } finally {
     releaseCatalog();
     await context.close();
@@ -589,6 +626,7 @@ try {
   browser = await chromium.launch({
     executablePath,
     headless: true,
+    ...(process.env.HTTPS_PROXY ? { proxy: { server: process.env.HTTPS_PROXY, bypass: "localhost,127.0.0.1" } } : {}),
     args: ['--no-sandbox', '--disable-dev-shm-usage']
   });
 

@@ -46,7 +46,7 @@ const requiredHtml = [
   'id="smCats"',
   'id="smMenu"',
   'id="pbV3BottomCart"',
-  'storefront-v3/storefront-v3.css?v=1.6',
+  'storefront-v3/storefront-v3.css?v=1.7',
   'storefront-v3/storefront-v3-reference.css?v=1.5',
   'storefront-v3/storefront-v3.js?v=1.8',
   'pb-ref-service-footer',
@@ -82,15 +82,15 @@ for (const token of forbiddenLegacy) {
 }
 
 for (const token of [
-  'js/unavailable-card-state.js?v=v3.1',
-  'js/app.js?v=v3.1',
-  'js/pasha-baby-commerce.js?v=v3.1',
-  'js/product-image-fallback.js?v=v3.1',
-  'js/price-safety.js?v=v3.1',
+  'js/unavailable-card-state.js?v=20261008.1',
+  'js/app.js?v=20261008.1',
+  'js/pasha-baby-commerce.js?v=20261008.1',
+  'js/product-image-fallback.js?v=20261008.1',
+  'js/price-safety.js?v=20261008.1',
   'js/cart.js?v=v3.1',
-  'js/live-prices.js?v=v3.1',
-  'js/pasha-baby-fixed-discounts.js?v=v3.1',
-  'js/live-card-badges.js?v=v3.1'
+  'js/live-prices.js?v=20261008.1',
+  'js/pasha-baby-fixed-discounts.js?v=20261008.1',
+  'js/live-card-badges.js?v=20261008.1'
 ]) {
   if (!html.includes(token)) fail('V3 isolated cache key missing: ' + token);
 }
@@ -109,7 +109,7 @@ if (!allCss.includes('--v3-sage') || !allCss.includes('--v3-beige')) {
 
 for (const token of [
   'id="pbV3Highlights"',
-  'storefront-v3/product-details-v3.js?v=1.3'
+  'storefront-v3/product-details-v3.js?v=20261008.1'
 ]) {
   if (!html.includes(token)) fail('V3 phase 2 feature missing: ' + token);
 }
@@ -301,8 +301,8 @@ if (!arabicOnlyJs.includes('IS_STOREFRONT_V3') ||
   fail('Arabic-only bootstrap can reload legacy gallery observers into V3.');
 }
 
-if (!fixedDiscountJs.includes('if (!IS_STOREFRONT_V3) subscribe();')) {
-  fail('V3 must not keep the fixed-discount realtime channel open.');
+if (!fixedDiscountJs.includes('if (!/\\/storefront-v3(?:\\/|$)/i.test(location.pathname)) subscribe();')) {
+  fail('The isolated prototype must not open the production discount channel.');
 }
 
 if (!numberNormalizerJs.includes('IS_STOREFRONT_V3') ||

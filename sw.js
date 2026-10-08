@@ -1,4 +1,4 @@
-const CACHE_NAME = "restbr-pasha-baby-v58";
+const CACHE_NAME = "restbr-pasha-baby-v59";
 // 2026-09-17: v46 forces iOS Safari to install a fresh code cache and fetch\n// the continuous carousel helper at its new v1.2 URL.
 
 const CORE = [
@@ -21,12 +21,12 @@ const CORE = [
   "./css/pasha-baby-final-tweaks.css?v=1.1",
   "./js/pasha-baby-storefront-bundle.js?v=1.3",
   "./js/vendor/supabase-2.114.0.min.js",
-  "./js/runtime-config.js?v=2.3",
+  "./js/runtime-config.js?v=20261008.1",
   "./js/restbr-hardening.js?v=1.0",
   "./js/url-safety.js?v=1.6",
-  "./js/pasha-arabic-only.js?v=2.3",
-  "./js/pasha-number-normalizer.js?v=1.2",
-  "./js/restaurant-hours.js?v=1.3",
+  "./js/pasha-arabic-only.js?v=20261008.1",
+  "./js/pasha-number-normalizer.js?v=20261008.1",
+  "./js/restaurant-hours.js?v=20261008.1",
   "./js/whatsapp-order-bullets.js?v=1.0",
   "./js/arabic-news-ticker.js?v=1.1",
   "./js/pasha-baby-product-description-v2.js?v=3.1",

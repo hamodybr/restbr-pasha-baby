@@ -105,7 +105,7 @@ if (RESTBR_CONFIGURED) {
     if (document.getElementById('pashaArabicOnlyScript')) return;
     const script = document.createElement('script');
     script.id = 'pashaArabicOnlyScript';
-    script.src = 'js/pasha-arabic-only.js?v=2.3';
+    script.src = 'js/pasha-arabic-only.js?v=20261008.1';
     script.async = false;
     document.head.appendChild(script);
   };
@@ -144,7 +144,7 @@ if (RESTBR_CONFIGURED) {
 
   const script = document.createElement('script');
   script.id = 'restbrRestaurantHoursScript';
-  script.src = 'js/restaurant-hours.js?v=1.3';
+  script.src = 'js/restaurant-hours.js?v=20261008.1';
   script.async = false;
   document.head.appendChild(script);
 })();

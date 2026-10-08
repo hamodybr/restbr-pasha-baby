@@ -1,6 +1,6 @@
 (() => {
   if (/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
-  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname) || document.body?.classList.contains('pb-v3-page') === true;
 
   function safeMedia(value){
     return typeof window.RESTBR_SAFE_MEDIA_URL === 'function'
@@ -107,6 +107,13 @@
     if (tryOriginal(img)) return;
 
     if (img.dataset.smFallbackApplied === '1') {
+      if (IS_STOREFRONT_V3) {
+        const placeholder = 'assets/pasha-baby-product-placeholder.svg';
+        if (img.getAttribute('src') !== placeholder) img.src = placeholder;
+        img.classList.remove('sm-image-fallback');
+        img.closest('.sm-img')?.classList.remove('sm-image-fallback-empty');
+        return;
+      }
       img.closest('.sm-img')?.classList.add('sm-image-fallback-empty');
       return;
     }

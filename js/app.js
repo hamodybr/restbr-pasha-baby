@@ -74,6 +74,36 @@ let active = "";
 let searchQuery = "";
 let searchTracked = false;
 let v3CatalogFilter = 'category';
+const V3_CATALOG_PAGE_SIZE = 32;
+let v3CatalogPage = 1;
+let v3CatalogPageKey = '';
+let searchRenderTimer = 0;
+
+function catalogPageRows(rows) {
+  if (!IS_STOREFRONT_V3) return rows;
+  const key = `${v3CatalogFilter}:${active}:${searchQuery}`;
+  if (key !== v3CatalogPageKey) { v3CatalogPageKey = key; v3CatalogPage = 1; }
+  v3CatalogPage = Math.max(1, Math.min(v3CatalogPage, Math.ceil(rows.length / V3_CATALOG_PAGE_SIZE) || 1));
+  return rows.slice((v3CatalogPage - 1) * V3_CATALOG_PAGE_SIZE, v3CatalogPage * V3_CATALOG_PAGE_SIZE);
+}
+
+function catalogPagination(total) {
+  if (!IS_STOREFRONT_V3 || total <= V3_CATALOG_PAGE_SIZE) return '';
+  const start = (v3CatalogPage - 1) * V3_CATALOG_PAGE_SIZE;
+  return `<nav class="pb-catalog-pages" aria-label="صفحات المنتجات">
+    <button type="button" data-catalog-page="${v3CatalogPage - 1}" ${v3CatalogPage === 1 ? 'disabled' : ''}>السابق</button>
+    <span aria-live="polite">${start + 1}–${Math.min(total, start + V3_CATALOG_PAGE_SIZE)} من ${total}</span>
+    <button type="button" data-catalog-page="${v3CatalogPage + 1}" ${start + V3_CATALOG_PAGE_SIZE >= total ? 'disabled' : ''}>التالي</button>
+  </nav>`;
+}
+
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-catalog-page]');
+  if (!button || button.disabled) return;
+  v3CatalogPage = Number(button.dataset.catalogPage) || 1;
+  render();
+  document.getElementById('smMenu')?.scrollIntoView({ block: 'start' });
+});
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -780,8 +810,11 @@ function ensureSearchUI(){
 
       if(!next)searchTracked=false;
 
-      render();
-      updateSearchCount();
+      window.clearTimeout(searchRenderTimer);
+      searchRenderTimer = window.setTimeout(() => {
+        render();
+        updateSearchCount();
+      }, next ? 180 : 0);
     });
 
     clear.addEventListener("click",()=>{
@@ -2197,6 +2230,7 @@ function render() {
   const menu=$("#smMenu");
 
   if(!menu||!DB)return;
+  window.clearTimeout(searchRenderTimer);
 
 
   if(searchQuery){
@@ -2230,8 +2264,9 @@ function render() {
         </div>
 
         <div class="sm-grid">
-          ${products.map(productCard).join("")}
+          ${catalogPageRows(products).map(productCard).join("")}
         </div>
+        ${catalogPagination(products.length)}
 
       </section>
     `;
@@ -2300,8 +2335,9 @@ function render() {
       </div>
 
       <div class="sm-grid">
-        ${products.map(productCard).join("")}
+        ${catalogPageRows(products).map(productCard).join("")}
       </div>
+      ${catalogPagination(products.length)}
 
     </section>
   `;
@@ -3635,10 +3671,11 @@ async function loadMenuFromSupabase() {
 
   const {
     data: categoriesData,
-    error: categoriesError
+    error: categoriesError,
+    count: categoriesTotal
   } = await supabaseClient
     .from("categories")
-    .select("*")
+    .select("*", { count: "exact" })
     .order("sort_order", {
       ascending: true
     });
@@ -3655,10 +3692,11 @@ async function loadMenuFromSupabase() {
 
   const {
     data: productsData,
-    error: productsError
+    error: productsError,
+    count: productsTotal
   } = await supabaseClient
     .from("products")
-    .select("*")
+    .select("*", { count: "exact" })
     .order("sort_order", {
       ascending: true
     });
@@ -3675,10 +3713,11 @@ async function loadMenuFromSupabase() {
 
   const {
     data: optionsData,
-    error: optionsError
+    error: optionsError,
+    count: optionsTotal
   } = await supabaseClient
     .from("product_options")
-    .select("*")
+    .select("*", { count: "exact" })
     .order("sort_order", {
       ascending: true
     });
@@ -3698,6 +3737,7 @@ async function loadMenuFromSupabase() {
     }
   );
 
+  window.RESTBR_INITIAL_CATALOG_TOTALS = { categories: categoriesTotal, products: productsTotal, options: optionsTotal };
   window.RESTBR_INITIAL_CATALOG_COUNTS = {
     categories: categoriesData?.length || 0,
     products: productsData?.length || 0,

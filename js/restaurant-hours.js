@@ -1,7 +1,7 @@
 (() => {
   if (/(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname)) return;
 
-  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname) || document.body?.classList.contains('pb-v3-page') === true;
   const TIMEZONE = 'Asia/Baghdad';
   const DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
   const DAY_FROM_SHORT = {

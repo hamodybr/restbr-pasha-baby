@@ -130,7 +130,7 @@
   }
 
   function extractIdFromHandler(row, fnName) {
-    const button = row?.querySelector(`[onclick*="${fnName}("]`);
+    const button = row ? [...row.querySelectorAll('[onclick]')].find(node => String(node.getAttribute('onclick')).includes(`${fnName}(`)) : null;
     const raw = String(button?.getAttribute('onclick') || '');
     const match = raw.match(new RegExp(`${fnName}\\(['\"]([^'\"]+)['\"]\\)`));
     return match ? String(match[1]) : '';
@@ -199,12 +199,16 @@
       return { enabled: false, categoryId, reason: 'لا توجد أصناف قابلة للترتيب في هذا القسم.' };
     }
 
+    const original = JSON.parse(q('#productsContainer')?.dataset.pbPageIds || '[]');
     const complete = ids.length === expected.length && expected.every(id => ids.includes(id));
-    if (!complete) {
+    const pageComplete = Number(q('#productsContainer')?.dataset.pbPageTotal) === expected.length &&
+      ids.length === original.length && ids.every(id => original.includes(id)) && expected.some((_,start) =>
+        original.every((id,index) => expected[start + index] === id));
+    if (!complete && !pageComplete) {
       return { enabled: false, categoryId, reason: 'اختر «الكل» حتى تظهر كل أصناف القسم قبل الترتيب.' };
     }
 
-    return { enabled: true, categoryId, reason: 'اسحب من ⋮⋮ — يتم حفظ الترتيب تلقائيًا.' };
+    return { enabled: true, categoryId, reason: complete ? 'اسحب من ⋮⋮ — يتم حفظ الترتيب تلقائيًا.' : 'اسحب لترتيب أصناف الصفحة الحالية — باقي القسم يبقى محفوظًا.' };
   }
 
   function decorateProductRows() {
@@ -315,7 +319,12 @@
       .map(row => String(row.dataset.pbOrderId || ''))
       .filter(Boolean);
     const expected = expectedProductIds(categoryId);
-    if (!ids.length || ids.length !== expected.length || !expected.every(id => ids.includes(id))) {
+    const original = JSON.parse(container.dataset.pbPageIds || '[]');
+    let fullOrder;
+    try {
+      if (!productOrderingState().enabled) throw new Error('قائمة غير كاملة');
+      fullOrder = window.PashaAdminData.mergePageOrder(expected, original.length ? original : expected, ids);
+    } catch (_) {
       setStatus(status, 'الترتيب متاح فقط عند عرض كل أصناف القسم.', 'error');
       scheduleProcess();
       return;
@@ -328,13 +337,17 @@
     try {
       const result = await supabaseClient.rpc('reorder_products', {
         p_category_id: categoryId,
-        p_ids: ids
+        p_ids: fullOrder
       });
       if (result.error) throw result.error;
-      mutateLocalOrder(adminProducts, ids);
+      mutateLocalOrder(adminProducts, fullOrder);
+      const currentIds = visibleProductRows().map(row => extractIdFromHandler(row, 'editAdminProduct'));
+      if (currentIds.length === ids.length && currentIds.every(id => ids.includes(id))) {
+        container.dataset.pbPageIds = JSON.stringify(currentIds);
+      }
       setStatus(status, 'تم حفظ الترتيب ✓', 'ok');
       window.dispatchEvent(new CustomEvent('restbr:inline-product-order-saved', {
-        detail: { categoryId, ids }
+        detail: { categoryId, ids: fullOrder }
       }));
     } catch (error) {
       console.error('INLINE PRODUCT ORDER ERROR:', error);

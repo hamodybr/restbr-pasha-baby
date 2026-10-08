@@ -2,7 +2,7 @@
   if (window.__RESTBR_LIVE_PRICES_V3__) return;
   window.__RESTBR_LIVE_PRICES_V3__ = true;
 
-  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname) || document.body?.classList.contains('pb-v3-page') === true;
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
   const PRICE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
@@ -28,10 +28,14 @@
 
   const db = () => window.RESTBR_DB;
 
+  let productIndexSource = null, productIndexLength = -1, productIndex = new Map();
   function productById(productId) {
-    return db()?.products?.find(
-      product => String(product.id) === String(productId)
-    ) || null;
+    const products = db()?.products || [];
+    if (productIndexSource !== products || productIndexLength !== products.length) {
+      productIndexSource = products; productIndexLength = products.length;
+      productIndex = new Map(products.map(product => [String(product.id), product]));
+    }
+    return productIndex.get(String(productId)) || null;
   }
 
   function optionById(product, optionId) {
@@ -128,7 +132,7 @@
     option.originalPrice = originalPrice;
     option.price = nextPrice;
 
-    if (changed) refreshProductDom(product.id);
+    if (changed && notify) refreshProductDom(product.id);
 
     if (changed && notify) {
       notifyPriceUpdate({
@@ -152,9 +156,9 @@
     let from = 0;
 
     while (true) {
-      const { data, error } = await sb
+      const { data, error, count } = await sb
         .from("product_options")
-        .select("id,product_id,price")
+        .select("id,product_id,price", { count: "exact" })
         .order("id", { ascending: true })
         .range(from, from + PAGE_SIZE - 1);
 
@@ -163,8 +167,8 @@
       const page = Array.isArray(data) ? data : [];
       rows.push(...page);
 
-      if (page.length < PAGE_SIZE) break;
-      from += PAGE_SIZE;
+      if (!page.length || (Number.isFinite(count) && rows.length >= count)) break;
+      from += page.length;
 
       if (from >= MAX_ROWS) {
         throw new Error(`product_options exceeded ${MAX_ROWS} row live-price safety limit`);
@@ -200,7 +204,9 @@
         }
       });
 
-      touchedProducts.forEach(refreshProductDom);
+      const visible = new Set([...document.querySelectorAll('[data-product-card]')].map(card => card.dataset.productCard));
+      if (activeChoiceProductId !== null) visible.add(String(activeChoiceProductId));
+      visible.forEach(id => { if (touchedProducts.has(id)) refreshProductDom(id); });
 
       if (changed) {
         notifyPriceUpdate({
