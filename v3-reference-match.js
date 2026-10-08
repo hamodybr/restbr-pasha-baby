@@ -236,7 +236,7 @@
     return `
       <article class="pb36-feature-card" data-pb36-product-card="${escapeHtml(product.id)}">
         <div class="pb36-feature-media">
-          <img src="${escapeHtml(optimizedMedia(product.image))}" alt="${escapeHtml(name)}" loading="lazy" decoding="async">
+          <img src="${escapeHtml(optimizedMedia(product.image))}" alt="${escapeHtml(name)}" tabindex="0" role="button" aria-label="تفاصيل ${escapeHtml(name)}" loading="lazy" decoding="async">
           <button class="pb36-heart" type="button" data-pb36-favorite="${escapeHtml(product.id)}" aria-label="إضافة ${escapeHtml(name)} للمفضلة" aria-pressed="false">${icon('heart')}</button>
           ${badge ? `<span class="pb36-card-badge">${escapeHtml(badge)}</span>` : ''}
         </div>
