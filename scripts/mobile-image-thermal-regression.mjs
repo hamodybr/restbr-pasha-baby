@@ -90,7 +90,7 @@ assert(files.arabic.includes('admin-color-image-upload.js?v=2.0'), 'color upload
 assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.3'), 'storefront gallery helper must be loaded');
 assert(!files.arabic.includes('admin-image-optimizer.js?v=1.0'), 'Arabic admin loader must not boot the retired legacy optimizer');
 
-assert(files.config.includes('pasha-arabic-only.js?v=2.3'), 'Arabic policy cache version must be bumped');
+assert(files.config.includes('pasha-arabic-only.js?v=20261008.1'), 'Arabic policy cache version must be bumped');
 assert(files.config.includes('admin-option-order.js?v=3.0'), 'option-order cache version must be bumped');
 assert(files.config.includes('pasha-baby-admin-polish-v3.js?v=3.1'), 'admin polish cache version must be bumped');
 

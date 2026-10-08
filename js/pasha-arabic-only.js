@@ -3,7 +3,7 @@
   window.__PASHA_ARABIC_ONLY_V1__ = true;
 
   const IS_ADMIN = /(?:^|\/)admin(?:\.html)?\/?$/i.test(location.pathname);
-  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname) || document.body?.classList.contains('pb-v3-page') === true;
   const q = selector => document.querySelector(selector);
 
   function forceArabicState() {
@@ -143,12 +143,12 @@
     loadScript('pashaBabyImagePipelineScript', 'js/admin-image-pipeline.js?v=1.0', true);
     loadScript('pashaBabyB2StorageScript', 'js/admin-b2-storage.js?v=2.0', true);
     loadScript('pashaBabyB2CleanupScript', 'js/admin-b2-cleanup.js?v=1.0', true);
-    loadScript('pashaBabyLargeCatalogScript', 'js/admin-large-catalog.js?v=1.0', true);
+    loadScript('pashaBabyLargeCatalogScript', 'js/admin-large-catalog.js?v=20261008.1', true);
     loadScript('pashaOptionPriceFastScript', 'js/admin-option-price-fast.js?v=1.0', true);
     loadScript('pashaBabyRetailDiscountsScript', 'js/admin-retail-discounts.js?v=4.0', true);
     loadScript('pashaBabyProductColorsScript', 'js/admin-product-colors.js?v=3.0', true);
     loadScript('pashaProductEditorCleanupScript', 'js/pasha-admin-product-editor-cleanup.js?v=1.0', true);
-    loadScript('pashaCategoryRetailCleanupScript', 'js/admin-category-retail-cleanup.js?v=1.2', true);
+    loadScript('pashaCategoryRetailCleanupScript', 'js/admin-category-retail-cleanup.js?v=20261008.1', true);
     loadScript('pashaNewProductColorsScript', 'js/admin-new-product-colors.js?v=1.0', true);
     loadScript('pashaColorImageUploadScript', 'js/admin-color-image-upload.js?v=2.0', true);
     loadScript('pashaAdminProgressiveDisclosureScript', 'js/admin-progressive-disclosure.js?v=2.0', true);
@@ -215,7 +215,7 @@
   function boot() {
     forceArabicState();
     installArabicOnlyStyle();
-    loadScript('pashaNumberNormalizerScript', 'js/pasha-number-normalizer.js?v=1.2');
+    loadScript('pashaNumberNormalizerScript', 'js/pasha-number-normalizer.js?v=20261008.1');
     if (IS_ADMIN) {
       cleanupAdminLanguages(document);
       loadArabicAdminTools();

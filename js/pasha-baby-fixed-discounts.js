@@ -4,7 +4,7 @@
 
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
-  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname) || document.body?.classList.contains('pb-v3-page') === true;
   let cachedDiscounts = [];
   let loadPromise = null;
   let boundaryTimer = null;
@@ -270,7 +270,7 @@
 
   function start() {
     observeMenu();
-    if (!IS_STOREFRONT_V3) subscribe();
+    if (!/\/storefront-v3(?:\/|$)/i.test(location.pathname)) subscribe();
     void reload({ render: true });
   }
 

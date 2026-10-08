@@ -100,8 +100,8 @@ const indexHtml = await expectText('/', [
   'پاشا بيبي',
   'js/runtime-config.js',
   'js/vendor/supabase-2.114.0.min.js',
-  'js/pasha-baby-commerce.js?v=v3.1',
-  'v3-visual-fixes.css?v=4.20'
+  'js/pasha-baby-commerce.js?v=20261008.1',
+  'v3-visual-fixes.css?v=4.21'
 ], 'storefront');
 
 if (indexHtml.includes('id="smLangs"')) fail('Arabic-only storefront', 'language picker still present');
@@ -235,7 +235,7 @@ await expectText('/sw.js', [
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
-  'js/pasha-arabic-only.js?v=2.3',
+  'js/pasha-arabic-only.js?v=20261008.1',
   'js/pasha-number-normalizer.js?v=1.2',
   'js/pasha-baby-storefront-bundle.js?v=1.3',
   'js/pasha-product-gallery-thermal-v1.js?v=1.3',

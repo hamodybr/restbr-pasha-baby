@@ -182,10 +182,10 @@ window.RESTBR_CONFIG = Object.freeze({
 })();
 
 (() => {
-  if (document.getElementById('restbrUrlSafetyScript')) return;
+  if (document.getElementById('restbrUrlSafetyScript') || document.querySelector('script[src^="js/url-safety.js"]')) return;
   const script = document.createElement('script');
   script.id = 'restbrUrlSafetyScript';
-  script.src = 'js/url-safety.js?v=1.5';
+  script.src = 'js/url-safety.js?v=1.7';
   script.defer = true;
   document.head.appendChild(script);
 })();
@@ -203,6 +203,7 @@ window.RESTBR_CONFIG = Object.freeze({
   const path = String(window.location.pathname || '').toLowerCase();
   if (/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
   if (document.getElementById('pbProductDescriptionV2Script')) return;
+  if (document.body?.classList.contains('pb-v3-page') || /\/storefront-v3(?:\/|$)/i.test(path)) return;
 
   const script = document.createElement('script');
   script.id = 'pbProductDescriptionV2Script';
@@ -215,6 +216,7 @@ window.RESTBR_CONFIG = Object.freeze({
   const path = String(window.location.pathname || '').toLowerCase();
   if (/(^|\/)admin(?:\.html)?\/?$/.test(path)) return;
   if (document.getElementById('pbCardDetailsButtonV3Script')) return;
+  if (document.body?.classList.contains('pb-v3-page') || /\/storefront-v3(?:\/|$)/i.test(path)) return;
 
   const script = document.createElement('script');
   script.id = 'pbCardDetailsButtonV3Script';

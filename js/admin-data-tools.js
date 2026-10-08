@@ -33,6 +33,14 @@
     const current = Math.max(1, Math.min(pages, page));
     return { rows: rows.slice((current - 1) * size, current * size), page: current, pages, total: rows.length };
   }
+  function mergePageOrder(expected, original, reordered) {
+    const keys = new Set(original);
+    if (!original.length || keys.size !== original.length || reordered.length !== original.length ||
+        new Set(reordered).size !== reordered.length || reordered.some(id => !keys.has(id)) ||
+        original.some(id => !expected.includes(id))) throw new Error('تغيّرت أصناف الصفحة؛ حدّث القائمة قبل الترتيب.');
+    let index = 0;
+    return expected.map(id => keys.has(id) ? reordered[index++] : id);
+  }
   async function archive(client, progress = () => {}) {
     const data = {};
     for (const table of TABLES) {
@@ -60,5 +68,5 @@
     if (!String(product.name_ar || product.name || '').trim()) issues.push('الاسم العربي ناقص');
     return issues;
   }
-  window.PashaAdminData = { readAll, pageRows, archive, productContentIssues };
+  window.PashaAdminData = { readAll, pageRows, mergePageOrder, archive, productContentIssues };
 })();

@@ -194,7 +194,7 @@
   if (document.getElementById('pashaInlineListOrderingScript')) return;
   const script = document.createElement('script');
   script.id = 'pashaInlineListOrderingScript';
-  script.src = 'js/admin-inline-list-ordering.js?v=1.0';
+  script.src = 'js/admin-inline-list-ordering.js?v=20261008.1';
   script.async = false;
   document.head.appendChild(script);
 })();

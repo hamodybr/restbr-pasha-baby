@@ -12,6 +12,8 @@
   let syncFrame = 0;
   let currentProductId = '';
   const categoryTiles = new Map();
+  let indexedProducts = null;
+  let productIndex = new Map();
 
   const escapeHtml = value => String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -87,7 +89,12 @@
   }
 
   function productById(id) {
-    return products().find(product => String(product?.id) === String(id)) || null;
+    const rows = products();
+    if (indexedProducts !== rows || productIndex.size !== rows.length) {
+      indexedProducts = rows;
+      productIndex = new Map(rows.map(product => [String(product.id), product]));
+    }
+    return productIndex.get(String(id)) || null;
   }
 
   function productByVisibleName(name) {
@@ -357,9 +364,8 @@
   }
 
   function enhanceCatalogCards() {
-    const rows = products();
     $$('#smMenu [data-product-card]').forEach(card => {
-      const product = rows.find(item => String(item?.id) === String(card.dataset.productCard));
+      const product = productById(card.dataset.productCard);
       if (!product) return;
       const media = $('.sm-img', card);
       const info = $('.sm-info', card);
@@ -864,13 +870,30 @@
   });
 
   const observer = new MutationObserver(mutations => {
-    if (mutations.some(mutation => mutation.addedNodes.length || mutation.removedNodes.length)) scheduleSync();
+    if (mutations.some(mutation => (mutation.addedNodes.length || mutation.removedNodes.length) &&
+        !mutation.target.closest?.('#pbV3ProductSheet'))) scheduleSync();
+    else if (mutations.some(mutation => mutation.target.closest?.('#pbV3ProductSheet'))) enhanceProductSheet();
   });
 
   function boot() {
     document.body.classList.remove('pb-v3-reviews-paused');
     syncAll();
-    observer.observe(document.body, { childList: true, subtree: true });
+    // Catalog mutations need catalog decoration; checkout/review mutations do not.
+    ['#smMenu', '#smCats', '#pbV3PopularSection', '#pbV3NewSection'].forEach(selector => {
+      const node = $(selector);
+      if (node) observer.observe(node, { childList: true, subtree: true });
+    });
+    const sheetObserver = new MutationObserver(enhanceProductSheet);
+    let observedSheet = null;
+    const observeSheet = () => {
+      const sheet = $('#pbV3ProductSheet');
+      if (sheet && sheet !== observedSheet) {
+        sheetObserver.disconnect(); observedSheet = sheet;
+        sheetObserver.observe(sheet, { childList: true, subtree: true });
+      }
+    };
+    observeSheet();
+    window.addEventListener('click', () => window.setTimeout(observeSheet, 0), { passive: true });
     window.setTimeout(syncAll, 180);
     window.setTimeout(syncAll, 650);
     window.setTimeout(syncAll, 1400);

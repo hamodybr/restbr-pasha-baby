@@ -41,6 +41,8 @@
     return raw;
   };
 
+  const previewMedia = value => window.RESTBR_OPTIMIZED_MEDIA_URL?.(safeMedia(value), 'category') || safeMedia(value);
+
   const productById = id => window.RESTBR_DB?.products?.find(
     product => String(product.id) === String(id)
   ) || null;
@@ -122,6 +124,14 @@
       </section>`);
 
     $('#pbV3ProductClose').addEventListener('click', close);
+    $('#pbV3ProductSheet').addEventListener('error', event => {
+      const image = event.target;
+      if (!(image instanceof HTMLImageElement)) return;
+      const original = image.dataset.v3ImageSrc;
+      if (original && image.getAttribute('src') !== original && !image.dataset.v3OriginalTried) {
+        image.dataset.v3OriginalTried = '1'; image.src = original;
+      } else if (image.getAttribute('src') !== PRODUCT_PLACEHOLDER) image.src = PRODUCT_PLACEHOLDER;
+    }, true);
     $('#pbV3ProductBackdrop').addEventListener('click', close);
     $('#pbV3ProductPrev').addEventListener('click', () => moveSlide(-1));
     $('#pbV3ProductNext').addEventListener('click', () => moveSlide(1));
@@ -201,7 +211,7 @@
 
     track.innerHTML = slides.map((slide, index) => `
       <div class="pb-v3-product-slide">
-        <img src="${esc(slide.url)}" alt="${esc(slide.label || txt(currentProduct?.name))}"
+        <img data-v3-image-src="${esc(slide.url)}" alt="${esc(slide.label || txt(currentProduct?.name))}"
              loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async">
       </div>`).join('');
 
@@ -209,7 +219,7 @@
       ? slides.map((slide, index) => `
           <button class="pb-v3-product-thumb ${index === slideIndex ? 'selected' : ''}"
                   type="button" data-v3-slide-index="${index}" aria-label="عرض الصورة ${index + 1}">
-            <img src="${esc(slide.url)}" alt="" loading="lazy" decoding="async">
+            <img data-v3-image-src="${esc(slide.url)}" src="${esc(previewMedia(slide.url))}" alt="" loading="lazy" decoding="async">
           </button>`).join('')
       : '';
 
@@ -222,6 +232,8 @@
 
     const track = $('#pbV3ProductTrack');
     if (track) {
+      const image = track.children[slideIndex]?.querySelector('img[data-v3-image-src]');
+      if (image && !image.hasAttribute('src')) image.src = image.dataset.v3ImageSrc;
       track.style.transition = animate ? 'transform .28s cubic-bezier(.2,.75,.25,1)' : 'none';
       track.style.transform = `translate3d(-${slideIndex * 100}%,0,0)`;
     }
@@ -323,7 +335,7 @@
               class="${selectedColorId === String(color.id) ? 'selected' : ''} ${color.isAvailable === false ? 'unavailable' : ''}"
               data-v3-color-id="${esc(color.id)}" aria-pressed="${selectedColorId === String(color.id)}" ${color.isAvailable === false ? 'disabled' : ''}>
         ${color.image
-          ? `<img src="${esc(safeMedia(color.image))}" alt="" loading="lazy" decoding="async">`
+          ? `<img data-v3-image-src="${esc(safeMedia(color.image))}" src="${esc(previewMedia(color.image))}" alt="" loading="lazy" decoding="async">`
           : `<i style="--v3-swatch:${esc(color.hex || '#d8d0d3')}"></i>`}
         <span>${esc(txt(color))}</span>
       </button>`).join('');

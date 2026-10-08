@@ -4,7 +4,7 @@
 
   const PAGE_SIZE = 1000;
   const MAX_ROWS = 50000;
-  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname) || document.body?.classList.contains('pb-v3-page') === true;
   let commerceReady = false;
   let currentProduct = null;
   let selectedOptionIndex = null;
@@ -48,20 +48,21 @@
     while (true) {
       let query = supabaseClient
         .from(table)
-        .select(select)
+        .select(select, { count: 'exact' })
         .range(from, from + PAGE_SIZE - 1);
 
       if (activeOnly) query = query.eq('is_active', true);
       if (order) query = query.order(order, { ascending });
 
-      const { data, error } = await query;
+      query = query.order('id', { ascending: true });
+      const { data, error, count } = await query;
       if (error) throw error;
 
       const page = Array.isArray(data) ? data : [];
       rows.push(...page);
 
-      if (page.length < PAGE_SIZE) break;
-      from += PAGE_SIZE;
+      if (!page.length || (Number.isFinite(count) && rows.length >= count)) break;
+      from += page.length;
       if (from >= MAX_ROWS) throw new Error(`${table} exceeded ${MAX_ROWS} row storefront safety limit`);
     }
 
@@ -208,10 +209,11 @@
     if (!DB) return false;
 
     const initialCounts = window.RESTBR_INITIAL_CATALOG_COUNTS;
+    const totals = window.RESTBR_INITIAL_CATALOG_TOTALS;
     if (
       initialCounts &&
       ['categories', 'products', 'options'].every(key =>
-        Number.isFinite(Number(initialCounts[key])) && Number(initialCounts[key]) < PAGE_SIZE
+        totals && Number.isFinite(totals[key]) && initialCounts[key] === totals[key]
       )
     ) {
       window.RESTBR_CATALOG_COUNTS = {

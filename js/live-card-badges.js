@@ -8,7 +8,7 @@
   };
 
   let frame = 0;
-  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname);
+  const IS_STOREFRONT_V3 = /\/storefront-v3(?:\/|$)/i.test(location.pathname) || document.body?.classList.contains('pb-v3-page') === true;
 
   const currentLanguage = () => {
     const value = document.documentElement.lang || localStorage.getItem('RESTBR_LANG_V1') || 'ar';

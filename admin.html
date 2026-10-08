@@ -13,7 +13,7 @@
   <meta name="theme-color" content="#080604">
 
   <title>Pasha Baby — Admin Dashboard</title>
-  <script src="js/admin-data-tools.js?v=1.1"></script>
+  <script src="js/admin-data-tools.js?v=20261008.1"></script>
 
   <link rel="icon" type="image/png" href="assets/favicon.png">
 
@@ -2420,6 +2420,10 @@
 
 .product-content-issues{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .product-content-issues:empty{display:none}
+ .pb-catalog-pages { display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0; }
+ .pb-catalog-pages[hidden] { display:none; }
+ .pb-catalog-pages button { min-height:42px;border:1px solid #b8ccc3;border-radius:9px;padding:8px 16px;background:#fff;color:#075c4e;font:700 13px Cairo,sans-serif; }
+ .pb-catalog-pages button:disabled { opacity:.4; }
 .product-content-issues span{font-size:12px;line-height:1.6;color:#85531a;background:#fff3dd;padding:2px 8px;border-radius:8px}
 </style>
 
@@ -3724,8 +3728,8 @@
 <script src="js/vendor/supabase-2.114.0.min.js"></script>
 
 <!-- One per-restaurant public configuration; never contains service_role. -->
-<script src="js/runtime-config.js?v=1.0"></script>
-<script src="js/supabase-config.js?v=2.4"></script>
+<script src="js/runtime-config.js?v=20261008.1"></script>
+<script src="js/supabase-config.js?v=2.5"></script>
 
 <!-- Touch-friendly Drag & Drop -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
@@ -5312,17 +5316,17 @@
 
         supabaseClient
           .from('categories')
-          .select('*')
+          .select('*', { count: 'exact' })
           .order('sort_order', { ascending: true }),
 
         supabaseClient
           .from('products')
-          .select('*')
+          .select('*', { count: 'exact' })
           .order('sort_order', { ascending: true }),
 
         supabaseClient
           .from('product_options')
-          .select('*'),
+          .select('*', { count: 'exact' }),
 
         supabaseClient
           .from('restaurant_settings')
@@ -5350,6 +5354,7 @@
       }
 
 
+      window.PASHA_ADMIN_CATALOG_TOTALS = [categoriesResult.count, productsResult.count, optionsResult.count];
       adminCategories = categoriesResult.data || [];
       adminProducts = productsResult.data || [];
       adminOptions = optionsResult.data || [];
@@ -5502,10 +5507,19 @@
   // ==========================================
 
 
+  let optionIndexSource = null, optionIndexLength = -1, optionIndex = new Map();
   function getProductOptions(productId) {
-    return adminOptions
-      .filter(option => option.product_id === productId)
-      .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
+    if (optionIndexSource !== adminOptions || optionIndexLength !== adminOptions.length) {
+      optionIndexSource = adminOptions; optionIndexLength = adminOptions.length;
+      optionIndex = new Map();
+      adminOptions.forEach(option => {
+        const key = String(option.product_id);
+        if (!optionIndex.has(key)) optionIndex.set(key, []);
+        optionIndex.get(key).push(option);
+      });
+      optionIndex.forEach(rows => rows.sort((a,b) => Number(a.sort_order || 0) - Number(b.sort_order || 0)));
+    }
+    return optionIndex.get(String(productId)) || [];
   }
 
   function getProductDisplayPrice(product) {
@@ -6615,7 +6629,19 @@
 
 
 
+  let adminProductsPage = 1, adminProductsPageKey = '', adminSearchTimer = 0;
+  const ADMIN_PRODUCTS_PAGE_SIZE = 50;
+  document.addEventListener('click', event => {
+    const button = event.target.closest('[data-admin-products-page]');
+    if (!button || button.disabled) return;
+    adminProductsPage = Number(button.dataset.adminProductsPage) || 1;
+    renderAdminProducts(document.getElementById('adminSearch')?.value || '');
+    document.getElementById('productsContainer')?.scrollIntoView({block:'start'});
+  });
+
   function renderAdminProducts(search = '') {
+    clearTimeout(adminSearchTimer);
+    optionIndexSource = null;
 
     const container =
       document.getElementById('productsContainer');
@@ -6656,6 +6682,7 @@
       });
 
 
+    filtered.sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
     document.getElementById('productsShown').textContent =
       `${filtered.length} من ${adminProducts.length}`;
 
@@ -6664,14 +6691,29 @@
 
       container.innerHTML =
         '<div class="empty">لا توجد نتائج.</div>';
+      const pages = document.getElementById('pbAdminProductPages');
+      if (pages) pages.hidden = true;
+      container.dataset.pbPageIds = '[]';
 
       return;
 
     }
 
 
+    const categoryId = document.querySelector('[data-admin-category-filter].active')?.dataset.adminCategoryFilter || '';
+    const pageKey = `${query}:${adminProductFilter}:${categoryId}`;
+    if (pageKey !== adminProductsPageKey) { adminProductsPageKey = pageKey; adminProductsPage = 1; }
+    adminProductsPage = Math.max(1, Math.min(adminProductsPage, Math.ceil(filtered.length / ADMIN_PRODUCTS_PAGE_SIZE) || 1));
+    const start = (adminProductsPage - 1) * ADMIN_PRODUCTS_PAGE_SIZE;
+    const pageRows = filtered.slice(start, start + ADMIN_PRODUCTS_PAGE_SIZE);
+    container.dataset.pbPageIds = JSON.stringify(pageRows.map(p => String(p.id)));
+    container.dataset.pbPageTotal = String(filtered.length);
+    let pages = document.getElementById('pbAdminProductPages');
+    if (!pages) { pages = document.createElement('nav'); pages.id = 'pbAdminProductPages'; pages.className = 'pb-catalog-pages'; pages.setAttribute('aria-label','صفحات الأصناف'); container.after(pages); }
+    pages.hidden = filtered.length <= ADMIN_PRODUCTS_PAGE_SIZE;
+    pages.innerHTML = `<button type="button" data-admin-products-page="${adminProductsPage - 1}" ${adminProductsPage === 1 ? 'disabled' : ''}>السابق</button><span>${start + 1}–${Math.min(filtered.length,start + ADMIN_PRODUCTS_PAGE_SIZE)} من ${filtered.length}</span><button type="button" data-admin-products-page="${adminProductsPage + 1}" ${start + ADMIN_PRODUCTS_PAGE_SIZE >= filtered.length ? 'disabled' : ''}>التالي</button>`;
     container.innerHTML =
-      filtered.map(product => {
+      pageRows.map(product => {
 
         const name =
           product.name_ar ||
@@ -7382,10 +7424,8 @@
   document
     .getElementById('adminSearch')
     .addEventListener('input', event => {
-
-      renderAdminProducts(
-        event.target.value
-      );
+      clearTimeout(adminSearchTimer);
+      adminSearchTimer = setTimeout(() => renderAdminProducts(event.target.value), 180);
 
     });
 

@@ -3678,3 +3678,7 @@ body.pb-v3-page:has(#pbCommerceSheet.open) .pb-v3-topbar{
   visibility:hidden!important;
   pointer-events:none!important;
 }
+
+.pb-catalog-pages { display:flex; align-items:center; justify-content:center; gap:12px; margin:18px 0; direction:rtl; }
+.pb-catalog-pages button { min-height:42px; padding:8px 16px; border:1px solid #d7e4df; border-radius:10px; background:#fff; color:#075b4c; font:600 13px Cairo,sans-serif; }
+.pb-catalog-pages button:disabled { opacity:.4; }
