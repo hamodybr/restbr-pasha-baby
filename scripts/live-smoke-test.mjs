@@ -160,7 +160,7 @@ await expectText('/js/pasha-arabic-only.js', [
   'js/admin-orders-customers.js?v=2.0',
   'js/pasha-admin-product-editor-cleanup.js?v=1.0',
   'js/arabic-news-ticker.js?v=1.1',
-  'js/pasha-number-normalizer.js?v=1.2',
+  'js/pasha-number-normalizer.js?v=20261008.1',
   'js/pasha-product-gallery-thermal-v1.js?v=1.3',
   "window.addEventListener('restbr:ready', keepArabic, { once: true })"
 ], 'Arabic-only policy');
@@ -219,7 +219,7 @@ await expectText('/js/live-prices.js', [
 await expectText('/js/admin-large-catalog.js', [
   'function catalogMayBeTruncated()',
   'async function ensureCompleteCatalog()',
-  'rows.length >= PAGE_SIZE'
+  'rows.length !== totals[index]'
 ], 'conditional large-catalog hydration');
 
 await expectText('/css/pasha-baby-final-tweaks.css', [
@@ -231,12 +231,12 @@ await expectText('/css/pasha-baby-final-tweaks.css', [
 ], 'Pasha final UI tweaks');
 
 await expectText('/sw.js', [
-  'restbr-pasha-baby-v58',
+  'restbr-pasha-baby-v59',
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
   'js/pasha-arabic-only.js?v=20261008.1',
-  'js/pasha-number-normalizer.js?v=1.2',
+  'js/pasha-number-normalizer.js?v=20261008.1',
   'js/pasha-baby-storefront-bundle.js?v=1.3',
   'js/pasha-product-gallery-thermal-v1.js?v=1.3',
   'css/pasha-baby-final-tweaks.css?v=1.1',
