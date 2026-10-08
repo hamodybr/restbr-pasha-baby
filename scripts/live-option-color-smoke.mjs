@@ -25,8 +25,8 @@ await expect('js/pasha-arabic-only.js', [
 ], 'production loaders');
 
 await expect('', [
-  'js/runtime-config.js?v=2.3',
-  'storefront-v3/product-details-v3.js?v=1.6'
+  'js/runtime-config.js?v=20261008.1',
+  'storefront-v3/product-details-v3.js?v=20261008.1'
 ], 'production product-detail entry assets');
 
 await expect('js/runtime-config.js', [
