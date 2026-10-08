@@ -222,22 +222,27 @@
     }).join('');
   }
 
+  // A single factual label is easier to scan than stacked campaign stickers.
+  function productBadge(product) {
+    const flags = product?.badges || {};
+    if (flags.unavailable === true) return 'غير متوفر';
+    const price = productPriceInfo(product);
+    if (price && price.original > price.current && price.current > 0) {
+      return `خصم ${Math.round((1 - price.current / price.original) * 100)}%`;
+    }
+    return [['unavailable', 'غير متوفر'], ['offer', 'عرض'], ['new', 'جديد'],
+      ['popular', 'الأكثر طلبًا'], ['hot', 'مميز']].find(([key]) => flags[key] === true)?.[1] || '';
+  }
+
   function featuredCard(product) {
     const price = productPriceInfo(product);
-    const badge = product?.badges?.popular === true
-      ? 'الأكثر طلبًا'
-      : product?.badges?.new === true
-        ? 'جديد'
-        : product?.badges?.offer === true
-          ? 'عرض'
-          : '';
+    const badge = productBadge(product);
     const name = localized(product?.name);
     const category = localized(product?.category);
     return `
       <article class="pb36-feature-card" data-pb36-product-card="${escapeHtml(product.id)}">
         <div class="pb36-feature-media">
           <img src="${escapeHtml(optimizedMedia(product.image))}" alt="${escapeHtml(name)}" tabindex="0" role="button" aria-label="تفاصيل ${escapeHtml(name)}" loading="lazy" decoding="async">
-          <button class="pb36-heart" type="button" data-pb36-favorite="${escapeHtml(product.id)}" aria-label="إضافة ${escapeHtml(name)} للمفضلة" aria-pressed="false">${icon('heart')}</button>
           ${badge ? `<span class="pb36-card-badge">${escapeHtml(badge)}</span>` : ''}
         </div>
         <div class="pb36-feature-body">
@@ -361,15 +366,17 @@
       const name = $('.sm-name', card);
       if (!media || !info || !name) return;
 
-      let favorite = $('.pb36-catalog-heart', card);
-      if (!favorite) {
-        favorite = document.createElement('button');
-        favorite.type = 'button';
-        favorite.className = 'pb36-catalog-heart';
-        favorite.dataset.pb36Favorite = String(product.id);
-        favorite.setAttribute('aria-label', `إضافة ${localized(product.name)} للمفضلة`);
-        favorite.innerHTML = icon('heart');
-        media.appendChild(favorite);
+      $('.pb36-catalog-heart', card)?.remove();
+      const badge = productBadge(product);
+      let badges = $('.pb36-product-badge', media);
+      if (badge && !badges) {
+        badges = document.createElement('div');
+        badges.className = 'pb36-product-badge';
+        media.appendChild(badges);
+      }
+      if (badges && badges.dataset.pbBadge !== badge) {
+        badges.dataset.pbBadge = badge;
+        badges.textContent = badge;
       }
 
       let meta = $('.pb36-catalog-meta', info);
