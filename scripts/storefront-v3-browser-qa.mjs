@@ -146,15 +146,18 @@ async function assertDetailsOnCards(page, label) {
       const info = card.querySelector('.sm-info');
       const action = card.querySelector('.sm-direct-add,.sm-choose-options');
       if (!info || !action) return false;
+      const price = card.querySelector('.pb-v3-card-summary b');
+      const expectedPriceSize = Math.min(13, Math.max(9, innerWidth * .0285));
+      const invalidPrice = price && (Math.abs(parseFloat(getComputedStyle(price).fontSize) - expectedPriceSize) > .1 || price.scrollWidth > price.clientWidth + 1);
       const style = getComputedStyle(info), buttonStyle = getComputedStyle(action);
       const available = info.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
       const labels = [...card.querySelectorAll('.pb36-product-badge,.sm-badges > *')]
         .filter(node => node.getBoundingClientRect().height > 0);
       return Math.abs(action.getBoundingClientRect().width - available) > 1 ||
         buttonStyle.height !== '32px' || buttonStyle.borderRadius !== '8px' || labels.length > 1 ||
-        !!card.querySelector('.pb36-catalog-heart');
+        !!card.querySelector('.pb36-catalog-heart') || invalidPrice;
     }).length);
-    assert(invalid === 0, `${label}: ${invalid} inconsistent mobile cart actions or labels`);
+    assert(invalid === 0, `${label}: ${invalid} inconsistent mobile cart actions, prices or labels`);
   }
 }
 

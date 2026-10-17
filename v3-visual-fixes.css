@@ -1048,7 +1048,7 @@ body.pb-v3-page .pb36-card-badge,body.pb-v3-page .pb-v3-feature-badge {
  body.pb-v3-page #smMenu .pb50-product-card .pb50-price-row { display:flex!important; min-height:0!important; height:28px!important; margin:0!important; padding:0!important; align-items:center!important; }
  body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary { flex-wrap:nowrap!important; min-width:0!important; gap:0!important; }
  body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary b,
- body.pb-v3-page .pb36-card-price strong,body.pb-v3-page .pb-v3-feature-price { font-size:clamp(8px,2.35vw,11px)!important; line-height:14px!important; font-weight:700!important; white-space:nowrap!important; }
+ body.pb-v3-page .pb36-card-price strong,body.pb-v3-page .pb-v3-feature-price { font-size:clamp(9px,2.85vw,13px)!important; line-height:16px!important; font-weight:700!important; white-space:nowrap!important; }
  body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary del,
  body.pb-v3-page #smMenu .pb50-product-card .pb-v3-card-summary small { font-size:7px!important; line-height:10px!important; }
  body.pb-v3-page #smMenu .pb50-product-card .pb-product-action-row { grid-template-columns:1fr!important; gap:4px!important; }
