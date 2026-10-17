@@ -4,6 +4,7 @@ import path from 'node:path';
 import { chromium } from 'playwright-core';
 
 const ROOT = process.cwd();
+const versionedThumbnailSources = new Set(JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/product-thumbnails/manifest.json'), 'utf8')).map(row => new URL(row.source).href));
 const PORT = 4173;
 const NETWORK_TIMEOUT = Number(process.env.PASHA_QA_NETWORK_TIMEOUT_MS || 15000);
 const HOST = '127.0.0.1';
@@ -586,8 +587,11 @@ async function runProductionLoad(browser, spec) {
       `${spec.name} offer moved ${after.offer.top - before.offer.top}px when loading placeholders were replaced`);
     assert(await page.locator('.pb-load-card').count() === 0, 'Loading placeholders remained after catalog load');
     await assertNoHorizontalOverflow(page, `${spec.name} production homepage`);
-    assert(originalsRequested.length === 0,
-      'Production homepage fetched original B2 photos: ' + originalsRequested.join(', '));
+    // New uploads intentionally bypass thumbnails from older image versions.
+    // Still forbid full-size downloads when an exact-version thumbnail exists.
+    const mappedOriginals = originalsRequested.filter(url => versionedThumbnailSources.has(url));
+    assert(mappedOriginals.length === 0,
+      'Production homepage bypassed version-matched thumbnails: ' + mappedOriginals.join(', '));
     const state = await page.evaluate(() => ({
       cairo: document.fonts.check('700 16px Cairo'),
       cls: window.__ROOT_CLS__,
@@ -606,7 +610,7 @@ async function runProductionLoad(browser, spec) {
       whatsapp.width > 0 && whatsapp.width <= whatsapp.parentWidth,
       spec.name + ': WhatsApp outline icon is filled, missing or oversized: ' + JSON.stringify(whatsapp));
     assert(errors.length === 0, 'Production root browser errors: ' + errors.join(' | '));
-    console.log(`Production load QA passed: ${spec.name} | CLS ${state.cls.toFixed(4)} | hero movement ${after.hero.top - before.hero.top}px | offer movement ${after.offer.top - before.offer.top}px | no original B2 image downloads`);
+    console.log(`Production load QA passed: ${spec.name} | CLS ${state.cls.toFixed(4)} | hero movement ${after.hero.top - before.hero.top}px | offer movement ${after.offer.top - before.offer.top}px | no mapped original B2 downloads | ${originalsRequested.length} current-upload fallbacks`);
     await page.locator('#pbV3SeeProducts').click();
     await page.waitForTimeout(160);
     await assertDetailsOnCards(page, spec.name + ' production catalog');
