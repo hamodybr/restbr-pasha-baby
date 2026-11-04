@@ -509,6 +509,30 @@ async function runViewport(browser, spec) {
   await context.close();
 }
 
+async function assertDetailStripNavigation(page) {
+  await page.route('https://pasha-strip.test/**', route => route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="beige"/></svg>'}));
+  await page.evaluate(async () => {
+    const base = window.RESTBR_DB.products.find(p => p.options?.length);
+    const product = {...base,id:'strip-test',colors:Array.from({length:10},(_,i)=>({id:'test-color-'+i,ar:'لون '+i,hex:'#bda884',image:'https://pasha-strip.test/'+i+'.svg',isAvailable:true}))};
+    window.RESTBR_DB.products.push(product);
+    await window.PASHA_V3_OPEN_PRODUCT_DETAILS(product);
+  });
+  await page.waitForTimeout(250);
+  assert(await page.locator('#pb36ProductFeatures').evaluate(n=>n.parentElement.classList.contains('pb-v3-product-gallery')), 'Feature indicators still occupy the description column');
+  for (const id of ['pbV3ProductThumbs','pbV3ProductColors']) {
+    const wrapper = page.locator('#'+id).locator('..');
+    assert(await wrapper.evaluate(n=>n.classList.contains('has-overflow')), id+' has no overflow cue');
+    const before = await page.locator('#'+id).evaluate(n=>n.scrollLeft);
+    await wrapper.locator('button.pb36-strip-left:enabled,button.pb36-strip-right:enabled').first().click();
+    await page.waitForTimeout(450);
+    const after = await page.locator('#'+id).evaluate(n=>n.scrollLeft);
+    assert(Math.abs(after-before)>5,id+' arrow did not scroll');
+  }
+  assert(await page.locator('#pbV3ProductNext').isVisible(), 'Gallery next-image arrow is hidden');
+  await page.locator('#pbV3ProductClose').click();
+  await page.evaluate(()=>{window.RESTBR_DB.products=window.RESTBR_DB.products.filter(p=>p.id!=='strip-test')});
+}
+
 async function assertLargeCatalog(page) {
   await page.evaluate(() => {
     const source = window.RESTBR_DB.products;
@@ -629,7 +653,7 @@ async function runProductionLoad(browser, spec) {
     await assertDetailsOnCards(page, spec.name + ' production catalog');
     await openProductDetails(page);
     await prepareCartAndCheckout(page);
-    if (spec.mobile) await assertLargeCatalog(page);
+    if (spec.mobile) { await assertDetailStripNavigation(page); await assertLargeCatalog(page); }
   } finally {
     releaseCatalog();
     await context.close();
