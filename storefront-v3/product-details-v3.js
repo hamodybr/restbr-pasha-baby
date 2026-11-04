@@ -604,6 +604,7 @@
   }
   window.addEventListener('click', openFromEvent, true);
   window.addEventListener('keydown', event => {
+    if (event.target.closest?.('dialog[open]')) return;
     if (event.key === 'Escape' && $('#pbV3ProductSheet')?.classList.contains('open')) {
       event.preventDefault();
       close();
