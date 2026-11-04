@@ -173,6 +173,14 @@
       const thumbnail = LOCAL_PRODUCT_THUMBNAILS[parsed.pathname];
       if (
         (preset === 'product-card' || preset === 'category') &&
+        parsed.protocol === 'https:' && parsed.hostname === 'images.pashababyiq.com' &&
+        /^\/products\/(?:color-assets\/)?[-a-zA-Z0-9_]+\/[a-f0-9]{64}\.(?:webp|jpg|png|avif)$/.test(parsed.pathname)
+      ) {
+        parsed.pathname = parsed.pathname.replace(/\.[^.]+$/, '-card.webp');
+        return parsed.href;
+      }
+      if (
+        (preset === 'product-card' || preset === 'category') &&
         parsed.hostname === B2_STORAGE_HOST && thumbnail &&
         parsed.searchParams.get('v') === thumbnail.version
       ) {

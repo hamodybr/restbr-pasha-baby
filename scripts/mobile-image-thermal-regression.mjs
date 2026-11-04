@@ -83,14 +83,14 @@ assert(files.gallery.includes('.sm-card.sm-life-ready:active'), 'touch active-st
 assert(files.gallery.includes('backdrop-filter:none!important'), 'scroll polish must disable expensive blur repainting');
 assert(!files.gallery.includes('setInterval('), 'storefront gallery helper must not poll after boot');
 
-const pipelinePos = files.arabic.indexOf('admin-image-pipeline.js?v=1.0');
-const b2Pos = files.arabic.indexOf('admin-b2-storage.js?v=2.0');
+const pipelinePos = files.arabic.indexOf('admin-image-pipeline.js?v=1.1');
+const b2Pos = files.arabic.indexOf('admin-b2-storage.js?v=3.0');
 assert(pipelinePos >= 0 && b2Pos > pipelinePos, 'shared image pipeline must load before B2 uploader');
-assert(files.arabic.includes('admin-color-image-upload.js?v=2.0'), 'color uploader v2 must be loaded explicitly');
+assert(files.arabic.includes('admin-color-image-upload.js?v=3.0'), 'color uploader v2 must be loaded explicitly');
 assert(files.arabic.includes('pasha-product-gallery-thermal-v1.js?v=1.3'), 'storefront gallery helper must be loaded');
 assert(!files.arabic.includes('admin-image-optimizer.js?v=1.0'), 'Arabic admin loader must not boot the retired legacy optimizer');
 
-assert(files.config.includes('pasha-arabic-only.js?v=20261008.1'), 'Arabic policy cache version must be bumped');
+assert(files.config.includes('pasha-arabic-only.js?v=20261105.1'), 'Arabic policy cache version must be bumped');
 assert(files.config.includes('admin-option-order.js?v=3.0'), 'option-order cache version must be bumped');
 assert(files.config.includes('pasha-baby-admin-polish-v3.js?v=3.1'), 'admin polish cache version must be bumped');
 

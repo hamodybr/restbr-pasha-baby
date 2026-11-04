@@ -157,8 +157,32 @@
     }
   }
 
+  async function thumbnail(file) {
+    const decoded = await decode(file);
+    const canvas = document.createElement('canvas');
+    try {
+      const source = decoded.source;
+      const scale = Math.min(1, 400 / Math.max(source.width || source.naturalWidth, source.height || source.naturalHeight));
+      canvas.width = Math.max(1, Math.round((source.width || source.naturalWidth) * scale));
+      canvas.height = Math.max(1, Math.round((source.height || source.naturalHeight) * scale));
+      const ctx = canvas.getContext('2d', { alpha: false });
+      if (!ctx) throw new Error('تعذر تجهيز صورة الكارت.');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+      const blob = await canvasToBlob(canvas, 'image/webp', 0.70);
+      if (blob.type !== 'image/webp' || blob.size > 150 * KB) throw new Error('تعذر تجهيز صورة كارت صغيرة على هذا الجهاز.');
+      return new File([blob], `${baseName(file.name)}-card.webp`, { type: 'image/webp' });
+    } finally {
+      canvas.width = 1;
+      canvas.height = 1;
+      decoded.close?.();
+    }
+  }
+
   window.PASHA_ADMIN_IMAGE_PIPELINE = Object.freeze({
     prepare,
+    thumbnail,
     formatBytes,
     targetBytes: DEFAULT_TARGET,
     maxBytes: DEFAULT_MAX,

@@ -21,5 +21,12 @@ assert.ok(totalCard < totalSource * 0.1, 'Thumbnail compression no longer saves 
 const sample = 'https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/test.png';
 assert.equal(new URL(optimize(sample, 'category')).searchParams.get('width'), '160');
 assert.equal(new URL(optimize(sample, 'product-card')).searchParams.get('width'), '480');
+const r2 = 'https://images.pashababyiq.com/products/item/' + 'a'.repeat(64) + '.jpg';
+assert.equal(optimize(r2, 'product-card'), r2.replace('.jpg', '-card.webp'));
+assert.equal(optimize(r2, 'category'), r2.replace('.jpg', '-card.webp'));
+assert.equal(optimize(r2, 'detail'), r2);
+assert.equal(optimize(r2.replace('images.pashababyiq.com', 'other.example'), 'product-card'), r2.replace('images.pashababyiq.com', 'other.example'));
+const unmigrated = 'https://images.pashababyiq.com/legacy/photo.jpg';
+assert.equal(optimize(unmigrated, 'product-card'), unmigrated, 'Only paired hash-addressed files may use R2 thumbnails');
 dom.window.close();
 console.log(`Product thumbnail regression passed: ${rows.length} versioned photos, ${totalSource} -> ${totalCard} bytes; changed uploads and original detail photos preserved.`);

@@ -6,7 +6,7 @@
 
   const TARGET_BYTES = 620 * 1024;
   const SERVER_MAX_BYTES = 700 * 1024;
-  const FUNCTION_NAME = 'b2-images';
+  const FUNCTION_NAME = 'r2-images';
   const GB = 1024 * 1024 * 1024;
   const previewUrls = new Map();
 
@@ -118,6 +118,8 @@
     const form = new FormData();
     form.append('productId', String(productId || ''));
     form.append('file', prepared, prepared.name || original.name || 'product.webp');
+    const thumbnail = await pipeline().thumbnail(prepared);
+    form.append('thumbnail', thumbnail, thumbnail.name);
 
     const data = await invoke('upload', form);
     if (!data.publicUrl) throw new Error('تم الرفع لكن لم يرجع رابط الصورة.');
@@ -233,10 +235,10 @@
       const current = Math.max(0, Number(data.currentBytes || 0));
       const percent = Math.min(100, current / hard * 100);
       fill.style.width = `${percent.toFixed(2)}%`;
-      value.textContent = `${fmt(current)} / 9 GB • ${Number(data.fileCount || 0)} صورة`;
+      value.textContent = `R2 • ${fmt(current)} • ${Number(data.fileCount || 0)} ملف`;
       card.dataset.state = data.blocked ? 'blocked' : data.warning ? 'warn' : 'ok';
     } catch (error) {
-      value.textContent = String(error?.message || 'B2 قيد الإعداد').slice(0, 120);
+      value.textContent = String(error?.message || 'R2 قيد الإعداد').slice(0, 120);
       card.dataset.state = 'blocked';
     }
   }

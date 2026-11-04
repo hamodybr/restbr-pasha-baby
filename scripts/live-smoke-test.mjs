@@ -235,7 +235,7 @@ await expectText('/sw.js', [
   'function staleWhileRevalidate(event, request)',
   'event.respondWith(staleWhileRevalidate(event, request))',
   'js/restbr-hardening.js',
-  'js/pasha-arabic-only.js?v=20261008.1',
+  'js/pasha-arabic-only.js?v=20261105.1',
   'js/pasha-number-normalizer.js?v=20261008.1',
   'js/pasha-baby-storefront-bundle.js?v=1.3',
   'js/pasha-product-gallery-thermal-v1.js?v=1.3',
