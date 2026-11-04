@@ -155,7 +155,7 @@
     loadScript('pashaAdminInteractionPolishScript', 'js/admin-interaction-polish.js?v=1.5', true);
     loadScript('pashaInvoiceSettingsScript', 'js/admin-invoice-settings.js?v=1.1', true);
     loadScript('pashaOrdersCustomersScript', 'js/admin-orders-customers.js?v=2.0', true);
-    loadScript('pashaOrdersNavHotfixScript', 'js/admin-orders-nav-hotfix.js?v=1.0', true);
+    loadScript('pashaOrdersNavHotfixScript', 'js/admin-orders-nav-hotfix.js?v=1.1', true);
   }
 
   function installStorefrontPerformanceGuards() {

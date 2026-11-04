@@ -104,7 +104,7 @@
     installStyles();
     tagQuickActions();
     loadAddon('pbOrdersEnhancementsScript', 'js/admin-orders-enhancements.js?v=1.0');
-    loadAddon('pbColorImageUploadScript', 'js/admin-color-image-upload.js?v=1.0');
+    loadAddon('pashaColorImageUploadScript', 'js/admin-color-image-upload.js?v=3.0');
 
     document.addEventListener('click', event => {
       const kind = kindFromTarget(event.target);
