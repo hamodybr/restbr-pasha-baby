@@ -178,6 +178,17 @@ async function openProductDetails(page) {
     const description = 'وصف اختبار طويل يحافظ على جميع التفاصيل. '.repeat(100);
     await page.locator('#pbV3ProductDescription').evaluate((node,text) => {node.hidden=false;node.textContent=text;},description);
     await page.locator('#pb36DescriptionToggle').waitFor({state:'visible'});
+    const alignment = await page.evaluate(() => {
+      const button = document.getElementById('pb36DescriptionToggle').getBoundingClientRect();
+      const features = document.getElementById('pb36ProductFeatures').getBoundingClientRect();
+      return Math.abs((button.top+button.bottom)/2 - (features.top+features.bottom)/2);
+    });
+    assert(alignment < 3,'Description toggle is not aligned with the indicators');
+    await page.locator('#pb36ZoomButton').click();
+    await page.locator('#pb36ImageViewer[open]').waitFor({state:'visible'});
+    assert(await page.locator('#pb36ImageViewer img').evaluate(n=>getComputedStyle(n).objectFit==='contain'), 'Full image is cropped');
+    await page.keyboard.press('Escape');
+    assert(await page.locator('#pbV3ProductSheet.open').count() === 1 && !await page.locator('#pb36ImageViewer[open]').count(), 'Closing the image also closed the product');
     await page.locator('#pb36DescriptionToggle').click();
     assert(await page.locator('#pbV3ProductDescription').textContent() === description, 'Full description was truncated');
     assert(await page.locator('#pbV3ProductDescription').evaluate(n=>getComputedStyle(n).display === 'block' && n.scrollHeight <= n.clientHeight+1), 'Expanded description is clipped');
@@ -518,7 +529,7 @@ async function assertDetailStripNavigation(page) {
     await window.PASHA_V3_OPEN_PRODUCT_DETAILS(product);
   });
   await page.waitForTimeout(250);
-  assert(await page.locator('#pb36ProductFeatures').evaluate(n=>n.parentElement.classList.contains('pb-v3-product-gallery')), 'Feature indicators still occupy the description column');
+  assert(await page.locator('#pb36ProductFeatures').evaluate(n=>n.parentElement.id === 'pb36DetailBottomRow'), 'Feature indicators still occupy the description column');
   for (const id of ['pbV3ProductThumbs','pbV3ProductColors']) {
     const wrapper = page.locator('#'+id).locator('..');
     assert(await wrapper.evaluate(n=>n.classList.contains('has-overflow')), id+' has no overflow cue');
