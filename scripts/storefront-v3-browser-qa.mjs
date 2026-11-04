@@ -174,6 +174,7 @@ async function openProductDetails(page) {
     'Details trigger opened the wrong product');
   const openedElapsed = Date.now() - started;
   if (await page.locator('#pb36SheetFavorite').count()) {
+    await page.evaluate(() => window.PASHA_V3_OPEN_PRODUCT_DETAILS(document.getElementById('pbV3ProductSheet').dataset.productId));
     const description = 'وصف اختبار طويل يحافظ على جميع التفاصيل. '.repeat(100);
     await page.locator('#pbV3ProductDescription').evaluate((node,text) => {node.hidden=false;node.textContent=text;},description);
     await page.locator('#pb36DescriptionToggle').waitFor({state:'visible'});
