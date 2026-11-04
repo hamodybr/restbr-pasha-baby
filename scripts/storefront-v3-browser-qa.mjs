@@ -172,7 +172,19 @@ async function openProductDetails(page) {
   await page.locator('#pbV3ProductSheet.open').waitFor({ state: 'visible', timeout: 5000 });
   assert(await page.locator('#pbV3ProductSheet').getAttribute('data-product-id') === productId,
     'Details trigger opened the wrong product');
-  const elapsed = Date.now() - started;
+  const openedElapsed = Date.now() - started;
+  if (await page.locator('#pb36SheetFavorite').count()) {
+    const description = 'وصف اختبار طويل يحافظ على جميع التفاصيل. '.repeat(100);
+    await page.locator('#pbV3ProductDescription').evaluate((node,text) => {node.hidden=false;node.textContent=text;},description);
+    await page.locator('#pb36DescriptionToggle').waitFor({state:'visible'});
+    await page.locator('#pb36DescriptionToggle').click();
+    assert(await page.locator('#pbV3ProductDescription').textContent() === description, 'Full description was truncated');
+    assert(await page.locator('#pbV3ProductDescription').evaluate(n=>getComputedStyle(n).display === 'block' && n.scrollHeight <= n.clientHeight+1), 'Expanded description is clipped');
+    await page.locator('#pb36DescriptionToggle').click();
+    assert(await page.locator('#pb36DescriptionToggle').getAttribute('aria-expanded') === 'false', 'Description did not collapse');
+    assert(await page.locator('.pb-v3-product-slide img').first().evaluate(n=>getComputedStyle(n).objectFit==='cover' && parseFloat(getComputedStyle(n).paddingTop)===0), 'Gallery still has image gutters');
+  }
+  const elapsed = openedElapsed;
   assert(elapsed <= 1600, `Product details interaction is too slow: ${elapsed}ms`);
   await assertInsideViewport(page, '#pbV3ProductSheet', 'Product details sheet');
   await assertNoHorizontalOverflow(page, 'Product details');
