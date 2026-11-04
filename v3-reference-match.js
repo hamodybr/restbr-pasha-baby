@@ -594,6 +594,41 @@
     });
   }
 
+  let stripFrame = 0;
+  const stripObservers = new WeakSet();
+  function refreshDetailStrips() {
+    if (stripFrame) return;
+    stripFrame = requestAnimationFrame(() => {
+      stripFrame = 0;
+      ['pbV3ProductThumbs', 'pbV3ProductColors'].forEach(id => {
+        const rail = document.getElementById(id);
+        if (!rail) return;
+        let wrapper = rail.parentElement;
+        if (!wrapper.classList.contains('pb36-strip-nav')) {
+          wrapper = document.createElement('div');
+          wrapper.className = 'pb36-strip-nav';
+          rail.before(wrapper);
+          const label = id === 'pbV3ProductThumbs' ? 'صور المنتج' : 'ألوان المنتج';
+          wrapper.innerHTML = `<button type="button" class="pb36-strip-left" aria-label="عرض المزيد من ${label} جهة اليسار" aria-controls="${id}">‹</button><button type="button" class="pb36-strip-right" aria-label="عرض المزيد من ${label} جهة اليمين" aria-controls="${id}">›</button>`;
+          wrapper.insertBefore(rail, wrapper.lastElementChild);
+          wrapper.querySelector('.pb36-strip-left').onclick = () => rail.scrollBy({left:-rail.clientWidth * .8,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+          wrapper.querySelector('.pb36-strip-right').onclick = () => rail.scrollBy({left:rail.clientWidth * .8,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+        }
+        if (!stripObservers.has(rail)) {
+          stripObservers.add(rail);
+          rail.addEventListener('scroll', refreshDetailStrips, {passive:true});
+          if (window.ResizeObserver) new ResizeObserver(refreshDetailStrips).observe(rail);
+        }
+        const overflow = rail.scrollWidth > rail.clientWidth + 2;
+        wrapper.classList.toggle('has-overflow', overflow);
+        const bounds = rail.getBoundingClientRect();
+        const children = [...rail.children].map(node => node.getBoundingClientRect());
+        wrapper.querySelector('.pb36-strip-left').disabled = !overflow || !children.some(r => r.left < bounds.left - 2);
+        wrapper.querySelector('.pb36-strip-right').disabled = !overflow || !children.some(r => r.right > bounds.right + 2);
+      });
+    });
+  }
+
   function enhanceProductSheet() {
     if (!ensureSheetStructure()) return;
     const product = sheetProduct();
@@ -677,6 +712,8 @@
     } else if (toggle) toggle.hidden = true;
 
     const features = $('#pb36ProductFeatures');
+    const gallery = $('#pbV3ProductSheet .pb-v3-product-gallery');
+    if (features && gallery && features.parentElement !== gallery) gallery.appendChild(features);
     if (features) {
       const featureMarkup = sheetFeatures(product);
       if (features.dataset.pb36Signature !== featureMarkup) {
@@ -685,6 +722,7 @@
       }
     }
     syncColorCards(product);
+    refreshDetailStrips();
 
     $$('[data-pb36-favorite]', $('#pbV3ProductSheet')).forEach(button => {
       button.dataset.pb36Favorite = String(product.id);

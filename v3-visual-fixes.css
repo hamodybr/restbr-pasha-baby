@@ -1075,3 +1075,17 @@ body.pb-v3-page #pbV3ProductSheet .pb-v3-product-description { white-space:pre-l
 body.pb-v3-page #pbV3ProductDescription[data-expanded="true"] { display:block!important; -webkit-line-clamp:unset; overflow:visible!important; }
 body.pb-v3-page #pb36DescriptionToggle { justify-self:start; border:0; background:transparent; color:#075c4e; font:700 13px Cairo,sans-serif; padding:4px 0; cursor:pointer; text-decoration:underline; }
 body.pb-v3-page #pb36DescriptionToggle[hidden] { display:none!important; }
+
+/* Detail navigation stays outside the scrollable content and supports RTL rails. */
+body.pb-v3-page #pbV3ProductSheet .pb36-strip-nav { display:grid; grid-template-columns:minmax(0,1fr); direction:ltr; align-items:center; gap:4px; min-width:0; }
+body.pb-v3-page #pbV3ProductSheet .pb36-strip-nav.has-overflow { grid-template-columns:26px minmax(0,1fr) 26px; }
+body.pb-v3-page #pbV3ProductSheet .pb36-strip-nav > button { display:none; width:26px; min-height:36px; padding:0; border:1px solid #d8e2de; border-radius:9px; background:#fff; color:#075c4e; font:26px/1 Arial,sans-serif; cursor:pointer; }
+body.pb-v3-page #pbV3ProductSheet .pb36-strip-nav.has-overflow > button { display:block; }
+body.pb-v3-page #pbV3ProductSheet .pb36-strip-nav > button:disabled { opacity:.25; cursor:default; }
+body.pb-v3-page #pbV3ProductSheet .pb36-strip-nav > button:focus-visible { outline:2px solid #075c4e; outline-offset:2px; }
+body.pb-v3-page #pbV3ProductSheet .pb36-strip-nav > div { min-width:0; }
+body.pb-v3-page #pbV3ProductSheet .pb-v3-product-thumbs { direction:ltr; }
+body.pb-v3-page #pbV3ProductSheet .pb-v3-product-arrow:not([hidden]) { display:grid!important; width:30px; height:36px; opacity:.9; }
+body.pb-v3-page #pbV3ProductSheet .pb-v3-product-arrow[hidden] { display:none!important; }
+body.pb-v3-page #pbV3ProductCounter:not(:empty) { display:block!important; color:#075c4e; font-size:11px; text-align:center; padding:4px; }
+body.pb-v3-page #pbV3ProductSheet .pb-v3-product-gallery > .pb36-product-features { margin-top:16px!important; }
