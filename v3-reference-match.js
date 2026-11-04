@@ -594,6 +594,30 @@
     });
   }
 
+  function openFullProductImage() {
+    const index = Number($('#pbV3ProductThumbs .selected')?.dataset.v3SlideIndex || 0);
+    const source = $('#pbV3ProductTrack')?.children[index]?.querySelector('img');
+    if (!source) return;
+    let viewer = $('#pb36ImageViewer');
+    if (!viewer) {
+      viewer = document.createElement('dialog');
+      viewer.id = 'pb36ImageViewer';
+      viewer.setAttribute('aria-label', 'صورة المنتج بالحجم الكامل');
+      viewer.innerHTML = '<button type="button" aria-label="إغلاق الصورة">×</button><img alt="">';
+      document.body.appendChild(viewer);
+      const close = () => { viewer.close(); $('img',viewer).removeAttribute('src'); $('#pb36ZoomButton')?.focus({preventScroll:true}); };
+      $('button',viewer).onclick = close;
+      viewer.addEventListener('click', event => { if (event.target === viewer) close(); });
+      viewer.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); }
+      });
+    }
+    const image = $('img',viewer);
+    image.src = safeMedia(source.dataset.v3ImageSrc || source.currentSrc || source.src);
+    image.alt = source.alt || $('#pbV3ProductName')?.textContent || 'صورة المنتج';
+    if (!viewer.open) viewer.showModal();
+  }
+
   let stripFrame = 0;
   const stripObservers = new WeakSet();
   function refreshDetailStrips() {
@@ -703,7 +727,7 @@
           const children = [...main.children].filter(n => n !== description && n !== toggle && !n.hidden);
           const used = children.reduce((sum,n) => sum + n.getBoundingClientRect().height, 0);
           const gap = parseFloat(getComputedStyle(main).rowGap) || 14;
-          const space = gallery.getBoundingClientRect().height - used - gap * (children.length + 1) - 32;
+          const space = gallery.getBoundingClientRect().height - used - gap * children.length;
           lines = Math.max(4, Math.min(24, Math.floor(space / parseFloat(getComputedStyle(description).lineHeight))));
         }
         if (description.style.getPropertyValue('--pb-description-lines') !== String(lines)) description.style.setProperty('--pb-description-lines', String(lines));
@@ -713,7 +737,14 @@
 
     const features = $('#pb36ProductFeatures');
     const gallery = $('#pbV3ProductSheet .pb-v3-product-gallery');
-    if (features && gallery && features.parentElement !== gallery) gallery.appendChild(features);
+    let bottomRow = $('#pb36DetailBottomRow');
+    if (!bottomRow && gallery) {
+      bottomRow = document.createElement('div');
+      bottomRow.id = 'pb36DetailBottomRow';
+      $('.pb-v3-product-main')?.after(bottomRow);
+    }
+    if (features && bottomRow && features.parentElement !== bottomRow) bottomRow.appendChild(features);
+    if (toggle && bottomRow && toggle.parentElement !== bottomRow) bottomRow.appendChild(toggle);
     if (features) {
       const featureMarkup = sheetFeatures(product);
       if (features.dataset.pb36Signature !== featureMarkup) {
@@ -896,7 +927,7 @@
 
     if (event.target.closest('#pb36ZoomButton')) {
       event.preventDefault();
-      $('#pbV3ProductStage')?.classList.toggle('pb36-zoomed');
+      openFullProductImage();
       return;
     }
 
