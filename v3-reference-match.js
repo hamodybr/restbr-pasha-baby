@@ -633,36 +633,48 @@
 
     // Keep long catalogue copy available without stretching the two-column hero.
     const description = $('#pbV3ProductDescription');
-    if (description && (description.hidden || !description.textContent.trim())) {
-      delete description.dataset.fullDescription;
-      delete description.dataset.previewText;
-    }
-    const fullDetails = $('#pb36FullDescription');
-    if (fullDetails && (!description || description.hidden || !description.textContent.trim())) fullDetails.hidden = true;
+    $('#pb36FullDescription')?.remove();
+    let toggle = $('#pb36DescriptionToggle');
     if (description && !description.hidden && description.textContent.trim()) {
-      const incoming = description.textContent.trim();
-      if (description.dataset.previewText !== incoming) {
-        const full = incoming;
+      const full = description.textContent.trim();
+      if (description.dataset.fullDescription !== full) {
         description.dataset.fullDescription = full;
-        const clean = full.split(/الألوان المتوفرة|الالوان المتوفرة/)[0]
-          .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '').trim();
-        const sentences = clean.split(/(?<=[.。!؟])\s+/);
-        let preview = sentences.slice(0, 2).join(' ');
-        if (preview.length > 155) preview = preview.slice(0, 152).replace(/\s+\S*$/, '') + '…';
-        description.dataset.previewText = preview;
-        description.textContent = preview;
-        let details = $('#pb36FullDescription');
-        if (!details) {
-          details = document.createElement('details');
-          details.id = 'pb36FullDescription';
-          details.innerHTML = '<summary>تفاصيل المنتج كاملة</summary><p></p>';
-          $('.pb-v3-product-scroll').appendChild(details);
-        }
-        details.hidden = full === preview;
-        details.open = false;
-        $('p', details).textContent = full;
+        description.dataset.expanded = 'false';
       }
-    }
+      if (!toggle) {
+        toggle = document.createElement('button');
+        toggle.id = 'pb36DescriptionToggle';
+        toggle.type = 'button';
+        toggle.setAttribute('aria-controls', 'pbV3ProductDescription');
+        description.after(toggle);
+        toggle.onclick = () => {
+          const expanded = description.dataset.expanded !== 'true';
+          description.dataset.expanded = String(expanded);
+          toggle.setAttribute('aria-expanded', String(expanded));
+          toggle.textContent = expanded ? 'عرض أقل' : 'عرض الوصف كامل';
+        };
+      }
+      const expanded = description.dataset.expanded === 'true';
+      const label = expanded ? 'عرض أقل' : 'عرض الوصف كامل';
+      if (toggle.textContent !== label) toggle.textContent = label;
+      toggle.setAttribute('aria-expanded', String(expanded));
+      requestAnimationFrame(() => {
+        if (description.hidden || !description.isConnected) return;
+        const main = description.closest('.pb-v3-product-main');
+        const gallery = $('#pbV3ProductSheet .pb-v3-product-gallery');
+        const columns = getComputedStyle($('#pbV3ProductSheet .pb-v3-product-scroll')).gridTemplateColumns.split(' ').length;
+        let lines = 4;
+        if (main && gallery && columns > 1) {
+          const children = [...main.children].filter(n => n !== description && n !== toggle && !n.hidden);
+          const used = children.reduce((sum,n) => sum + n.getBoundingClientRect().height, 0);
+          const gap = parseFloat(getComputedStyle(main).rowGap) || 14;
+          const space = gallery.getBoundingClientRect().height - used - gap * (children.length + 1) - 32;
+          lines = Math.max(4, Math.min(24, Math.floor(space / parseFloat(getComputedStyle(description).lineHeight))));
+        }
+        if (description.style.getPropertyValue('--pb-description-lines') !== String(lines)) description.style.setProperty('--pb-description-lines', String(lines));
+        toggle.hidden = !expanded && description.scrollHeight <= description.clientHeight + 1;
+      });
+    } else if (toggle) toggle.hidden = true;
 
     const features = $('#pb36ProductFeatures');
     if (features) {
@@ -868,6 +880,8 @@
   ['restbr:ready', 'restbr:commerce-ready', 'restbr:prices-updated', 'restbr:v3-menu-rendered'].forEach(type => {
     window.addEventListener(type, scheduleSync);
   });
+
+  window.addEventListener('resize', scheduleSync, { passive: true });
 
   const observer = new MutationObserver(mutations => {
     if (mutations.some(mutation => (mutation.addedNodes.length || mutation.removedNodes.length) &&
