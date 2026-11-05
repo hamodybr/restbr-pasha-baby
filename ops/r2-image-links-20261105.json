@@ -1,0 +1,495 @@
+{
+  "date": "2026-11-05",
+  "site": "pashababyiq.com",
+  "productRows": 27,
+  "colorRows": 27,
+  "originalsRetained": true,
+  "results": [
+    {
+      "id": "dde1bc5c-1a0b-42e1-85dc-d95bcda123d1",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/dde1bc5c-1a0b-42e1-85dc-d95bcda123d1/main?v=4_z1d84e1a751897ddca4000717_f10157f54378f1e9a_d20261015_m144457_c003_v0312022_t0024_u01792075497734",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/dde1bc5c-1a0b-42e1-85dc-d95bcda123d1/50613796bff5bf4c958ca22668a06d776b77ec659428f89d50f89bc6f5ff1ac4.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/dde1bc5c-1a0b-42e1-85dc-d95bcda123d1/50613796bff5bf4c958ca22668a06d776b77ec659428f89d50f89bc6f5ff1ac4-card.webp",
+      "bytes": 596235,
+      "card_bytes": 13260
+    },
+    {
+      "id": "c3d8409c-14cc-4039-854c-e16530b8a45d",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/c3d8409c-14cc-4039-854c-e16530b8a45d/main?v=4_z1d84e1a751897ddca4000717_f1175adc1db5362fa_d20260910_m205842_c003_v0312028_t0057_u01789073922544",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/c3d8409c-14cc-4039-854c-e16530b8a45d/9571cf0b6a38437c4e5f8917d399c124f897a5245565a0e501225558f8f50fb0.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/c3d8409c-14cc-4039-854c-e16530b8a45d/9571cf0b6a38437c4e5f8917d399c124f897a5245565a0e501225558f8f50fb0-card.webp",
+      "bytes": 612788,
+      "card_bytes": 6966
+    },
+    {
+      "id": "7f3e4c53-efd0-455e-88d8-d0af37ea9c51",
+      "image_url": "https://wlollfpmjzenhkjwxrqo.supabase.co/storage/v1/object/public/menu-images/products/7f3e4c53-efd0-455e-88d8-d0af37ea9c51/1788638561419-t65fuy.jpg",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/7f3e4c53-efd0-455e-88d8-d0af37ea9c51/f58e5e756181cb7160d8097541326987f047e4818e030bfaa8e35aeac8c0d2f9.jpg",
+      "thumbnail_url": "https://images.pashababyiq.com/products/7f3e4c53-efd0-455e-88d8-d0af37ea9c51/f58e5e756181cb7160d8097541326987f047e4818e030bfaa8e35aeac8c0d2f9-card.webp",
+      "bytes": 265020,
+      "card_bytes": 13142
+    },
+    {
+      "id": "84b7b879-e464-499e-b035-0d454b047800",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/84b7b879-e464-499e-b035-0d454b047800/main?v=4_z1d84e1a751897ddca4000717_f11162edd12bff20f_d20261016_m192504_c003_v0312031_t0004_u01792178704061",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/84b7b879-e464-499e-b035-0d454b047800/6b08eb7f028872c08b6aaacd235cee9fe7fa8ba1dd89cac2f7c63fa2505c159a.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/84b7b879-e464-499e-b035-0d454b047800/6b08eb7f028872c08b6aaacd235cee9fe7fa8ba1dd89cac2f7c63fa2505c159a-card.webp",
+      "bytes": 626793,
+      "card_bytes": 16150
+    },
+    {
+      "id": "e9d7795f-a464-4e6a-96ee-84734aec9cf6",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/e9d7795f-a464-4e6a-96ee-84734aec9cf6/main?v=4_z1d84e1a751897ddca4000717_f1168dc27f965ce5c_d20261015_m150349_c003_v0312045_t0006_u01792076629500",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/e9d7795f-a464-4e6a-96ee-84734aec9cf6/c25537b2fa61debdf8d3c54e45ccbe16713369e1579593b8a437d6adfe9c5a18.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/e9d7795f-a464-4e6a-96ee-84734aec9cf6/c25537b2fa61debdf8d3c54e45ccbe16713369e1579593b8a437d6adfe9c5a18-card.webp",
+      "bytes": 523264,
+      "card_bytes": 7424
+    },
+    {
+      "id": "856ee19f-c52b-41ff-9605-503973a7c8f4",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/856ee19f-c52b-41ff-9605-503973a7c8f4/main?v=4_z1d84e1a751897ddca4000717_f11142aa39c45565a_d20260917_m114942_c003_v0312041_t0046_u01789645782487",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/856ee19f-c52b-41ff-9605-503973a7c8f4/a3a0b80294491cbd14527b2346f2f444ae6c7fabee4e1259ce407b436ef03d2d.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/856ee19f-c52b-41ff-9605-503973a7c8f4/a3a0b80294491cbd14527b2346f2f444ae6c7fabee4e1259ce407b436ef03d2d-card.webp",
+      "bytes": 522001,
+      "card_bytes": 12916
+    },
+    {
+      "id": "9c4f903c-a78b-4620-9279-3c696235e55c",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/9c4f903c-a78b-4620-9279-3c696235e55c/main?v=4_z1d84e1a751897ddca4000717_f1017a8362dd26e2a_d20261015_m150057_c003_v0312045_t0007_u01792076457670",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/9c4f903c-a78b-4620-9279-3c696235e55c/30d8d625e4420c165ccedb4dd0bccd935d2ae3770e41908cf7cdba4f1d199dae.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/9c4f903c-a78b-4620-9279-3c696235e55c/30d8d625e4420c165ccedb4dd0bccd935d2ae3770e41908cf7cdba4f1d199dae-card.webp",
+      "bytes": 551601,
+      "card_bytes": 7768
+    },
+    {
+      "id": "8f03f98e-aae2-4a3e-a21a-58c96218b176",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/8f03f98e-aae2-4a3e-a21a-58c96218b176/main?v=4_z1d84e1a751897ddca4000717_f11460329a63226ef_d20261016_m185414_c003_v0312045_t0024_u01792176854708",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/8f03f98e-aae2-4a3e-a21a-58c96218b176/71856c96c5b6f8aac232f9806b06f5596a3ac63be6741c1a6b6eacb8ef0497d4.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/8f03f98e-aae2-4a3e-a21a-58c96218b176/71856c96c5b6f8aac232f9806b06f5596a3ac63be6741c1a6b6eacb8ef0497d4-card.webp",
+      "bytes": 545174,
+      "card_bytes": 9116
+    },
+    {
+      "id": "93f9ebe4-e6be-421d-9867-311233717548",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/93f9ebe4-e6be-421d-9867-311233717548/main?v=4_z1d84e1a751897ddca4000717_f114b8123af8c24ab_d20260911_m011936_c003_v0312040_t0025_u01789089576030",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/93f9ebe4-e6be-421d-9867-311233717548/0c4659d4993fafc3566fa78e3839b8daa7f7a0b3dea2a9f21b4695d4cd3b5226.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/93f9ebe4-e6be-421d-9867-311233717548/0c4659d4993fafc3566fa78e3839b8daa7f7a0b3dea2a9f21b4695d4cd3b5226-card.webp",
+      "bytes": 542884,
+      "card_bytes": 13048
+    },
+    {
+      "id": "9a23f8f6-9160-4698-b6af-95902ff28d05",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/9a23f8f6-9160-4698-b6af-95902ff28d05/main?v=4_z1d84e1a751897ddca4000717_f10919dd1ac5e9dca_d20260916_m192609_c003_v0312027_t0053_u01789586769838",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/9a23f8f6-9160-4698-b6af-95902ff28d05/c506ccda30fd3e9232ead11012a0d675e01e646795db73fd4f3c638a252fd75d.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/9a23f8f6-9160-4698-b6af-95902ff28d05/c506ccda30fd3e9232ead11012a0d675e01e646795db73fd4f3c638a252fd75d-card.webp",
+      "bytes": 500604,
+      "card_bytes": 24256
+    },
+    {
+      "id": "99d7e493-1c46-4cde-9504-f79f75fec145",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/99d7e493-1c46-4cde-9504-f79f75fec145/main?v=4_z1d84e1a751897ddca4000717_f1019c5c3f423c01f_d20261016_m192951_c003_v0312021_t0010_u01792178991827",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/99d7e493-1c46-4cde-9504-f79f75fec145/f11e184e0d00983426b873732a9516640322da199b2db9316e7a8d8838ac3d2f.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/99d7e493-1c46-4cde-9504-f79f75fec145/f11e184e0d00983426b873732a9516640322da199b2db9316e7a8d8838ac3d2f-card.webp",
+      "bytes": 608194,
+      "card_bytes": 12640
+    },
+    {
+      "id": "29b3725f-f211-4b70-8514-ea5db82aa488",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/29b3725f-f211-4b70-8514-ea5db82aa488/main?v=4_z1d84e1a751897ddca4000717_f101c9e3ddaef895e_d20261016_m194348_c003_v0312034_t0033_u01792179828402",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/29b3725f-f211-4b70-8514-ea5db82aa488/282b2909a1eb4a44718a245474dd89247d9a48b2f13da86b81f43617cd22a44d.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/29b3725f-f211-4b70-8514-ea5db82aa488/282b2909a1eb4a44718a245474dd89247d9a48b2f13da86b81f43617cd22a44d-card.webp",
+      "bytes": 585597,
+      "card_bytes": 14256
+    },
+    {
+      "id": "37b16b55-cfd3-4adc-8d36-0cf28df49c9a",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/37b16b55-cfd3-4adc-8d36-0cf28df49c9a/main?v=4_z1d84e1a751897ddca4000717_f119b8f458d515963_d20261016_m192208_c003_v0312031_t0057_u01792178528935",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/37b16b55-cfd3-4adc-8d36-0cf28df49c9a/30a428101104a61074c993a653cf34d1b060f99eed2739cb078ab82b0839142a.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/37b16b55-cfd3-4adc-8d36-0cf28df49c9a/30a428101104a61074c993a653cf34d1b060f99eed2739cb078ab82b0839142a-card.webp",
+      "bytes": 601340,
+      "card_bytes": 14542
+    },
+    {
+      "id": "5753c1bb-a39c-4bbb-8935-d192eb5de2db",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/5753c1bb-a39c-4bbb-8935-d192eb5de2db/main?v=4_z1d84e1a751897ddca4000717_f112c7f6a055a9d08_d20261016_m194601_c003_v0312013_t0007_u01792179961927",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/5753c1bb-a39c-4bbb-8935-d192eb5de2db/f6e93cabb3e934bed8f95d374ff7b3229400452ee2b5895531047d7d79459ee4.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/5753c1bb-a39c-4bbb-8935-d192eb5de2db/f6e93cabb3e934bed8f95d374ff7b3229400452ee2b5895531047d7d79459ee4-card.webp",
+      "bytes": 611905,
+      "card_bytes": 14982
+    },
+    {
+      "id": "4b57986e-910b-4d7f-81b8-f35828d3307b",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/4b57986e-910b-4d7f-81b8-f35828d3307b/main?v=4_z1d84e1a751897ddca4000717_f107548507cdc8828_d20260918_m051800_c003_v0312041_t0029_u01789708680029",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/4b57986e-910b-4d7f-81b8-f35828d3307b/d8e69fdb2669dd6baabb088c8bb4d6683c811706ccced32e02ea82fa341e4e9d.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/4b57986e-910b-4d7f-81b8-f35828d3307b/d8e69fdb2669dd6baabb088c8bb4d6683c811706ccced32e02ea82fa341e4e9d-card.webp",
+      "bytes": 677815,
+      "card_bytes": 16462
+    },
+    {
+      "id": "6bfefb0f-d482-49a8-9e4a-5a12e9b3f193",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/6bfefb0f-d482-49a8-9e4a-5a12e9b3f193/main?v=4_z1d84e1a751897ddca4000717_f11864bdf3fa84531_d20261015_m141910_c003_v0312025_t0000_u01792073950261",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/6bfefb0f-d482-49a8-9e4a-5a12e9b3f193/1d78261d152005d2e8abc253f108e5f7d7c73e9c2468625a09b52554ebf8ed70.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/6bfefb0f-d482-49a8-9e4a-5a12e9b3f193/1d78261d152005d2e8abc253f108e5f7d7c73e9c2468625a09b52554ebf8ed70-card.webp",
+      "bytes": 532688,
+      "card_bytes": 12506
+    },
+    {
+      "id": "31ead0c1-d2eb-4a6d-9739-4fee2c21781d",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/31ead0c1-d2eb-4a6d-9739-4fee2c21781d/main?v=4_z1d84e1a751897ddca4000717_f1117da5f1456d561_d20260918_m053027_c003_v0312046_t0036_u01789709427327",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/31ead0c1-d2eb-4a6d-9739-4fee2c21781d/94f78115a04e47fe9a70bf72ae4aa043f6c7c041858526e56a784e33dc8daec8.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/31ead0c1-d2eb-4a6d-9739-4fee2c21781d/94f78115a04e47fe9a70bf72ae4aa043f6c7c041858526e56a784e33dc8daec8-card.webp",
+      "bytes": 681732,
+      "card_bytes": 14698
+    },
+    {
+      "id": "dbcb361c-8778-43ff-b843-ad337564d131",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/dbcb361c-8778-43ff-b843-ad337564d131/main?v=4_z1d84e1a751897ddca4000717_f100ca9cf31ed5bea_d20261016_m193518_c003_v0312041_t0059_u01792179318821",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/dbcb361c-8778-43ff-b843-ad337564d131/782f6f31db8cd26614734237969d81f9e515b856f2ec73e78956cd50fc60d12a.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/dbcb361c-8778-43ff-b843-ad337564d131/782f6f31db8cd26614734237969d81f9e515b856f2ec73e78956cd50fc60d12a-card.webp",
+      "bytes": 618367,
+      "card_bytes": 13558
+    },
+    {
+      "id": "a44364be-a0d8-4917-b1d1-a25757cc52b7",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/a44364be-a0d8-4917-b1d1-a25757cc52b7/main?v=4_z1d84e1a751897ddca4000717_f117873440606aba3_d20261016_m191826_c003_v0312028_t0058_u01792178306222",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/a44364be-a0d8-4917-b1d1-a25757cc52b7/8ea4599a2253bab8657412727f8244343cefd254324d7511bb559d5b49895d40.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/a44364be-a0d8-4917-b1d1-a25757cc52b7/8ea4599a2253bab8657412727f8244343cefd254324d7511bb559d5b49895d40-card.webp",
+      "bytes": 565922,
+      "card_bytes": 10412
+    },
+    {
+      "id": "f8ae19ea-3317-45f9-aa67-4087d0485028",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/f8ae19ea-3317-45f9-aa67-4087d0485028/main?v=4_z1d84e1a751897ddca4000717_f1094b40c0e7a7ec1_d20261021_m140227_c003_v0312032_t0037_u01792591347591",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/f8ae19ea-3317-45f9-aa67-4087d0485028/36b96124d55b645877d8db486e75425324ca694ea8a45560fd90a637ff44c753.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/f8ae19ea-3317-45f9-aa67-4087d0485028/36b96124d55b645877d8db486e75425324ca694ea8a45560fd90a637ff44c753-card.webp",
+      "bytes": 605246,
+      "card_bytes": 11964
+    },
+    {
+      "id": "b1921298-67c3-470c-9ce5-1701b2fc973a",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/b1921298-67c3-470c-9ce5-1701b2fc973a/main?v=4_z1d84e1a751897ddca4000717_f1023f7e05a0c644f_d20261015_m191647_c003_v0312045_t0020_u01792091807175",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/b1921298-67c3-470c-9ce5-1701b2fc973a/8bba13d3eb60411712758f069231791fc92d266f55fc323afe3a67072cba4759.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/b1921298-67c3-470c-9ce5-1701b2fc973a/8bba13d3eb60411712758f069231791fc92d266f55fc323afe3a67072cba4759-card.webp",
+      "bytes": 603426,
+      "card_bytes": 11660
+    },
+    {
+      "id": "380533c1-640d-4a0e-ba8b-e41da40258a0",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/380533c1-640d-4a0e-ba8b-e41da40258a0/main?v=4_z1d84e1a751897ddca4000717_f1092b428690d10e3_d20261016_m200122_c003_v0312020_t0022_u01792180882318",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/380533c1-640d-4a0e-ba8b-e41da40258a0/ddcb771fbe51f08b2ae8c03223b497fe65f7387cf9ff205fec5fe1b29ca19260.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/380533c1-640d-4a0e-ba8b-e41da40258a0/ddcb771fbe51f08b2ae8c03223b497fe65f7387cf9ff205fec5fe1b29ca19260-card.webp",
+      "bytes": 622090,
+      "card_bytes": 15540
+    },
+    {
+      "id": "7f1ba31a-20c4-4eec-b76b-c7de57f49902",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/7f1ba31a-20c4-4eec-b76b-c7de57f49902/main?v=4_z1d84e1a751897ddca4000717_f1090d4060c98bc6f_d20261016_m202158_c003_v0312045_t0015_u01792182118431",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/7f1ba31a-20c4-4eec-b76b-c7de57f49902/e80130b6abd9f61b860120cd8ad6ed86e7a7513082403fbaabb4d327dcaa0725.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/7f1ba31a-20c4-4eec-b76b-c7de57f49902/e80130b6abd9f61b860120cd8ad6ed86e7a7513082403fbaabb4d327dcaa0725-card.webp",
+      "bytes": 596948,
+      "card_bytes": 14824
+    },
+    {
+      "id": "d140cc69-29d0-4b1a-8899-208206cc437d",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/d140cc69-29d0-4b1a-8899-208206cc437d/main?v=4_z1d84e1a751897ddca4000717_f11276e1d856df254_d20261016_m202510_c003_v0312047_t0046_u01792182310170",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/d140cc69-29d0-4b1a-8899-208206cc437d/920954feb9245aa072a47ff2b22f437234051f4a5e2d2d780980615442cdaded.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/d140cc69-29d0-4b1a-8899-208206cc437d/920954feb9245aa072a47ff2b22f437234051f4a5e2d2d780980615442cdaded-card.webp",
+      "bytes": 589441,
+      "card_bytes": 14538
+    },
+    {
+      "id": "aad60969-75d1-439b-95c6-30e7a7917130",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/aad60969-75d1-439b-95c6-30e7a7917130/main?v=4_z1d84e1a751897ddca4000717_f113ef7eb7d21aa0b_d20261104_m190735_c003_v0312046_t0010_u01793819255149",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/aad60969-75d1-439b-95c6-30e7a7917130/2d43e99841a772e5e6e7197d1e019f08e8f62be00de00eb37327c72af43ff361.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/aad60969-75d1-439b-95c6-30e7a7917130/2d43e99841a772e5e6e7197d1e019f08e8f62be00de00eb37327c72af43ff361-card.webp",
+      "bytes": 602047,
+      "card_bytes": 14012
+    },
+    {
+      "id": "00459128-2555-4a79-b949-fe9abfe18a51",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/00459128-2555-4a79-b949-fe9abfe18a51/main?v=4_z1d84e1a751897ddca4000717_f102d256a858e0128_d20261016_m202815_c003_v0312036_t0016_u01792182495482",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/00459128-2555-4a79-b949-fe9abfe18a51/920954feb9245aa072a47ff2b22f437234051f4a5e2d2d780980615442cdaded.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/00459128-2555-4a79-b949-fe9abfe18a51/920954feb9245aa072a47ff2b22f437234051f4a5e2d2d780980615442cdaded-card.webp",
+      "bytes": 589441,
+      "card_bytes": 14538
+    },
+    {
+      "id": "d735c9ff-8a31-4003-aaba-380845cacac9",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/d735c9ff-8a31-4003-aaba-380845cacac9/main?v=4_z1d84e1a751897ddca4000717_f115f74a3a6f40c81_d20261104_m181511_c003_v0312018_t0010_u01793816111317",
+      "table": "products",
+      "new_url": "https://images.pashababyiq.com/products/d735c9ff-8a31-4003-aaba-380845cacac9/d93dd55f80551439c8cf87761975127b76cc525514dcf59a08f81a934adb4fe5.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/d735c9ff-8a31-4003-aaba-380845cacac9/d93dd55f80551439c8cf87761975127b76cc525514dcf59a08f81a934adb4fe5-card.webp",
+      "bytes": 621432,
+      "card_bytes": 10660
+    },
+    {
+      "id": "af6251f9-dfdd-4dd4-803b-c32e8d6b9531",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-f3114a2f-3379-457e-8635-4c0a9d4736a2?v=4_z1d84e1a751897ddca4000717_f11049038aaea637d_d20261015_m142241_c003_v0312046_t0023_u01792074161114",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/af6251f9-dfdd-4dd4-803b-c32e8d6b9531/6a530aa45810966b99dd70654d8dba08172341139df7b1d126d554ab816a7f3c.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/af6251f9-dfdd-4dd4-803b-c32e8d6b9531/6a530aa45810966b99dd70654d8dba08172341139df7b1d126d554ab816a7f3c-card.webp",
+      "bytes": 445247,
+      "card_bytes": 12520
+    },
+    {
+      "id": "8dc56c6e-7e7a-4c12-9df1-5d130bb6e384",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-136d2cf4-01ac-4733-9754-ac1630f41d28?v=4_z1d84e1a751897ddca4000717_f105bfb3c100d7b8f_d20261015_m142040_c003_v0312045_t0004_u01792074040749",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/8dc56c6e-7e7a-4c12-9df1-5d130bb6e384/d6ed1f9f201b5cb04a0a336c7f70789db8821e3792297b118e7624365123e2f4.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/8dc56c6e-7e7a-4c12-9df1-5d130bb6e384/d6ed1f9f201b5cb04a0a336c7f70789db8821e3792297b118e7624365123e2f4-card.webp",
+      "bytes": 448962,
+      "card_bytes": 12234
+    },
+    {
+      "id": "4f0756b8-b39f-4d61-a63c-498393976792",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-24e81172-a29f-4534-b0f9-f93361486f1d?v=4_z1d84e1a751897ddca4000717_f11730db520cc59eb_d20261015_m142009_c003_v0312026_t0011_u01792074009546",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/4f0756b8-b39f-4d61-a63c-498393976792/b626e98e4b6719083bc9e9bbbe61802613af90fa86b98c549e1755dcffac06a9.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/4f0756b8-b39f-4d61-a63c-498393976792/b626e98e4b6719083bc9e9bbbe61802613af90fa86b98c549e1755dcffac06a9-card.webp",
+      "bytes": 452429,
+      "card_bytes": 12756
+    },
+    {
+      "id": "1985ac47-db1a-491d-a32a-4cf794b795c1",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-de583b0c-aa69-4bb1-a15c-09f30b5d06be?v=4_z1d84e1a751897ddca4000717_f1040ce9d2369f24e_d20260909_m042547_c003_v0312036_t0045_u01788927947045",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/1985ac47-db1a-491d-a32a-4cf794b795c1/38a0a82faf8241900a225235840e4a1e90acd35b537e19e1386bd7ab65dd1557.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/1985ac47-db1a-491d-a32a-4cf794b795c1/38a0a82faf8241900a225235840e4a1e90acd35b537e19e1386bd7ab65dd1557-card.webp",
+      "bytes": 589987,
+      "card_bytes": 8246
+    },
+    {
+      "id": "b8ab036d-3155-4a62-a66f-6fea2ad172d2",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-f30dc9e8-a061-4832-b197-5cae05920f79?v=4_z1d84e1a751897ddca4000717_f1040844ae6ede35d_d20261015_m142656_c003_v0312023_t0031_u01792074416485",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/b8ab036d-3155-4a62-a66f-6fea2ad172d2/64c242d80637520987b106779c1f8cbcf71858f623ba9debcec50456146676fd.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/b8ab036d-3155-4a62-a66f-6fea2ad172d2/64c242d80637520987b106779c1f8cbcf71858f623ba9debcec50456146676fd-card.webp",
+      "bytes": 440386,
+      "card_bytes": 12268
+    },
+    {
+      "id": "c86a553d-21df-4d43-8e1d-3a080702a304",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-358f35b7-3e67-40d1-92fe-7706997e2ab2?v=4_z1d84e1a751897ddca4000717_f114d9de82a0995b2_d20260909_m042515_c003_v0312021_t0046_u01788927915635",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/c86a553d-21df-4d43-8e1d-3a080702a304/0e084c47bd5d197b4d3d0d8276b34893fa050d8bfd35eb478605894b7878aa4e.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/c86a553d-21df-4d43-8e1d-3a080702a304/0e084c47bd5d197b4d3d0d8276b34893fa050d8bfd35eb478605894b7878aa4e-card.webp",
+      "bytes": 496649,
+      "card_bytes": 11908
+    },
+    {
+      "id": "c2b483ed-4132-4254-ae49-689dd5d92782",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-d47daf8b-8553-44c2-a218-b32112232d98?v=4_z1d84e1a751897ddca4000717_f11995c65a170491c_d20260917_m023117_c003_v0312028_t0035_u01789612277159",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/c2b483ed-4132-4254-ae49-689dd5d92782/704d5065ad98a4fdee5e1bd9eb8df016e88f259e5beb1824921177c9babe2f3d.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/c2b483ed-4132-4254-ae49-689dd5d92782/704d5065ad98a4fdee5e1bd9eb8df016e88f259e5beb1824921177c9babe2f3d-card.webp",
+      "bytes": 532190,
+      "card_bytes": 16460
+    },
+    {
+      "id": "3e040ddb-9a4c-46cb-8d68-873debb0a5d7",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-8cc5957a-21e7-4cbc-99f3-7dd81278d12a?v=4_z1d84e1a751897ddca4000717_f100084f19f38c6f3_d20260909_m084432_c003_v0312046_t0057_u01788943472536",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/3e040ddb-9a4c-46cb-8d68-873debb0a5d7/0e084c47bd5d197b4d3d0d8276b34893fa050d8bfd35eb478605894b7878aa4e.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/3e040ddb-9a4c-46cb-8d68-873debb0a5d7/0e084c47bd5d197b4d3d0d8276b34893fa050d8bfd35eb478605894b7878aa4e-card.webp",
+      "bytes": 496649,
+      "card_bytes": 11908
+    },
+    {
+      "id": "b865c516-3a9e-4b0c-9276-e9903e9b0e85",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-9d66cba5-2441-427a-969e-ab5c8ee796be?v=4_z1d84e1a751897ddca4000717_f118dc8f92efc4197_d20260910_m133430_c003_v0312029_t0008_u01789047270858",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/b865c516-3a9e-4b0c-9276-e9903e9b0e85/246965bfc62126c42656efd5a24df0f943a45d6a030b32edb5534f7b78434258.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/b865c516-3a9e-4b0c-9276-e9903e9b0e85/246965bfc62126c42656efd5a24df0f943a45d6a030b32edb5534f7b78434258-card.webp",
+      "bytes": 488148,
+      "card_bytes": 7582
+    },
+    {
+      "id": "b3694e9b-2aa5-4384-9eca-b2aed2c35fe9",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-d59262df-d54f-40e9-a30c-d1946b050f97?v=4_z1d84e1a751897ddca4000717_f103b98ed76a41f09_d20260917_m023339_c003_v0312001_t0007_u01789612419912",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/b3694e9b-2aa5-4384-9eca-b2aed2c35fe9/84b3446c1214286db49deac3301018b1061f601ec38209a2b6b08cef23c9785b.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/b3694e9b-2aa5-4384-9eca-b2aed2c35fe9/84b3446c1214286db49deac3301018b1061f601ec38209a2b6b08cef23c9785b-card.webp",
+      "bytes": 530211,
+      "card_bytes": 16414
+    },
+    {
+      "id": "c122da97-a84d-4591-b16e-1c7d4276919d",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-f8ff2f1e-5c70-4623-891e-5bdefc130615?v=4_z1d84e1a751897ddca4000717_f111e48d85c6aaa3a_d20260917_m023247_c003_v0312013_t0014_u01789612367838",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/c122da97-a84d-4591-b16e-1c7d4276919d/633cf6807bff4926aae7f0c364bbea3908ebd08d4811b46a74365ac94bd71185.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/c122da97-a84d-4591-b16e-1c7d4276919d/633cf6807bff4926aae7f0c364bbea3908ebd08d4811b46a74365ac94bd71185-card.webp",
+      "bytes": 530747,
+      "card_bytes": 16006
+    },
+    {
+      "id": "4722d429-e911-429b-b5ec-b9752f432ae4",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-f84b5a12-df2c-4571-9e38-899a8b1fcf78?v=4_z1d84e1a751897ddca4000717_f11753b62a2a24c6b_d20260917_m023311_c003_v0312027_t0021_u01789612391242",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/4722d429-e911-429b-b5ec-b9752f432ae4/9b2f65d2b1849d697665feb5deb052f0cf0e4bf87577bf790b2646efedc15765.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/4722d429-e911-429b-b5ec-b9752f432ae4/9b2f65d2b1849d697665feb5deb052f0cf0e4bf87577bf790b2646efedc15765-card.webp",
+      "bytes": 517123,
+      "card_bytes": 14760
+    },
+    {
+      "id": "8d9adbd9-06cd-4b7b-9bf0-73027fd0bc9f",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-a3914b69-4913-4737-b94f-176173fa09c4?v=4_z1d84e1a751897ddca4000717_f10704e22116ef108_d20260918_m052848_c003_v0312039_t0045_u01789709328665",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/8d9adbd9-06cd-4b7b-9bf0-73027fd0bc9f/04b68682bb660b3410fe871b47d3e757c2800cb5a404b25178315be94f7af4c2.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/8d9adbd9-06cd-4b7b-9bf0-73027fd0bc9f/04b68682bb660b3410fe871b47d3e757c2800cb5a404b25178315be94f7af4c2-card.webp",
+      "bytes": 566695,
+      "card_bytes": 14758
+    },
+    {
+      "id": "bc60f62c-c26c-4838-9231-02d46e3aa2bc",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-a8b6b40d-e7cc-4e80-b0f8-7ce7dc71af1d?v=4_z1d84e1a751897ddca4000717_f1103afa5d54a5091_d20260918_m052911_c003_v0312025_t0000_u01789709351654",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/bc60f62c-c26c-4838-9231-02d46e3aa2bc/8f81708e282023085f7a5ce81f4997669b517a706d9c70bb0a2b2ebb92ff4fc5.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/bc60f62c-c26c-4838-9231-02d46e3aa2bc/8f81708e282023085f7a5ce81f4997669b517a706d9c70bb0a2b2ebb92ff4fc5-card.webp",
+      "bytes": 544757,
+      "card_bytes": 13770
+    },
+    {
+      "id": "6b21be69-f864-4e8b-a289-30bdada9928a",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-09e21420-4d9e-49a3-8a05-0e3199208cea?v=4_z1d84e1a751897ddca4000717_f11813760eb5f436b_d20260918_m052957_c003_v0312045_t0056_u01789709397811",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/6b21be69-f864-4e8b-a289-30bdada9928a/ca4d0c25e4a8688d7d199034f358845cfb1ebfa33976f49f2c07e3c6dfaf8823.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/6b21be69-f864-4e8b-a289-30bdada9928a/ca4d0c25e4a8688d7d199034f358845cfb1ebfa33976f49f2c07e3c6dfaf8823-card.webp",
+      "bytes": 563104,
+      "card_bytes": 14628
+    },
+    {
+      "id": "8b8ad45c-0063-4f68-8d68-92572ab76bc4",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-6ebde2d8-31d1-4001-ab3f-3d6dd4afcf16?v=4_z1d84e1a751897ddca4000717_f113cf713ffc266a0_d20261104_m190339_c003_v0312045_t0048_u01793819019357",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/8b8ad45c-0063-4f68-8d68-92572ab76bc4/52bdf2829b817c85c74aa7a6e734272bd8294d3d3fd5bb444c59fde5b2b78eb5.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/8b8ad45c-0063-4f68-8d68-92572ab76bc4/52bdf2829b817c85c74aa7a6e734272bd8294d3d3fd5bb444c59fde5b2b78eb5-card.webp",
+      "bytes": 474957,
+      "card_bytes": 11392
+    },
+    {
+      "id": "188af8c9-2d76-41de-84bc-7d5949f4f23b",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-cf5ff286-f993-44c1-acf7-46b328d46854?v=4_z1d84e1a751897ddca4000717_f1095eb0c47e098a5_d20261104_m182033_c003_v0312045_t0010_u01793816433598",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/188af8c9-2d76-41de-84bc-7d5949f4f23b/d2961103ab1b72e719840bca1ae5bb4294ac3573fe9e3a519987ed2ac23ffa93.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/188af8c9-2d76-41de-84bc-7d5949f4f23b/d2961103ab1b72e719840bca1ae5bb4294ac3573fe9e3a519987ed2ac23ffa93-card.webp",
+      "bytes": 470205,
+      "card_bytes": 10390
+    },
+    {
+      "id": "ce23399e-759e-43eb-bf9a-eca866bb0df9",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-26a40603-9195-41c1-bda8-8450af5add95?v=4_z1d84e1a751897ddca4000717_f1110854658d5d17f_d20261104_m182205_c003_v0312049_t0050_u01793816525809",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/ce23399e-759e-43eb-bf9a-eca866bb0df9/d2961103ab1b72e719840bca1ae5bb4294ac3573fe9e3a519987ed2ac23ffa93.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/ce23399e-759e-43eb-bf9a-eca866bb0df9/d2961103ab1b72e719840bca1ae5bb4294ac3573fe9e3a519987ed2ac23ffa93-card.webp",
+      "bytes": 470205,
+      "card_bytes": 10390
+    },
+    {
+      "id": "3bca673d-e00c-4923-977d-69395cc9ec2a",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-518a1547-c2a2-44fe-a238-d3d89468320d?v=4_z1d84e1a751897ddca4000717_f104c0524ae4704df_d20261104_m190445_c003_v0312030_t0030_u01793819085033",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/3bca673d-e00c-4923-977d-69395cc9ec2a/d81a11b8f14355a0cf6521cb012b06e7298d892dc497ef9aa66b3904e6313716.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/3bca673d-e00c-4923-977d-69395cc9ec2a/d81a11b8f14355a0cf6521cb012b06e7298d892dc497ef9aa66b3904e6313716-card.webp",
+      "bytes": 393320,
+      "card_bytes": 7630
+    },
+    {
+      "id": "e5b6a94f-a96e-4fd5-b6cb-d3a7214632d4",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-136b4923-0b81-4936-b480-0c6026c9bb55?v=4_z1d84e1a751897ddca4000717_f114b87c1a7aa93eb_d20261104_m190418_c003_v0312046_t0034_u01793819058491",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/e5b6a94f-a96e-4fd5-b6cb-d3a7214632d4/b04c9d8f85ca4863fc34606c181f9ae494f4e55faa6f5d37639f946f97300798.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/e5b6a94f-a96e-4fd5-b6cb-d3a7214632d4/b04c9d8f85ca4863fc34606c181f9ae494f4e55faa6f5d37639f946f97300798-card.webp",
+      "bytes": 488805,
+      "card_bytes": 12368
+    },
+    {
+      "id": "95f06c54-cbc6-4afb-9f9b-e4809fc16e26",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-8847c47c-07da-46b3-ac62-eb28c604ed49?v=4_z1d84e1a751897ddca4000717_f1182a81571848e3a_d20261104_m190400_c003_v0312025_t0002_u01793819040604",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/95f06c54-cbc6-4afb-9f9b-e4809fc16e26/434ad84e75a7c79499f2718d4f94e96886febe68a170d5b8123a9e4dd93c18cb.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/95f06c54-cbc6-4afb-9f9b-e4809fc16e26/434ad84e75a7c79499f2718d4f94e96886febe68a170d5b8123a9e4dd93c18cb-card.webp",
+      "bytes": 501998,
+      "card_bytes": 13574
+    },
+    {
+      "id": "45c3527e-9b5d-4eb4-a445-e705c4d60e73",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-2335543f-7cc6-4ee6-8408-e98b04daf3b7?v=4_z1d84e1a751897ddca4000717_f104ab1489d0f4e4e_d20261104_m190559_c003_v0312049_t0015_u01793819159476",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/45c3527e-9b5d-4eb4-a445-e705c4d60e73/db57e63e33f5e2446086c56a0a7fabfcbe948f1bf839be9d72f8e569944674c7.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/45c3527e-9b5d-4eb4-a445-e705c4d60e73/db57e63e33f5e2446086c56a0a7fabfcbe948f1bf839be9d72f8e569944674c7-card.webp",
+      "bytes": 517071,
+      "card_bytes": 10652
+    },
+    {
+      "id": "49ce404b-ee53-4a3c-a41c-c4c4c0a5a5b5",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-0d3630f1-93ae-40c7-8de1-526bf0196106?v=4_z1d84e1a751897ddca4000717_f113351cfdcc35c5f_d20261104_m190522_c003_v0312049_t0021_u01793819122537",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/49ce404b-ee53-4a3c-a41c-c4c4c0a5a5b5/d81a11b8f14355a0cf6521cb012b06e7298d892dc497ef9aa66b3904e6313716.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/49ce404b-ee53-4a3c-a41c-c4c4c0a5a5b5/d81a11b8f14355a0cf6521cb012b06e7298d892dc497ef9aa66b3904e6313716-card.webp",
+      "bytes": 393320,
+      "card_bytes": 7630
+    },
+    {
+      "id": "cdb23a5d-5159-4c9d-a19e-c51b6650601b",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-efb1a34e-dccb-469e-a57f-16472b6f6e4d?v=4_z1d84e1a751897ddca4000717_f1032d072afbbdfb3_d20261104_m190538_c003_v0312048_t0039_u01793819138989",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/cdb23a5d-5159-4c9d-a19e-c51b6650601b/db57e63e33f5e2446086c56a0a7fabfcbe948f1bf839be9d72f8e569944674c7.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/cdb23a5d-5159-4c9d-a19e-c51b6650601b/db57e63e33f5e2446086c56a0a7fabfcbe948f1bf839be9d72f8e569944674c7-card.webp",
+      "bytes": 517071,
+      "card_bytes": 10652
+    },
+    {
+      "id": "ca1456bf-9995-48cd-88f9-3a64a83668da",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-f85b9dcd-f464-4d9e-9728-19ebbdc732f5?v=4_z1d84e1a751897ddca4000717_f1180fa4681a36a7a_d20261104_m190646_c003_v0312047_t0004_u01793819206778",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/ca1456bf-9995-48cd-88f9-3a64a83668da/b04c9d8f85ca4863fc34606c181f9ae494f4e55faa6f5d37639f946f97300798.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/ca1456bf-9995-48cd-88f9-3a64a83668da/b04c9d8f85ca4863fc34606c181f9ae494f4e55faa6f5d37639f946f97300798-card.webp",
+      "bytes": 488805,
+      "card_bytes": 12368
+    },
+    {
+      "id": "e95efcde-4d78-4c8d-ad77-1e241a04c19f",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-3e26a968-311a-4af8-8eef-64737ea994f1?v=4_z1d84e1a751897ddca4000717_f117982dd4b3660d1_d20261104_m190707_c003_v0312033_t0033_u01793819227905",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/e95efcde-4d78-4c8d-ad77-1e241a04c19f/d81a11b8f14355a0cf6521cb012b06e7298d892dc497ef9aa66b3904e6313716.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/e95efcde-4d78-4c8d-ad77-1e241a04c19f/d81a11b8f14355a0cf6521cb012b06e7298d892dc497ef9aa66b3904e6313716-card.webp",
+      "bytes": 393320,
+      "card_bytes": 7630
+    },
+    {
+      "id": "07ba816a-ebf0-4b17-87b5-733d8f1570ad",
+      "image_url": "https://f003.backblazeb2.com/file/pasha-baby-products/products/color-assets/clr-10f175c6-7880-4b87-938b-fa2eb1b8d65b?v=4_z1d84e1a751897ddca4000717_f10813bdc5f77ecdc_d20261104_m190728_c003_v0312025_t0032_u01793819248882",
+      "table": "colors",
+      "new_url": "https://images.pashababyiq.com/products/color-assets/07ba816a-ebf0-4b17-87b5-733d8f1570ad/d81a11b8f14355a0cf6521cb012b06e7298d892dc497ef9aa66b3904e6313716.png",
+      "thumbnail_url": "https://images.pashababyiq.com/products/color-assets/07ba816a-ebf0-4b17-87b5-733d8f1570ad/d81a11b8f14355a0cf6521cb012b06e7298d892dc497ef9aa66b3904e6313716-card.webp",
+      "bytes": 393320,
+      "card_bytes": 7630
+    }
+  ]
+}
