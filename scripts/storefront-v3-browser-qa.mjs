@@ -311,7 +311,7 @@ async function assertCatalogNavigation(page, spec) {
     allActive: !!document.querySelector('#smCats .sm-cat[data-cat="__all__"].active')
   }));
   assert(full.expected > 0 && full.actual === Math.min(32, full.expected) &&
-    full.title === 'كل المنتجات' && full.allActive,
+    full.title === 'كل المنتجات' && !full.allActive,
     spec.name + ': View all did not show all real products: ' + JSON.stringify(full));
 
   const category = page.locator('#smCats .sm-cat:not([data-cat="__all__"])').first();
@@ -636,6 +636,18 @@ async function runProductionLoad(browser, spec) {
     assert(before.categories.height >= 100, 'Empty category rail did not reserve its space');
     releaseCatalog();
     await waitForCatalog(page);
+    assert(await page.locator('#smCats [data-cat="__all__"]').count() === 0, 'All-products tile remains in category rail');
+    const categoryLabels = await page.evaluate(() => {
+      const first = document.querySelector('#smCats .sm-cat');
+      const label = first.querySelector('.pb-v3-cat-copy b');
+      const original = label.textContent;
+      label.textContent = 'الحفاظات والمناديل ومستلزمات العناية اليومية بالطفل';
+      const style = getComputedStyle(label);
+      const result = { selected:first.classList.contains('active'), wraps:label.getBoundingClientRect().height > parseFloat(style.lineHeight)*2, font:parseFloat(style.fontSize), unclipped:style.overflow==='visible' && style.whiteSpace==='normal' };
+      label.textContent = original;
+      return result;
+    });
+    assert(categoryLabels.selected && categoryLabels.wraps && categoryLabels.font >= 14 && categoryLabels.unclipped, 'Category default/long label regression: '+JSON.stringify(categoryLabels));
     await page.locator('body[data-pb-loading]').waitFor({ state: 'detached', timeout: 5000 });
     await page.waitForTimeout(700);
     const after = {

@@ -1996,9 +1996,7 @@ function renderCats() {
 
   const savedScroll = rail.scrollLeft;
 
-  const categoryRows = IS_STOREFRONT_V3
-    ? [{ id: '__all__', ar: 'كل المنتجات', en: 'All products', ku: 'هەموو بەرهەمەکان' }, ...categories()]
-    : categories();
+  const categoryRows = categories();
 
   rail.innerHTML = categoryRows
     .map(category => `
