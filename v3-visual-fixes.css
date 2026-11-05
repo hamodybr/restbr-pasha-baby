@@ -1099,3 +1099,19 @@ body.pb-v3-page #pb36DetailBottomRow > #pb36DescriptionToggle { grid-column:2; j
 #pb36ImageViewer img { display:block; width:100%; height:100%; object-fit:contain; object-position:center; }
 #pb36ImageViewer > button { position:absolute; z-index:1; top:calc(env(safe-area-inset-top,0px) + 10px); right:16px; width:44px; height:44px; border:1px solid #7b8883; border-radius:50%; color:#fff; background:#263f36; font:32px/1 Arial,sans-serif; cursor:pointer; }
 #pb36ImageViewer > button:focus-visible { outline:2px solid #fff; outline-offset:3px; }
+/* Category names remain complete, including long Arabic and mixed names. */
+body.pb-v3-page #smCats .pb-v3-cat-copy {
+  width:100%!important; height:auto!important; overflow:visible!important;
+}
+body.pb-v3-page #smCats .pb-v3-cat-copy b {
+  display:block!important; font-size:14px!important; line-height:1.55!important;
+  height:auto!important; min-height:44px!important; max-height:none!important;
+  white-space:normal!important; overflow:visible!important; text-overflow:clip!important;
+  overflow-wrap:anywhere!important; -webkit-line-clamp:unset!important;
+}
+body.pb-v3-page #smCats .sm-cat.pb-v3-cat-tile {
+  height:auto!important; max-height:none!important; align-self:stretch!important;
+}
+@media(min-width:681px){
+  body.pb-v3-page #smCats .pb-v3-cat-copy b {font-size:16px!important;min-height:50px!important;}
+}
