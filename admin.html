@@ -3730,6 +3730,7 @@
 <!-- One per-restaurant public configuration; never contains service_role. -->
 <script src="js/runtime-config.js?v=20261008.1"></script>
 <script src="js/supabase-config.js?v=2.6"></script>
+<script src="js/admin-option-images.js?v=1.0" defer></script>
 
 <!-- Touch-friendly Drag & Drop -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
@@ -5759,9 +5760,13 @@
     openAdminEditor('تعديل الصنف',html);
   }
 
+  function optionImageEditorHtml(url=''){
+    return `<div class="pb-option-image"><input class="oe-image" type="hidden" value="${escapeAdminHtml(url||'')}"><div class="pb-option-image-actions"><button type="button" data-option-image-pick>اختيار من صور الصنف</button><button type="button" data-option-image-upload>رفع صورة للخيار</button><button type="button" data-option-image-clear>إلغاء الربط</button><input type="file" accept="image/*" class="pb-option-image-file" hidden></div><div class="pb-option-image-preview" hidden><img alt="صورة الخيار" width="56" height="56" loading="lazy"><span>تظهر عند اختيار هذا الخيار</span></div><div class="pb-option-image-picker" hidden></div><small class="pb-option-image-status" role="status"></small></div>`;
+  }
+
   function optionEditorHtml(o={}){
     const id=o.id||''; const name=firstExisting(o,['name_ar','label_ar','name_ku','name_en','name'],''); const price=firstExisting(o,['price','base_price'],0);
-    return `<div class="option-editor" data-option-id="${escapeAdminHtml(id)}"><div class="option-editor-grid"><div class="field"><label>اسم الخيار</label><input class="oe-name" value="${escapeAdminHtml(name)}"></div><div class="field"><label>السعر</label><input class="oe-price" type="number" value="${escapeAdminHtml(price)}"></div><button class="danger-mini" type="button" onclick="removeOptionEditor(this)">حذف</button></div></div>`;
+    return `<div class="option-editor" data-option-id="${escapeAdminHtml(id)}"><div class="option-editor-grid"><div class="field"><label>اسم الخيار</label><input class="oe-name" value="${escapeAdminHtml(name)}"></div><div class="field"><label>السعر</label><input class="oe-price" type="number" value="${escapeAdminHtml(price)}"></div><button class="danger-mini" type="button" onclick="removeOptionEditor(this)">حذف</button></div>${optionImageEditorHtml(o.image_url)}</div>`;
   }
   function addOptionEditor(){ document.getElementById('optionsEditor').insertAdjacentHTML('beforeend',optionEditorHtml({})); }
   function removeOptionEditor(btn){ const row=btn.closest('.option-editor'); if(row.dataset.optionId) row.dataset.deleted='1'; row.style.display='none'; }
@@ -5776,6 +5781,7 @@
   }
 
   async function saveAdminProduct(productId){
+    if(window.PASHA_OPTION_IMAGE_UPLOADS){showEditorMsg('انتظر اكتمال رفع صورة الخيار.',false);return;}
     const product=adminProducts.find(x=>String(x.id)===String(productId));
     if(!product)return;
 
@@ -5883,12 +5889,14 @@
 
         const name=row.querySelector('.oe-name').value.trim();
         const price=Number(row.querySelector('.oe-price').value||0);
+        const imageUrl=row.querySelector('.oe-image')?.value.trim()||'';
 
         if(!name&&!oid)continue;
 
         if(oid){
           const old=adminOptions.find(o=>String(o.id)===String(oid))||{};
           const op={};
+          if(imageUrl!==String(old.image_url||''))op.image_url=imageUrl||null;
           const oldName=String(old.name_ar ?? old.label_ar ?? old.name ?? '').trim();
           const oldPrice=Number(old.price ?? old.base_price ?? 0);
 
@@ -5909,7 +5917,7 @@
 
         } else {
           const sample=adminOptions[0]||{};
-          const op={product_id:product.id};
+          const op={product_id:product.id,image_url:imageUrl||null};
 
           if(hasField(sample,'name_ar'))op.name_ar=name;
           else if(hasField(sample,'label_ar'))op.label_ar=name;
@@ -6080,6 +6088,7 @@
         <div class="field"><label>السعر</label><input class="noe-price" type="number" min="0" value="0"></div>
         <button class="danger-mini" type="button" onclick="this.closest('.option-editor').remove()">حذف</button>
       </div>
+      ${optionImageEditorHtml()}
     </div>`;
   }
 
@@ -6148,6 +6157,7 @@
   }
 
   async function createAdminProduct(){
+    if(window.PASHA_OPTION_IMAGE_UPLOADS){showEditorMsg('انتظر اكتمال رفع صورة الخيار.',false);return;}
     const sample=adminProducts[0]||{};
     const btn=document.getElementById('createProductBtn');
     const nameAr=val('np_name_ar').trim();
@@ -6212,7 +6222,8 @@
       const optionRows=[...document.querySelectorAll('#newOptionsEditor .option-editor')]
         .map(row=>({
           name:row.querySelector('.noe-name')?.value.trim()||'',
-          price:Number(row.querySelector('.noe-price')?.value||0)
+          price:Number(row.querySelector('.noe-price')?.value||0),
+          image:row.querySelector('.oe-image')?.value.trim()||''
         }))
         .filter(row=>row.name);
 
@@ -6241,6 +6252,7 @@
       for(let i=0;i<optionsToCreate.length;i++){
         const option=optionsToCreate[i];
         const payload=buildNewOptionPayload(newId,option.name,option.price,i);
+        payload.image_url=option.image||null;
 
         const r=await supabaseClient
           .from('product_options')

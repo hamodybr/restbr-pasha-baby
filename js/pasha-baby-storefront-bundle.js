@@ -4455,6 +4455,7 @@ async function loadMenuFromSupabase() {
         .push({
 
           id: option.id,
+          image: option.image_url || "",
 
           ar:
             option.name_ar ||
@@ -5521,6 +5522,7 @@ startRestbr();
       if (!optionsMap.has(productId)) optionsMap.set(productId, []);
       optionsMap.get(productId).push({
         id: option.id,
+        image: option.image_url || '',
         ar: option.name_ar || option.ar || '',
         ku: option.name_ku || option.ku || option.name_ar || '',
         en: option.name_en || option.en || option.name_ar || '',

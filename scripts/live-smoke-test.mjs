@@ -100,7 +100,7 @@ const indexHtml = await expectText('/', [
   'پاشا بيبي',
   'js/runtime-config.js',
   'js/vendor/supabase-2.114.0.min.js',
-  'js/pasha-baby-commerce.js?v=20261008.1',
+  'js/pasha-baby-commerce.js?v=20261105.1',
   'v3-visual-fixes.css?v=4.26'
 ], 'storefront');
 

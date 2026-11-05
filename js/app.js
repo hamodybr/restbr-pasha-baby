@@ -3829,6 +3829,7 @@ async function loadMenuFromSupabase() {
         .push({
 
           id: option.id,
+          image: option.image_url || "",
 
           ar:
             option.name_ar ||

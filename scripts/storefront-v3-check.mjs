@@ -83,8 +83,8 @@ for (const token of forbiddenLegacy) {
 
 for (const token of [
   'js/unavailable-card-state.js?v=20261008.1',
-  'js/app.js?v=20261105.2',
-  'js/pasha-baby-commerce.js?v=20261008.1',
+  'js/app.js?v=20261105.3',
+  'js/pasha-baby-commerce.js?v=20261105.1',
   'js/product-image-fallback.js?v=20261008.1',
   'js/price-safety.js?v=20261008.1',
   'js/cart.js?v=v3.1',
@@ -109,7 +109,7 @@ if (!allCss.includes('--v3-sage') || !allCss.includes('--v3-beige')) {
 
 for (const token of [
   'id="pbV3Highlights"',
-  'storefront-v3/product-details-v3.js?v=20261105.1'
+  'storefront-v3/product-details-v3.js?v=20261105.2'
 ]) {
   if (!html.includes(token)) fail('V3 phase 2 feature missing: ' + token);
 }

@@ -37,7 +37,9 @@ jobs:
         run: node scripts/r2-storage-regression.mjs
 
       - name: Storefront V3 DOM regression
-        run: node scripts/storefront-v3-dom-regression.mjs
+        run: |
+          node scripts/storefront-v3-dom-regression.mjs
+          node scripts/option-image-regression.mjs
 
       - name: Versioned product thumbnail regression
         run: node scripts/product-thumbnail-regression.mjs
