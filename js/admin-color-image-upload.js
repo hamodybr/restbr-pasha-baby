@@ -95,10 +95,12 @@
       const form = new FormData();
       form.append('assetKey', assetKey);
       form.append('file', prepared, prepared.name || file.name || 'color.webp');
+      const thumbnail = await imagePipeline().thumbnail(prepared);
+      form.append('thumbnail', thumbnail, thumbnail.name);
 
       const sb = client();
       if (!sb?.functions?.invoke) throw new Error('خدمة رفع الصور غير جاهزة.');
-      const { data, error } = await sb.functions.invoke('b2-color-images', {
+      const { data, error } = await sb.functions.invoke('r2-images', {
         headers: { 'x-pb-action': 'upload' },
         body: form
       });

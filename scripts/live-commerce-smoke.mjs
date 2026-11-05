@@ -41,7 +41,7 @@ await expectText('/', [
 ], 'storefront Arabic-only fixed-discount commerce assets');
 
 await expectText('/js/supabase-config.js', [
-  'js/pasha-arabic-only.js?v=20261008.1'
+  'js/pasha-arabic-only.js?v=20261105.1'
 ], 'Arabic-only policy loader');
 
 await expectText('/js/pasha-arabic-only.js', [

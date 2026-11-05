@@ -132,7 +132,7 @@ requireText('js/admin-role-ui.js', "const ORDERS_ROLES = new Set(['super_admin',
 requireText('js/admin-role-ui.js', "qa('.bottom-nav .nav-btn')", 'dynamic bottom-nav column count');
 
 requireText('js/admin-orders-nav-hotfix.js', 'js/admin-orders-enhancements.js?v=1.0', 'orders UI enhancement loader');
-requireText('js/admin-orders-nav-hotfix.js', 'js/admin-color-image-upload.js?v=1.0', 'color image upload loader');
+requireText('js/admin-orders-nav-hotfix.js', 'js/admin-color-image-upload.js?v=3.0', 'color image upload loader');
 requireText('js/admin-orders-enhancements.js', "from('orders').delete()", 'order delete action');
 requireText('js/admin-orders-enhancements.js', "from('customers').delete()", 'customer delete action');
 requireText('js/admin-orders-enhancements.js', 'body.admin-global-dark #viewPashaOrders', 'orders dark theme');
@@ -159,7 +159,7 @@ requireText('js/admin-orders-customers.js', 'id="pbOrderStatusBar"', 'order stat
 forbidText('js/admin-orders-customers.js', 'id="pbOrderFilter"', 'legacy native status dropdown filter');
 requireText('js/pasha-color-image-gallery.js', 'pb-color-choice-image', 'color thumbnail chooser');
 requireText('js/pasha-color-image-gallery.js', 'pb-color-large-preview', 'selected color image preview');
-requireText('js/admin-color-image-upload.js', "sb.functions.invoke('b2-color-images'", 'B2 color image upload invocation');
+requireText('js/admin-color-image-upload.js', "sb.functions.invoke('r2-images'", 'R2 color image upload invocation');
 requireText('js/admin-color-image-upload.js', '.pb-edit-color-image,.pb-npc-image', 'existing and new product color image fields');
 requireText(colorImageEdge, 'COLOR_PREFIX = `${B2_PREFIX}color-assets/`', 'isolated color image B2 prefix');
 requireText(colorImageEdge, 'MAX_UPLOAD_BYTES = 700 * 1024', 'color image max upload size');

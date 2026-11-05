@@ -30,8 +30,11 @@ jobs:
 
       - name: Mobile idle and color-switch regression
         run: |
-          npm install --no-save --package-lock=false jsdom@26.1.0
+          npm install --no-save --package-lock=false jsdom@26.1.0 aws4fetch@1.0.20 typescript@5.9.3
           node scripts/mobile-idle-regression.mjs
+
+      - name: R2 image storage regression
+        run: node scripts/r2-storage-regression.mjs
 
       - name: Storefront V3 DOM regression
         run: node scripts/storefront-v3-dom-regression.mjs

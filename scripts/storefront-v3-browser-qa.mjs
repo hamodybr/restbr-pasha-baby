@@ -10,6 +10,20 @@ const NETWORK_TIMEOUT = Number(process.env.PASHA_QA_NETWORK_TIMEOUT_MS || 15000)
 const HOST = '127.0.0.1';
 const BASE = `http://${HOST}:${PORT}`;
 
+async function isolateImageDownloads(context) {
+  // Layout/interaction CI must not spend the shop's image-delivery quota.
+  // URL request assertions still observe the original requested URLs.
+  if (process.env.PASHA_QA_LIVE_IMAGES === '1') return;
+  const fixture = fs.readFileSync(path.join(ROOT, 'assets/pasha-baby-logo-256.webp'));
+  await context.route('**/*', route => {
+    const req = route.request();
+    if (req.resourceType() === 'image' && !req.url().startsWith(BASE + '/')) {
+      return route.fulfill({ contentType: 'image/webp', body: fixture, headers: { 'Access-Control-Allow-Origin': '*' } });
+    }
+    return route.fallback();
+  });
+}
+
 const mime = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -373,6 +387,7 @@ async function runViewport(browser, spec) {
     } catch (_) {}
   });
 
+  await isolateImageDownloads(context);
   const page = await context.newPage();
   const consoleErrors = [];
   page.on('pageerror', error => consoleErrors.push(String(error?.message || error)));
@@ -597,6 +612,7 @@ async function runProductionLoad(browser, spec) {
       }).observe({ type: 'layout-shift', buffered: true });
     } catch (_) {}
   });
+  await isolateImageDownloads(context);
   const page = await context.newPage();
   const originalsRequested = [];
   const errors = [];
