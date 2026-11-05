@@ -99,7 +99,7 @@ requireText('js/app.js', 'loading="lazy"', 'lazy product images');
 requireText('js/app.js', 'decoding="async"', 'async product image decode');
 requireText('index.html', 'css/style.css?v=4.1', 'original storefront base CSS order');
 requireMatch('index.html', /(css\/pasha-baby-final-tweaks\.css\?v=1\.1|v3-visual-fixes\.css\?v=4\.26)/, 'original or V3 storefront override CSS order');
-requireMatch('index.html', /(js\/pasha-baby-storefront-bundle\.js\?v=1\.3|js\/pasha-baby-commerce\.js\?v=20261008\.1)/, 'storefront JavaScript bundle or V3 commerce runtime');
+requireMatch('index.html', /(js\/pasha-baby-storefront-bundle\.js\?v=1\.3|js\/pasha-baby-commerce\.js\?v=20261105\.1)/, 'storefront JavaScript bundle or V3 commerce runtime');
 requireText('index.html', 'id="pbBrand" class="pb-brand"', 'server-rendered brand layout');
 requireMatch('index.html', /id="(?:pbStoreHeroV2|pbV3Hero)" class="(?:pb-store-hero|pb-v3-hero)"/, 'server-rendered hero layout');
 requireMatch('index.html', /(__smIntroEarlyDismissTimer|id="smIntro" class="sm-intro pb-v3-intro" aria-hidden="true")/, 'data-independent intro dismissal');

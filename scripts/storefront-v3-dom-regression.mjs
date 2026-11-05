@@ -34,8 +34,8 @@ window.RESTBR_DB = {
     image: 'https://cdn.example.test/main.webp',
     badges: {},
     options: [
-      { id: 'o1', ar: 'صغير', price: 10000, originalPrice: 12000 },
-      { id: 'o2', ar: 'كبير', price: 15000, originalPrice: 15000 }
+      { id: 'o1', ar: 'صغير', image: 'https://cdn.example.test/green.webp', price: 10000, originalPrice: 12000 },
+      { id: 'o2', ar: 'كبير', image: 'https://cdn.example.test/large.webp', price: 15000, originalPrice: 15000 }
     ],
     colors: [
       { id: 'green', ar: 'أخضر', hex: '#5f7868', image: 'https://cdn.example.test/green.webp', isAvailable: true },
@@ -87,8 +87,8 @@ if (!sheet || sheet.hidden || !sheet.classList.contains('open')) {
   fail('Product details sheet did not open.');
 }
 
-if (document.querySelectorAll('.pb-v3-product-slide').length !== 3) {
-  fail('Gallery did not build main image + two color images.');
+if (document.querySelectorAll('.pb-v3-product-slide').length !== 4) {
+  fail('Gallery did not deduplicate shared option/color image or add the unique option image.');
 }
 
 const optionButtons = [...document.querySelectorAll('[data-v3-option-index]')];
@@ -101,6 +101,13 @@ const add = document.getElementById('pbV3ProductAdd');
 if (!add?.disabled) fail('Add button should require option and color selection.');
 
 optionButtons[1]?.click();
+if (!document.querySelector('[data-v3-slide-index="3"]')?.classList.contains('selected')) fail('Option selection did not show its linked image.');
+document.querySelector('[data-v3-option-index="0"]')?.click();
+if (!document.querySelector('[data-v3-slide-index="1"]')?.classList.contains('selected')) fail('Option/color shared URL did not select the existing slide.');
+delete window.RESTBR_DB.products[0].options[0].image;
+document.querySelector('[data-v3-option-index="0"]').click();
+if (!document.querySelector('[data-v3-slide-index="0"]')?.classList.contains('selected')) fail('Unlinked option did not restore main image.');
+document.querySelector('[data-v3-option-index="1"]').click();
 if (!add?.disabled) fail('Add button should still require a color.');
 
 colorButtons[0]?.click();
@@ -137,6 +144,12 @@ if (!cartAdd.image.includes('green.webp')) {
   fail('Selected color image was not handed to the cart.');
 }
 if (sheet?.classList.contains('open')) fail('Product details sheet did not close after add.');
+
+await new Promise(resolve => setTimeout(resolve, 210));
+const single = {...window.RESTBR_DB.products[0], id:'single-option', options:[{id:'only',ar:'180ML',price:8000,image:'https://cdn.example.test/size.webp'}], colors:[]};
+await window.PASHA_V3_OPEN_PRODUCT_DETAILS(single);
+const active = document.querySelector('#pbV3ProductThumbs .selected img');
+if (active?.dataset.v3ImageSrc !== 'https://cdn.example.test/size.webp') fail('Automatically selected single option did not display its image.');
 
 if (!process.exitCode) {
   console.log('Storefront V3 DOM regression passed.');

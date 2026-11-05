@@ -539,7 +539,7 @@ async function assertDetailStripNavigation(page) {
   await page.route('https://pasha-strip.test/**', route => route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="beige"/></svg>'}));
   await page.evaluate(async () => {
     const base = window.RESTBR_DB.products.find(p => p.options?.length);
-    const product = {...base,id:'strip-test',colors:Array.from({length:10},(_,i)=>({id:'test-color-'+i,ar:'لون '+i,hex:'#bda884',image:'https://pasha-strip.test/'+i+'.svg',isAvailable:true}))};
+    const product = {...base,id:'strip-test',options:[{id:'size-small',ar:'180ML',price:8000,image:'https://pasha-strip.test/small.svg'},{id:'size-large',ar:'240ML',price:10000,image:'https://pasha-strip.test/large.svg'}],colors:Array.from({length:10},(_,i)=>({id:'test-color-'+i,ar:'لون '+i,hex:'#bda884',image:'https://pasha-strip.test/'+i+'.svg',isAvailable:true}))};
     window.RESTBR_DB.products.push(product);
     await window.PASHA_V3_OPEN_PRODUCT_DETAILS(product);
   });
@@ -555,6 +555,12 @@ async function assertDetailStripNavigation(page) {
     assert(Math.abs(after-before)>5,id+' arrow did not scroll');
   }
   assert(await page.locator('#pbV3ProductPrev,#pbV3ProductNext').count() === 0, 'Large photo still has overlay navigation arrows');
+  await page.locator('[data-v3-option-index="1"]').click();
+  assert(await page.locator('#pbV3ProductThumbs .selected img').getAttribute('data-v3-image-src') === 'https://pasha-strip.test/large.svg', 'Large size did not select its photo');
+  await page.locator('[data-v3-option-index="0"]').click();
+  assert(await page.locator('#pbV3ProductThumbs .selected img').getAttribute('data-v3-image-src') === 'https://pasha-strip.test/small.svg', 'Small size did not select its photo');
+  await page.locator('[data-v3-color-id="test-color-0"]').click();
+  assert(await page.locator('[data-v3-option-index="0"]').evaluate(n=>n.classList.contains('selected')), 'Color selection changed the chosen size');
   await page.locator('#pbV3ProductClose').click();
   await page.evaluate(()=>{window.RESTBR_DB.products=window.RESTBR_DB.products.filter(p=>p.id!=='strip-test')});
 }

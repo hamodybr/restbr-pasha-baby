@@ -36,7 +36,7 @@ async function expectText(url, markers, label) {
 await expectText('/', [
   'css/pasha-baby-commerce.css?v=1.0',
   'v3-visual-fixes.css?v=4.26',
-  'js/pasha-baby-commerce.js?v=20261008.1',
+  'js/pasha-baby-commerce.js?v=20261105.1',
   'js/vendor/supabase-2.114.0.min.js'
 ], 'storefront Arabic-only fixed-discount commerce assets');
 

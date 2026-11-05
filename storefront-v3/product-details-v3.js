@@ -146,6 +146,10 @@
       if (!button) return;
       selectedOptionIndex = Number(button.dataset.v3OptionIndex);
       renderOptions();
+      const optionImage = safeMedia(selectedOption()?.image);
+      const imageIndex = optionImage ? slides.findIndex(slide => slide.url === optionImage) : -1;
+      // An unlinked option restores the main photo instead of showing another size.
+      setSlide(imageIndex >= 0 ? imageIndex : 0);
       renderPrice();
       syncAddState();
     });
@@ -159,7 +163,8 @@
         card.classList.toggle('selected', selected);
         card.setAttribute('aria-pressed', String(selected));
       });
-      const targetIndex = slides.findIndex(slide => String(slide.colorId || '') === selectedColorId);
+      const colorImage = safeMedia((currentProduct?.colors || []).find(color => String(color.id) === selectedColorId)?.image);
+      const targetIndex = colorImage ? slides.findIndex(slide => slide.url === colorImage) : -1;
       if (targetIndex >= 0) setSlide(targetIndex);
       syncAddState();
     });
@@ -195,6 +200,10 @@
 
     (Array.isArray(product?.colors) ? product.colors : []).forEach(color => {
       if (color?.image) push(color.image, color.id, txt(color));
+    });
+
+    (Array.isArray(product?.options) ? product.options : []).forEach(option => {
+      if (option?.image) push(option.image, '', txt(option));
     });
 
     if (!rows.length) push(PRODUCT_PLACEHOLDER, '', txt(product?.name));
@@ -369,7 +378,8 @@
     selectedColorId = availableColors.length === 1 ? String(availableColors[0].id) : '';
 
     slides = buildSlides(product);
-    slideIndex = 0;
+    const initialImage = safeMedia(selectedOption()?.image);
+    slideIndex = Math.max(0, initialImage ? slides.findIndex(slide => slide.url === initialImage) : 0);
     $('#pbV3ProductStage').classList.remove('pb36-zoomed');
     $('.pb-v3-product-scroll').scrollTop = 0;
 
