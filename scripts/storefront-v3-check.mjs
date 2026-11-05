@@ -109,7 +109,7 @@ if (!allCss.includes('--v3-sage') || !allCss.includes('--v3-beige')) {
 
 for (const token of [
   'id="pbV3Highlights"',
-  'storefront-v3/product-details-v3.js?v=20261104.1'
+  'storefront-v3/product-details-v3.js?v=20261105.1'
 ]) {
   if (!html.includes(token)) fail('V3 phase 2 feature missing: ' + token);
 }
