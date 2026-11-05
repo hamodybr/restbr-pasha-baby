@@ -83,7 +83,7 @@ for (const token of forbiddenLegacy) {
 
 for (const token of [
   'js/unavailable-card-state.js?v=20261008.1',
-  'js/app.js?v=20261008.1',
+  'js/app.js?v=20261105.2',
   'js/pasha-baby-commerce.js?v=20261008.1',
   'js/product-image-fallback.js?v=20261008.1',
   'js/price-safety.js?v=20261008.1',
