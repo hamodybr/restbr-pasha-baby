@@ -65,8 +65,6 @@
             <div class="pb-v3-product-gallery">
               <div id="pbV3ProductStage" class="pb-v3-product-stage" tabindex="0" aria-label="معرض صور المنتج">
                 <div id="pbV3ProductTrack" class="pb-v3-product-track"></div>
-                <button id="pbV3ProductPrev" class="pb-v3-product-arrow prev" type="button" aria-label="الصورة السابقة">‹</button>
-                <button id="pbV3ProductNext" class="pb-v3-product-arrow next" type="button" aria-label="الصورة التالية">›</button>
               </div>
               <div id="pbV3ProductThumbs" class="pb-v3-product-thumbs"></div>
               <div id="pbV3ProductCounter" class="pb-v3-product-counter"></div>
@@ -133,8 +131,6 @@
       } else if (image.getAttribute('src') !== PRODUCT_PLACEHOLDER) image.src = PRODUCT_PLACEHOLDER;
     }, true);
     $('#pbV3ProductBackdrop').addEventListener('click', close);
-    $('#pbV3ProductPrev').addEventListener('click', () => moveSlide(-1));
-    $('#pbV3ProductNext').addEventListener('click', () => moveSlide(1));
     $('#pbV3ProductAdd').addEventListener('click', addSelected);
     $('#pbV3QtyMinus').addEventListener('click', () => setQuantity(selectedQuantity - 1));
     $('#pbV3QtyPlus').addEventListener('click', () => setQuantity(selectedQuantity + 1));
@@ -245,8 +241,6 @@
     const counter = $('#pbV3ProductCounter');
     counter.textContent = slides.length > 1 ? `${slideIndex + 1} / ${slides.length}` : '';
 
-    $('#pbV3ProductPrev').hidden = slides.length < 2;
-    $('#pbV3ProductNext').hidden = slides.length < 2;
   }
 
   function moveSlide(delta) {

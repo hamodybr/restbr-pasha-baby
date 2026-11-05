@@ -554,7 +554,7 @@ async function assertDetailStripNavigation(page) {
     const after = await page.locator('#'+id).evaluate(n=>n.scrollLeft);
     assert(Math.abs(after-before)>5,id+' arrow did not scroll');
   }
-  assert(await page.locator('#pbV3ProductNext').isVisible(), 'Gallery next-image arrow is hidden');
+  assert(await page.locator('#pbV3ProductPrev,#pbV3ProductNext').count() === 0, 'Large photo still has overlay navigation arrows');
   await page.locator('#pbV3ProductClose').click();
   await page.evaluate(()=>{window.RESTBR_DB.products=window.RESTBR_DB.products.filter(p=>p.id!=='strip-test')});
 }
